@@ -1,6 +1,3 @@
-; URL: http://cryptb.in/aAw#8ad916bfe03957f480d49c98b394b3f0
-; Delete: http://cryptb.in/delete/eMBJ3KygQ8KxgFfBgzlsGK6jmo0ZzBvN
-; Delete IMG: https://imgur.com/a/DVtynCT
 ; ======================================================================================================
 ;  '||   ||` '||`   ||                                 /.\      '||`
 ;   ||   ||   ||    ||     ''                         // \\      ||   ''
@@ -18,9 +15,9 @@
 ;      ~~`~~`~           ~`~~~`~   `~`~`"_/O\""\
 ;    ~`~~`~~`~~~        ~~~`~~~`~   ~|`~_ |[|##|
 ;     `~~`~~~`~          ~~~|~~~`      '_--...__
-;      ~`~|~\_~\_   __/¯¯)  |     _- _-  _       _
+;      ~`~|~\_~\_   __/Â¯Â¯)  |     _- _-  _       _
 ;         |   |/     .'( )  |              _- _-  _
-;         |  / -\   __`/\ \ |_- _- ¯_  -
+;         |  / -\   __`/\ \ |_- _- Â¯_  -
 ;      _____/ /--'(^,__ /\ \     //\       _
 ;    /'  GM   \      | |  \ \    ||\\_- _-  _
 ;     \....( /       ;;;___;;;  /||~~`~~
@@ -35,7 +32,7 @@
 ; Version: 1.5
 ; Client Tested with: 2.0.3
 ; EUO version tested with: EasyUO 1.5 Version 243
-; Shard: Ultima Alianza ¡Hasta la muerte!
+; Shard: Ultima Alianza Â¡Hasta la muerte!
 ; Revision Date: 181218
 ; Public Release: 11/21/2005 - 18/12/2018
 ; Purpose: Macro de domar semi asistida.
@@ -45,7 +42,7 @@ set %version v1.5
 ;________________________________
 ;
 ; ///////////////////////////////
-; ******** CONFIGURACIÓN ********
+; ******** CONFIGURACIÃ“N ********
 ; ///////////////////////////////
 ;________________________________
 ;
@@ -59,7 +56,7 @@ set %tiempo_alimentacion 360 ; Cada cuantos segundos comprobar el hambre del pj,
 ;________________________________________________
 ;
 ; //////////////////////////////////////////////
-; ************* FIN CONFIGURACIÓN *************
+; ************* FIN CONFIGURACIÃ“N *************
 ; //////////////////////////////////////////////
 ;________________________________________________
 ;
@@ -208,7 +205,7 @@ WaitArrive:
         set %objetivo_posy #FINDY
         set %objetivo_posz #FINDZ
         gosub pathFind %objetivo_posx %objetivo_posy %objetivo_posz 1 5 ; Tolerancia a 1 casilla del objetivo, timeout 3 segundos.
-        gosub wait_for MSG GET_THERE TE_ESTA_ATACANDO TE_GOLPEA 1 ; 3 ; Esperamos tres segundos al pathfind a ver qué pasa...
+        gosub wait_for MSG GET_THERE TE_ESTA_ATACANDO TE_GOLPEA 1 ; 3 ; Esperamos tres segundos al pathfind a ver quÃ© pasa...
         if ( #TRUE in #result )
              {
                if ( GET_THERE in #result ) ; Hay algo que nos bloquea el camino... una verja, pared, etc.
@@ -222,7 +219,7 @@ WaitArrive:
                       if ( %modo_establo ) && ( ! %modo_ciudad )
                            {
                              finditem %puertas_establo_cerradas G_25
-                             if #FINDCNT > 0 ; ¿Parece que hemos encontrado un establo?
+                             if #FINDCNT > 0 ; Â¿Parece que hemos encontrado un establo?
                                 {
                                   set %puerta_establo #FINDID
                                   set %puerta_x #FINDX
@@ -236,12 +233,12 @@ WaitArrive:
                                        }
                                   if ( %aviso_establos )
                                        {
-                                         display yesno ******************** ¡AVISO ESTABLO! ********************$
-                                                     + ¿Quieres entrar al establo de animales? Si decides entrar$
+                                         display yesno ******************** Â¡AVISO ESTABLO! ********************$
+                                                     + Â¿Quieres entrar al establo de animales? Si decides entrar$
                                                      + nos quedaremos dentro domando nuevas spawn's de$
-                                                     + animales en función de si vemos o no, otros nuevos en$
+                                                     + animales en funciÃ³n de si vemos o no, otros nuevos en$
                                                      + el exterior del establo.$$
-                                                     + ¡OJO! ¡Puede que nos salgamos de nuevo por la puerta!
+                                                     + Â¡OJO! Â¡Puede que nos salgamos de nuevo por la puerta!
                                                      + ***********************************************************$
                                        }
                                   if ( #dispres = yes || %aceptamos_establo )
@@ -360,7 +357,7 @@ WaitArrive:
                     }
              }
         finditem %objetivo
-        if #FINDDIST > 2 ; Si tenemos que andar, ponemos un límite...
+        if #FINDDIST > 2 ; Si tenemos que andar, ponemos un lÃ­mite...
            {
              set %objetivo_posx #FINDX
              set %objetivo_posy #FINDY
@@ -381,7 +378,7 @@ WaitArrive:
            }
         if ( %circulo_transparencia )
              {
-               event macro 29 0	; OK, hemos llegado, activamos el círculo de transparencia...
+               event macro 29 0	; OK, hemos llegado, activamos el cÃ­rculo de transparencia...
              }
         set %pathfinds 0
         set %oldfollowers #followers
@@ -430,7 +427,7 @@ follow:
                   {
                     goto busca
                   }
-             if ( NO_PUEDES_VER in #result || GET_THERE in #result || SEE_THE_TARGET in #result ) ; En esta fase, lo que molesta suelen ser árboles, o animales en medio, o que te apartes corriendo mientras estabas domando....
+             if ( NO_PUEDES_VER in #result || GET_THERE in #result || SEE_THE_TARGET in #result ) ; En esta fase, lo que molesta suelen ser Ã¡rboles, o animales en medio, o que te apartes corriendo mientras estabas domando....
                   {
                     gosub ResetJournal
                     set %intentos_seguir %intentos_seguir + 1
@@ -500,14 +497,14 @@ follow:
                          goto tame ; Estamos lo suficientemente cerca del animal...
                        }
              }
-             else ; Ya no vemos al animal que estábamos domando...
+             else ; Ya no vemos al animal que estÃ¡bamos domando...
                 {
                   event exmsg #charid 3 88 LOL ???
                   wait 20
                   return
                 }
 tamed:
-        if ( %ya_tameado ) ; Por si a caso el animal es nuestro, lo intentamos 1 vez más
+        if ( %ya_tameado ) ; Por si a caso el animal es nuestro, lo intentamos 1 vez mÃ¡s
              {
                set %intentos_domar %intentos_domar + 1
                if %intentos_domar = 1
@@ -520,7 +517,7 @@ tamed:
                     event macro 3 0 All release
                     wait 10
                     set %ya_tameado #FALSE
-                    goto tame ; Lo intentamos una última vez...
+                    goto tame ; Lo intentamos una Ãºltima vez...
                   }
                if ( %intentos_domar > 1 ) && ( %kill_ya_domadas ) ; Si sigue estando domado, entonces no es nuestro...
                     {
@@ -528,7 +525,7 @@ tamed:
                            {
                              event exmsg #charid 3 88 Uhmm... ???
                              wait 40
-                             event exmsg #charid 3 73 ¡MUERTEEEEE! >:-)
+                             event exmsg #charid 3 73 Â¡MUERTEEEEE! >:-)
                              wait 40
                            }
                       set %ya_tameado #FALSE
@@ -536,7 +533,7 @@ tamed:
                       gosub kill
                       goto search
                     }
-                    else ; Si ya está tameada y no estamos en modo killer...
+                    else ; Si ya estÃ¡ tameada y no estamos en modo killer...
                        {
                          if ( %mensajes )
                               {
@@ -555,7 +552,7 @@ tamed:
         gosub ignora
         if ( %circulo_transparencia )
              {
-               event macro 29 0	; Listo, desactivamos el círculo de transparencia...
+               event macro 29 0	; Listo, desactivamos el cÃ­rculo de transparencia...
              }
 return
 
@@ -571,7 +568,7 @@ if ( #FINDCNT > 0 )
        if ( #FINDCNT < 1 ) ; Si no tenemos el arma puesta
             {
               finditem %arma_elegida C_ , #BACKPACKID
-              if ( #FINDCNT > 0 ) ; La equipamos si es que está en la mochila
+              if ( #FINDCNT > 0 ) ; La equipamos si es que estÃ¡ en la mochila
                    {
                      set #LOBJECTID %arma_elegida
                      event macro 17 0
@@ -615,7 +612,7 @@ if ( #FINDCNT > 0 )
             gosub limpiar_cadaveres
             if ( %circulo_transparencia )
                  {
-                   event macro 29 0	; Listo, desactivamos el círculo de transparencia...
+                   event macro 29 0	; Listo, desactivamos el cÃ­rculo de transparencia...
                  }
      }
 return
@@ -656,10 +653,10 @@ if ( #true in #result )
        if ( %comienzo )
             {
               display yesno ***************** MODO CIUDAD ***************$
-                    + ¡ATENCIÓN! ¡Iniciando la macro en una ciudad!$
-                    + Ten en cuenta que es autómata, se acercará a$
+                    + Â¡ATENCIÃ“N! Â¡Iniciando la macro en una ciudad!$
+                    + Ten en cuenta que es autÃ³mata, se acercarÃ¡ a$
                     + lo que vea, y puede ser que llegue a salirse!$
-                    + ¿Realmente es lo que quieres hacer? ^^
+                    + Â¿Realmente es lo que quieres hacer? ^^
                     + **************************************************$
               if #dispres = yes
                  {
@@ -673,10 +670,10 @@ if ( #true in #result )
                    set %modo_ciudad #TRUE
                    set %modo_establo #FALSE
                    display yesno ********** ABRIR PUERTAS **********$
-                    + ¿Quieres probar a entrar en las casas a domar?$
-                    + Si eliges que sí, ¡intentará abrir las puertas$
+                    + Â¿Quieres probar a entrar en las casas a domar?$
+                    + Si eliges que sÃ­, Â¡intentarÃ¡ abrir las puertas$
                     + que vea hasta encontrar un camino al animal!$
-                    + ¿Estas seguro de ello? (Opción Experimental) ^^
+                    + Â¿Estas seguro de ello? (OpciÃ³n Experimental) ^^
                     + **************************************************$
                     if #dispres = yes
                        {
@@ -732,9 +729,9 @@ if ( #FINDCNT > 0 )
                     if ( %comienzo )
                          {
                            display ********* PROBLEMA CON LAS ARMAS *********$
-                                 + ¡ATENCIÓN! ¡Necesito un arma de filo decente!$
-                                 + o si no, ¡No podré ejecutar a los animales que$
-                                 + ya estén domados pero olvidados por el mapa!$
+                                 + Â¡ATENCIÃ“N! Â¡Necesito un arma de filo decente!$
+                                 + o si no, Â¡No podrÃ© ejecutar a los animales que$
+                                 + ya estÃ©n domados pero olvidados por el mapa!$
                                  + *********************** :-( ***********************$
                            if ( %mensajes )
                                 {
@@ -753,7 +750,7 @@ set %arma_elegida #FINDID
 event property %arma_elegida
 set %descripcion_arma #property
 gosub split %descripcion_arma $ PROPIEDADES_ARMA
-if ( Durabilidad in %PROPIEDADES_ARMA8 ) || Durabilidad in %PROPIEDADES_ARMA9 || Durabilidad in %PROPIEDADES_ARMA10 || Durabilidad in %PROPIEDADES_ARMA11 ) ; Nos quedamos con el primer arma válida que veamos...
+if ( Durabilidad in %PROPIEDADES_ARMA8 ) || Durabilidad in %PROPIEDADES_ARMA9 || Durabilidad in %PROPIEDADES_ARMA10 || Durabilidad in %PROPIEDADES_ARMA11 ) ; Nos quedamos con el primer arma vÃ¡lida que veamos...
      {
        if ( %mensajes )
                {
@@ -782,7 +779,7 @@ if ( Durabilidad in %PROPIEDADES_ARMA8 ) || Durabilidad in %PROPIEDADES_ARMA9 ||
                     }
                }
           finditem %arma_elegida C_ , #CHARID
-          if ( #FINDCNT = 0 ) ; Si la elegida no está ya puesta, nos la equipamos...
+          if ( #FINDCNT = 0 ) ; Si la elegida no estÃ¡ ya puesta, nos la equipamos...
                {
                  set #LOBJECTID %arma_elegida
                  event macro 17 0
@@ -796,7 +793,7 @@ if ( Durabilidad in %PROPIEDADES_ARMA8 ) || Durabilidad in %PROPIEDADES_ARMA9 ||
                  wait 40
                }
      }
-     else ; No parece un arma de filo estándard, tipo Kryss
+     else ; No parece un arma de filo estÃ¡ndard, tipo Kryss
         {
           if ( %mensajes )
                {
@@ -858,14 +855,14 @@ return
 sub comprobar_comida
 {
   hambriento:
-  set %jrnl #jindex ; Marcamos un índice de las líneas del diario.
+  set %jrnl #jindex ; Marcamos un Ã­ndice de las lÃ­neas del diario.
   msg .hungry $
   wait 20
   while #true
      {
-       if #jindex > %jrnl ; Si aparece una nueva línea.
+       if #jindex > %jrnl ; Si aparece una nueva lÃ­nea.
           {
-            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de línea.
+            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de lÃ­nea.
              scanjournal %jrnl   ; La leemos...
             if Estas_no_le_afecta_el_hambre in #journal || Estas_tan_lleno_que_no_puedes in #journal || Estas_totalmente_saciado in #journal
                {
@@ -900,7 +897,7 @@ sub comprobar_comida
                                  set %proxima_vez %tiempo_actual + %tiempo_alimentacion
                                }
                        }
-                       else ; Mensaje extraño, repetimos...
+                       else ; Mensaje extraÃ±o, repetimos...
                           {
                             goto hambriento
                           }
@@ -913,7 +910,7 @@ return
 
 ;-@ ============================== @-;
 ;-@ ############################## @-;
-;-@ SUBS públicos del Foro EasyUO  @-;
+;-@ SUBS pÃºblicos del Foro EasyUO  @-;
 ;-@ ############################## @-;
 ;-@ ============================== @-;
 
@@ -1211,7 +1208,7 @@ goto _lets_wait_for_a_message
 ;=================================================================
 sub wait_for_GUMP ; version 1.4 ~Locke
 ;=================================================================
-; Añadido #CONTID para "sub abrir_cofre"
+; AÃ±adido #CONTID para "sub abrir_cofre"
 if !_A0 < 3
 {
 display ok You haven't specified enough vars.$
@@ -1352,7 +1349,7 @@ sub waitForItem
 {
    namespace push
    namespace local wfi
-   set %time #SCNT2 + %3 ; Décimas de segundo
+   set %time #SCNT2 + %3 ; DÃ©cimas de segundo
    dropwait:
    finditem %1 C_ , %2
    if ( #FINDKIND = -1 ) ; 404 Not Found ^^
