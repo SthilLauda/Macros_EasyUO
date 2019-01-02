@@ -1,0 +1,1409 @@
+; ======================================================================================================
+;  '||   ||` '||`   ||                                 /.\      '||`
+;   ||   ||   ||    ||     ''                         // \\      ||   ''
+;   ||   ||   ||  ''||''   ||  '||),,(|,   '''|.     //...\\     ||   ||   '''|.  `||''|,  '''/  '''|.
+;   ||   ||   ||    ||     ||   || || ||  .|''||    //     \\    ||   ||  .|''||   ||  ||   //  .|''||
+;   `|...|'  .||.   `|..' .||. .||    ||. `|..||. .//       \\. .||. .||. `|..||. .||  ||. /... `|..||.
+; ======================================================================================================
+;
+; Script Name:  SimpleTamer [ UA / Heaven ]
+;
+;                           ;
+;         ;               ~~`~~      ;
+;        ~`~             ~~`~~`~    `~`
+;       ~~`~~           `~~~`~~~~  `~`~`   ,
+;      ~~`~~`~           ~`~~~`~   `~`~`"_/O\""\
+;    ~`~~`~~`~~~        ~~~`~~~`~   ~|`~_ |[|##|
+;     `~~`~~~`~          ~~~|~~~`      '_--...__
+;      ~`~|~\_~\_   __/¯¯)  |     _- _-  _       _
+;         |   |/     .'( )  |              _- _-  _
+;         |  / -\   __`/\ \ |_- _- ¯_  -
+;      _____/ /--'(^,__ /\ \     //\       _
+;    /'  GM   \      | |  \ \    ||\\_- _-  _
+;     \....( /       ;;;___;;;  /||~~`~~
+;      ||   \\          | |   _/ ||~~~`~~~ -
+;      \\    \\         |=|  /_( ||~~`~~~`      _
+;       \\_   \\_    , (__|    _  ~~~~`~~~_- _-  _
+;   _- _-  _   -   <`_\ __; _-  _  ~~~`~~
+;    _   -    _   -  (_ __)     _    ~~;~~     -_
+;       _- _-  _    < / < \  _-  _    -     _-   _
+;
+; Author: Sthil Lauda
+; Version: 1.6
+; Client Tested with: 2.0.3
+; EUO version tested with: EasyUO 1.5 Version 243
+; Shard: Ultima Alianza ¡Hasta la muerte!
+; Revision Date: 181218
+; Public Release: 11/21/2005 - 18/12/2018
+; Purpose: Macro de domar semi asistida.
+; Instrucciones: Llevar al PJ andando por el mapa en busca de animales.
+;
+set %version v1.6
+;________________________________
+;
+; ///////////////////////////////
+; ******** CONFIGURACIÓN ********
+; ///////////////////////////////
+;________________________________
+;
+set %repetir_animales #FALSE      ; [ #TRUE (ON) / #FALSE (OFF) ]
+set %sonido #TRUE                 ; [ #TRUE (ON) / #FALSE (OFF) ]
+set %mensajes #TRUE               ; [ #TRUE (ON) / #FALSE (OFF) ]
+set %modo_establo #TRUE           ; [ #TRUE (ON) / #FALSE (OFF) ]
+set %kill_ya_domadas #TRUE        ; [ #TRUE (ON) / #FALSE (OFF) ]
+set %circulo_transparencia #TRUE  ; [ #TRUE (ON) / #FALSE (OFF) ]
+set %evitar_expulsion #TRUE       ; [ #TRUE (ON) / #FALSE (OFF) ]
+set %tiempo_alimentacion 360 ; Cada cuantos segundos comprobar el hambre del pj, y comer si es necesario.
+;________________________________________________
+;
+; //////////////////////////////////////////////
+; ************* FIN CONFIGURACIÓN *************
+; //////////////////////////////////////////////
+;________________________________________________
+;
+set %animales_ciudad IG_AH_WC_AG_TC_WC_HG_WG_NF_PF_WN_SG_TF_OF_EG_YF_CO_RF
+set %animales_campo IG_AH_WC_AG_TC_WC_HG_WG_NF_PF_WN_SG_TF_OF_EG_YF_CO_BG_TG_WF_RF
+set %comida RGG_NRD_QSD_ZBG_WLI_QRD_END_FUD_YLI_WLI_HGI
+ +_KGI_EGI_QLI_KLI_MLI_KRD_HQD_AQD_MQE_VQE_TQE_JQE_IQE
+ +_GQE_SPE_ZPE_OQE_BDF_KPE_RQE_YSD_SQD_YWI_AXI_PQD_QQD
+set %armas FMH_GFF_EPH_LPH_BPH_CUO_TSF_LPO_JPH_ZTH_RMH_SOH_TLH_
+ +FUO_WSF_ATF_OMH_XPO_NMH_BNF_LTF_VPO_WTH_VRH_KTF_
+ +OLH_FFF_ZSF_YTH_BUO_ASF_ISF_BSF_QPF_KPH_CUH_NPO_MPH_UOH_TRH_XRH_CSF_
+ +KPO_POH_RRH_WPO_EMH_MSF_OPO_BUH_GUO_VTH_BFF_QMH_YSF_NSF_LSF_
+ +GMH_JTF_SRH_CNF_FBG_HNF_ZPF_GBG_OSF_INF_HSF_AUO_ZTO_FSF_WRH_MTF_JPO_
+ +RPF_HFF_XSF_YPO_DMH_XTH_QOH_URH_CQF_CFF_PMH_AUH_SPO_CPH_AQF_
+ +MPO_YRH_JOH_KSF_ZRF_PPF_SMH_NPO_GUO_XHF_NPF
+set %puertas_establo_cerradas KCD_CDD_SCD_UCD
+set %puertas_establo_abiertas JCD_BDD_RCD
+set %puertas_ciudad_cerradas JQC_ZPC_BQC_HQC_HNC_FNC_XMC_ZMC_VFD_XFD_JOC_XNC
+set %puertas_ciudad_abiertas UQC_CQC_MQC_SNC_INC_ANC_KNC_YFD_SFD_EOC_IOC
+set %tiempo_actual #SCNT
+set %proxima_vez #SCNT
+set %comienzo #TRUE
+set %alarma_animales #TRUE
+set %ya_tameado #FALSE
+set %aviso_establos #TRUE
+set %aceptamos_establo #FALSE
+set %modo_ciudad #FALSE
+set %abrir_puertas #FALSE
+set %intentos_domar 0
+set %intentos_seguir 0
+set %intentos_puerta 0
+set %pathfinds 0
+
+;===end of config section.
+ignoreitem reset
+
+set #SYSMSGCOL 88
+event sysmessage ====================
+event sysmessage SimpleTamer %version
+event sysmessage ====================
+wait 3s
+
+gosub selec_tipos_animales
+
+if ( %kill_ya_domadas )
+     {
+       gosub comprobar_armamento
+     }
+
+gosub time #time
+     
+set #SYSMSGCOL 88
+event sysmessage ===================
+event sysmessage START: %temp
+event sysmessage ===================
+wait 3s
+
+search:
+        set %jstart #jindex
+        set %tiempo_actual #SCNT
+        if %proxima_vez <= %tiempo_actual
+           {
+             gosub comprobar_comida
+           }
+        finditem %animales
+        if #FINDKIND = -1
+           {
+             if ( %alarma_animales ) && ( %sonido || %mensajes )
+                  {
+                    if ( %sonido )
+                         {
+                           sound
+                         }
+                    if ( %mensajes )
+                         {
+                           if ( ! %comienzo )
+                                {
+                                  event exmsg #charid 3 88 NO VEO MAS ANIMALES :-(
+                                  wait 20
+                                  set %alarma_animales #false
+                                }
+                                else
+                                   {
+                                     event exmsg #charid 3 88 NO VEO ANIMALES... :-(
+                                     wait 20
+                                     set %comienzo #FALSE
+                                     set %alarma_animales #false
+                                   }
+                         }
+                  }
+             gosub wait_for MSG TE_ESTA_ATACANDO TE_GOLPEA 5
+             if ( #true in #result )
+                  {
+                    gosub nos_atacan
+                  }
+             goto search
+           }
+        if ( #FINDCNT > 0 ) && ( #FINDREP = 3 ) ; Tipo 3	Grey (Grey - Animal) http://wiki.easyuo.com/index.php?title=FindRep
+             {
+               if ( %repetir_animales ) ; Volvemos a resetear los ID's.
+                    {
+                      ignoreitem reset
+                    }
+               for #FINDINDEX 1 #FINDCNT
+                   {
+                     if #FINDREP = 3
+                        {
+                          set %alarma_animales #true
+                          set %comienzo #false
+                          set %objetivo #FINDID
+                          event property %objetivo
+                          set %descripcion_objetivo #property
+                          gosub split %descripcion_objetivo $ PROPIEDADES_ANIMAL
+                          finditem %objetivo
+                          if ( #FINDDIST = N/A )
+                               {
+                                 gosub ignora
+                                 continue
+                               }
+                          if ( %mensajes )
+                               {
+                                 set #SYSMSGCOL 73
+                                 event sysmessage YIHAA! VEO UN %PROPIEDADES_ANIMAL1 !
+                                 wait 20
+                               }
+                          if ( %sonido )
+                               {
+                                 sound c:\windows\media\notify.wav  ; Cambiar al gusto por otro...
+                               }
+                          gosub procesar_animal
+                        }
+                   }
+             }
+             else ; Este es el caso de un Caballo ya domado que es azul (pitu), y tiene un #FINDREP distinto al de un animal salvaje, pero comparte el mismo ID.
+                {
+                  set %objetivo #FINDID
+                  gosub ignora
+                }
+goto search
+            
+sub procesar_animal
+WaitArrive:
+        set %jstart #jindex
+        finditem %objetivo
+        set %objetivo_posx #FINDX
+        set %objetivo_posy #FINDY
+        set %objetivo_posz #FINDZ
+        gosub pathFind %objetivo_posx %objetivo_posy %objetivo_posz 1 5 ; Tolerancia a 1 casilla del objetivo, timeout 3 segundos.
+        gosub wait_for MSG GET_THERE TE_ESTA_ATACANDO TE_GOLPEA 1 ; 3 ; Esperamos tres segundos al pathfind a ver qué pasa...
+        if ( #TRUE in #result )
+             {
+               if ( GET_THERE in #result ) ; Hay algo que nos bloquea el camino... una verja, pared, etc.
+                    {
+                      if ( %mensajes )
+                           {
+                             set #SYSMSGCOL 43
+                             event sysmessage UPSSS... :-(
+                             wait 20
+                           }
+                      if ( %modo_establo ) && ( ! %modo_ciudad )
+                           {
+                             finditem %puertas_establo_cerradas G_25
+                             if #FINDCNT > 0 ; ¿Parece que hemos encontrado un establo?
+                                {
+                                  set %puerta_establo #FINDID
+                                  set %puerta_x #FINDX
+                                  set %puerta_y #FINDY
+                                  if ( %mensajes )
+                                       {
+                                         event exmsg #charid 3 88 OOHHHH!! :-)
+                                         wait 40
+                                         event exmsg #charid 3 88 DETECTO UNA PUERTA...
+                                         wait 40
+                                       }
+                                  if ( %aviso_establos )
+                                       {
+                                         display yesno ******************** ¡AVISO ESTABLO! ********************$
+                                                     + ¿Quieres entrar al establo de animales? Si decides entrar$
+                                                     + nos quedaremos dentro domando nuevas spawn's de$
+                                                     + animales en función de si vemos o no, otros nuevos en$
+                                                     + el exterior del establo.$$
+                                                     + ¡OJO! ¡Puede que nos salgamos de nuevo por la puerta!
+                                                     + ***********************************************************$
+                                       }
+                                  if ( #dispres = yes || %aceptamos_establo )
+                                       {
+                                         set %aviso_establos #FALSE
+                                         set %modo_establo #TRUE
+                                         set %aceptamos_establo #TRUE
+                                         repeat
+                                              {
+                                                if ( %mensajes )
+                                                     {
+                                                       event exmsg #charid 3 88 BUSCANDO...
+                                                       wait 20
+                                                     }
+                                                gosub pathFind #FINDX #FINDY #FINDZ 1 3 ; Tolerancia 1
+                                                wait 3s
+                                                set %intentos_puerta %intentos_puerta + 1
+                                                if ( %intentos_puerta > 6 )
+                                                     {
+                                                       if ( %mensajes )
+                                                            {
+                                                              event exmsg #charid 3 88 NO LLEGO BIEN... :-(
+                                                              wait 40
+                                                            }
+                                                       set %intentos_puerta 0
+                                                     }
+                                                finditem %puerta_establo
+                                                until #FINDDIST = 1 || %intentos_puerta > 5
+                                                gosub abrir_puerta_establo
+                                                goto search
+                                              }
+                                       }
+                                       else
+                                          {
+                                            set %modo_establo #false
+                                            goto search
+                                          }
+                                }
+                                else ; Si no podemos llegar al establo...
+                                   {
+                                     gosub ignora
+                                     return ; Probamos con el siguiente animal...
+                                   }
+                           }
+                           else
+                              {
+                                if ( %modo_ciudad ) && ( ! %modo_establo ) && ( %abrir_puertas )
+                                     {
+                                       finditem %puertas_ciudad_cerradas
+                                       if #FINDCNT > 0
+                                          {
+                                            for #FINDINDEX 1 #FINDCNT ; Estable los datos de las puertas
+                                                {
+                                                  set %num_puertas #FINDCNT
+                                                  set %puerta_id , _ , #FINDINDEX #FINDID
+                                                  set %puerta_x , _ , #FINDINDEX #FINDX
+                                                  set %puerta_y , _ , #FINDINDEX #FINDY
+                                                  set %puerta_z , _ , #FINDINDEX #FINDZ
+                                                }
+                                            for %i 1 %num_puertas ; Para cada una de las puertas encontradas,
+                                                {
+                                                  repeat ; Hasta estar justo delante, o hasta que veamos que no se puede
+                                                       {
+                                                         set %ok_puerta #false
+                                                         msg : PROBANDO PUERTA %puerta_id_ . %i ... $
+                                                         wait 40
+                                                         gosub pathFind %puerta_x_ . %i %puerta_y_ . %i %puerta_z_ . %i 1 30 ; Tolerancia 1, Timeout 3 secs.
+                                                         if ( #true in %return ) ; Si hemos llegado a las coordenadas,
+                                                              {
+                                                                finditem %puerta_id_ . %i
+                                                                if #FINDCNT > 0
+                                                                   {
+                                                                     if #FINDDIST <= 1 ; Si tenemos la puerta lo suficientemente cerca
+                                                                        {
+                                                                          set %ok_puerta #true
+                                                                          gosub WalkThroughDoor %puerta_id_ . %i
+                                                                          gosub cerrar_puerta_edificio
+                                                                        }
+                                                                   }
+                                                                set %intentos_puerta 0
+                                                              }
+                                                              else ; No podemos llegar al destino,
+                                                                 {
+                                                                   set %intentos_puerta %intentos_puerta + 1
+                                                                   if ( %intentos_puerta >= 2 ) ; 2 intentos max
+                                                                        {
+                                                                          wait 20
+                                                                          event exmsg #charid 3 88 NO LLEGO BIEN... :-(
+                                                                          wait 40
+                                                                        }
+                                                                 }
+                                                       }
+                                                       until ( #FINDDIST <= 1 || %intentos_puerta >= 2 || %ok_puerta )
+                                                         if ( %ok_puerta )
+                                                              {
+                                                                goto WaitArrive
+                                                              }
+                                                }
+                                          }
+                                          else ; Si no podemos llegar al animal, y no vamos a entrar al establo...
+                                             {
+                                               gosub ignora
+                                               return ; Probamos con el siguiente animal...
+                                             }
+                                     }
+                              }
+                              else ; Si no podemos llegar al animal, y no vamos a entrar al establo, ni a un edificio...
+                                 {
+                                   gosub ignora
+                                   return ; Probamos con el siguiente animal...
+                                 }
+                    }
+               if ( TE_ESTA_ATACANDO in #result || TE_GOLPEA in #result )
+                    {
+                      gosub nos_atacan
+                    }
+             }
+        finditem %objetivo
+        if #FINDDIST > 2 ; Si tenemos que andar, ponemos un límite...
+           {
+             set %objetivo_posx #FINDX
+             set %objetivo_posy #FINDY
+             set %objetivo_posz #FINDZ
+             set %pathfinds %pathfinds + 1
+             if ( %pathfinds >= 6 ) ; Demasiados intentos...
+                  {
+                    if ( %mensajes )
+                         {
+                           event exmsg #charid 3 43 NO SE LLEGAR :-(
+                           wait 20
+                         }
+                    set %pathfinds 0
+                    gosub ignora
+                    return ; Nos vamos a por el siguiente animal...
+                  }
+             goto WaitArrive ; Seguimos intentando llegar al animal...
+           }
+        if ( %circulo_transparencia )
+             {
+               event macro 29 0	; OK, hemos llegado, activamos el círculo de transparencia...
+             }
+        set %pathfinds 0
+        set %oldfollowers #followers
+tame:
+        if #followers <> %oldfollowers
+           {
+             goto Tamed
+           }
+        set %jstart #jindex
+        event macro 13 35
+        set #ltargetkind 1
+        set #ltargetid %objetivo
+        target 3s
+        event macro 22
+        wait 20
+        set %tametimer #scnt + 15 ; Tiempo que le puede costar 1 intento de doma.
+        set %followtimer #scnt + 3
+        set %alarma_animales #true ; Estamos procesando la lista de animales...
+follow:
+        gosub wait_for MSG ESTAS_DEMASIADO_LEJOS TE_ESTA_ATACANDO TE_GOLPEA YA_ESTA TE_ACEPTA NO_PUEDES_VER NO_PUEDES_DOMAR_ESO NO_CONSIGUES TU_HABILIDAD GET_THERE NO_PUEDE_SER SEE_THE_TARGET 10
+        if #true in #result
+           {
+             if ( YA_ESTA in #result || TE_ACEPTA in #result )
+                  {
+                    if ( %mensajes )
+                         {
+                           if ( TE_ACEPTA in #result )
+                                {
+                                  if ( %mensajes )
+                                       {
+                                         set #sysmsgcol 16
+                                         event sysmessage YUHUUU! :-)
+                                         wait 20
+                                       }
+                                  set %ya_tameado #FALSE
+                                  set %intentos_domar 0
+                                  if ( %evitar_expulsion )
+                                       {
+                                         gosub evitarExpulsion
+                                       }
+                                }
+                           if ( YA_ESTA in #result )
+                                {
+                                  set %ya_tameado #TRUE
+                                }
+                         }
+                    goto tamed
+                  }
+             if ( NO_CONSIGUES in #result )
+                  {
+                    goto busca
+                  }
+             if ( NO_PUEDES_VER in #result || GET_THERE in #result || SEE_THE_TARGET in #result ) ; En esta fase, lo que molesta suelen ser árboles, o animales en medio, o que te apartes corriendo mientras estabas domando....
+                  {
+                    gosub ResetJournal
+                    set %intentos_seguir %intentos_seguir + 1
+                    if ( %mensajes )
+                         {
+                           event exmsg #charid 3 88 Grrrrr...
+                           wait 20
+                         }
+                    if %intentos_seguir >= 6
+                       {
+                         set #sysmsgcol 43
+                         set %intentos_seguir 0
+                         if ( %mensajes )
+                              {
+                                event sysmessage IGNORANDO ANIMAL! :-(
+                                wait 20
+                              }
+                         gosub ignora
+                         return ; Nos vamos a por el siguiente animal...
+                       }
+                    goto busca
+                  }
+             if ( ESTAS_DEMASIADO_LEJOS in #result )
+                  {
+                    goto busca
+                  }
+             if ( TE_ESTA_ATACANDO in #result || TE_GOLPEA in #result )
+                  {
+                    gosub nos_atacan
+                  }
+             if ( TU_HABILIDAD in #result || NO_PUEDE_SER in #result || NO_PUEDES_DOMAR_ESO in #result )
+                  {
+                    if ( %mensajes )
+                         {
+                           event exmsg #charid 3 38 NO PUEDORR! :-(
+                           wait 20
+                         }
+                    gosub ignora
+                    return ; Nos vamos a por el siguiente animal...
+                  }
+           }
+        busca:
+        finditem %objetivo
+        if ( #FINDCNT > 0 )
+             {
+               if ( #scnt > %followtimer )
+                    {
+                      set %pj_posx #CHARPOSX
+                      set %pj_posy #CHARPOSY
+                      if ( #FINDDIST > 2 )
+                           {
+                             gosub pathFind #FINDX #FINDY #FINDZ 1 3 ; Tolerancia 1
+                             set %followtimer #scnt + 3
+                             wait 30
+                           }
+                    }
+               if ( #scnt < %tametimer )
+                    {
+                      goto follow
+                    }
+                    else
+                       {
+                         if ( %pj_posx <> #CHARPOSX ) || ( %pj_posy <> #CHARPOSY ) ; Nos hemos movido...
+                              {
+                                set %intentos_seguir 0 ; Seguimos intentando...
+                              }
+                         goto tame ; Estamos lo suficientemente cerca del animal...
+                       }
+             }
+             else ; Ya no vemos al animal que estábamos domando...
+                {
+                  event exmsg #charid 3 88 LOL ???
+                  wait 20
+                  return
+                }
+tamed:
+        if ( %ya_tameado ) ; Por si a caso el animal es nuestro, lo intentamos 1 vez más
+             {
+               set %intentos_domar %intentos_domar + 1
+               if %intentos_domar = 1
+                  {
+                    if ( %mensajes )
+                         {
+                           event exmsg #charid 3 88 Uhmm... ???
+                           wait 40
+                         }
+                    event macro 3 0 All release
+                    wait 10
+                    set %ya_tameado #FALSE
+                    goto tame ; Lo intentamos una última vez...
+                  }
+               if ( %intentos_domar > 1 ) && ( %kill_ya_domadas ) ; Si sigue estando domado, entonces no es nuestro...
+                    {
+                      if ( %mensajes )
+                           {
+                             event exmsg #charid 3 88 Uhmm... ???
+                             wait 40
+                             event exmsg #charid 3 73 ¡MUERTEEEEE! >:-)
+                             wait 40
+                           }
+                      set %ya_tameado #FALSE
+                      set %intentos_domar 0
+                      gosub kill
+                      goto search
+                    }
+                    else ; Si ya está tameada y no estamos en modo killer...
+                       {
+                         if ( %mensajes )
+                              {
+                                event exmsg #charid 3 88 TE LIBRAS... ^^
+                                wait 20
+                              }
+                         set %ya_tameado #FALSE
+                         set %intentos_domar 0
+                         gosub ignora
+                         goto search
+                       }
+             }
+        wait 20
+        event macro 3 0 All release
+        wait 20
+        gosub ignora
+        if ( %circulo_transparencia )
+             {
+               event macro 29 0	; Listo, desactivamos el círculo de transparencia...
+             }
+return
+
+sub ignora
+ignoreitem %objetivo
+return
+
+sub kill
+finditem %objetivo
+if ( #FINDCNT > 0 )
+     {
+       finditem %arma_elegida C_ , #CHARID
+       if ( #FINDCNT < 1 ) ; Si no tenemos el arma puesta
+            {
+              finditem %arma_elegida C_ , #BACKPACKID
+              if ( #FINDCNT > 0 ) ; La equipamos si es que está en la mochila
+                   {
+                     set #LOBJECTID %arma_elegida
+                     event macro 17 0
+                     gosub waitForItem %arma_elegida #CHARID 2 ; Turbo Mode ^^
+                   }
+                   else ; Mal asunto, no encontramos el arma... pedimos una...
+                      {
+                        gosub comprobar_armamento
+                      }
+            }
+       set #LTARGETID %objetivo
+       set #LOBJECTID %arma_elegida
+       if ( %mensajes )
+            {
+              event sysmessage SACRIFICANDO %PROPIEDADES_ANIMAL1 ...
+            }
+       repeat
+            {
+              finditem %objetivo ; Buscamos si sigue existiendo...
+              if #FINDCNT > 0
+                 {
+                   repeat
+                        {
+                          if #FINDDIST > 1 ; Si no estamos cerca...
+                             {
+                               gosub pathFind #FINDX #FINDY #FINDZ 1 2 ; Andamos hacia ella... Tolerancia 1
+                               wait 2s
+                             }
+                        }
+                        until #FINDDIST <= 1 ; Hasta estar cerca para pegarle
+                 }
+              event macro 27 0 ; Atacamos sin parar...
+              wait 3s
+            }
+            until #FINDCNT = 0 ; Hasta que desaparezca del mapa...
+            if ( %mensajes )
+                 {
+                   event sysmessage OCULTANDO EVIDENCIAS ...
+                   wait 40
+                 }
+            gosub limpiar_cadaveres
+            if ( %circulo_transparencia )
+                 {
+                   event macro 29 0	; Listo, desactivamos el círculo de transparencia...
+                 }
+     }
+return
+
+sub nos_atacan
+finditem * G_25
+for #FINDINDEX 1 #FINDCNT
+    {
+      if ( #FINDREP = 4 ) || ( #FINDREP = 5 ) || ( #FINDREP = 6 )
+           {
+             set %id_enemigo #FINDID
+             set %dist_ennemigo #FINDDIST
+           }
+    }
+
+repeat
+     {
+       finditem %id_enemigo G_25
+       if ( #FINDKIND <> -1 )
+            {
+              event exmsg #charid 3 23 PELIGRO!!! XDD
+              sound c:\windows\media\notify.wav
+              wait 60
+            }
+     }
+     until #FINDDIST > 25 || #FINDDIST = N/A
+event exmsg #charid 3 88 NO PROBLEM :-)
+wait 20
+return
+
+sub selec_tipos_animales
+gosub ResetJournal
+event macro 3 0 .where
+wait 40
+gosub FindJournalMessage ESTAS_EN_HAVEN ESTAS_EN_BRITAIN ESTAS_EN_COVE ESTAS_EN_MOONGLOW ESTAS_EN_MINOC ESTAS_EN_NUJEL'M ESTAS_EN_MAGINCIA ESTAS_EN_ISLA_SUR_DE_JHELOM ESTAS_EN_JHELOM ESTAS_EN_SKARA_BRAE ESTAS_EN_TRINSIC ESTAS_EN_ISLA_DE_SERPENT'S
+if ( #true in #result )
+     {
+       if ( %comienzo )
+            {
+              display yesno ***************** MODO CIUDAD ***************$
+                    + ¡ATENCIÓN! ¡Iniciando la macro en una ciudad!$
+                    + Ten en cuenta que es autómata, se acercará a$
+                    + lo que vea, y puede ser que llegue a salirse!$
+                    + ¿Realmente es lo que quieres hacer? ^^
+                    + **************************************************$
+              if #dispres = yes
+                 {
+                   if ( %mensajes )
+                        {
+                          set #sysmsgcol 18
+                          event sysmessage OK: MODO CIUDAD
+                          wait 20
+                        }
+                   set %animales %animales_ciudad
+                   set %modo_ciudad #TRUE
+                   set %modo_establo #FALSE
+                   display yesno ********** ABRIR PUERTAS **********$
+                    + ¿Quieres probar a entrar en las casas a domar?$
+                    + Si eliges que sí, ¡intentará abrir las puertas$
+                    + que vea hasta encontrar un camino al animal!$
+                    + ¿Estas seguro de ello? (Opción Experimental) ^^
+                    + **************************************************$
+                    if #dispres = yes
+                       {
+                         set %abrir_puertas #TRUE
+                       }
+                       else
+                          {
+                            set %abrir_puertas #FALSE
+                          }
+                       
+                 }
+                 else
+                    {
+                      set %abrir_puertas #FALSE
+                      goto domar_exteriores
+                    }
+            }
+     }
+     else ; Estamos en otro lugar...
+        {
+          domar_exteriores:
+          set %animales %animales_campo
+          if ( %comienzo )
+               {
+                 if ( %mensajes )
+                         {
+                           set #sysmsgcol 18
+                           event sysmessage OK: MODO EXTERIOR
+                           wait 20
+                         }
+               }
+        }
+return
+
+sub comprobar_armamento
+busca_arma:
+finditem %armas C_ , #CHARID
+if ( #FINDCNT > 0 )
+     {
+       gosub setup_arma
+       return
+     }
+     else ; Si no hay un arma equipada en el pj
+        {
+          finditem %armas C_ , #BACKPACKID
+          if ( #FINDCNT > 0 )
+               {
+                 gosub setup_arma
+                 return
+               }
+               else ; Si tampoco encontramos en la mochila...
+                  {
+                    if ( %comienzo )
+                         {
+                           display ********* PROBLEMA CON LAS ARMAS *********$
+                                 + ¡ATENCIÓN! ¡Necesito un arma de filo decente!$
+                                 + o si no, ¡No podré ejecutar a los animales que$
+                                 + ya estén domados pero olvidados por el mapa!$
+                                 + *********************** :-( ***********************$
+                           if ( %mensajes )
+                                {
+                                  set #sysmsgcol 43
+                                  event sysmessage AUTOKILL OFF :-(
+                                  wait 40
+                                }
+                         }
+                    set %kill_ya_domadas #FALSE
+                  }
+        }
+return
+
+sub setup_arma
+set %arma_elegida #FINDID
+event property %arma_elegida
+set %descripcion_arma #property
+gosub split %descripcion_arma $ PROPIEDADES_ARMA
+if ( Durabilidad in %PROPIEDADES_ARMA8 ) || Durabilidad in %PROPIEDADES_ARMA9 || Durabilidad in %PROPIEDADES_ARMA10 || Durabilidad in %PROPIEDADES_ARMA11 ) ; Nos quedamos con el primer arma válida que veamos...
+     {
+       if ( %mensajes )
+               {
+                 set #sysmsgcol 73
+                 event sysmessage OK, Arma: %PROPIEDADES_ARMA1
+                 wait 40
+                 if Durabilidad in %PROPIEDADES_ARMA8
+                    {
+                      event sysmessage %PROPIEDADES_ARMA8
+                      wait 40
+                    }
+                 if Durabilidad in %PROPIEDADES_ARMA9
+                    {
+                      event sysmessage %PROPIEDADES_ARMA9
+                      wait 40
+                    }
+                 if Durabilidad in %PROPIEDADES_ARMA11
+                    {
+                      event sysmessage %PROPIEDADES_ARMA11
+                      wait 40
+                    }
+                 if Durabilidad in %PROPIEDADES_ARMA10
+                    {
+                      event sysmessage %PROPIEDADES_ARMA10
+                      wait 40
+                    }
+               }
+          finditem %arma_elegida C_ , #CHARID
+          if ( #FINDCNT = 0 ) ; Si la elegida no está ya puesta, nos la equipamos...
+               {
+                 set #LOBJECTID %arma_elegida
+                 event macro 17 0
+                 gosub waitForItem %arma_elegida #CHARID 2 ; Turbo Mode ^^
+               }
+          if ( %mensajes )
+               {
+                 set #sysmsgcol 43
+                 wait 20
+                 event sysmessage AUTO-KILL ON >:-)
+                 wait 40
+               }
+     }
+     else ; No parece un arma de filo estándard, tipo Kryss
+        {
+          if ( %mensajes )
+               {
+                 set #sysmsgcol 28
+                 event sysmessage NO ME VALE UN %PROPIEDADES_ARMA1 ...
+                 wait 40
+               }
+          ignoreitem #FINDID
+          goto busca_arma ; Volvemos a revisar el pj y la mochila
+        }
+return
+
+sub evitarExpulsion
+chooseskill Anim real
+if ( #SKILL >= 649 ) && ( #skillLock <> locked )
+     {
+       Exevent skilllock Anim locked
+       if #skillLock <> locked
+          {
+            event macro 3 0 La habilidad de domar no se ha podido bloquear!
+            sound
+          }
+   event macro 3 0 Domar = 65.0, SKILL BLOQUEADA
+ }
+return
+
+sub limpiar_cadaveres
+_limpia:
+finditem YFM
+if #FINDCNT > 0
+   {
+     hideitem #FindID
+     goto _limpia
+   }
+return
+
+sub abrir_puerta_establo
+finditem %puertas_establo_cerradas G_25
+if #findcnt > 0
+   {
+     set %puerta #FINDID
+     set #lobjectid %puerta
+     event macro 17 0
+     wait 20
+   }
+return
+
+sub abrir_puerta_edificio
+finditem %puerta_id_ . %i G_25
+if #FINDCNT > 0
+   {
+     set #LOBJECTID %puerta_id_ . %i
+     event macro 17 0
+     wait 20
+   }
+return
+
+sub cerrar_puerta_edificio
+finditem %puerta_id_ . %i G_25
+if #FINDCNT > 0
+   {
+     set #LOBJECTID %puerta_id_ . %i
+     event macro 17 0
+     wait 20
+   }
+return
+        
+;=====================================================
+; Rutina para, en caso de hambre, comer hasta saciarse
+;=====================================================
+; v2.1
+sub comprobar_comida
+{
+  hambriento:
+  set %jrnl #jindex ; Marcamos un índice de las líneas del diario.
+  msg .hungry $
+  wait 20
+  while #true
+     {
+       if #jindex > %jrnl ; Si aparece una nueva línea.
+          {
+            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de línea.
+             scanjournal %jrnl   ; La leemos...
+            if Estas_no_le_afecta_el_hambre in #journal || Estas_tan_lleno_que_no_puedes in #journal || Estas_totalmente_saciado in #journal
+               {
+                 set %proxima_vez %tiempo_actual + %tiempo_alimentacion
+                 return
+               }
+               else
+                  {
+                    if Estas_lleno in #journal || Estas_contento in #journal || Estas_en_inanicion in #journal || Estas_hambriento in #journal || Sientes_mucho in #journal || Estas_con_hambre in #journal || Estas_parcialmente in #journal || Estas_bien_lleno in #journal || Te_sientes_casi_lleno in #journal
+                       {
+                         finditem %comida C_ , #backpackid
+                         if #findcnt > 0
+                            {
+                              if ( %mensajes )
+                                   {
+                                     event exmsg #charid 3 111 Comiendo...
+                                     wait 20
+                                   }
+                              set #lobjectid #findid
+                              event macro 17
+                              wait 20
+                              goto hambriento
+                            }
+                            else
+                               {
+                                 if ( %mensajes )
+                                      {
+                                        event exmsg #charid 3 48 COMPRA COMIDA!!
+                                        sound
+                                        wait 40
+                                      }
+                                 set %proxima_vez %tiempo_actual + %tiempo_alimentacion
+                               }
+                       }
+                       else ; Mensaje extraño, repetimos...
+                          {
+                            goto hambriento
+                          }
+                  }
+          }
+       return
+     } ; FIN While
+}
+return
+
+;-@ ============================== @-;
+;-@ ############################## @-;
+;-@ SUBS públicos del Foro EasyUO  @-;
+;-@ ############################## @-;
+;-@ ============================== @-;
+
+;==================================
+; Name: sub time
+; Author: Orngrimm
+; Version: 1.1
+; Client Tested with: UO 4.0.6a
+; EasyUO version tested with: EasyUO 1.42.009D
+; Revision Date: 23.11.04
+; Public Release: 20.12.03
+; Purpose: Formates the time correctly. Also 01:02:03 is formatted correct.
+; normally this time gives 1:2:3 without leading "0". My sub takes care of it!
+; Disclaimer:   Dont change this script and release it under own name.
+;            Let this header intact and dont distribute without it!
+;            DONT distribute without my permission!! (PM Orngrimm @ easyuo.com)
+; Copyright: Orngrimm
+;==================================
+
+; Thanks to Janus who found (and fixed!) a bug with 00:xx:yy shown as xx:xx:yy.
+
+;*******************************************
+;**** Parses the correct time from %1 (gosub time #time)
+;*******************************************
+sub time
+set %string %1
+set %len 2
+str len %string
+if #Strres = 5
+        set %len 1
+if #StrRes =< 4
+        {
+        set %hour 00:
+        goto _time_min
+        }
+
+
+
+; Parsing the hour
+str left %string %len
+set %hour #StrRes
+str len %hour
+if #strRes = 1 2
+        set %hour 0 , %hour , :
+        goto _time_min
+set %hour %hour , :
+
+; Parsing the minute
+_time_min:
+str right %string 4
+str left #StrRes 2
+set %min #StrRes
+str len %Min
+if #strRes = 1 2
+        set %min 0 , %min , :
+        goto _time_sec
+set %min %min , :
+
+; Parsing the second
+_time_sec:
+str right %string 2
+set %sec #StrRes
+str len %sec
+if #strRes = 1 2
+        set %temp %hour , %min , 0 , %sec
+        goto _time_end
+set %temp %hour , %min , %sec
+
+
+_time_end:
+return %temp
+stop
+
+;*******************************************
+
+;**
+;* Splits a string by a divider into an array and
+;* copies the result into the desired namespace
+;* @param %1 The string to split
+;* @param %2 Divider
+;* @param %3 Array name
+;* @param %4 {optional} Result namespace. If no
+;*           namespace is given it will create the
+;*           array using the %-notation
+;* @sideEffects Creates a number of variables
+;*              with name as given in %3 followed by
+;*              a digit
+;* @returns The length of the array
+sub split
+  namespace Push
+  namespace Local split , #systime
+  set !lpc #lpc
+  if #lpc < 500
+     set #lpc 500
+
+  set !string %1
+  set !divider %2
+  set !arrayName %3
+  if %0 > 3
+     set !namespace %4
+  else
+     set !namespace #false
+
+  set !length 0
+  repeat
+  {
+     set !length !length + 1
+     str Pos !string !divider 1
+     if #strRes = 0
+     {
+        set !done #true
+        set ! . !arrayName , !length !string
+     }
+     else
+     {
+        set !pos #strRes
+        set !len !pos - 1
+        str Left !string !len
+        set ! . !arrayName , !length #strRes
+        str Del !string 1 !pos
+        set !string #strRes
+     }
+  }
+  until ( !done = #true )
+  set #result !length
+
+  if !namespace <> #false
+  {
+     namespace Copy !arrayName , * To Local !namespace
+  }
+  else
+  {
+    for !i 1 #result
+    {
+       set !value !arrayName , !i
+       set % . !arrayName , !i ! . !value
+    }
+  }
+  set #lpc !lpc
+  namespace Clear
+  namespace Pop
+return #result
+
+;===========================================================
+; Name: pathFind
+; Author: ScriptFellow (the.WZA)
+; Parameters: %1 = X
+;             %2 = Y
+;             %3 = Z
+;             %4 = tolerance
+;             %5 = timeout (in seconds)
+; Purpose: Pathfind to the given coordinates
+; Return: %return (#true or #false )
+;-----------------------------------------------------------
+sub pathFind
+set %_x %1
+set %_y %2
+if %0 <= 2 || %2 = N/A
+   set %_z -1
+else
+   set %_z %3
+if %0 <= 3 || %3 = N/A
+   set %_tolerance 0
+else
+   set %_tolerance %4
+if %0 <= 4
+   set %_endTime #sCnt + 15
+else
+   set %_endTime #sCnt + %5
+set %return #false
+deleteJournal
+scanJournal 2
+event PathFind %_x %_y %_z
+_pathFindScanAgain:
+scanJournal 1
+if pathfinding in #journal
+   goto _pathFindOkay
+if can't_get_there in #journal || #sCnt > %_endTime
+   return
+goto _pathFindScanAgain
+_pathFindOkay:
+gosub _pathFindDist %_x %_y %_z #charPosX #charPosY #charPosZ
+set %return %return <= %_tolerance
+if %return
+{
+   if %_tolerance > 0
+   {
+      set %1 #cliLeft + #cliXRes / 2
+      set %2 #cliTop + #cliYRes / 2
+      if #charDir < 3
+          set %1 %1 + 1
+      else
+      {
+         if #charDir > 3 && #charDir < 7
+            set %1 %1 - 1
+      }
+      if #charDir = 0 || #charDir = 6
+         set %2 %2 - 1
+      else
+      {
+         if #charDir > 1 && #charDir < 5
+            set %2 %2 + 1
+      }
+      click %1 %2 R
+   }
+   return
+}
+if #sCnt > %_endTime
+   return
+goto _pathFindOkay
+
+sub _pathFindDist
+set %1 %1 - %4 abs
+set %2 %2 - %5 abs
+set %3 %3 - %6 abs
+gosub max %1 %2 %3
+return
+
+; to be defined
+sub max
+set %return %1
+for %_idx 2 %0
+{
+   if % . %_idx > %return
+   set %return % . %_idx
+}
+return
+        
+;=================================================================
+sub wait_for
+;=================================================================
+; This "wait_for" sub package was created by Locke. If you use these subs please keep this header intact.
+; Documentation: the sub package grew to large with all the comments. To load them call the sub like this:
+; gosub wait_for docs    | or you can use doc, documention, what, or my personal favorite, kickass.
+
+; "wait_for core dispatcher" version 1.2 by Locke
+if %1 = doc || if %1 = docs || if %1 = documentation || if %1 = what || if %1 = kickass
+{
+Display ok Please click ok and wait for your browser to start.
+execute http://www.easyuo.com/forum/viewtopic.php?t=24716
+halt
+}
+nameSpace Push
+namespace local LLNS
+set #result N/A ; if #result isn't set by one of my wait_for subs it'll throw an error.
+set !LPC #lpc
+set #lpc 200
+for %i 0 %0
+set !_A . %i % . %i
+gosub wait_for_ , !_A1
+set #lpc !lpc
+namespace clear LLNS
+namespace pop
+if #result <> N/A
+return #result
+else
+display ok You specified an unknown wait_for command. Script returned #result and is halting.
+halt
+;=================================================================
+sub wait_for_MSG ; version 1.4 ~Locke
+;=================================================================
+if !_A0 < 3
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for MSG %message time_out_in_seconds$
++Script is halting
+halt
+}
+set !_timeout ( #scnt + !_A . !_A0 )
+_lets_wait_for_a_message:
+for %i %jstart #jindex
+{
+ scanjournal %i
+  for %ii 2 !_A0
+  {
+    if !_A . %ii in #journal && %jstart <> %i
+    set #result #true , #spc , !_A . %ii
+  }
+}
+
+if #true notin #result
+{
+set #result #false
+ if !_timeout =< #scnt
+ return #result
+wait 1
+goto _lets_wait_for_a_message
+}
+else
+return #result
+
+wait 1
+goto _lets_wait_for_a_message
+
+;=================================================================
+sub wait_for_GUMP ; version 1.4 ~Locke
+;=================================================================
+; Añadido #CONTID para "sub abrir_cofre"
+if !_A0 < 3
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for GUMP XXX_YYY time_out_in_seconds$
++Script is halting
+halt
+}
+if !_A3 <> CLOSE
+set !_timeout #scnt + !_A3
+else
+set !_timeout 0 ; no gump wait if %3 = CLOSE since we already believe it to be open.
+
+_lets_wait_for_a_gump:
+if #CONTSIZE = !_A2 || #CONTKIND = !_A2 || #CONTNAME = !_A2 || #CONTTYPE = !_A2 || #CONTID = !_A2
+{
+ if !_A5 <> N/A && !_A6 <> N/A
+ {
+ set !clickx !_A5 + #contposx
+ set !clicky !_A6 + #contposy
+ click !clickx !clicky
+ }
+ if !_A3 = CLOSE || if !_A4 = CLOSE || !_A5 = CLOSE || !_A6 = CLOSE
+ {
+ set !string #contsize
+ str pos !string _
+ set !pos #strres
+ str del !string #strres #strres
+ set !clickX #contposx + ( #strres / 2 )
+ str del !string 1 !pos
+ set !clickY #contposy + ( #strres / 2 )
+ click !clickx !clicky R
+ }
+return #true
+}
+
+if ( !_timeout =< #scnt ) && ( !_A4 = N/A )
+   {
+     return #false
+   }
+
+if !_A4 <> N/A && !_timeout =< #scnt
+{
+finditem !_A4
+if #findkind <> -1
+{
+ for #findindex 1 #findcnt
+ {
+  if #finddist > 2
+  ignoreitem #findid LLWAITFOR
+  else
+  break
+ }
+ set #lobjectid #findid
+ event macro 17 0
+ set !_timeout #scnt + !_A3
+}
+else
+return #false
+}
+wait 1
+goto _lets_wait_for_a_gump
+
+
+;================================
+Sub WalkThroughDoor
+;ver 1.0 7Dec03 by Roadkill
+;purpose: open a door and walk through it without having a rail.  Useful
+;         for getting to a vendor type, I use this in conjunction with my
+;         RKFindVendorType to hike in/out a building looking for a cobbler
+;         so I don't have to hard code vendorIDs and get boofed later.
+;       If no door specified, finds one within 5 tiles.  If in Fel may get blocked
+;%1 = id of door to walk through, optional
+;@dependencies: RKsubs.txt findThingsDir
+;status: tested, insert doortypes.  buggy due to not square t door.
+;        use #chardir with doortype to decide which dir to walk
+;       the different types below are n/s and e/w doors
+        set %doortypes JQC_ZPC_BQC_HQC_HNC_FNC_XMC_ZMC_VFD_XFD_JOC_XNC ; kcd_ucd__joc_hoc__nnc_wcd_qcd_vnc_xnc__pqc_hqc_jqc
+        if %0 >= 1
+                set %doortypes %1
+        finditem %doortypes G_5
+        if #findkind
+                display ok there is no door within 5 tiles
+                set %doorid #findid
+        move #findx #findy 1 2s
+        gosub FindThingsDir #findx #findy doordir
+        event macro 5 %doordir
+_openDoor:
+        wait 10
+        set #lobjectid %doorid
+                event macro 17
+        set %_charx #charposx
+        set %_chary #charposy
+        wait 20
+        event macro 5 %doordir
+        wait 20
+        event macro 5 %doordir
+        wait 20
+        event macro 5 %doordir
+        wait 20
+        if #charposx = %_charx && #charposy = %_chary
+                goto _openDoor
+return
+
+SUB FindThingsDir
+;ver 1.2 10Jul04 by Roadkill
+;purpose: find the direction from you that a thing is
+;%1= #findx of object, it's UO world coord
+;%2=#findy of object, it's UO world coord
+;%3= the name of the return var, i.e. 'dir', 'thingsdirection' by default
+;%3 holds its dir from you 0-nw 1-n 2-ne 3-e 4-se 5-s 6-sw 7-w 8-sametile
+;* @example call rksubs.txt FindThingsDir %mapxcoord %mapycoord spotdir
+	SET !itsX %1
+	SET !itsY %2
+	if %0 < 3
+		set %3 thingsdirection
+	IF !itsX = #charposx && !itsY < #charposy
+		SET % . %3 1 ;N
+	IF !itsX > #charposx && !itsY < #charposy
+		SET % . %3 2 ;NE
+	IF !itsX > #charposx && !itsY = #charposy
+		SET % . %3 3 ;E
+	IF !itsX > #charposx && !itsY > #charposy
+		SET % . %3 4 ;SE
+	IF !itsX = #charposx && !itsY > #charposy
+		SET % . %3 5 ;S
+	IF !itsX < #charposx && !itsY > #charposy
+		SET % . %3 6 ;SW
+	IF !itsX < #charposx && !itsY = #charposy
+		SET % . %3 7 ;W
+	IF !itsX < #charposx && !itsY < #charposy
+		SET % . %3 0 ;NW
+	IF !itsX = #charposx && !itsY = #charposy
+		SET % . %3 8 ;same tile
+RETURN
+
+;=================================================================
+sub waitForItem
+{
+   namespace push
+   namespace local wfi
+   set %time #SCNT2 + %3 ; Décimas de segundo
+   dropwait:
+   finditem %1 C_ , %2
+   if ( #FINDKIND = -1 ) ; 404 Not Found ^^
+   {
+       wait 1
+       if ( #SCNT2 >= %time )
+       {
+           return #false
+       }
+       goto dropwait
+   }
+   namespace clear
+   namespace pop
+   return
+}
+
+;=================================================================
+sub FindJournalMessage
+set %jc 1
+FJM1:
+scanjournal %jc
+if #journal = N/A
+	return #false
+for %_i 1 %0
+{
+ 	if % . %_i in #journal
+	{
+		deletejournal
+		return #true
+	}
+}
+set %jc %jc + 1
+goto FJM1
+
+;=================================================================
+sub ResetJournal
+scanjournal 1
+deletejournal
+return
