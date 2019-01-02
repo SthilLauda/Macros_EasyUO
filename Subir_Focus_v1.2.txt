@@ -5,6 +5,7 @@
 ;   ||   ||   ||    ||     ||   || || ||  .|''||    //     \\    ||   ||  .|''||   ||  ||   //  .|''||
 ;   `|...|'  .||.   `|..' .||. .||    ||. `|..||. .//       \\. .||. .||. `|..||. .||  ||. /... `|..||.
 ; ======================================================================================================
+;
 ; Script Name: Subir Focus
 ;          ____
 ;         / _\ \
@@ -19,13 +20,13 @@
 ;   \_____>   <  ____/
 ;              \l
 ;
-; Author: Sthil Lauda
+; Author: Sthil
 ; Version: 1.2
 ; Client Tested with: 2.0.3
 ; EUO version tested with: 1.5 Version 142
 ; Shard: Ultima Alianza ¡Hasta la muerte!
 ; Public Release: 30/04/2018
-; Purpose: Entrena focus/concentración gastando y recuperando puntos de estamina.
+; Purpose: Entrena focus/concentración gastando y recuperando puntos de stamina.
 ; ==================================================================================
 ; INSTRUCCIONES:
 ;
