@@ -15,7 +15,7 @@
 ;                         l/                _) )_             \I                                 +
 ;      +                                    `\ /'
 ;
-; Script Name:  SimpleTamer [ UA / Heaven ]
+; Script Name:  SimpleTamer [ UA / Haven ]
 ;
 ;                           ;
 ;         ;               ~~`~~      ;
