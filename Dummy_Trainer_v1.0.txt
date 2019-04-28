@@ -1,0 +1,251 @@
+; ======================================================================================================
+;  '||   ||` '||`   ||                                 /.\      '||`
+;   ||   ||   ||    ||     ''                         // \\      ||   ''
+;   ||   ||   ||  ''||''   ||  '||),,(|,   '''|.     //...\\     ||   ||   '''|.  `||''|,  '''/  '''|.
+;   ||   ||   ||    ||     ||   || || ||  .|''||    //     \\    ||   ||  .|''||   ||  ||   //  .|''||
+;   `|...|'  .||.   `|..' .||. .||    ||. `|..||. .//       \\. .||. .||. `|..||. .||  ||. /... `|..||.
+; ======================================================================================================
+;
+; Script Name: Dummy Trainer
+;
+;          &&&
+;         (+.+)
+;       ___\=/___
+;      (|_ ~~~ _|)
+;         |___|
+;         / _ \
+;        /_/ \_\
+; ejm97 /_)   (_\
+;
+; Author: Sthil Lauda
+; Version: 1.0
+; Client Tested with: 2.0.3
+; EUO version tested with: 1.5 Version 142
+; Shard: Ultima Alianza ¡Hasta la muerte!
+; Public Release: 05/04/2019
+; Purpose: Entrena habilidades de combate usando dummy's.
+; ================================
+set %version v1.0
+; ________________________________
+;
+; ///////////////////////////////
+; ******** CONFIGURACIÓN ********
+; ///////////////////////////////
+; ________________________________
+;
+set %tiempo_alimentacion 360 ; En segundos = 5 minutos.
+; _______________________________________________
+;
+; //////////////////////////////////////////////
+; ************* FIN CONFIGURACIÓN *************
+; //////////////////////////////////////////////
+; _______________________________________________
+;
+set %dummys WDG
+set %comida RGG_NRD_QSD_ZBG_WLI_QRD_END_FUD_YLI_WLI_HGI
+ +_KGI_EGI_QLI_KLI_MLI_KRD_HQD_AQD_MQE_VQE_TQE_JQE_IQE
+ +_GQE_SPE_ZPE_OQE_BDF_KPE_RQE_YSD_SQD_YWI_AXI_PQD_QQD
+set %tiempo_actual #SCNT ; Reloj
+set %proxima_vez #SCNT ; Trigger
+
+set #SYSMSGCOL 88
+event sysmessage ====================
+event sysmessage Dummy Trainer %version
+event sysmessage ====================
+wait 40
+
+gosub choose_pace run ; Cambiar el modo de moverse a " Always Run = ON ".
+
+;========================================================
+;
+; ******************* LOOP PRINCIPAL *******************
+;
+;========================================================
+loop:
+gosub checkHungry ; Comprobar el hambre del PJ.
+finditem %dummys G_30 ; Buscar Dummy's en un radio de 30 tiles.
+if ( #FINDCNT > 0 )
+     {
+       for #FINDINDEX 1 #FINDCNT
+           {
+             set %dummy_dist #FINDDIST
+             set %dummy_ID #FINDID
+             set %dummy_x #FINDX
+             set %dummy_y #FINDY + 1
+             set %dummy_z #FINDZ
+             gosub checkDummy
+             gosub hitDummy
+           }
+     }
+goto loop
+;========================================================
+;
+; ***************** FIN LOOP PRINCIPAL *****************
+;
+;========================================================
+
+sub checkDummy
+repeat
+     {
+       event pathfind %dummy_x %dummy_y %dummy_z
+       wait 10
+     }
+     until ( #CHARPOSX = %dummy_x ) && ( #CHARPOSY = %dummy_y )
+return
+
+sub hitDummy
+set #LOBJECTID %dummy_ID
+event macro 17 0
+wait 35
+return
+
+sub checkHungry
+set %tiempo_actual #SCNT
+if ( %proxima_vez <= %tiempo_actual )
+     {
+       gosub comprobar_comida
+     }
+return
+
+;=====================================================
+; Rutina para, en caso de hambre, comer hasta saciarse
+;=====================================================
+; v2.1
+sub comprobar_comida
+{
+  hambriento:
+  set %jrnl #jindex ; Marcamos un índice de las líneas del diario.
+  event macro 3 0 .hungry
+  wait 20
+  while #true
+     {
+       if #jindex > %jrnl ; Si aparece una nueva línea.
+          {
+            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de línea.
+            scanjournal %jrnl   ; La leemos...
+            if Dentro_de_1_minuto in #journal
+               {
+                 wait 120s ; Save del server...
+               }
+            if Estas_no_le_afecta_el_hambre in #journal || Estas_tan_lleno_que_no_puedes in #journal || Estas_totalmente_saciado in #journal
+               {
+                 set %proxima_vez %tiempo_actual + %tiempo_alimentacion
+                 return
+               }
+               else
+                  {
+                    if Estas_lleno in #journal || Estas_contento in #journal || Estas_en_inanicion in #journal || Estas_hambriento in #journal || Sientes_mucho in #journal || Estas_con_hambre in #journal || Estas_parcialmente in #journal || Estas_bien_lleno in #journal || Te_sientes_casi_lleno in #journal
+                       {
+                         finditem %comida C_ , #backpackid
+                         if #findcnt > 0
+                            {
+                              set #lobjectid #findid
+                              event macro 17
+                              wait 20
+                              goto hambriento
+                            }
+                            else
+                               {
+                                 event exmsg #charid 3 48 COMPRA COMIDA!!
+                                 wait 40
+                                 set %proxima_vez %tiempo_actual + %tiempo_alimentacion
+                               }
+                       }
+                       else ; Mensaje extraño, repetimos...
+                          {
+                            goto hambriento
+                          }
+                  }
+          }
+       return
+     } ; FIN While
+}
+return
+
+;-@ ============================== @-;
+;-@ ############################## @-;
+;-@ SUBS públicos del Foro EasyUO  @-;
+;-@ ############################## @-;
+;-@ ============================== @-;
+;
+;==================================
+; Script Name: Peragrins' Pace choosing sub
+; Author: Peragrin
+; Version: v1.1
+; Client Tested with: 4.0.10b
+; EUO version tested with: 1.42.00A5
+; Shard OSI / FS: OSI
+; Revision Date: 05/06/05
+; Public Release: 22/09/04
+; Purpose: callable subroutine to pick whether always run is on or off
+; Revisions: v1.1 now uses Namespace and better journal scanning
+;============================================
+sub choose_pace
+;%0 - 1
+;%1 - WALK/RUN
+if %0 <> 1 || %1 notin WALK_RUN
+        {
+        display OK Incorrect arguments passed to ChoosePace subroutine, script halted.
+        halt
+        }
+namespace push
+namespace LOCAL ChoosePace
+set !desired_pace %1
+_TOGGLE_PACE:
+set !jindex #jindex + 1
+event macro 32 0
+_CHOOSE_PACE_JOURNAL_SCAN:
+gosub ScanJournal ALWAYS_RUN !jindex 1
+if #result
+        {
+           if ON in #journal && !desired_pace = WALK
+                goto _toggle_pace
+           if OFF in #journal && !desired_pace = RUN
+                goto _toggle_pace
+        }
+if ! #result
+        {
+        set !error !error + 1
+        if !error > 5
+                {
+                   set !error 0
+                   goto _toggle_pace
+                }
+        goto _choose_pace_journal_scan
+        }
+return
+;==================================
+; Script Name: Peragrins' journal scanning sub
+; Author: Peragrin
+; Version: v1.0
+; Client Tested with: 4.0.10b
+; EUO version tested with: 1.42.00A5
+; Shard OSI / FS: OSI
+; Revision Date: 05/06/05
+; Public Release: 22/09/04
+; Purpose: callable subroutine to scan for phrases passed to the sub
+;============================================
+sub scanJournal
+;%0 - 2
+;%1 - phrase to scan for
+;%2 - #jindex to scan from
+;%3 - time to scan for
+namespace push
+namespace local ScanJournal
+for !timeout 1 %3
+        {
+        for !line %2 #jindex
+                {
+                scanjournal !line
+                wait 1
+                if %1 in #journal
+                        {
+                        namespace pop
+                        return #true
+                        }
+                }
+        wait 1s
+        }
+namespace pop
+return #false
+;=======================================

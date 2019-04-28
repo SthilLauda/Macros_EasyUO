@@ -1,0 +1,352 @@
+;        |                                 /   \                   |       .
+;  _    -O-       .                )      ((   ))     (           -O-
+; (@)    |     +                  /|\      ))_((     /|\           |            .
+; |-|                            / | \    (/\|/\)   / | \                            (@)
+; | | --------------------------/--|-voV---\`|'/--Vov-|--\---------------------------|-|         .
+; |-|                                '^`   (o o)  '^`                                | |
+; | |                                      `\Y/'                                     |-|
+; |-|   _______ __ __   __                  _______ __ __                            | |
+; | |  |   |   |  |  |_|__|.--------.---.-.|   _   |  |__|.---.-.-----.-----.---.-.  |-|    .     o
+; |-|  |   |   |  |   _|  ||        |  _  ||       |  |  ||  _  |     |-- __|  _  |  | |
+; | |  |_______|__|____|__||__|__|__|___._||___|___|__|__||___._|__|__|_____|___._|  |-|
+; |_|________________________________________________________________________________| |
+; (@)                     l   /\ /         ( (          \ /\   l                   `\|-|             .
+;           o             l /   V           \ \          V   \ l       +             (@)
+;                         l/                _) )_             \I                                 +
+;      +                                    `\ /'
+;
+; Script Name: Archery con Golem
+;
+;                                                        |
+;                                                         \.
+;                                                         /|.
+;                                                       /  `|.
+;                                                     /     |.
+;                                                   /       |.
+;                                                 /         `|.
+;                                               /            |.
+;                                             /              |.
+;                                           /                |.
+;      __                                 /                  `|.
+;       -\                              /                     |.
+;         \\                          /                       |.
+;           \\                      /                         |.
+;            \|                   /                           |\
+;              \#####\          /                             ||
+;          ==###########>     /                               ||
+;           \##==      \    /                                 ||
+;      ______ =       =|__/___                                ||
+;  ,--' ,----`-,__ ___/'  --,-`-==============================##==========>
+; \               '        ##_______ ______   ______,--,____,=##,__
+;  `,    __==    ___,-,__,--'#'  ==='      `-'              | ##,-/
+;    `-,____,---'       \####\              |        ____,--\_##,/
+;        #_              |##   \  _____,---==,__,---'         ##
+;         #              ]===--==\                            ||
+;         #,             ]         \                          ||
+;          #_            |           \                        ||
+;           ##_       __/'             \                      ||
+;            ####='     |                \                    |/
+;             ###       |                  \                  |.
+;             ##       _'                    \                |.
+;            ###=======]                       \              |.
+;           ///        |                         \           ,|.
+;           //         |                           \         |.
+;                                                    \      ,|.
+;                                                      \    |.
+;                                                        \  |.
+;                                                          \|.
+;                                                          /.
+;                                                         |
+; Author: Sthil Lauda
+; Version: 2.8
+; Client Tested with: 2.0.3
+; EUO version tested with: 1.5 Version 142
+; Shard OSI / FS: Ultima Alianza ¡Hasta la muerte!
+; Revision Date: 25/03/2019
+; Public Release: 10/02/2019
+; Purpose: Lanza flechas a un Golem para entrenar la skill de Archery. Recoge las flechas del Golem automáticamente ^^
+set %version 2.8
+;________________________________
+;
+; ///////////////////////////////
+; ******** CONFIGURACIÓN ********
+; ///////////////////////////////
+;________________________________
+;
+set %cofre XXXXXX     ; La ID del cofre donde tienes las flechas.
+set %lote_flechas 100 ; Número de flechas a gastar en cada ronda.
+set %tiempo_attack 3  ; En segundos, cada cuánto ordenar el ataque al Golem.
+set %tiempo_alimentacion 360 ; En segundos, cada cuanto recoger flechas del suelo y comer (5 minutos).
+;________________________________________________
+;
+; //////////////////////////////////////////////
+; ************* FIN CONFIGURACIÓN *************
+; //////////////////////////////////////////////
+;________________________________________________
+;
+set %arcos TOH_WOH_MMH_LMH_USF_JSF
+set %flechas RWF
+set %golems YAB
+set %comida RGG_NRD_QSD_ZBG_WLI_QRD_END_FUD_YLI_WLI_HGI
+ +_KGI_EGI_QLI_KLI_MLI_KRD_HQD_AQD_MQE_VQE_TQE_JQE_IQE
+ +_GQE_SPE_ZPE_OQE_BDF_KPE_RQE_YSD_SQD_YWI_AXI_PQD_QQD
+set %proxima_vez_comer #SCNT
+set %proxima_vez_attack #SCNT
+initevents
+
+set #SYSMSGCOL 88
+event sysmessage ====================
+event sysmessage Archery Golem %version
+event sysmessage ====================
+set #SYSMSGCOL 73
+wait 40
+
+gosub setupGolem
+
+;========================================================
+;
+; ******************* LOOP PRINCIPAL ********************
+;
+;========================================================
+;---------------------
+loop:                ;
+gosub checkSkill     ;
+gosub recogerFlechas ;
+gosub reponerFlechas ;
+gosub comprobarArco  ;
+gosub atacarGolem    ;
+goto loop            ;
+;---------------------
+;========================================================
+;
+; ***************** FIN LOOP PRINCIPAL ******************
+;
+;========================================================
+
+sub checkSkill
+chooseskill Arch real ; Comprobar GM
+if #SKILL >= 1000
+   {
+     set #SYSMSGCOL 19
+     event sysmessage ¡Somos GM Archery! :)
+     halt
+   }
+return
+
+sub comprobarArco
+finditem %arcos C_ , #CHARID ; Reponer el arco roto.
+if #FINDCNT < 1
+   {
+     finditem %arcos C_ , #BACKPACKID
+     if #FINDCNT > 0
+        {
+          set #LOBJECTID #FINDID
+          event macro 17
+          wait 20
+        }
+        else
+           {
+             set #SYSMSGCOL 39
+             event sysmessage NO QUEDA NINGUN ARCO!
+             halt
+           }
+   }
+return
+
+sub recogerFlechas
+set %tiempo_actual #SCNT ; Reloj
+if %proxima_vez_comer <= %tiempo_actual
+  {
+    msg $ all drop $ ; Recuperar flechas ^^
+    wait 40
+    _recoge:
+    finditem %flechas G_4 ; Máxima distancia a la que podemos recoger algo.
+    if #FINDCNT > 0
+       {
+         event sysmessage Recogiendo del suelo...
+         wait 10
+         exevent drag #FINDID #FINDSTACK
+         exevent dropc %cofre
+         wait 30
+         goto _recoge
+       }
+    gosub comprobar_comida ; Alimentación.
+  }
+return
+
+sub reponerFlechas
+set %total_flechas 0
+finditem %flechas C_ , #BACKPACKID
+for #FINDINDEX 1 #FINDCNT ; Sumar todos los stack's de flechas
+    {
+      set %total_flechas %total_flechas + #FINDSTACK
+    }
+if %total_flechas <= 10 ; Mínimo de flechas en la mochila antes de reponer más.
+   {
+     finditem %flechas C_ , %cofre ; Reponer flechas del cofre
+     if #FINDSTACK => %lote_flechas
+        {
+          event sysmessage Reponiendo del cofre...
+          wait 10
+          exevent drag #FINDID %lote_flechas
+          exevent dropc #BACKPACKID
+          wait 30
+        }
+        else
+           {
+             set #SYSMSGCOL 39
+             event sysmessage NO QUEDAN MAS FLECHAS!
+             halt
+           }
+   }
+return
+
+sub atacarGolem
+if %proxima_vez_attack <= %tiempo_actual ; Seleccionar y atacar al Golem cada X tiempo.
+  {
+    finditem %golem_id
+    if #FINDCNT > 0 ; Hemos encontrado el Golem
+       {
+         set #LTARGETID %golem_id
+         event macro 27 ; ¡ Attack Last !
+         set %proxima_vez_attack %tiempo_actual + %tiempo_attack
+       }
+  }
+return
+
+sub setupGolem
+_ClickGolem:
+finditem %golems
+if #FINDCNT > 0
+   {
+     if #FINDCNT > 1 ; Hay más de 1 Golem en la ZONA - [ Modo manual ]
+        {
+          display OK Selecciona el Golem con el que quieres macrear
+          set #TARGCURS 1
+          _targLoop1:
+          if #TARGCURS = 1
+             {
+               wait 1
+               goto _targLoop1
+             }
+          set %golem_id #LTARGETID
+          finditem %golem_id ; Comprobar si es un Golem o es otra cosa... XD
+          if #FINDCNT > 0
+             {
+               if %golems NotIn #FINDTYPE
+                  {
+                    set #SYSMSGCOL 39
+                    event sysmessage ESTO NO PARECE SER UN GOLEM!
+                    wait 20
+                    goto _ClickGolem
+                  }
+                  else ; OK, parece un Golem: Sacamos su nombre...
+                     {
+                       set #SYSMSGCOL 73
+                       gosub GetName %golem_id nombre_golem
+                       event sysmessage OK GOLEM: %nombre_golem
+                       wait 40
+                     }
+             }
+        }
+        else ; Sólo vemos 1 Golem en la ZONA - [ Modo automático ]
+          {
+            if #FINDCNT = 1
+               {
+                 set %golem_id #FINDID
+               }
+          }
+   }
+   else
+      {
+        set #SYSMSGCOL 39
+        event sysmessage NO HAY GOLEMS EN LA ZONA!
+        halt
+      }
+return
+
+;=====================================================
+; Rutina para, en caso de hambre, comer hasta saciarse
+;=====================================================
+; v2.2
+sub comprobar_comida
+{
+  hambriento:
+  set %jrnl #jindex ; Marcamos un índice de las líneas del diario.
+  event macro 4 0 .hungry
+  wait 20
+  while #true
+     {
+       if #jindex > %jrnl ; Si aparece una nueva línea.
+          {
+            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de línea.
+            scanjournal %jrnl   ; La leemos...
+            if Dentro_de_1_minuto in #journal
+               {
+                 wait 140s ; Save del server...
+               }
+            if Estas_no_le_afecta_el_hambre in #journal || Estas_tan_lleno_que_no_puedes in #journal || Estas_totalmente_saciado in #journal
+               {
+                 set %proxima_vez_comer %tiempo_actual + %tiempo_alimentacion
+                 return
+               }
+               else
+                  {
+                    if Estas_lleno in #journal || Estas_contento in #journal || Estas_en_inanicion in #journal || Estas_hambriento in #journal || Sientes_mucho in #journal || Estas_con_hambre in #journal || Estas_parcialmente in #journal || Estas_bien_lleno in #journal || Te_sientes_casi_lleno in #journal
+                       {
+                         finditem %comida C_ , #backpackid
+                         if #findcnt > 0
+                            {
+                              set #lobjectid #findid
+                              event macro 17
+                              wait 20
+                              goto hambriento
+                            }
+                            else
+                               {
+                                 event exmsg #charid 3 48 COMPRA COMIDA!!
+                                 wait 40
+                                 set %proxima_vez_comer %tiempo_actual + %tiempo_alimentacion
+                               }
+                       }
+                       else ; Mensaje extraño, repetimos...
+                          {
+                            goto hambriento
+                          }
+                  }
+          }
+       return
+     } ; FIN While
+}
+return
+
+;-@ ============================== @-;
+;-@ ############################## @-;
+;-@ SUBS públicos del Foro EasyUO  @-;
+;-@ ############################## @-;
+;-@ ============================== @-;
+;
+
+;**
+;* @name GetName
+;* @author Roadkill
+;* @ver 1.0 24Jan04
+;* @purpose get the name of a creature/vendor
+;* @params %1= the id of the thing whose name you want, required
+;*  @%2= variable name to return the ID in, required
+;* @returns @%2 and #result
+;* @changes #property, #strres, @%2, !strlength
+;* @example call rksubs.txt GetName %beetle beetlename
+;* @status: tested
+sub GetName
+  finditem %1
+  if #findkind = -1
+    return error-cant_find
+  event property #findid
+  str pos #property $
+  set !strlength #strres - 2
+  str left #property !strlength
+  set %string #strres
+  str Del %string 1 1
+  set % . %2 #strres
+return % . %2

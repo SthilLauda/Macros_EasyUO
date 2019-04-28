@@ -1,0 +1,101 @@
+;==================================
+; Script Name: Hider
+; Author: Sthil Lauda
+; Version: 1.1
+; Client Tested with: 2.0.3
+; EUO version tested with: EasyUO 1.5 Version 243
+; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Revision Date: 28-04-2019
+; Public Release: 27-04-2019
+; Global Variables Used: Ninguna.
+; Purpose: Oculta el PJ automáticamente con una tecla.
+;==================================
+set %version 1.1
+;________________________________
+;
+; ///////////////////////////////
+; ******** CONFIGURACIÓN ********
+; ///////////////////////////////
+;________________________________
+;
+;------------------------------
+; ****** Tecla Rápida ********
+;------------------------------
+; A-Z, 0-9, F1-F12, ESC, BACK, TAB, ENTER, PAUSE, CAPSLOCK, SPACE, PGDN, PGUP,
+; END, HOME, LEFT, RIGHT, UP, DOWN, PRNSCR, INSERT, DELETE, NUMLOCK, SCROLLLOCK.
+set %tecla F9 ; <~~ Escribe aquí la tecla que quieres usar para activar la macro.
+;________________________________________________
+;
+; //////////////////////////////////////////////
+; ************* FIN CONFIGURACIÓN *************
+; //////////////////////////////////////////////
+;________________________________________________
+;
+set #SYSMSGCOL 88
+event sysmessage =========
+set #SYSMSGCOL 53
+event sysmessage Hider %version
+set #SYSMSGCOL 88
+event sysmessage =========
+wait 20
+
+;========================================================
+;
+; ******************* LOOP PRINCIPAL ********************
+;
+;========================================================
+loop:
+onhotkey %tecla
+       {
+         gosub check_muerto
+         if H in #CHARSTATUS || #TARGCURS = 1
+            {
+              wait 1s
+              goto loop
+            }
+         _hidLoop:
+         if H Notin #CHARSTATUS
+            {
+              event macro 13 21 ; Use SKILL Hiding
+              gosub waitForSysVar CHARSTATUS = H 50
+              goto _hidLoop
+            }
+       }
+wait 1
+goto loop
+;========================================================
+;
+; ***************** FIN LOOP PRINCIPAL ******************
+;
+;========================================================
+
+sub check_muerto ; <==============================>
+if #CHARGHOST = Yes
+{
+   check_loop:
+   wait 3s
+   if #CHARGHOST = Yes
+       goto check_loop
+}
+return
+
+;-@ ============================== @-;
+;-@ ############################## @-;
+;-@ SUBS públicos del Foro EasyUO  @-;
+;-@ ############################## @-;
+;-@ ============================== @-;
+;
+sub waitForSysVar ; <==============================>
+if %0 < 4 || %4 = N/A
+set %4 %_defaultWaitForTimeout
+if %0 < 5
+set %5 return
+set %4 #sCnt2 + %4
+_waitForSysVar:
+set % . %5 # . %1 %2 %3
+if ! % . %5 && #sCnt2 < %4
+{
+Wait 1
+goto _waitForSysVar
+}
+return
