@@ -1,0 +1,2516 @@
+;        |                                 /   \                   |       .
+;  _    -O-       .                )      ((   ))     (           -O-
+; (@)    |     +                  /|\      ))_((     /|\           |            .
+; |-|                            / | \    (/\|/\)   / | \                            (@)
+; | | --------------------------/--|-voV---\`|'/--Vov-|--\---------------------------|-|         .
+; |-|                                '^`   (o o)  '^`                                | |
+; | |                                      `\Y/'                                     |-|
+; |-|   _______ __ __   __                  _______ __ __                            | |
+; | |  |   |   |  |  |_|__|.--------.---.-.|   _   |  |__|.---.-.-----.-----.---.-.  |-|    .     o
+; |-|  |   |   |  |   _|  ||        |  _  ||       |  |  ||  _  |     |-- __|  _  |  | |
+; | |  |_______|__|____|__||__|__|__|___._||___|___|__|__||___._|__|__|_____|___._|  |-|
+; |_|________________________________________________________________________________| |
+; (@)                     l   /\ /         ( (          \ /\   l                   `\|-|             .
+;           o             l /   V           \ \          V   \ l       +             (@)
+;                         l/                _) )_             \I                                 +
+;      +                                    `\ /'
+;
+; Script Name: Smart Brasero
+;
+;          (
+;          )
+;         (  (
+;             )
+;       (    (  ,,
+;        ) /\  ((
+;      (  // | (`'
+;    _ -.;_/ \\--._
+;   (_;-// | \ \-'.\
+;   ( `.__ _  ___,')
+;    `'(_ )_)(_)_)'
+;
+; Author: Sthil Lauda
+; Version: 1.0
+; Client Tested with: 2.0.3
+; EUO version tested with: 1.5 Version 130
+; Shard: Ultima Alianza
+; Release: 28/04/2019
+; Purpose: Intenta macrear healing sin morir en el intento... XD
+;==================================
+;
+set %version v1.0
+; ________________________________
+;
+; ///////////////////////////////
+; ******** CONFIGURACIÓN ********
+; ///////////////////////////////
+; ________________________________
+;
+set %min_comida 20                ; Mínimo número de manzanas, peras, etc, en la mochila, antes de reponer del banco.
+set %min_vendas 150               ; Mínimo de vendas en la mochila antes de reponer del banco.
+set %max_vendas_sucias 50         ; Número de vendas sucias antes de limpiarlas con el pilón o pozo de agua.
+set %damage_hits 4                ; En puntos de vida, cuántos perder encima del brasero.
+set %seguro_vida 40               ; En puntos de vida, mínimo de vida por si pasa algo...
+set %encima_brasas 20             ; En décimas de segundo, (2 segundos) el tiempo máximo quemándote encima del brasero.
+set %tiempo_vendazo_vs_player 60  ; En décimas de segundo, (6 segundos) el tiempo que tardas en curar a otro PJ (Modo "Vs").
+set %tiempo_fallo 35              ; En décimas de segundo, (3.5 segundos) el tiempo que hay que esperar cuando fallas la venda(Modo "Vs").
+set %tiempo_alimentacion 360      ; En segundos, (6 minutos) cada cuánto comprobar el hambre.
+set %radio_busqueda_agua 20       ; Distancia en Tiles/Casillas para buscar agua y marcar un sitio para limpiar las vendas.
+; _______________________________________________
+;
+; //////////////////////////////////////////////
+; ************* FIN CONFIGURACIÓN *************
+; //////////////////////////////////////////////
+; _______________________________________________
+;
+set %comida RGG_NRD_QSD_ZBG_WLI
+ +_QRD_END_FUD_YLI_WLI_HGI_JQE
+ +_KGI_EGI_QLI_KLI_MLI_KRD_HQD
+ +_AQD_MQE_VQE_TQE_IQE_PQD_QQD
+ +_GQE_SPE_ZPE_OQE_BDF_KPE_RQE
+ +_YSD_SQD_YWI_AXI                ; ID's de alimentos
+set %tiempo_actual #SCNT          ; Reloj
+set %cronometro_vendazo #SCNT2    ; Reloj
+set %tiempo_brasero #SCNT2        ; Reloj
+set %hid_timer #SCNT2             ; Reloj
+set %proxima_vez #SCNT            ; Reloj
+set %vendaLimpia ZLF              ; ID de las vendas limpias.
+set %vendaSucia AMF               ; ID de las vendas sucias.
+set %pilon TEE_QEE_WEE_VEE        ; ID's de los pilones de agua.
+set %tipos_braseros RMF_PMF       ; ID de los braseros.
+set %tipos_papeleras BKF          ; ID de las papeleras de Tickets.
+set %pilon_agua N/A               ; ID del pilón de agua del PJ.
+set %mala_gente 4_5_6             ; 4 Criminales (Grises), 5 Enemigos (Naranjas), 6 Asesinos (Rojos).
+set %pozo_agua_x N/A              ; Coordenada X de un pozo de agua en el suelo.
+set %pozo_agua_y N/A              ; Coordenada Y de un pozo de agua en el suelo.
+set %ignore_water 0               ; Tiles de agua que no podemos usar.
+set %ignore_pos 0_2512_543
+  +_2512_542_2510_544
+  +_2510_559_2511_559
+  +_2511_544                      ; Locations problemáticas (paredes, farolas... de momento sólo Minoc, pero podéis añadir más mirando las que se añaden durante el macreo, en el Easy -> VarDump -> %IGNORE_POS).
+set %old_dir N/A                  ; Última orientación del PJ.
+set %skill_ocultarse 300          ; 300 equivale a 30.0 puntos de habilidad.
+set %skill_caminar_oculto 300     ; 300 equivale a 30.0 puntos de habilidad.
+set %dir 0                        ; Cambio de posición al andar.
+set %menu_reciclarx 0             ; Posición X del menú de reciclar
+set %menu_reciclary 0             ; Posición Y del menú de reciclar
+set %limit_hits #MAXHITS - %damage_hits ; Límite de daño en el brasero.
+set %pixel_vendazo 10859990       ; Color del pixel de la venda.
+set %peace 3221801                ; Color del pixel PAZ
+set %war 6541055                  ; Color del pixel GUERRA
+set %first_heal #FALSE            ; Primer vendazo con la túnica de resurrección.
+set %bloqueo_objeto #FALSE        ; Control de objetos que bloquean al PJ.
+set %pilon_suelo #FALSE           ; Hemos encontrado un pilón de agua en el suelo.
+set %_worldsavejournalindex #jindex ; Journal para escanear en busca de save's del server.
+set *CEOWorldSaving #FALSE        ; Indica si hay un save del server en marcha.
+set %loot_items %vendaLimpia , _ , %vendaSucia , _ , %comida ; Lista de items a lotear de nuestro cuerpo.
+Tile init                         ; Inicializa la información de Tiles para su recuperación.
+ignoreitem reset
+ignoreitem #CHARID                ; Descartamos nuestro PJ.
+
+set #SYSMSGCOL 88
+event sysmessage =====================
+set #SYSMSGCOL 53
+event sysmessage Healing Brasero %version
+set #SYSMSGCOL 88
+event sysmessage =====================
+wait 20
+
+gosub setupBank     ; Configuración del banco.
+gosub checkPilon    ; Configuración del pilón de agua o un pozo para limpiar las vendas.
+gosub setupPapelera ; Configuración de la papelera de tickets.
+gosub setupBrasero  ; Configuración del brasero.
+gosub setupHid      ; Configuración del "Modo Hiding".
+gosub askForPlayer  ; Preguntamos por otro jugador con el que macrear o usar el modo solitario.
+gosub askForHealer  ; Configurar el healer para resucitar.
+gosub initMacro     ; Seleccionar la macro correspondiente.
+
+;
+;=======================================================================
+;
+; ******************* LOOP PRINCIPAL MODO SOLITARIO *******************
+;
+;=======================================================================
+;
+Heal_loop:
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+gosub checkStatus       ; ¿Vivo o Muerto?
+gosub checkPlayerBack   ; Miramos si ha vuelto el otro player en caso de que estuviéramos en modo "VS".
+gosub hiding            ; Ocultarse.
+gosub checkHungry       ; Alimentación.
+if ( #HITS >= #MAXHITS - %damage_hits ) && ( #CHARGHOST <> YES ) ; Si estamos casi al 100% de vida.
+     {
+       _reMove0:
+       set %old_charpos_X #CHARPOSX  ; Apuntamos la posición X del PJ
+       set %old_charpos_Y #CHARPOSY  ; Apuntamos la posición Y del PJ
+       _reMove1:
+       move %brasero_x %brasero_y 0 5s ; Pisar el brasero.
+       if ( #CHARPOSX = %old_charpos_X && #CHARPOSY = %old_charpos_Y && #CHARPOSX <> %brasero_x || #CHARPOSY <> %brasero_y ) || ( #CHARPOSX <> %brasero_x && #CHARPOSY <> %brasero_y ) ; Si no nos hemos movido y no estamos encima del brasero, o no hemos llegado al brasero...
+            {
+              if ( #CHARGHOST <> YES )
+                   {
+                     gosub comprobarBloqueo ; ¬¬
+                     if ( %bloqueo_objeto ) ; Es un objeto en el suelo y en teoría ya lo hemos quitado...
+                          {
+                            goto _reMove1
+                          }
+                          else ; ¿Podría ser una pared o farola pegada a un brasero? Okay...
+                             {
+                               if ( ! %bloqueo_objeto ) ; Descartamos location y buscamos una nueva...
+                                    {
+                                      gosub cambiarDireccion ; Elegimos un sitio al azar
+                                      set #SYSMSGCOL 49
+                                      event sysmessage IGNORANDO LOCATION!
+                                      wait 20
+                                      set %ignore_pos %ignore_pos , _ , %pj_pos_X , _ , %pj_pos_Y
+                                      goto _reMove0
+                                    }
+                             }
+                   }
+            }
+       gosub waitToHits ; Esperamos a que nos baje la vida + Cronómetro.
+     }
+     else
+        {
+          if ( #HITS < #MAXHITS ) && ( #CHARGHOST <> YES ) ; Si nos falta algo de vida.
+               {
+                 gosub checkHeal  ; Nos aplicamos una venda en cuanto nos sea posible...
+                 _reMove2:
+                 gosub hiding
+                 if ( #CHARPOSX = %brasero_x ) && ( #CHARPOSY = %brasero_y ) && ( #CHARGHOST <> YES ) ; Si estamos encima del brasero...
+                      {
+                        gosub cambiarDireccion       ; Elegimos un sitio al azar
+                        set %old_charpos_X #CHARPOSX ; Apuntamos la posición X del PJ
+                        set %old_charpos_Y #CHARPOSY ; Apuntamos la posición Y del PJ
+                        _reMove3:
+                        move %pj_pos_X %pj_pos_Y 0 2s ; Alejarse del brasero hasta al nuevo sitio...
+                        if ( #CHARPOSX = %old_charpos_X ) && ( #CHARPOSY = %old_charpos_Y ) ; && ( #CHARPOSX <> %pj_pos_X ) && ( #CHARPOSY <> %pj_pos_Y ) ; Si no nos hemos movido y no estamos en el destino.....
+                             {
+                               gosub comprobarBloqueo ; ¬¬
+                               if ( %bloqueo_objeto ) ; Es un objeto en el suelo y en teoría ya lo hemos quitado...
+                                    {
+                                      goto _reMove3   ; Intentamos seguir en la misma dirección.
+                                    }
+                                    else ; ¿Podría ser una pared o farola pegada a un brasero? Okay...
+                                       {
+                                         if ( ! %bloqueo_objeto ) ; Descartamos location y buscamos una nueva a la que movernos...
+                                              {
+                                                set #SYSMSGCOL 49
+                                                event sysmessage IGNORANDO LOCATION!
+                                                wait 20
+                                                set %ignore_pos %ignore_pos , _ , %pj_pos_X , _ , %pj_pos_Y
+                                                goto _reMove2
+                                              }
+                                       }
+                             }
+                             else
+                                {
+                                  set %bloqueo_objeto #FALSE
+                                }
+                        gosub waitToHeal ; Esperamos a que se nos llene la vida...
+                      }
+               }
+        }
+goto Heal_loop
+;
+;=======================================================================
+;
+; ***************** FIN LOOP PRINCIPAL MODO SOLITARIO *****************
+;
+;=======================================================================
+;
+;==================================================================
+;
+; ******************* LOOP PRINCIPAL VS PLAYER *******************
+;
+;==================================================================
+;
+Heal_Vs_Player:
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+gosub checkStatus     ; ¿Vivo o Muerto?
+gosub checkEmergency  ; Seguro de vida.
+gosub findEnemy       ; Buscamos cosas malas... ¬¬
+gosub hiding          ; Ocultarse.
+gosub checkHungry     ; Alimentación
+gosub checkPlayer     ; Miramos si hay que cambiar al modo "Solitario" en caso de que marche/muera/desconecte el compañero...
+if #CHARGHOST <> YES
+   {
+     finditem %vendaLimpia C_ , #BACKPACKID
+     if #FINDCNT > 0
+        {
+          set #LOBJECTID #FINDID
+          event macro 17
+          target
+          set %jstart #jindex
+          set #LTARGETID %player
+          set #LTARGETKIND 1
+          event macro 22
+          gosub wait_for MSG Pones_el_vendas no_necesita pero_fallas 20
+          if ( #TRUE in #RESULT )
+               {
+                 if ( Pones_el_vendas in #RESULT )
+                      {
+                        set %heal_timer #SCNT2 + %tiempo_vendazo_vs_player ; 6 segundos
+                        _WaitToBandage:
+                        if #SCNT2 < %heal_timer
+                           {
+                             gosub checkEmergency
+                             gosub findEnemy
+                             wait 1
+                             goto _WaitToBandage
+                           }
+                        gosub limpiarVendas
+                        goto Heal_Vs_Player
+                      }
+                 if ( no_necesita in #RESULT )
+                      {
+                        wait 20
+                        goto Heal_Vs_Player
+                      }
+                 if ( pero_fallas in #RESULT )
+                      {
+                        set %fail_timer #SCNT2 + %tiempo_fallo ; 3 segundos
+                        _WaitToFail:
+                        if #SCNT2 < %fail_timer
+                           {
+                             gosub checkEmergency
+                             gosub findEnemy
+                             wait 1
+                             goto _WaitToFail
+                           }
+                        goto Heal_Vs_Player
+                      }
+               }
+        }
+        else
+           {
+             set #SYSMSGCOL 38
+             event sysmessage NO HAY VENDAS LIMPIAS!! :-(
+             wait 20
+             goto _problemas
+           }
+   }
+goto Heal_Vs_Player
+;
+;==================================================================
+;
+; ***************** FIN LOOP PRINCIPAL VS PLAYER *****************
+;
+;==================================================================
+;
+sub checkEmergency ; <==============================>
+if ( #HITS < %seguro_vida ) && ( #CHARGHOST = no ) ; Seguro de vida...
+     {
+       _problemas:
+       if ( #CHARPOSX = %brasero_x ) && ( #CHARPOSY = %brasero_y ) ; ¿Seguimos en el brasero?
+            {
+              set #SYSMSGCOL 38
+              event sysmessage PELIGRO! Moviendo el PJ! ...
+              wait 20
+              _reMove7:
+              gosub hiding
+              gosub cambiarDireccion       ; Elegimos un sitio al azar
+              set %old_charpos_X #CHARPOSX ; Apuntamos la posición X del PJ
+              set %old_charpos_Y #CHARPOSY ; Apuntamos la posición Y del PJ
+              _reMove8:
+              move %pj_pos_X %pj_pos_Y 0 2s ; Alejarse del brasero hasta al nuevo sitio...
+              if ( #CHARPOSX = %old_charpos_X ) && ( #CHARPOSY = %old_charpos_Y ) ; && ( #CHARPOSX <> %pj_pos_X ) && ( #CHARPOSY <> %pj_pos_Y ) ; Si no nos hemos movido y no estamos en el destino.....
+                   {
+                     gosub comprobarBloqueo ; ¬¬
+                     if ( #TRUE in #RESULT ) ; Es un objeto en el suelo y en teoría ya lo hemos quitado...
+                          {
+                            goto _reMove8
+                          }
+                          else ; ¿Podría ser una pared o farola pegada a un brasero? Okay...
+                             {
+                               if ( ! #RESULT ) ; Descartamos location y buscamos una nueva...
+                                    {
+                                      set #SYSMSGCOL 49
+                                      event sysmessage IGNORANDO LOCATION!
+                                      wait 20
+                                      set %ignore_pos %ignore_pos , _ , %pj_pos_X , _ , %pj_pos_Y
+                                      gosub cambiarDireccion ; Elegimos un sitio al azar
+                                      goto _reMove7
+                                    }
+                             }
+                   }
+            }
+       if ( #CHARGHOST = no )
+            {
+              finditem %vendaLimpia C_ , #BACKPACKID
+              if ( #FINDCNT = 0 ) ; No podemos continuar sin vendas...
+                   {
+                     gosub pickItemsBank ; Intentamos buscarlas en el banco...
+                     gosub waitToHeal    ; Nos curamos la vida entera
+                     gosub selectMode    ; Enviamos el PJ a macrear a él sólo o con el compañero.
+                   }
+                   else ; OK, tenemos vendas para continuar...
+                      {
+                        gosub waitToHeal ; Nos curamos la vida entera
+                        gosub selectMode ; Enviamos el PJ a macrear a él sólo o con el compañero.
+                      }
+            }
+     }
+return
+
+sub selectMode ; <==============================>
+if ( %vs_player_mode ) ; Volvemos al Loop de "Vs Player"
+     {
+       set %old_charpos_X #CHARPOSX  ; Apuntamos la posición X del PJ
+       set %old_charpos_Y #CHARPOSY  ; Apuntamos la posición Y del PJ
+       _reMove9:
+       move %brasero_x %brasero_y 0 5s ; Pisar el brasero.
+       if ( #CHARPOSX = %old_charpos_X && #CHARPOSY = %old_charpos_Y && #CHARPOSX <> %brasero_x && #CHARPOSY <> %brasero_y ) || ( #CHARPOSX <> %brasero_x && #CHARPOSY <> %brasero_y ) ; Si no nos hemos movido y no estamos encima del brasero, o no hemos llegado al brasero...
+            {
+              gosub comprobarBloqueo ; ¬¬
+              goto _reMove9
+            }
+       goto Heal_Vs_Player
+     }
+     else
+        {
+          if ( ! %vs_player_mode ) ; Volvemos al Loop de "Solitario"
+               {
+                 goto Heal_loop
+               }
+        }
+return
+
+sub pickItemsBank ; <==============================>
+_rePick:
+if ( #CONTID <> %bank_ID ) && ( #CHARGHOST <> YES ) ; El cofre del banco está cerrado
+     {
+       event macro 1 0 Bank
+       gosub wait_for GUMP 180_240 30 ; Esperar a que se abra el cofre
+       if ( #TRUE in #RESULT ) ; OK :-)
+            {
+              goto _rePick
+            }
+            else ; ¿No se abre? :-( Intentamos abrirlo desde el sitio en el que lo configuramos al inicio
+               {
+                 _reMove10:
+                 set %old_charpos_X #CHARPOSX  ; Apuntamos la posición X del PJ
+                 set %old_charpos_Y #CHARPOSY  ; Apuntamos la posición Y del PJ
+                 _reMove11:
+                 move %bank_x %bank_y 0 5s ; Moverse al banco...
+                 if ( #CHARPOSX = %old_charpos_X && #CHARPOSY = %old_charpos_Y ) && ( #CHARPOSX <> %bank_x || #CHARPOSY <> %bank_y ) ; Si no nos hemos movido y no estamos en el banco...
+                      {
+                        gosub comprobarBloqueo ; ¬¬
+                        goto _reMove11
+                      }
+                 if ( #CHARPOSX = %bank_x ) && ( #CHARPOSY = %bank_y ) ; Si ya hemos llegado al banco...
+                      {
+                        event macro 1 0 Bank
+                        gosub wait_for GUMP 180_240 30 ; Esperar a que se abra el cofre
+                        if ( #TRUE in #RESULT ) ; OK, parece que ahora sí se abre :-)
+                             {
+                               goto _rePick
+                             }
+                             else ; Tiene pintas de que el banquero se ha ido a echar la siesta...
+                                {
+                                  display OK ERROR: No hay banquero disponible para macrear :-(
+                                  halt
+                                }
+                      }
+                      else ; Todavía no hemos llegado al banco...
+                         {
+                           goto _reMove10
+                         }
+               }
+     }
+     else ; El cofre del banco ya está abierto...
+        {
+          gosub reponerItem %comida %min_comida COMIDA
+          gosub reponerItem %vendaLimpia %min_vendas VENDAS
+        }
+return
+
+sub reponerItem ; <==============================>
+set %item %1
+set %cantidad %2
+set %item_name %3
+_rePon:
+set %stack_mochila 0
+set %stack_bank 0
+finditem %item C_ , #BACKPACKID
+for #FINDINDEX 1 #FINDCNT
+    {
+      set %stack_mochila %stack_mochila + #FINDSTACK
+    }
+finditem %item C_ , %bank_ID
+for #FINDINDEX 1 #FINDCNT
+    {
+      set %stack_bank %stack_bank + #FINDSTACK
+    }
+if ( %stack_mochila < %cantidad ) ; No hay comida, o queda poca en la mochila...
+     {
+       set %reponer %cantidad - %stack_mochila
+       finditem %item C_ , %bank_ID
+       if ( %stack_bank < %reponer ) ; No hay comida, o queda poca en el banco...
+            {
+              set #SYSMSGCOL 38
+              event sysmessage ERROR: NECESITAS MAS %item_name EN EL BANCO ... :-(
+              halt
+            }
+            else
+               {
+                 exevent drag #FINDID %reponer
+                 exevent dropc #BACKPACKID
+                 wait 30
+                 goto _rePon
+               }
+     }
+return
+
+sub setupBank ; <==============================>
+_setupK:
+display OK *********************** [ BANK ] ***********************$$
+         + Acércate hasta el banco y pulsa la tecla ESCAPE. $$
+         + ********************************************************
+_hotLoop:
+onhotkey ESC
+       {
+         event macro 1 0 Bank
+         gosub wait_for GUMP 180_240 30 ; Esperar a que se abra el cofre del banco
+         if ( #TRUE in #RESULT )
+              {
+                set %bank_x #CHARPOSX
+                set %bank_y #CHARPOSY
+                set %bank_z #CHARPOSZ
+                set %bank_ID #CONTID
+                set #SYSMSGCOL 73
+                event sysmessage OK: Bank %bank_ID
+                wait 20
+                gosub pickItemsBank ; Reponer vendas y comida...
+                gosub wait_for GUMP 180_240 CLOSE ; Cerrar el cofre del banco.
+                return
+              }
+              else
+                 {
+                   set #SYSMSGCOL 38
+                   event sysmessage ERROR: IMPOSIBLE ABRIR
+                   wait 20
+                   display OK ERROR: ¡ACÉRCATE MÁS AL BANCO!
+                   goto _setupK
+                 }
+       }
+       wait 1
+goto _hotLoop
+return
+
+sub setupHid ; <==============================>
+display yesno ********************** [ HIDING ] **********************$$
+            + ¿Quieres intentar OCULTAR tu PJ mientras macreas?       $$
+            + NOTA: Se recomienda un nivel alto de andar oculto.      $$
+            + ******************************************************* $$
+if ( #dispres = yes )
+     {
+       gosub checkHiding ; ¿Compatibilidad con el "Modo oculto"?
+       if ( %hiding ) ; OK, es compatible :-)
+            {
+              gosub hiding
+            }
+     }
+return
+
+sub setupBrasero ; <==============================>
+_setupB:
+display OK Haz Click en el BRASERO
+set #TARGCURS 1
+target
+while #TARGCURS = 1
+      {
+        wait 1
+      }
+set %brasero_ID #LTARGETID
+finditem %brasero_ID
+if ( #FINDTYPE NotIn %tipos_braseros )
+     {
+       set #SYSMSGCOL 38
+       event sysmessage ESTO NO PARECE UN BRASERO! ¬¬
+       wait 20
+       goto _setupB
+     }
+     else
+        {
+          ignoreitem %brasero_id Brasero
+          set %brasero_x #FINDX
+          set %brasero_y #FINDY
+          set %brasero_z #FINDZ
+          set #SYSMSGCOL 73
+          event sysmessage OK: Brasero %brasero_id
+          wait 20
+        }
+return
+
+sub setupPapelera ; <==============================>
+display yesno ************************ [ TICKETS ] ************************ $$
+            + ¿Quieres hacer tickets con los objetos que encontraste?       $$
+            + - La alternativa es apartarlos del camino a otro sitio.       $$
+            + ************************************************************  $$
+if ( #dispres = yes ) ; Buscamos tiles de agua en el suelo....
+     {
+       _setupP:
+       display OK *********************** [ PAPELERA ] *********************** $$
+               + Acércate hasta la papelera, ponte en frente de ella a una      $
+               + casilla de distancia, y márcala con un click... :-)           $$
+               + ************************************************************  $$
+       set #TARGCURS 1
+       target
+       while #TARGCURS = 1
+             {
+               wait 1
+             }
+       set %papelera_ID #LTARGETID
+       finditem %papelera_ID
+       if ( #FINDTYPE NotIn %tipos_papeleras ) || ( #FINDCOL <> 1946 )
+            {
+              set #SYSMSGCOL 38
+              display OK ERROR: ESTO NO PARECE UNA PAPELERA! ¬¬
+              wait 20
+              goto _setupP
+            }
+            else
+               {
+                 set %papelera_x #CHARPOSX
+                 set %papelera_y #CHARPOSY
+                 set %papelera_z #CHARPOSZ
+                 set #SYSMSGCOL 73
+                 set #LOBJECTID %papelera_ID
+                 event macro 17
+                 gosub wait_for GUMP 585_401 30 ; Esperar a que se abra el menú de la la papelera
+                 if ( #TRUE in #RESULT )
+                      {
+                        gosub wait_for GUMP 585_401 CLOSE ; Cerrar el menú de la papelera
+                        event sysmessage OK: Papelera %papelera_ID
+                        set %papelera_ticket #TRUE ; OK activamos la opción de hacer tickets XD
+                        wait 20
+                        return
+                      }
+                      else
+                         {
+                           event sysmessage ERROR: IMPOSIBLE ABRIR
+                           wait 20
+                           display OK ERROR: ¡ACÉRCATE MÁS A LA PAPELERA!
+                           goto _setupP
+                         }
+               }
+     }
+return
+
+sub checkPilon ; <==============================>
+finditem %pilon C_ , #BACKPACKID
+if #FINDKIND = -1 ; Si no hay ninguno, buscamos un pozo de agua...
+   {
+     set #SYSMSGCOL 53
+     display OK *******************************************************************************$$
+              + AVISO: ¡SUBIRÁS MÁS RÁPIDO CON UN PILÓN DE AGUA EN LA MOCHILA!                 $$
+              + ****************** ¡¡MEJOR CONSIGUE UN PILON DE AGUA!! ****************        $$
+              + *******************************************************************************$$
+     event sysmessage CONSIGUE UN PILON DE AGUA!!
+     wait 40
+     display yesno ******************** WATER SCANNER ********************$$
+            +   ¿Quieres buscar agua escaneando las capas del suelo? $$
+            +   - La alternativa es que configures un pozo con 1 click.$$
+            + ***********************************************************
+     if ( #dispres = yes ) ; Buscamos tiles de agua en el suelo....
+          {
+            ;   *******************************************************
+            ;  ///////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+            ; ////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+              gosub waterScanner
+            ; \\\\\\\\\\\\\\\\\\\\\\\\\\\\///////////////////////////////
+            ;  \\\\\\\\\\\\\\\\\\\\\\\\\\\\/////////////////////////////
+            ;   *******************************************************
+            return
+          }
+          else
+             {
+               gosub askForPozo
+             }
+   }
+   else
+      {
+        set %pilon_agua #FINDID
+        set #SYSMSGCOL 73
+        event sysmessage OK: Pilon agua %pilon_agua
+        wait 20
+      }
+return
+
+sub waterScanner ; <==============================>
+set %scan_timer #SCNT
+set #SYSMSGCOL 6
+event sysmessage BUSCANDO AGUA EN LA ZONA...
+wait 20
+set %x1 #CHARPOSX - %radio_busqueda_agua
+set %x2 #CHARPOSX + %radio_busqueda_agua
+set %y1 #CHARPOSY - %radio_busqueda_agua
+set %y2 #CHARPOSY + %radio_busqueda_agua
+for %y %y1 %y2
+    {
+      for %x %x1 %x2
+          {
+            for %a 2 3
+                {
+                  Tile Get %x %y %a ; En este caso, el agua se encuentra en las capas ("Layer") número 2 y 3.
+                  if ( water in #TILENAME ) ; Hemos visto tiles de agua...
+                       {
+                         if ( %x , _ , %y , _ , %a notin %ignore_water ) ; No está en la lista de tiles de agua chungos.
+                              {
+                                set #SYSMSGCOL 73
+                                event sysmessage OK: AGUA ENCONTRADA %a :-)
+                                wait 40
+                                gosub askForPozo
+                                return
+                              }
+                      }
+                      else
+                         {
+                           if ( %x , _ , %y , _ , %a notin %ignore_water )
+                                {
+                                  set %ignore_water %ignore_water , _ , %x , _ , %y , _ , %a ; Apuntamos la coordenada X e Y además de la capa (Layer).
+                                }
+                           if ( #SCNT > %scan_timer )
+                                {
+                                  set #SYSMSGCOL 88
+                                  event sysmessage ESCANEANDO....
+                                  wait 20
+                                  set %scan_timer #SCNT + 10
+                                }
+                         }
+                }
+          }
+    }
+if ( %pozo_agua_x = N/A || %pozo_agua_y = N/A ) ; Si hemos llegado aquí, casi seguro que no hay agua cerca...
+     {
+       set #SYSMSGCOL 38
+       event sysmessage ERROR: NO HAY AGUA :-(
+       wait 20
+       display OK *** BUSCA UN PILÓN O UN BRASERO CON POZO DE AGUA CERCA! ***
+       gosub askForPozo
+     }
+return
+
+sub askForPozo ; <==============================>
+display yesno ******************** ¿POZO DE AGUA? ******************************$$
+            + OK: ¿Quieres intentar configurar un pilón o pozo de agua cercano? $$
+            + *********************************************************************
+if ( #dispres = yes )
+     {
+       gosub setupPozo ; Modo manual...
+     }
+     else
+        {
+          set #SYSMSGCOL 38
+          event sysmessage PARANDO LA MACRO... :-(
+          halt
+        }
+return
+
+sub askForPlayer ; <==============================>
+display yesno ************** ¿COMPAÑERO DE MACREO? **************$$
+            +         ¿Quieres macrear junto con otra persona?   $$
+            +     ¡SUBIRÁS LA HABILIDAD EL TRIPLE DE RÁPIDO! :-) $$
+            + ***********************************************************
+       if ( #dispres = yes )
+            {
+              set %vs_player_mode #TRUE
+              set #SYSMSGCOL 43
+              event sysmessage OK: MODO VS PLAYER... ^^
+              wait 20
+              gosub setupPlayer ; Modo Player Vs Player...
+            }
+            else
+               {
+                 set %vs_player_mode #FALSE
+                 set #SYSMSGCOL 43
+                 event sysmessage OK: MODO SOLITARIO... ^^
+                 wait 20
+               }
+return
+
+sub setupPlayer ; <==============================>
+display OK Haz click en el PJ al que quieres curar
+set #TARGCURS 1
+target
+while #TARGCURS = 1
+      {
+        wait 1
+      }
+set %player #LTARGETID
+gosub GetName %player nombre_player
+set #SYSMSGCOL 73
+event sysmessage OK Player: %nombre_player
+wait 40
+return
+
+sub setupPozo ; <==============================>
+_rePozo:
+display OK ************************* ¡POZO/PILÓN DE AGUA! ***********************    $$
+         + ~~~~~> 1.) Acércate al pozo/pilón de agua para configurarlo.              $
+         + ~~~~~> 2.) Prueba a limpiar una venda en un sitio que te lo permita.      $
+         + ~~~~~> 3.) Presiona la tecla ESCAPE cuando lo hayas encontrado.           $
+         + ~~~~~> 4.) Haz click en el sitio cuando cambie el cursor del ratón.       $$
+         + **************************************************************************
+_hotLoop2:
+onhotkey ESC
+       {
+         finditem %vendaLimpia C_ , #BACKPACKID
+         if #FINDCNT > 0
+            {
+              set #LOBJECTID #FINDID
+              event macro 17
+              target
+              while #TARGCURS = 1
+                    {
+                      wait 1
+                    }
+              set %pozo_agua_x #LTARGETX
+              set %pozo_agua_y #LTARGETY
+              set %borde_pozo_x #CHARPOSX
+              set %borde_pozo_y #CHARPOSY
+              set %pilon_suelo_ID #LTARGETID
+              finditem %pilon_suelo_ID G_
+              if #FINDCNT > 0
+                 {
+                   if #FINDTYPE in %pilon ; Parece un pilón de agua en el suelo...
+                      {
+                        set #SYSMSGCOL 73
+                        event sysmessage OK: PILÓN CONFIGURADO %pilon_suelo_ID
+                        set %pilon_suelo #TRUE
+                        wait 20
+                        return
+                      }
+                      else
+                         {
+                           goto _Pozo ; No parece un pilón, probamos con tiles de agua...
+                         }
+                 }
+                 else
+                    {
+                      _Pozo:
+                      Tile Get %pozo_agua_x %pozo_agua_y 2 ; Layer 2
+                      if ( Water in #TILENAME )
+                           {
+                             set #SYSMSGCOL 73
+                             event sysmessage OK: POZO CONFIGURADO :-)
+                             set #RESULT #TRUE ; OK
+                             return
+                           }
+                           else
+                              {
+                                Tile Get %pozo_agua_x %pozo_agua_y 3 ; Layer 3
+                                if ( Water in #TILENAME )
+                                     {
+                                       set #SYSMSGCOL 73
+                                       event sysmessage OK: POZO CONFIGURADO :-)
+                                       set #RESULT #TRUE ; OK
+                                       return
+                                     }
+                                     else
+                                        {
+                                          display OK ERROR: ESTO NO PARECE TENER AGUA! :-(
+                                          set #RESULT #FALSE ; ERROR
+                                          goto _rePozo
+                                        }
+                              }
+                    }
+            }
+            else
+               {
+                 display OK ERROR: Debes tener vendas en la mochila :-(
+                 halt
+               }
+       }
+wait 1
+goto _hotLoop2
+return
+
+sub askForHealer ; <==============================>
+display yesno ************** ¿RESUCITAR EN EL HEALER? **************        $$
+            +         ¿Quieres resucitar en un curandero en caso de muerte? $$
+            + ***********************************************************
+if ( #dispres = yes )
+     {
+       set %resucitar #TRUE
+       gosub setupPaperdoll ; Configurar el botón de WAR/PAZ
+       gosub setupBackpack  ; Configurar la posición de la mochila.
+       gosub setupHealer    ; Configurar el curandero
+     }
+     else
+        {
+          set %resucitar #FALSE
+        }
+return
+
+sub setupHealer ; <==============================>
+_setupH:
+display OK Vete andando hasta donde está el Healer, y pulsa ESCAPE.
+_hotLoop3:
+onhotkey ESC
+       {
+         gosub findHealer
+         if %healer = N/A ; No hay un curandero en los alrededores...
+            {
+              set #SYSMSGCOL 38
+              event sysmessage ALERTA! NO HAY NINGUN HEALER!
+              wait 20
+              display yesno ************************* CONFIGURACIÖN DEL HEALER *************************     $$
+                          + ¡ALERTA! ¡No parece haber un healer/curandero en la zona!                        $$
+                          + ¿Estas seguro de que quieres establecer aquí la posición para venir a resucitar? $$
+                          + ***********************************************************************************
+              if ( #dispres = yes )
+                   {
+                     set %healer_x #CHARPOSX
+                     set %healer_y #CHARPOSY
+                     set %healer_z #CHARPOSZ
+                     set #SYSMSGCOL 23
+                     event sysmessage OK: HEALER ACTIVADO... ^^
+                     gosub choose_pace run ; Activar correr.
+                     gosub pathLoop %bank_x %bank_y ; Volvemos andando a la zona de macreo
+                     gosub choose_pace walk ; Activar andar normal.
+                     return
+                   }
+                   else
+                      {
+                        goto _setupH ; Repetimos...
+                      }
+            }
+            else ; Lo hemos encontrado automáticamente... :-)
+               {
+                 set %healer_x #CHARPOSX
+                 set %healer_y #CHARPOSY
+                 set %healer_z #CHARPOSZ
+                 gosub choose_pace run ; Activar correr.
+                 gosub pathLoop %bank_x %bank_y ; Volvemos andando a la zona de macreo
+                 gosub choose_pace walk ; Activar andar normal.
+                 return
+               }
+       }
+       wait 1
+goto _hotLoop3
+return
+
+sub pathLoop ; <==============================>
+set %destino_x %1
+set %destino_y %2
+_rePath:
+gosub BMPathfind %destino_x %destino_y 0 60
+if ( ! #RESULT )
+     {
+       goto _rePath
+     }
+return
+
+sub findHealer ; <==============================>
+set %healer N/A
+finditem HS_IS G_
+if #FINDCNT > 0
+   {
+     for #FINDINDEX 1 #FINDCNT
+         {
+           event property #FINDID
+           if Curandero in #PROPERTY
+              {
+                set %healer #FINDID
+                gosub GetName %healer nombre_healer
+                set #SYSMSGCOL 23
+                event sysmessage OK HEALER: %nombre_healer
+                break
+              }
+         }
+   }
+return
+
+sub checkHiding ; <==============================>
+chooseskill Hidi real
+set %skillinihiding #SKILL
+chooseskill Stlt real
+set %skillinistlt #SKILL
+if ( %skillinihiding >= %skill_ocultarse ) && ( %skillinistlt >= %skill_caminar_oculto )
+     {
+       set %hiding #TRUE
+       set #SYSMSGCOL 16
+       event sysmessage OK: Modo OCULTO Activado! :-)
+       wait 20
+       gosub choose_pace walk ; Desactivar correr
+     }
+     else
+        {
+          set %hiding #FALSE
+          set #SYSMSGCOL 6
+          event sysmessage Skill de Hiding insuficiente...
+          wait 20
+          event sysmessage Desactivando modo Oculto :-(
+          wait 20
+          gosub choose_pace run ; Cambiar el modo de moverse a " Always Run = ON ".
+        }
+return
+
+sub checkPlayer ; <==============================>
+_waitToPlayer:
+gosub checkEmergency
+finditem %player
+if #FINDCNT > 0 ; El compañero todavía está presente...
+   {
+     if #FINDDIST > 1 ; Si está, pero demasiado lejos, le esperamos...
+        {
+          wait 1
+          goto _waitToPlayer
+        }
+   }
+   else
+      {
+        if ( #FINDCNT = 0 && #FINDDIST = N/A ) ; El compañero se ha marchado, desconectado, o muerto, etc... XD
+             {
+               goto Heal_loop ; Nos ponemos a macrear solitos en el brasero :-(
+             }
+      }
+return
+
+sub checkPlayerBack ; <==============================>
+if ( %vs_player_mode )
+     {
+       finditem %player
+       if #FINDCNT > 0 ; Si ha vuelto el compañero, nos volvemos al Loop de "Vs Player" :-)
+          {
+            gosub selectMode
+          }
+     }
+return
+
+sub healMe ; <==============================>
+if ( #CHARGHOST <> YES )
+     {
+       if #TARGCURS = 1
+          {
+            key esc
+            wait 10
+          }
+       finditem %vendaLimpia C_ , #BACKPACKID
+       if #FINDCNT > 0
+          {
+            set #LOBJECTID #FINDID
+            event macro 17
+            target
+            set %jstart #jindex
+            event macro 23
+            set %tiempo_icono #SCNT2 + 10 ; (5) Tiempo espera para el icono de vendas
+            _waitToPix:
+            savepix 30 47 1 ; Posición X / Y del icono
+            if ( #pixCol <> %pixel_vendazo ) ; Bucle para esperar al icono, y reintentar el vendazo
+                 {
+                   if ( #SCNT2 > %tiempo_icono ) ; Si no aparece en todo este tiempo, es que algo ha fallado... :-(
+                        {
+                          return
+                        }
+                        else
+                           {
+                             wait 1 ; 1 décima de segundo en cada ciclo
+                             goto _waitToPix
+                           }
+                 }
+          }
+          else
+             {
+               if ( ! %first_heal ) ; No estamos en el healer...
+                    {
+                      gosub pickItemsBank ; Intentamos buscarlas en el banco...
+                    }
+             }
+     }
+return
+
+sub limpiarVendas ; <==============================>
+set %stack_sucias 0
+finditem %vendaSucia C_ , #BACKPACKID
+for #FINDINDEX 1 #FINDCNT
+    {
+      set %stack_sucias %stack_sucias + #FINDSTACK
+    }
+if ( %stack_sucias >= %max_vendas_sucias )
+     {
+       if ( %pilon_agua <> N/A ) ; OK, tenemos un pilón
+            {
+              finditem %vendaSucia C_ , #BACKPACKID
+              if #FINDCNT > 0 ; Hay vendas sucias...
+                 {
+                   for #FINDINDEX 1 #FINDCNT ; Para cada montón de vendas sucias...
+                       {
+                         set #LOBJECTID #FINDID
+                         event macro 17
+                         target
+                         set #LTARGETID %pilon_agua ; Limpiar con el pilón de la mochila.
+                         set #LTARGETKIND 1
+                         event macro 22
+                         wait 10
+                       }
+                   gosub agruparVendas
+                 }
+            }
+            else
+               {
+                 if ( %pilon_agua = N/A ) ; Hay que ir andando al pozo o pilón de agua...
+                      {
+                        gosub hiding
+                        set %old_charpos_X #CHARPOSX  ; Apuntamos la posición X del PJ
+                        set %old_charpos_Y #CHARPOSY  ; Apuntamos la posición Y del PJ
+                        _reMove4:
+                        move %borde_pozo_x %borde_pozo_y 0 10s ; Movernos hasta el pozo de agua
+                        if ( #CHARPOSX = %old_charpos_X && #CHARPOSY = %old_charpos_Y ) || ( #CHARPOSX <> %borde_pozo_x && #CHARPOSY <> %borde_pozo_y ) ; Si no nos hemos movido o no estamos en el destino...
+                             {
+                               gosub comprobarBloqueo ; ¬¬
+                               goto _reMove4
+                             }
+                        gosub hiding
+                        _reLimpia:
+                        finditem %vendaSucia C_ , #BACKPACKID
+                        if #FINDCNT > 0 ; Hay vendas sucias...
+                           {
+                             for #FINDINDEX 1 #FINDCNT ; Para cada montón de vendas sucias...
+                                 {
+                                   set #LOBJECTID #FINDID
+                                   event macro 17
+                                   target
+                                   if ( ! %pilon_suelo ) ; Es un pozo de agua...
+                                        {
+                                          set #LTARGETX %pozo_agua_x
+                                          set #LTARGETY %pozo_agua_y
+                                          set #LTARGETKIND 3
+                                        }
+                                        else
+                                           {
+                                             if ( %pilon_suelo ) ; Es un pilón de agua en el suelo...
+                                                  {
+                                                    set #LTARGETID %pilon_suelo_ID
+                                                    set #LTARGETKIND 1
+                                                  }
+                                           }
+                                   event macro 22
+                                   wait 10
+                                 }
+                              goto _reLimpia
+                            }
+                        gosub agruparVendas
+                        if ( %vs_player_mode ) ; Volvemos al sitio donde estábamos
+                             {
+                               set %old_charpos_X #CHARPOSX  ; Apuntamos la posición X del PJ
+                               set %old_charpos_Y #CHARPOSY  ; Apuntamos la posición Y del PJ
+                               _reMove5:
+                               move %brasero_x %brasero_y 0 5s ; Pisar el brasero.
+                               if ( #CHARPOSX = %old_charpos_X ) && ( #CHARPOSY = %old_charpos_Y ) && ( #CHARPOSX <> %brasero_x ) && ( #CHARPOSY <> %brasero_y ) ; Si no nos hemos movido y no estamos encima del brasero...
+                                    {
+                                      gosub comprobarBloqueo ; ¬¬
+                                      goto _reMove5
+                                    }
+                               gosub hiding
+                             }
+                      }
+               }
+     }
+return
+
+sub comprobarBloqueo ; <==============================>
+if ( #CHARGHOST = no )
+     {
+       ignoreitem reset Objetos
+       finditem * G_ ; Buscamos cualquier objeto en el suelo.
+       if #FINDCNT > 0
+          {
+            for #FINDINDEX 1 #FINDCNT
+                {
+                  if #FINDDIST = 1 ; Para todo lo que está cerca nuestro.
+                     {
+                       gosub checkObjectDir ; Miramos si está justo delante... ¬¬
+                       if ( #CHARPOSX = %objecto_tocahuevos_X ) && ( #CHARPOSY = %objecto_tocahuevos_Y )
+                            {
+                              event macro 1 0 Grrrrr! ¬¬
+                              wait 20
+                              set %bloqueo_objeto #TRUE
+                              if ( %papelera_ticket )
+                                   {
+                                     gosub dragItemBackpack
+                                     set %recolectados %recolectados , _ , %objecto_tocahuevos_ID ; Añadir a una lista los objectos recolectados, para hacer tickets en la papelera.
+                                     gosub checkWeight
+                                     return
+                                   }
+                                   else
+                                      {
+                                        gosub moveItemRandom
+                                        return
+                                      }
+                            }
+                     }
+                }
+          }
+       set %bloqueo_objeto #FALSE ; Si llegamos hasta aquí, es que no es un objeto, sino una pared, una farola, etc...
+     }
+return
+
+sub dragItemBackpack ; <==============================>
+exevent drag %objecto_tocahuevos_ID  ; Levantamos el objeto.
+exevent dropc #BACKPACKID            ; Lo guardamos en la mochila.
+wait 30
+return
+
+sub moveItemRandom ; <==============================>
+gosub cambiarDireccion               ; Elegir un sitio aleatorio donde moverlo y que no sea en nuestra misma dirección...
+exevent drag %objecto_tocahuevos_ID  ; Levantamos el objeto.
+exevent dropG %pj_pos_X %pj_pos_Y    ; Lo movemos a otro sitio aleatorio.
+wait 30
+return
+
+sub checkWeight ; <==============================>
+if #WEIGHT >= #MAXWEIGHT - 30
+   {
+     gosub moveToPaperbasket
+     gosub makeTickets
+   }
+return
+
+sub checkStatus  ; <==============================>
+if #CHARGHOST = yes
+   {
+     if ( %resucitar )
+          {
+            gosub resucitar
+          }
+          else ; Si no está activada la opción de resucitar, paramos la macro.
+             {
+               halt
+             }
+   }
+return
+
+sub initMacro ; <==============================>
+if ( ! %vs_player_mode )
+     {
+       goto Heal_loop
+     }
+     else
+        {
+          goto Heal_Vs_Player
+        }
+return
+
+sub resucitar ; <==============================>
+gosub choose_pace run               ; Activar correr.
+gosub pathLoop %healer_x %healer_y  ; Moverse hasta el curandero.
+gosub checkPaperdoll                ; Situar correctamente el paperdoll del PJ.
+gosub paceWar war                   ; Ponerse en WAR.
+gosub waitToRes                     ; Esperar a que nos resuciten.
+gosub waitToBackpack                ; Esperar a que se abra la mochila.
+gosub checkPaperdoll                ; Situar correctamente el paperdoll del PJ.
+gosub paceWar peace                 ; Ponerse en PAZ.
+gosub firstheal                     ; Primer vendazo al resucitar XD
+gosub pathLoop %bank_x %bank_y      ; Moverse hasta el banco.
+gosub choose_pace walk              ; Desactivar correr
+gosub lootRestos                    ; Lotear nuestro propio cadáver.
+return
+
+sub checkPaperdoll
+event macro 8	1 ; Open Paperdoll
+gosub wait_for GUMP paperdoll_gump 20
+contpos %paperdoll_x %paperdoll_y
+return
+
+sub waitToBackpack  ; <==============================>
+gosub wait_for GUMP #BACKPACKID 50 ; Esperar a que se abra la mochila
+contpos %backpack_x %backpack_y ; Situar la mochila en sus sitio...
+return
+
+sub firstheal
+set %first_heal #TRUE
+finditem KAG C_ , #BACKPACKID
+if #FINDCNT > 0 ; Hay tijeras
+   {
+     set %tijeras #FINDID
+     _Desnudo:
+     finditem FWL C_ , #CHARID
+     if #FINDCNT > 0
+        {
+          event property #FINDID
+          if Resurreccion in #PROPERTY
+             {
+               set %tunica_res #FINDID
+               exevent drag %tunica_res
+               exevent dropc #BACKPACKID
+               wait 30
+               goto _Desnudo
+             }
+        }
+     finditem %tunica_res C_ , #BACKPACKID
+     if #FINDCNT > 0
+        {
+          set #LOBJECTID %tijeras
+          event macro 17
+          target
+          set #LTARGETID %tunica_res
+          set #LTARGETKIND 1
+          event macro 22
+          wait 20
+        }
+     repeat
+          {
+            finditem %vendaLimpia C_ , #BACKPACKID
+            set %vendas #FINDSTACK
+            gosub checkHeal  ; Nos aplicamos una venda en cuanto nos sea posible...
+          }
+          until ( #HITS = #MAXHITS ) || ( %vendas = 0 )
+          set %first_heal #FALSE
+   }
+return
+
+sub lootRestos ; <==============================>
+ignoreitem reset Objetos
+_newCorpse:
+finditem YFM_QNF G_25 ; Cuerpos, Restos...
+if #FINDCNT > 0
+   {
+     event property #FINDID
+     if ( Cuerpo , #spc , De , #spc , #CHARNAME in #PROPERTY ) || ( Restos , #spc , De , #spc , #CHARNAME in #PROPERTY )
+          {
+            set %mi_cuerpo_id #FINDID
+            set %mi_cuerpo_x #FINDX
+            set %mi_cuerpo_y #FINDY
+            repeat
+                 {
+                   finditem %mi_cuerpo_id G_
+                   if #FINDDIST > 2
+                      {
+                        gosub FindThingsDir %mi_cuerpo_x %mi_cuerpo_y corpsedir
+                        event macro 5 %corpsedir
+                        wait 20
+                      }
+                   finditem %mi_cuerpo_id G_
+                 }
+                 until #FINDDIST <= 2
+            set %loot_timer #SCNT + 20 ; Cronómetro de loteo (10 segundos).
+            _repiteCorpse:
+            set #LOBJECTID %mi_cuerpo_id
+            event macro 17
+            gosub wait_for GUMP %mi_cuerpo_id 20 ; Esperamos un máximo de 2s a que se abra el contenedor con el ID del cuerpo a lotear
+            if ( ! #RESULT ) ; Failed! ;-(
+                 {
+                   goto _repiteCorpse
+                 }
+            finditem %loot_items C_ , %mi_cuerpo_id
+            if ( #FINDCNT > 0 ) && ( #SCNT < %loot_timer )
+                 {
+                   if ( #FINDTYPE <> YC ) && ( #FINDTYPE <> X ) ; Bugs del Easy... ¬¬
+                        {
+                          for #FINDINDEX 1 #FINDCNT
+                              {
+                                if ( #WEIGHT <= #MAXWEIGHT - 50 )
+                                     {
+                                       exevent drag #FINDID #FINDSTACK
+                                       exevent dropc #BACKPACKID
+                                       wait 30
+                                     }
+                              }
+                          goto _repiteCorpse
+                        }
+                 }
+            wait 20
+            gosub wait_for GUMP %mi_cuerpo_id CLOSE ; Cerramos el cuerpo...
+            ignoreitem %mi_cuerpo_id CorpsesID ; Descartamos este cuerpo para futuras ocasiones...
+          }
+     goto _newCorpse ; Buscamos otro cadáver...
+   }
+return
+
+sub setupBackpack ; <==============================>
+display OK Haz click en la Mochila de tu personaje. $$
+      + ************** [ TIENES 5 SEGUNDOS ] **************
+set %backpack_timer #SCNT + 5
+repeat
+     {
+       wait 1
+       set %backpack_x #CONTPOSX ; La posición X de la mochila de tu personaje.
+       set %backpack_y #CONTPOSY ; La posición Y de la mochila de tu personaje.
+     }
+     until ( #CONTID = #BACKPACKID ) && ( #SCNT > %backpack_timer )
+return
+
+sub setupPaperdoll ; <==============================>
+_rePaperdoll:
+display OK Haz click en el Paperdoll/Cartel de tu personaje. $$
+      + ************** [ TIENES 5 SEGUNDOS ] **************
+set %paperdoll_timer #SCNT + 5
+repeat
+     {
+       wait 1
+       set %paperdoll_x #CONTPOSX ; La posición X del paperdoll de tu personaje.
+       set %paperdoll_y #CONTPOSY ; La posición Y del paperdoll de tu personaje.
+       set %boton_war_x %paperdoll_x + 201 ; 1024 -> Offset desde el borde izquierdo del paperdoll hasta el interior del botón.
+       set %boton_war_y %paperdoll_y + 214 ; 217 -> Offset desde el borde superior del paperdoll hasta el interior del botón.
+     }
+     until ( #CONTNAME = paperdoll_gump ) && ( #SCNT > %paperdoll_timer )
+_rePace:
+set #SYSMSGCOL 53
+event sysmessage Configurando WAR/PEACE...
+wait 40
+SavePix %boton_war_x %boton_war_y 1
+set %tmp_pixel #pixcol ; Guardamos el pixel del boton...
+if ( %tmp_pixel = %peace )
+     {
+       set #SYSMSGCOL 86
+       event sysmessage OK: Estamos en PAZ
+       wait 20
+     }
+     else
+        {
+          if ( %tmp_pixel = %war )
+               {
+                 set #SYSMSGCOL 40
+                 event sysmessage Estamos en GUERRA!
+                 wait 20
+                 event macro 6 0 ; WAR/PAZ
+                 goto _rePace
+               }
+               else
+                  {
+                    set #SYSMSGCOL 38
+                    event sysmessage PROBLEMA: Algo tapa el Paperdoll!
+                    sound
+                    wait 20
+                    goto _rePaperdoll ; Preparamos el Paperdoll en su posición.
+                  }
+        }
+return
+
+sub paceWar ; <==============================>
+if %1 = war
+   {
+     set %pixel %war
+   }
+   else
+      {
+        if %1 = peace
+           {
+             set %pixel %peace
+           }
+      }
+_repix:
+SavePix %boton_war_x %boton_war_y 2 ; Comprobamos si estamos en PAZ y nos ponemos en WAR para resucitar...
+set %tmp_pix #pixcol
+if %tmp_pix <> %pixel ; Si el pixel era distinto al que buscamos entonces debemos cambiar a PAZ o WAR.
+   {
+     event macro 6 0 ; WAR/PAZ
+     gosub waitForSysVar pixcol <> %tmp_pix 10
+     goto _repix
+   }
+return
+
+sub waitToRes ; <==============================>
+repeat
+     {
+       wait 1
+     }
+     until #CHARGHOST = no
+return
+
+sub moveToPaperbasket ; <==============================>
+set %old_charpos_X #CHARPOSX  ; Apuntamos la posición X del PJ
+set %old_charpos_Y #CHARPOSY  ; Apuntamos la posición Y del PJ
+_reMove6:
+move %papelera_x %papelera_y 0 5s ; Nos movemos hacia la papelera...
+if ( #CHARPOSX = %old_charpos_X ) && ( #CHARPOSY = %old_charpos_Y ) && ( #CHARPOSX <> %papelera_x ) && ( #CHARPOSY <> %papelera_y ) ; Si no nos hemos movido y no hemos llegado a la papelera...
+     {
+       ignoreitem reset Objetos
+       finditem * G_ ; Buscamos cualquier objeto en el suelo.
+       if #FINDCNT > 0
+          {
+            for #FINDINDEX 1 #FINDCNT
+                {
+                  if #FINDDIST = 1 ; Para todo lo que está cerca nuestro.
+                     {
+                       gosub checkObjectDir ; Miramos si está justo delante... ¬¬
+                       if ( #CHARPOSX = %objecto_tocahuevos_X ) && ( #CHARPOSY = %objecto_tocahuevos_Y )
+                            {
+                              gosub moveItemRandom ; Como ya vamos pasados de peso, apartamos el objeto a otro sitio al azar...
+                            }
+                     }
+              }
+         }
+       goto _reMove6
+   }
+return
+
+sub makeTickets ; <==============================>
+finditem %recolectados C_ , #BACKPACKID
+if #FINDCNT > 0
+   {
+     set %num_items #FINDCNT
+     finditem %papelera_ID G_2
+     if #FINDCNT > 0
+        {
+          set #LOBJECTID #FINDID
+          event macro 17
+          gosub wait_for GUMP 585_401 30 ; Esperar a que se abra el menú de la la papelera
+          if ( ! #RESULT ) ; Ha habido algún problema al abrir...
+               {
+                 goto _reMove6 ; Intentamos acercarnos otra vez...
+               }
+          contpos %menu_reciclarx %menu_reciclary ; Situamos el menú de papelera en su sitio
+          set %boton_eliminar_offsetx 89
+          set %boton_eliminar_offsety 168
+          set %clickx #contposx + %boton_eliminar_offsetx
+          set %clicky #contposy + %boton_eliminar_offsety
+          click %clickx %clicky f
+          gosub wait_for GUMP 585_401 30 ; Esperar a que vuelva el menú de la papelera
+          set %boton_target_offsetx 307
+          set %boton_target_offsety 334
+          set %clickx #contposx + %boton_target_offsetx
+          set %clicky #contposy + %boton_target_offsety
+          click %clickx %clicky f
+          target 3s
+          for %i 1 %num_items
+              {
+                finditem %recolectados C_ , #BACKPACKID ; CORAZA, ALABARDA PESADA, MALLA ORO...
+                set %peso #WEIGHT
+                set %id #FINDID
+                set #LTARGETKIND 1
+                set #LTARGETID %id
+                event macro 22
+                gosub waitForSysVar Weight <> %peso 50 ; Esperamos a que cambie el peso del PJ
+              }
+        }
+	   key ESC
+   	 gosub wait_for GUMP 585_401 CLOSE ; Cerrar el menú de la papelera
+   }
+return
+
+sub agruparVendas ; <==============================>
+_agruparVendas:
+finditem %vendaLimpia C_ , #BACKPACKID
+if #FINDCNT > 1 ; Si hay más de 1 montón de vendas...
+   {
+     for #FINDINDEX 1 #FINDCNT
+         {
+           exevent drag #FINDID #FINDSTACK
+           exevent dropc #BACKPACKID
+           wait 20
+           goto _agruparVendas
+         }
+   }
+return
+
+sub findEnemy ; <==============================>
+_reCheckEnemy:
+finditem * G_
+if ( #FINDTYPE <> YC ) && ( #FINDTYPE <> X ) ; Bugs del Easy... ¬¬
+     {
+       for #FINDINDEX 1 #FINDCNT
+           {
+             if ( #FINDREP in %mala_gente )
+                  {
+                    event macro 1 0 GUARDS
+                    wait 3s
+                    goto _reCheckEnemy
+                  }
+                  else
+                     {
+                       if ( %vs_player_mode ) ; Si estamos macreando con alguien, no lo ignoramos...
+                            {
+                              if ( #FINDID NotIn %player )
+                                   {
+                                     ignoreitem #FINDID Objetos
+                                   }
+                            }
+                            else
+                               {
+                                 ignoreitem #FINDID Objetos
+                               }
+                     }
+           }
+     }
+return
+
+sub hiding ; <==============================>
+if ( %hiding )
+     {
+       if ( H Notin #CHARSTATUS ) && ( #CHARGHOST <> YES )
+            {
+              if ( #SCNT2 > %hid_timer )
+                   {
+                     event macro 13 21 ; Use skill Hiding
+                     set %hid_timer #SCNT2 + 50
+                   }
+            }
+     }
+return
+
+sub checkHungry ; <==============================>
+set %tiempo_actual #SCNT
+if ( %proxima_vez <= %tiempo_actual )
+     {
+       gosub comprobar_comida
+     }
+return
+
+sub waitToHits ; <==============================>
+set %tiempo_brasero #SCNT2 + %encima_brasas
+_waitDamage:
+if ( #HITS = #MAXHITS ) && ( #SCNT2 <= %tiempo_brasero )
+     {
+       wait 1
+       goto _waitDamage
+     }
+repeat
+     {
+       gosub hiding
+       gosub checkHeal
+       gosub checkEmergency
+       gosub findEnemy
+     }
+     until ( #HITS <= %limit_hits ) || ( #SCNT2 >= %tiempo_brasero )
+return
+
+sub waitToHeal ; <==============================>
+repeat
+     {
+       gosub checkStatus
+       gosub hiding
+       gosub checkHeal
+       gosub checkEmergency
+       gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+       gosub limpiarVendas
+       gosub findEnemy
+     }
+     until ( #HITS >= #MAXHITS )
+return
+
+sub checkHeal ; <==============================>
+if ( #HITS < #MAXHITS )
+     {
+       savepix 30 47 1 ; Posición X / Y del icono de las vendas
+       if ( #pixCol <> %pixel_vendazo ) ; Si no hay una venda en curso...
+            {
+              gosub healMe ; Nos aplicamos una venda
+            }
+     }
+return
+
+
+sub cambiarDireccion ; <==============================>
+_reDir:
+gosub randomDir  ; Movimiento aleatorio circular... ¬¬
+gosub randomDist ; Distancia aleatoria con el brasero... ¬¬
+if %dir = 0 ; Noroeste
+   {
+     set %pj_pos_X #CHARPOSX
+     set %pj_pos_Y #CHARPOSY
+     set %pj_pos_Y %pj_pos_Y - %dist
+     if ( %pj_pos_X , _ , %pj_pos_Y In %ignore_pos ) ; Si la location está en la lista negra, elegimos una nueva...
+          {
+            goto _reDir
+          }
+     return
+   }
+if %dir = 1 ; Norte
+   {
+     set %pj_pos_X #CHARPOSX
+     set %pj_pos_Y #CHARPOSY
+     set %pj_pos_X %pj_pos_X + %dist
+     set %pj_pos_Y %pj_pos_Y - %dist
+     if ( %pj_pos_X , _ , %pj_pos_Y In %ignore_pos ) ; Si la location está en la lista negra, elegimos una nueva...
+          {
+            goto _reDir
+          }
+     return
+   }
+if %dir = 2 ; Noreste
+   {
+     set %pj_pos_X #CHARPOSX
+     set %pj_pos_Y #CHARPOSY
+     set %pj_pos_X %pj_pos_X + %dist
+     if ( %pj_pos_X , _ , %pj_pos_Y In %ignore_pos ) ; Si la location está en la lista negra, elegimos una nueva...
+          {
+            goto _reDir
+          }
+     return
+   }
+if %dir = 3 ; Este
+   {
+     set %pj_pos_X #CHARPOSX
+     set %pj_pos_Y #CHARPOSY
+     set %pj_pos_X %pj_pos_X + %dist
+     set %pj_pos_Y %pj_pos_Y + %dist
+     if ( %pj_pos_X , _ , %pj_pos_Y In %ignore_pos ) ; Si la location está en la lista negra, elegimos una nueva...
+          {
+            goto _reDir
+          }
+     return
+   }
+if %dir = 4 ; Sureste
+   {
+     set %pj_pos_X #CHARPOSX
+     set %pj_pos_Y #CHARPOSY
+     set %pj_pos_Y %pj_pos_Y + %dist
+     if ( %pj_pos_X , _ , %pj_pos_Y In %ignore_pos ) ; Si la location está en la lista negra, elegimos una nueva...
+          {
+            goto _reDir
+          }
+     return
+   }
+if %dir = 5 ; Sur
+   {
+     set %pj_pos_X #CHARPOSX
+     set %pj_pos_Y #CHARPOSY
+     set %pj_pos_X %pj_pos_X - %dist
+     set %pj_pos_Y %pj_pos_Y + %dist
+     if ( %pj_pos_X , _ , %pj_pos_Y In %ignore_pos ) ; Si la location está en la lista negra, elegimos una nueva...
+          {
+            goto _reDir
+          }
+     return
+   }
+if %dir = 6 ; Suroeste
+   {
+     set %pj_pos_X #CHARPOSX
+     set %pj_pos_Y #CHARPOSY
+     set %pj_pos_X %pj_pos_X - %dist
+     if ( %pj_pos_X , _ , %pj_pos_Y In %ignore_pos ) ; Si la location está en la lista negra, elegimos una nueva...
+          {
+            goto _reDir
+          }
+     return
+   }
+if %dir = 7 ; Oeste
+   {
+     set %pj_pos_X #CHARPOSX
+     set %pj_pos_Y #CHARPOSY
+     set %pj_pos_X %pj_pos_X - %dist
+     set %pj_pos_Y %pj_pos_Y - %dist
+     if ( %pj_pos_X , _ , %pj_pos_Y In %ignore_pos ) ; Si la location está en la lista negra, elegimos una nueva...
+          {
+            goto _reDir
+          }
+     return
+     set %dir 0
+   }
+return
+
+sub checkObjectDir ; <==============================>
+set %objecto_tocahuevos_X 0
+set %objecto_tocahuevos_Y 0
+if #CHARDIR = 0 ; Noroeste
+   {
+     set %objecto_tocahuevos_X #FINDX
+     set %objecto_tocahuevos_Y #FINDY
+     set %objecto_tocahuevos_ID #FINDID
+     set %objecto_tocahuevos_Y %objecto_tocahuevos_Y + 1
+     return
+   }
+if #CHARDIR = 1 ; Norte
+   {
+     set %objecto_tocahuevos_X #FINDX
+     set %objecto_tocahuevos_Y #FINDY
+     set %objecto_tocahuevos_ID #FINDID
+     set %objecto_tocahuevos_X %objecto_tocahuevos_X - 1
+     set %objecto_tocahuevos_Y %objecto_tocahuevos_Y + 1
+     return
+   }
+if #CHARDIR = 2 ; Noreste
+   {
+     set %objecto_tocahuevos_X #FINDX
+     set %objecto_tocahuevos_Y #FINDY
+     set %objecto_tocahuevos_ID #FINDID
+     set %objecto_tocahuevos_X %objecto_tocahuevos_X - 1
+     return
+   }
+if #CHARDIR = 3 ; Este
+   {
+     set %objecto_tocahuevos_X #FINDX
+     set %objecto_tocahuevos_Y #FINDY
+     set %objecto_tocahuevos_ID #FINDID
+     set %objecto_tocahuevos_X %objecto_tocahuevos_X - 1
+     set %objecto_tocahuevos_Y %objecto_tocahuevos_Y - 1
+     return
+   }
+if #CHARDIR = 4 ; Sureste
+   {
+     set %objecto_tocahuevos_X #FINDX
+     set %objecto_tocahuevos_Y #FINDY
+     set %objecto_tocahuevos_ID #FINDID
+     set %objecto_tocahuevos_Y %objecto_tocahuevos_Y - 1
+     return
+   }
+if #CHARDIR = 5 ; Sur
+   {
+     set %objecto_tocahuevos_X #FINDX
+     set %objecto_tocahuevos_Y #FINDY
+     set %objecto_tocahuevos_ID #FINDID
+     set %objecto_tocahuevos_X %objecto_tocahuevos_X + 1
+     set %objecto_tocahuevos_Y %objecto_tocahuevos_Y - 1
+     return
+   }
+if #CHARDIR = 6 ; Suroeste
+   {
+     set %objecto_tocahuevos_X #FINDX
+     set %objecto_tocahuevos_Y #FINDY
+     set %objecto_tocahuevos_ID #FINDID
+     set %objecto_tocahuevos_X %objecto_tocahuevos_X + 1
+     return
+   }
+if #CHARDIR = 7 ; Oeste
+   {
+     set %objecto_tocahuevos_X #FINDX
+     set %objecto_tocahuevos_Y #FINDY
+     set %objecto_tocahuevos_ID #FINDID
+     set %objecto_tocahuevos_X %objecto_tocahuevos_X + 1
+     set %objecto_tocahuevos_Y %objecto_tocahuevos_Y + 1
+     return
+   }
+return
+
+sub randomDir ; <==============================>
+_reDir:
+set %dir #random % 7 ; Movimiento circular aleatorio... ¬¬  [ #CHARDIR 0-7 ]
+if ( %dir = %old_dir || %dir = #CHARDIR )
+     {
+       goto _reDir ; No repetir la última dirección, ni en la que ya estamos...
+     }
+     else
+        {
+          set %old_dir %dir
+        }
+return
+
+sub randomDist ; <==============================>
+_reDist:
+set %dist #random % 2 + 1 ; Distancia con el brasero aleatoria... ¬¬ [rango (2 - 1 + 1)] + [Offset_desde_0_al_primer_número_aleatorio]
+if ( %dist = %old_dist )
+     {
+       goto _reDist ; No repetir lo último
+     }
+     else
+        {
+          set %old_dist %dist
+        }
+return
+
+;=====================================================
+; Rutina para, en caso de hambre, comer hasta saciarse
+;=====================================================
+; v2.4
+sub comprobar_comida
+{
+  hambriento:
+  set %jrnl #JINDEX ; Marcamos un índice de las líneas del diario.
+  event macro 4 0 .hungry
+  wait 20
+  while #TRUE
+     {
+       if #JINDEX > %jrnl ; Si aparece una nueva línea.
+          {
+            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de línea.
+            scanjournal %jrnl   ; La leemos...
+            if Dentro_de_1_minuto in #JOURNAL
+               {
+                 wait 120s ; Save del server...
+               }
+            if no_te_puedes_comer_eso in #JOURNAL
+               {
+                 event exmsg #CHARID 3 48 ESTO NO ES COMIDA!!
+                 wait 40
+                 ignoreitem #FINDID ComidaID ; Lo guardamos en una lista de ID's que no se pueden comer [ ignoreitem reset ComidaID ].
+                 goto hambriento
+               }
+            if Estas_no_le_afecta_el_hambre in #JOURNAL || Estas_tan_lleno_que_no_puedes in #JOURNAL || Estas_totalmente_saciado in #JOURNAL
+               {
+                 set %proxima_vez %tiempo_actual + %tiempo_alimentacion
+                 return
+               }
+               else
+                  {
+                    if Estas_lleno in #JOURNAL || Estas_contento in #JOURNAL || Estas_en_inanicion in #JOURNAL || Estas_hambriento in #JOURNAL || Sientes_mucho in #JOURNAL || Estas_con_hambre in #JOURNAL || Estas_parcialmente in #JOURNAL || Estas_bien_lleno in #JOURNAL || Te_sientes_casi_lleno in #JOURNAL
+                       {
+                         finditem %comida C_ , #BACKPACKID
+                         if #findcnt > 0
+                            {
+                              set #LOBJECTID #FINDID
+                              event macro 17
+                              goto hambriento ; Seguimos comiendo...
+                            }
+                            else
+                               {
+                                 event exmsg #CHARID 3 48 COMPRA COMIDA!!
+                                 wait 40
+                                 set %proxima_vez %tiempo_actual + %tiempo_alimentacion
+                               }
+                       }
+                       else ; Mensaje extraño, repetimos...
+                          {
+                            goto hambriento
+                          }
+                  }
+          }
+       return
+     } ; FIN While
+}
+return
+
+;-@ ============================== @-;
+;-@ ############################## @-;
+;-@ SUBS públicos del Foro EasyUO  @-;
+;-@ ############################## @-;
+;-@ ============================== @-;
+;
+;-----------------------------------------------------------
+; Script Name: CEOWorldSaveChecker
+; Author: CEO
+; Version: 1.0
+; Client Tested with: 4.0.10b
+; EUO version tested with: 1.42.00A5
+; Shard OSI / FS: OSI
+; Revision Date: 060105
+; Public Release: 060105
+; Global Variables Used:  *CEOWorldSaving
+; Purpose: Used to catch the world save message for freeshards and temporarily pause mainscript during save.
+;-------------------------------------------------------------
+sub CEOWorldSaveChecker
+; sub to pause a script during a RunUO world save.
+set %_text1 %1
+set %_text2 %2
+set %_text3 %3
+if %_worldsaveupcoming
+{
+        if %_worldsavetimer < #scnt
+        {
+                set %_worldsavetimer #scnt + %5
+                gosub popupworldsave 25 15 blue
+                goto _WSC_WAIT1
+        }
+        return
+}
+_WSC1:
+if %_worldsavejournalindex > #jindex
+        return
+scanjournal %_worldsavejournalindex
+if %_text1  in #JOURNAL
+{
+        set %_worldsaveupcoming #true
+        set %_worldsavetimer #scnt + %4
+        set %_worldsavejournalindex  %_worldsavejournalindex + 1
+        return
+}
+set %_worldsavejournalindex  %_worldsavejournalindex + 1
+goto _WSC1
+_WSC_WAIT1:
+if %_worldsavetimer < #scnt
+        goto _WSC_Complete
+wait 5
+set *CEOWorldSaving #true
+if %_worldsavejournalindex > #jindex
+        goto _WSC_WAIT1
+scanjournal %_worldsavejournalindex
+if %_text2 in #journal
+{
+        gosub popupworldsave 25 15 yellow
+        set %_worldsavejournalindex  %_worldsavejournalindex + 1
+        goto _WSC_WAIT2
+}
+set %_worldsavejournalindex  %_worldsavejournalindex + 1
+goto _WSC_WAIT1
+_WSC_WAIT2:
+if %_worldsavetimer < #scnt
+        goto _WSC_Complete
+wait 5
+if %_worldsavejournalindex > #jindex
+        goto _WSC_WAIT2
+scanjournal %_worldsavejournalindex
+if %_text3 notin #journal
+{
+        set %_worldsavejournalindex  %_worldsavejournalindex + 1
+        goto _WSC_WAIT2
+}
+_WSC_Complete:
+set %_worldsavejournalindex  #jindex
+set %_worldsaveupcoming #false
+set *CEOWorldSaving #false
+menu delete worldsave
+return
+
+sub popupworldsave
+set %x %1
+set %y %2
+set %worldcolor %3
+menu Clear
+menu Window Title World Save Monitor
+menu Window Color Black
+menu Window Size 160 160
+menu shape worldsave 20 15 125 125 1 7 2 olive 7 %worldcolor
+menu font bgcolor %worldcolor
+menu font color lime
+menu font type b
+menu font size 15
+set %x %x + 30
+set %y %y + 30
+menu text worldsave %x %y World
+set %x %x + 15
+set %y %y + 20
+menu text worldsave %x %y Save
+set %x %x + 15
+set %y %y + 20
+menu text worldsave %x %y Wait
+menu font size 9
+menu font bgcolor black
+menu font color lime
+menu font type n
+menu Show 920 770
+return
+
+;=============================================================
+; Script Name:  Bad Maniac's Auto Magic Pathfinding Sub
+; Author: BadManiac
+; Version: 1.0
+; Client Tested with: 5.0.1c
+; EUO version tested with: 1.5 Test Version 62
+; Shard OSI / FS: Both
+; Revision Date: N/A
+; Public Release: 19/10/2005
+; Global Variables Used:
+; Purpose:
+; Replacement for EasyUO's internal MOVE and Event Pathfind
+;=============================================================
+; %1 is the destination X
+; %2 is the destination Y
+; %3 is the tolerance [opt. 0 is default]
+; %4 is the timeout in seconds [opt. defaults to a calculated timeout]
+;=============================================================
+SUB BMPathfind
+	IF %1 = #CHARPOSX && %2 = #CHARPOSY
+		RETURN #TRUE
+	IF %0 < 3 || %3 = N/A
+		SET %3 0
+	IF %0 < 4 || %4 = N/A
+		SET %4 0
+	NAMESPACE PUSH
+	NAMESPACE LOCAL BMPathFind , #RANDOM , #RANDOM
+	SET !bmp_x %1
+	SET !bmp_y %2
+	SET !bmp_tolerance %3
+	IF %4 = 0
+	{
+   GOSUB Distance #CHARPOSX #CHARPOSY !bmp_x !bmp_y
+   SET %4 10
+   IF #RESULT > 10
+     SET %4 #RESULT / 2
+  }
+	SET !bmp_segmenttimeout %4
+	SET !bmp_timeout #SCNT + %4
+	SET !bmp_initsegment #FALSE
+	SET !bmp_oldlpc #LPC
+	IF #LPC < 100
+		SET #LPC 100
+	IF !bmp_tileinit = N/A
+	{
+		TILE INIT
+		SET !bmp_tileinit #TRUE
+	}
+	;Set the destination to the actual target minus the tolerance radius if greater than 0 (works, with a few % error)
+	IF !bmp_tolerance > 0
+	{
+		GOSUB ScaledLine !bmp_x !bmp_y #CHARPOSX #CHARPOSY !bmp_tolerance
+		GOSUB XYReadout #RESULT bmp_x bmp_y
+	}
+bmp_initsegment:
+	SET !bmp_currx !bmp_x
+	SET !bmp_curry !bmp_y
+	IF #CHARPOSX = !bmp_x && #CHARPOSY = !bmp_y
+	{
+		SET !bmp_return #TRUE
+		GOTO bmp_end
+	}
+	IF #SCNT > !bmp_timeout
+	{
+		SET !bmp_return #FALSE
+		GOTO bmp_end
+	}
+	GOSUB Distance #CHARPOSX #CHARPOSY !bmp_x !bmp_y
+	IF #RESULT <= 11
+		SET !bmp_final #TRUE
+	ELSE
+	{
+		IF ! !bmp_initsegment
+		{
+			SET !bmp_segmenttimeout !bmp_segmenttimeout / ( #RESULT / 11 )
+			IF !bmp_segmenttimeout < 2
+				SET !bmp_segmenttimeout 2
+			SET !bmp_initsegment #TRUE
+		}
+		GOSUB ScaledLine #CHARPOSX #CHARPOSY !bmp_x !bmp_y 11
+		GOSUB XYReadout #RESULT bmp_currx bmp_curry
+		SET !bmp_final #FALSE
+	}
+	SET !bmp_xmajor #FALSE
+	IF ( ABS ( #CHARPOSX - !bmp_currx ) ) > ( ABS ( #CHARPOSY - !bmp_curry ) )
+		SET !bmp_xmajor #TRUE
+	SET !bmp_delta 11
+	SET !bmp_jitter 1
+	SET !bmp_jittercnt 1
+	SET !time #SCNT + !bmp_segmenttimeout
+bmp_checktile:
+	TILE CNT !bmp_currx !bmp_curry
+	SET !bmp_imp #FALSE
+	SET !bmp_impz 9999
+	FOR !ti 1 #TILECNT
+	{
+		IF #SCNT > !time
+			GOTO bmp_initsegment
+		TILE GET !bmp_currx !bmp_curry !ti
+		IF !ti = 1 || #TILEZ = #CHARPOSZ
+			SET !bmp_currz #TILEZ
+		IF Impassable IN #TILEFLAGS
+		{
+			SET !bmp_imp #TRUE
+			SET !bmp_impz #TILEZ
+		}
+		IF Surface IN #TILEFLAGS && !bmp_imp = #TRUE && #TILEZ > !bmp_impz
+		{
+			SET !bmp_imp #FALSE
+			SET !bmp_currz #TILEZ
+			SET !ti #TILECNT
+		}
+	}
+	IF !bmp_imp
+	{
+		IF !bmp_jittercnt > 25
+			SET !bmp_jitter !bmp_jitter + 1
+		SET !rnd_x ( #RANDOM % ( !bmp_jitter * 2 + 1 ) ) - !bmp_jitter
+		SET !rnd_y ( #RANDOM % ( !bmp_jitter * 2 + 1 ) ) - !bmp_jitter
+		SET !bmp_currx !bmp_currx + !rnd_x
+		SET !bmp_curry !bmp_curry + !rnd_y
+		;If this is the final segment of the path, change the target coordinates to match the jittered ones.
+		IF !bmp_final
+		{
+			SET !bmp_x !bmp_currx
+			SET !bmp_y !bmp_curry
+		}
+		SET !bmp_jittercnt !bmp_jittercnt + 1
+		GOTO bmp_checktile
+	}
+	SET !bmp_jstart #JINDEX + 1
+	EVENT PATHFIND !bmp_currx !bmp_curry !bmp_currz
+	SET !time #SCNT + !bmp_segmenttimeout
+	SET !bmp_jend #JINDEX + 1
+	SET !bmp_disttimeout #SCNT2 + 25
+	SET !bmp_charpos #CHARPOSX , _ , #CHARPOSY
+bmp_distancewait:
+	FOR !i !bmp_jstart !bmp_jend
+	{
+		SCANJOURNAL !i
+		IF Can't_get_there IN #JOURNAL
+		{
+			SET !bmp_delta !bmp_delta - 1
+			IF !bmp_delta > 1
+			{
+				GOSUB ScaledLine #CHARPOSX #CHARPOSY !bmp_currx !bmp_curry !bmp_delta
+				GOSUB XYReadout #RESULT bmp_currx bmp_curry
+				GOTO bmp_checktile
+			}
+			GOTO bmp_avoidobstacle
+		}
+	}
+	SET !bmp_jend #JINDEX + 1
+	IF #SCNT2 > !bmp_disttimeout
+	{
+	  IF !bmp_charpos = #CHARPOSX , _ , #CHARPOSY
+	    GOTO bmp_initsegment
+	  SET !bmp_disttimeout #SCNT2 + 25
+	  SET !bmp_charpos #CHARPOSX , _ , #CHARPOSY
+  }
+	IF ( #CHARPOSX <> !bmp_currx || #CHARPOSY <> !bmp_curry ) && #SCNT < !time
+		GOTO bmp_distancewait
+	GOTO bmp_initsegment
+bmp_avoidobstacle:
+	SET !bmp_delta 11
+	SET !random #RANDOM % 3
+	SET !avoid 8 + ( #RANDOM % 8 )
+	IF #CHARPOSX <> !bmp_lavoidx
+	{
+		SET !bmp_lavoidmaxy #CHARPOSY
+		SET !bmp_lavoidminy #CHARPOSY
+	}
+	IF #CHARPOSY <> !bmp_lavoidy
+	{
+		SET !bmp_lavoidmaxx #CHARPOSX
+		SET !bmp_lavoidminx #CHARPOSX
+	}
+	IF !bmp_xmajor
+	{
+		SET !bmp_lavoidx #CHARPOSX
+		SET !bmp_currx #CHARPOSX
+		IF ( #CHARPOSY > !bmp_y && !random > 0 ) || ( #CHARPOSY <= !bmp_y && !random = 0 )
+		{
+			SET !bmp_lavoidminy !bmp_lavoidminy - !avoid
+			SET !bmp_curry !bmp_lavoidminy
+		}
+    ELSE
+		{
+			SET !bmp_lavoidmaxy !bmp_lavoidmaxy + !avoid
+			SET !bmp_curry !bmp_lavoidmaxy
+		}
+	}
+	IF ! !bmp_xmajor
+	{
+		SET !bmp_lavoidy #CHARPOSY
+		SET !bmp_curry #CHARPOSY
+		IF ( #CHARPOSX > !bmp_x && !random > 0 ) || ( #CHARPOSX <= !bmp_x && !random = 0 )
+		{
+			SET !bmp_lavoidminx !bmp_lavoidminx - !avoid
+			SET !bmp_currx !bmp_lavoidminx
+		}
+		ELSE
+		{
+			SET !bmp_lavoidmaxx !bmp_lavoidmaxx + !avoid
+			SET !bmp_currx !bmp_lavoidmaxx
+		}
+	}
+	GOSUB BMPathfind !bmp_currx !bmp_curry 0
+	GOTO bmp_initsegment
+bmp_end:
+	SET #LPC !bmp_oldlpc
+	SET #RESULT !bmp_return
+	NAMESPACE CLEAR
+	NAMESPACE POP
+	RETURN #RESULT
+RETURN #FALSE
+;%1 = X1
+;%2 = Y1
+;%3 = X2
+; %4 = Y2
+; %5 = Distance along the line from X1,Y1 to X2,Y2 to calculate the new point
+; Returns the new pont formatted as X_Y (ex:123_456)
+SUB ScaledLine
+	SET !sl_startx %1
+	SET !sl_starty %2
+	SET !sl_goalx %3
+	SET !sl_goaly %4
+	SET !sl_dx ( !sl_goalx - !sl_startx ) * 256
+	SET !sl_dy ( !sl_goaly - !sl_starty ) * 256
+	SET !sl_sd %5
+	SET
+	GOSUB Distance !sl_startx !sl_starty !sl_goalx !sl_goaly
+	SET #RESULT #RESULT * 256
+	SET !sl_ts #RESULT / !sl_sd
+	IF #RESULT <= !sl_sd
+	{
+		SET #RESULT !sl_goalx , _ , !sl_goaly
+		RETURN #RESULT
+	}
+	SET !sl_resultx !sl_startx + ( !sl_dx / !sl_ts )
+	SET !sl_resulty !sl_starty + ( !sl_dy / !sl_ts )
+	SET #RESULT !sl_resultx , _ , !sl_resulty
+RETURN #RESULT
+; %1 is X1
+; %2 is Y1
+; %3 is X2
+; %4 is Y2
+; Returns the approximate UO tile distance
+SUB Distance
+	SET !dist_x ABS ( %3 - %1 )
+	SET !dist_y ABS ( %4 - %2 )
+	SET #RESULT !dist_x
+	IF !dist_y > !dist_x
+		SET #RESULT !dist_y
+RETURN #RESULT
+;%1 = the X_Y formatted value to parse
+;%2 = the % variable name to otput the X component to, WITHOUT %
+;%3 = the % variable name to otput the Y component to, WITHOUT %
+SUB XYReadout
+	SET !local1 %1
+	STR POS !local1 _
+	STR DEL !local1 #STRRES 999
+	SET ! . %2 #STRRES
+	SET !local1 %1
+	STR POS !local1 _
+	STR DEL !local1 1 #STRRES
+	SET ! . %3 #STRRES
+RETURN
+
+;**
+;* @name GetName
+;* @author Roadkill
+;* @ver 1.0 24Jan04
+;* @purpose get the name of a creature/vendor
+;* @params %1= the id of the thing whose name you want, required
+;*	@%2= variable name to return the ID in, required
+;* @returns @%2 and #result
+;* @changes #property, #strres, @%2, !strlength
+;* @example call rksubs.txt GetName %beetle beetlename
+;* @status: tested
+sub GetName
+	finditem %1
+	if #findkind = -1
+		return error-cant_find
+	event property #findid
+	str pos #property $
+	set !strlength #strres - 2
+	str left #property !strlength
+	set %string #strres
+	str Del %string 1 1
+	set % . %2 #strres
+return % . %2
+
+SUB FindThingsDir
+;ver 1.2 10Jul04 by Roadkill
+;purpose: find the direction from you that a thing is
+;%1= #findx of object, it's UO world coord
+;%2=#findy of object, it's UO world coord
+;%3= the name of the return var, i.e. 'dir', 'thingsdirection' by default
+;%3 holds its dir from you 0-nw 1-n 2-ne 3-e 4-se 5-s 6-sw 7-w 8-sametile
+;* @example call rksubs.txt FindThingsDir %mapxcoord %mapycoord spotdir
+	SET !itsX %1
+	SET !itsY %2
+	if %0 < 3
+		set %3 thingsdirection
+	IF !itsX = #charposx && !itsY < #charposy
+		SET % . %3 1 ;N
+	IF !itsX > #charposx && !itsY < #charposy
+		SET % . %3 2 ;NE
+	IF !itsX > #charposx && !itsY = #charposy
+		SET % . %3 3 ;E
+	IF !itsX > #charposx && !itsY > #charposy
+		SET % . %3 4 ;SE
+	IF !itsX = #charposx && !itsY > #charposy
+		SET % . %3 5 ;S
+	IF !itsX < #charposx && !itsY > #charposy
+		SET % . %3 6 ;SW
+	IF !itsX < #charposx && !itsY = #charposy
+		SET % . %3 7 ;W
+	IF !itsX < #charposx && !itsY < #charposy
+		SET % . %3 0 ;NW
+	IF !itsX = #charposx && !itsY = #charposy
+		SET % . %3 8 ;same tile
+RETURN
+
+;============================================
+; Script Name: Peragrins' Pace choosing sub
+; Author: Peragrin
+; Version: v1.1
+; Client Tested with: 4.0.10b
+; EUO version tested with: 1.42.00A5
+; Shard OSI / FS: OSI
+; Revision Date: 05/06/05
+; Public Release: 22/09/04
+; Purpose: callable subroutine to pick whether always run is on or off
+; Revisions: v1.1 now uses Namespace and better journal scanning
+;============================================
+sub choose_pace
+;%0 - 1
+;%1 - WALK/RUN
+if %0 <> 1 || %1 notin WALK_RUN
+        {
+        display OK Incorrect arguments passed to ChoosePace subroutine, script halted.
+        halt
+        }
+namespace push
+namespace LOCAL ChoosePace
+set !desired_pace %1
+_TOGGLE_PACE:
+set !jindex #jindex + 1
+event macro 32 0
+_CHOOSE_PACE_JOURNAL_SCAN:
+gosub ScanJournal ALWAYS_RUN !jindex 1
+if #result
+        {
+           if ON in #journal && !desired_pace = WALK
+                goto _toggle_pace
+           if OFF in #journal && !desired_pace = RUN
+                goto _toggle_pace
+        }
+if ! #result
+        {
+        set !error !error + 1
+        if !error > 5
+                {
+                   set !error 0
+                   goto _toggle_pace
+                }
+        goto _choose_pace_journal_scan
+        }
+return
+;============================================
+; Script Name: Peragrins' journal scanning sub
+; Author: Peragrin
+; Version: v1.0
+; Client Tested with: 4.0.10b
+; EUO version tested with: 1.42.00A5
+; Shard OSI / FS: OSI
+; Revision Date: 05/06/05
+; Public Release: 22/09/04
+; Purpose: callable subroutine to scan for phrases passed to the sub
+;============================================
+sub scanJournal
+;%0 - 2
+;%1 - phrase to scan for
+;%2 - #jindex to scan from
+;%3 - time to scan for
+namespace push
+namespace local ScanJournal
+for !timeout 1 %3
+        {
+        for !line %2 #jindex
+                {
+                scanjournal !line
+                wait 1
+                if %1 in #journal
+                        {
+                        namespace pop
+                        return #true
+                        }
+                }
+        wait 1s
+        }
+namespace pop
+return #false
+
+;=================================================================
+sub wait_for
+;=================================================================
+; This "wait_for" sub package was created by Locke. If you use these subs please keep this header intact.
+; Documentation: the sub package grew to large with all the comments. To load them call the sub like this:
+; gosub wait_for docs    | or you can use doc, documention, what, or my personal favorite, kickass.
+
+; "wait_for core dispatcher" version 1.2 by Locke
+if %1 = doc || if %1 = docs || if %1 = documentation || if %1 = what || if %1 = kickass
+{
+Display ok Please click ok and wait for your browser to start.
+execute http://www.easyuo.com/forum/viewtopic.php?t=24716
+halt
+}
+nameSpace Push
+namespace local LLNS
+set #result N/A ; if #result isn't set by one of my wait_for subs it'll throw an error.
+set !LPC #lpc
+set #lpc 200
+for %i 0 %0
+set !_A . %i % . %i
+gosub wait_for_ , !_A1
+set #lpc !lpc
+namespace clear LLNS
+namespace pop
+if #result <> N/A
+return #result
+else
+display ok You specified an unknown wait_for command. Script returned #result and is halting.
+halt
+;=================================================================
+sub wait_for_MSG ; version 1.4 ~Locke
+;=================================================================
+if !_A0 < 3
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for MSG %message time_out_in_seconds$
++Script is halting
+halt
+}
+set !_timeout ( #scnt2 + !_A . !_A0 )
+_lets_wait_for_a_message:
+for %i %jstart #jindex
+{
+ scanjournal %i
+  for %ii 2 !_A0
+  {
+    if !_A . %ii in #journal && %jstart <> %i
+    set #result #true , #spc , !_A . %ii
+  }
+}
+
+if #true notin #result
+{
+set #result #false
+ if !_timeout =< #scnt2
+ return #result
+wait 1
+goto _lets_wait_for_a_message
+}
+else
+return #result
+
+wait 1
+goto _lets_wait_for_a_message
+
+;======================================================================
+sub wait_for_GUMP ; version 1.4 ~Locke
+;=================================================================
+; Añadido #CONTID ^^
+if !_A0 < 3
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for GUMP XXX_YYY time_out_in_seconds$
++Script is halting
+halt
+}
+if !_A3 <> CLOSE
+set !_timeout #scnt2 + !_A3
+else
+set !_timeout 0 ; no gump wait if %3 = CLOSE since we already believe it to be open.
+
+_lets_wait_for_a_gump:
+if #CONTSIZE = !_A2 || #CONTKIND = !_A2 || #CONTNAME = !_A2 || #CONTTYPE = !_A2 || #CONTID = !_A2
+{
+ if !_A5 <> N/A && !_A6 <> N/A
+ {
+ set !clickx !_A5 + #contposx
+ set !clicky !_A6 + #contposy
+ click !clickx !clicky
+ }
+ if !_A3 = CLOSE || if !_A4 = CLOSE || !_A5 = CLOSE || !_A6 = CLOSE
+ {
+ set !string #contsize
+ str pos !string _
+ set !pos #strres
+ str del !string #strres #strres
+ set !clickX #contposx + ( #strres / 2 )
+ str del !string 1 !pos
+ set !clickY #contposy + ( #strres / 2 )
+ click !clickx !clicky R
+ }
+return #true
+}
+
+if ( !_timeout =< #scnt2 ) && ( !_A4 = N/A )
+   {
+     return #false
+   }
+
+if !_A4 <> N/A && !_timeout =< #scnt2
+{
+finditem !_A4
+if #findkind <> -1
+{
+ for #findindex 1 #findcnt
+ {
+  if #finddist > 2
+  ignoreitem #findid LLWAITFOR
+  else
+  break
+ }
+ set #lobjectid #findid
+ event macro 17 0
+ set !_timeout #scnt2 + !_A3
+}
+else
+return #false
+}
+wait 1
+goto _lets_wait_for_a_gump
+
+sub waitForSysVar
+if %0 < 4 || %4 = N/A
+set %4 %_defaultWaitForTimeout
+if %0 < 5
+set %5 return
+set %4 #sCnt2 + %4
+_waitForSysVar:
+set % . %5 # . %1 %2 %3
+if ! % . %5 && #sCnt2 < %4
+{
+  goto _waitForSysVar
+}
+return
