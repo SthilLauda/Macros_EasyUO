@@ -1468,7 +1468,7 @@ if #FINDCNT > 0
           target 3s
           for %i 1 %num_items
               {
-                finditem %recolectados C_ , #BACKPACKID ; CORAZA, ALABARDA PESADA, MALLA ORO...
+                finditem %recolectados C_ , #BACKPACKID
                 set %peso #WEIGHT
                 set %id #FINDID
                 set #LTARGETKIND 1
