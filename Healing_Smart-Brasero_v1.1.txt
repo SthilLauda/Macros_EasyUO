@@ -38,7 +38,7 @@
 ; Purpose: Intenta macrear healing sin morir en el intento... XD
 ;==================================
 ;
-set %version v1.0
+set %version v1.1
 ; ________________________________
 ;
 ; ///////////////////////////////
