@@ -1569,6 +1569,7 @@ repeat
 return
 
 sub waitToHeal ; <==============================>
+set %healing_timer #SCNT + 30 ; Seguro de tiempo...
 repeat
      {
        gosub checkStatus
@@ -1579,7 +1580,7 @@ repeat
        gosub limpiarVendas
        gosub findEnemy
      }
-     until ( #HITS >= #MAXHITS )
+     until ( #HITS >= #MAXHITS ) || ( #SCNT >= %healing_timer )
 return
 
 sub checkHeal ; <==============================>
