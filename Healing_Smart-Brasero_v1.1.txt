@@ -1569,7 +1569,7 @@ repeat
 return
 
 sub waitToHeal ; <==============================>
-set %healing_timer #SCNT + 30 ; Seguro de tiempo...
+set %healing_timer #SCNT + 90 ; Seguro de tiempo (1.5 minutos)...
 repeat
      {
        gosub checkStatus
