@@ -1,0 +1,143 @@
+; ======================================================================================================
+;  '||   ||` '||`   ||                                 /.\      '||`
+;   ||   ||   ||    ||     ''                         // \\      ||   ''
+;   ||   ||   ||  ''||''   ||  '||),,(|,   '''|.     //...\\     ||   ||   '''|.  `||''|,  '''/  '''|.
+;   ||   ||   ||    ||     ||   || || ||  .|''||    //     \\    ||   ||  .|''||   ||  ||   //  .|''||
+;   `|...|'  .||.   `|..' .||. .||    ||. `|..||. .//       \\. .||. .||. `|..||. .||  ||. /... `|..||.
+; =====================================================================================================
+;
+; Script Name: Monitor Durabilidad
+;      __,              _
+;   .-'  /   ,  jgs   ./ |    ___________________
+; .'    /   / `.     /  /    /  ____________    //\_
+; |    /   /   |   /'  /    |  (____________)  ||.'`-.________________________
+; |    \__/    |  /   /     |    ____________ ||`._.-'~~~~~~~~~~~~~~~~~~~~~~~~`
+; `.          .' /    \      \__(____________)__\\/
+;   `.      .'  |      `\
+;     | ][ |    |        |                                __________________
+;     | ][ |    |        |____________________...-------'''-  -  =- - =  - =`
+;     | ][ |   /|        |                    \-  =   -  -= - =  - =-   =  -=|
+;     | ][ |  ( |        |                     |= -= - = - =  = - =--= = - ==|
+;     | ][ |   \|        |____________________/- = - -= =_- =_-=_ -=_=-=_=_=-|
+;     | ][ |    |        |   ________________```------...___________________.'
+;     | ][ |    |________|  /______________ /|
+;     | ][ |      \    /   |  ___________  | |  ___  _  __
+;   .'  __  `.    |    |   | |  _  _     | | | / _ \| |/ /
+;   |  /  \  |  ,-'    `-, | | (_||_ O/  | | || | | | ' /
+;   |  \__/  |  |        | | |   | _)/O  | | || |_| | . \
+;   `.      .'  `--------' | |___________| | | \___/|_|\_\
+;     `----'               |_______________|/                                `
+;
+; Author: SthiL
+; Version: 1.8
+; Client Tested with: 2.0.3
+; EUO version tested with: EasyUO 1.5 Version 243
+; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Revision Date: 23/08/2018
+; Public Release:  26/07/2019
+; Purpose: Monitoriza los items equipados y alerta si bajan de durabilidad.
+;============================================
+set %version v1.8
+;________________________________
+;
+; ///////////////////////////////
+; ******** CONFIGURACIÓN ********
+; ///////////////////////////////
+;________________________________
+;
+set %min_durabilidad 20 ; El mínimo de durabilidad que hará saltar la alerta.
+set %frecuencia 180     ; Cuántos segundos han de pasar entre las comprobaciones.
+;________________________________________________
+;
+; //////////////////////////////////////////////
+; ************* FIN CONFIGURACIÓN *************
+; //////////////////////////////////////////////
+;________________________________________________
+;
+; COLOR
+;
+set #SYSMSGCOL 88
+;
+; LÍNEAS POR CICLO
+;
+set #lpc 100
+;
+; AVISOS
+;
+event sysmessage Monitor Durabilidad %version
+wait 1s
+
+;========================================================
+;
+; ******************* LOOP PRINCIPAL *******************
+;
+;========================================================
+loop:
+gosub scan
+gosub check
+goto loop
+;========================================================
+;
+; ***************** FIN LOOP PRINCIPAL *****************
+;
+;========================================================
+
+;===============================================
+; ESCANEAR Y FILTRAR ITEMS CON DURABILIDAD
+;===============================================
+sub scan
+finditem * C_ , #charid
+set %durmon_i 0
+for #findindex 1 #findcnt
+    {
+    event property #findid
+    if durabilidad in #property
+       {
+       set %durmon_i %durmon_i + 1
+       set %durmon_item . %durmon_i #findid
+       }
+    }
+return
+
+;================================================
+; COMPROBAR LA DURABILIDAD DE LOS ITEMS FILTRADOS
+;================================================
+sub check
+while #true
+      {
+      event exmsg #charid 3 111 Comprobando Equipo...
+      wait 20
+      for %durmon_j 1 %durmon_i
+          {
+          event property %durmon_item . %durmon_j
+          str pos #property durabilidad
+          set %durmon_k #strres + 12
+          str del #property 1 %durmon_k
+          set %durmon_res #strres
+          str pos %durmon_res /
+          str del %durmon_res #strres 99
+          set %durmon_res #strres
+          if %durmon_res < %min_durabilidad
+                {
+                str pos #Property $
+                set %posicion #StrRes
+                set %posicion %posicion - 2
+                str left #Property %posicion
+                set #SYSMSGCOL 72
+                event sysmessage ================================
+                set #SYSMSGCOL 28
+                event sysmessage PELIGRO !!!!!
+                set #SYSMSGCOL 99
+                event sysmessage #StrRes
+                set #SYSMSGCOL 19
+                event sysmessage DURABILIDAD: %durmon_res !!
+                set #SYSMSGCOL 72
+                event sysmessage ================================
+                }
+          }
+      set %durmon_timer #scnt + %frecuencia
+      while %durmon_timer > #scnt
+            wait 1
+            gosub scan
+      }
+return
