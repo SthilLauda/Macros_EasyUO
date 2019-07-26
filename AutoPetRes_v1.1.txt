@@ -1,0 +1,441 @@
+;        |                                 /   \                   |       .
+;  _    -O-       .                )      ((   ))     (           -O-
+; (@)    |     +                  /|\      ))_((     /|\           |            .
+; |-|                            / | \    (/\|/\)   / | \                            (@)
+; | | --------------------------/--|-voV---\`|'/--Vov-|--\---------------------------|-|         .
+; |-|                                '^`   (o o)  '^`                                | |
+; | |                                      `\Y/'                                     |-|
+; |-|   _______ __ __   __                  _______ __ __                            | |
+; | |  |   |   |  |  |_|__|.--------.---.-.|   _   |  |__|.---.-.-----.-----.---.-.  |-|    .     o
+; |-|  |   |   |  |   _|  ||        |  _  ||       |  |  ||  _  |     |-- __|  _  |  | |
+; | |  |_______|__|____|__||__|__|__|___._||___|___|__|__||___._|__|__|_____|___._|  |-|
+; |_|________________________________________________________________________________| |
+; (@)                     l   /\ /         ( (          \ /\   l                   `\|-|             .
+;           o             l /   V           \ \          V   \ l       +             (@)
+;                         l/                _) )_             \I                                 +
+;      +                                    `\ /'
+;
+; Script Name: Auto Pet Res
+;
+;       ,-=-.
+;      /  +  \
+;      | ~~~ |
+;      |R.I.P|
+; \vV,,|_____|VvV,v,
+;
+; Author: SthiL
+; Version: 1.0
+; Client Tested with: 2.0.3
+; EUO version tested with: EasyUO 1.5 Version 243
+; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Public Release: 11/05/2019
+; Revised On: 11/05/2019
+; Propósito: Busca un veterinario para resucitar la montura.
+;==================================
+
+; ________________________________
+;
+; ///////////////////////////////
+; ******** CONFIGURACIÓN ********
+; ///////////////////////////////
+; ________________________________
+;
+set %tiempo_mensaje 60       ; Cada cuántos segundos pedir que nos resuciten la montura.
+set %tiempo_alimentacion 360 ; Cada cuántos segundos comprobar el hambre del PJ.
+; _______________________________________________
+;
+; //////////////////////////////////////////////
+; ************* FIN CONFIGURACIÓN *************
+; //////////////////////////////////////////////
+; _______________________________________________
+;
+set %version v1.0
+set %call_timer #SCNT
+set %msg_timer #SCNT
+set %comida RGG_NRD_QSD_ZBG_WLI
+ +_QRD_END_FUD_YLI_WLI_HGI_JQE
+ +_KGI_EGI_QLI_KLI_MLI_KRD_HQD
+ +_AQD_MQE_VQE_TQE_IQE_PQD_QQD
+ +_GQE_SPE_ZPE_OQE_BDF_KPE_RQE
+ +_YSD_SQD_YWI_AXI
+set %tiempo_actual #SCNT
+set %proxima_vez #SCNT
+set %player_id
+
+set #SYSMSGCOL 88
+event sysmessage ==================
+set #SYSMSGCOL 53
+event sysmessage Auto Pet Res %version
+set #SYSMSGCOL 88
+event sysmessage ==================
+wait 40
+
+ignoreitem #CHARID PJ
+
+gosub setupMontura
+goto resLoop
+
+;========================================================
+;
+; ******************* LOOP PRINCIPAL ********************
+;
+;========================================================
+resLoop:
+gosub checkMontura
+gosub addPlayers
+gosub controlPlayers 10
+gosub checkHungry
+goto resLoop
+;========================================================
+;
+; ***************** FIN LOOP PRINCIPAL *****************
+;
+;========================================================
+
+sub setupMontura ; <==============================>
+display OK Haz click en tu montura
+set #TARGCURS 1
+target
+while #TARGCURS = 1
+      {
+        wait 1
+      }
+set %montura #LTARGETID
+gosub GetName %montura nombre_montura
+event sysmessage OK Montura: %nombre_montura
+wait 20
+return
+
+sub addPlayers ; <==============================>
+if ( %muerta )
+     {
+       finditem HS_IS
+       if #FINDCNT > 0
+          {
+            for #FINDINDEX 1 #FINDCNT
+                {
+                  if #FINDREP = 1 && #FINDCOL = 33770 ; Es un jugador
+                     {
+                       set %player_id #FINDID
+                       if %player_id NotIn %player_list
+                          {
+                            set %player_list %player_list , _ , %player_id
+                          }
+                     }
+                }
+          }
+     }
+return
+
+sub controlPlayers ; <==============================>
+if ( %muerta )
+     {
+       set %distancia %1
+       finditem %player_list
+       if #FINDCNT > 0
+          {
+            for #FINDINDEX 1 #FINDCNT
+                {
+                  if #FINDDIST <= %distancia ; Está bastante cerca...
+                     {
+                       if #SCNT > %msg_timer
+                          {
+                            gosub GetName #FINDID nombre_player
+                            gosub playerMessage %nombre_player
+                            return
+                          }
+                     }
+                }
+          }
+     }
+return
+
+sub checkHungry ; <==============================>
+set %tiempo_actual #SCNT
+if ( %proxima_vez <= %tiempo_actual )
+     {
+       gosub comprobar_comida
+     }
+return
+
+sub checkMontura ; <==============================>
+gosub distanciaMontura
+gosub statusMontura
+return
+
+sub distanciaMontura ; <==============================>
+finditem %montura
+if #FINDCNT > 0
+   {
+     if #FINDDIST > 1
+        {
+          repeat
+               {
+                 if #SCNT > %call_timer
+                    {
+                      event macro 1 0 %nombre_montura Come
+                      set %call_timer #SCNT + 5
+                    }
+                 finditem %montura
+               }
+               until #FINDDIST <= 1
+        }
+   }
+return
+
+sub statusMontura ; <==============================>
+finditem %montura
+if #FINDCNT > 0
+   {
+     if #FINDCOL = 961 ; Está muerta...
+        {
+          set %muerta #TRUE
+          gosub wait_for GUMP 438_188 10 ; Ventana de Resucitar.
+          if ( #TRUE in #RESULT )
+               {
+                 contpos 25 25   ; Situar en su posición.
+                 click 245 178 f ; Fast Click.
+                 gosub controlPlayers 2 ; Player muy cercano, posible veterinario...
+                 wait 20
+                 event macro 1 0 ¡Muchas Gracias! %nombre_player
+                 wait 20
+                 event macro 1 0 :)
+                 wait 20
+                 set %muerta #FALSE
+               }
+        }
+        else ; Nos subimos a la montura
+           {
+             if ( ! %muerta )
+                  {
+                    event macro 1 0 All Come
+                    wait 60  
+                    set #LOBJECTID %montura
+                    event macro 17
+                    wait 20
+                    gosub Hideloop ; Nos quedamos en oculto...
+                  }
+           }
+   }
+return
+
+sub Hideloop ; <==============================>
+_hidLoop:
+if H Notin #CHARSTATUS
+   {
+     event macro 13 21 ; Use skill Hiding
+     gosub waitForSysVar CHARSTATUS = H 50
+     goto _hidLoop
+   }
+return
+
+sub playerMessage ; <==============================>
+set %msg_timer #SCNT + %tiempo_mensaje
+event macro 1 0 ¡Saludos! %nombre_player
+wait 40
+event macro 1 0 ¿Podrías resucitarme la montura, por favor?
+wait 40
+event macro 1 0 ... La vida es dura es Sosaria :(
+wait 20
+return
+
+;=====================================================
+; Rutina para, en caso de hambre, comer hasta saciarse
+;=====================================================
+; v2.4
+sub comprobar_comida ; <=============================>
+{
+  hambriento:
+  set %jrnl #JINDEX ; Marcamos un índice de las líneas del diario.
+  event macro 4 0 .hungry
+  wait 20
+  while #TRUE
+     {
+       if #JINDEX > %jrnl ; Si aparece una nueva línea.
+          {
+            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de línea.
+            scanjournal %jrnl   ; La leemos...
+            if Dentro_de_1_minuto in #JOURNAL
+               {
+                 wait 120s ; Save del server...
+               }
+            if no_te_puedes_comer_eso in #JOURNAL
+               {
+                 event exmsg #CHARID 3 48 ESTO NO ES COMIDA!!
+                 wait 40
+                 ignoreitem #FINDID ComidaID ; Lo guardamos en una lista de ID's que no se pueden comer [ ignoreitem reset ComidaID ].
+                 goto hambriento
+               }
+            if Estas_no_le_afecta_el_hambre in #JOURNAL || Estas_tan_lleno_que_no_puedes in #JOURNAL || Estas_totalmente_saciado in #JOURNAL
+               {
+                 set %proxima_vez %tiempo_actual + %tiempo_alimentacion
+                 return
+               }
+               else
+                  {
+                    if Estas_lleno in #JOURNAL || Estas_contento in #JOURNAL || Estas_en_inanicion in #JOURNAL || Estas_hambriento in #JOURNAL || Sientes_mucho in #JOURNAL || Estas_con_hambre in #JOURNAL || Estas_parcialmente in #JOURNAL || Estas_bien_lleno in #JOURNAL || Te_sientes_casi_lleno in #JOURNAL
+                       {
+                         finditem %comida C_ , #BACKPACKID
+                         if #findcnt > 0
+                            {
+                              set #LOBJECTID #FINDID
+                              event macro 17
+                              goto hambriento ; Seguimos comiendo...
+                            }
+                            else
+                               {
+                                 event exmsg #CHARID 3 48 COMPRA COMIDA!!
+                                 wait 40
+                                 set %proxima_vez %tiempo_actual + %tiempo_alimentacion
+                               }
+                       }
+                       else ; Mensaje extraño, repetimos...
+                          {
+                            goto hambriento
+                          }
+                  }
+          }
+       return
+     } ; FIN While
+}
+return
+
+;-@ ============================== @-;
+;-@ ############################## @-;
+;-@ SUBS públicos del Foro EasyUO  @-;
+;-@ ############################## @-;
+;-@ ============================== @-;
+;
+;=================================================================
+sub wait_for
+;=================================================================
+; This "wait_for" sub package was created by Locke. If you use these subs please keep this header intact.
+; Documentation: the sub package grew to large with all the comments. To load them call the sub like this:
+; gosub wait_for docs    | or you can use doc, documention, what, or my personal favorite, kickass.
+
+; "wait_for core dispatcher" version 1.2 by Locke
+if %1 = doc || if %1 = docs || if %1 = documentation || if %1 = what || if %1 = kickass
+{
+Display ok Please click ok and wait for your browser to start.
+execute http://www.easyuo.com/forum/viewtopic.php?t=24716
+halt
+}
+nameSpace Push
+namespace local LLNS
+set #result N/A ; if #result isn't set by one of my wait_for subs it'll throw an error.
+set !LPC #lpc
+set #lpc 200
+for %i 0 %0
+set !_A . %i % . %i
+gosub wait_for_ , !_A1
+set #lpc !lpc
+namespace clear LLNS
+namespace pop
+if #result <> N/A
+return #result
+else
+display ok You specified an unknown wait_for command. Script returned #result and is halting.
+halt
+;======================================================================
+sub wait_for_GUMP ; version 1.4 ~Locke
+;=================================================================
+; Añadido #CONTID ^^
+if !_A0 < 3
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for GUMP XXX_YYY time_out_in_seconds$
++Script is halting
+halt
+}
+if !_A3 <> CLOSE
+set !_timeout #scnt2 + !_A3
+else
+set !_timeout 0 ; no gump wait if %3 = CLOSE since we already believe it to be open.
+
+_lets_wait_for_a_gump:
+if #CONTSIZE = !_A2 || #CONTKIND = !_A2 || #CONTNAME = !_A2 || #CONTTYPE = !_A2 || #CONTID = !_A2
+{
+ if !_A5 <> N/A && !_A6 <> N/A
+ {
+ set !clickx !_A5 + #contposx
+ set !clicky !_A6 + #contposy
+ click !clickx !clicky
+ }
+ if !_A3 = CLOSE || if !_A4 = CLOSE || !_A5 = CLOSE || !_A6 = CLOSE
+ {
+ set !string #contsize
+ str pos !string _
+ set !pos #strres
+ str del !string #strres #strres
+ set !clickX #contposx + ( #strres / 2 )
+ str del !string 1 !pos
+ set !clickY #contposy + ( #strres / 2 )
+ click !clickx !clicky R
+ }
+return #true
+}
+
+if ( !_timeout =< #scnt2 ) && ( !_A4 = N/A )
+   {
+     return #false
+   }
+
+if !_A4 <> N/A && !_timeout =< #scnt2
+{
+finditem !_A4
+if #findkind <> -1
+{
+ for #findindex 1 #findcnt
+ {
+  if #finddist > 2
+  ignoreitem #findid LLWAITFOR
+  else
+  break
+ }
+ set #lobjectid #findid
+ event macro 17 0
+ set !_timeout #scnt2 + !_A3
+}
+else
+return #false
+}
+wait 1
+goto _lets_wait_for_a_gump
+
+;**
+;* @name GetName
+;* @author Roadkill
+;* @ver 1.0 24Jan04
+;* @purpose get the name of a creature/vendor
+;* @params %1= the id of the thing whose name you want, required
+;*      @%2= variable name to return the ID in, required
+;* @returns @%2 and #result
+;* @changes #property, #strres, @%2, !strlength
+;* @example call rksubs.txt GetName %beetle beetlename
+;* @status: tested
+sub GetName
+        finditem %1
+        if #findkind = -1
+                return error-cant_find
+        event property #findid
+        str pos #property $
+        set !strlength #strres - 1
+        str left #property !strlength
+        set % . %2 #strres
+return % . %2
+;===============================
+
+sub waitForSysVar ; <==============================>
+if %0 < 4 || %4 = N/A
+set %4 %_defaultWaitForTimeout
+if %0 < 5
+set %5 return
+set %4 #sCnt2 + %4
+_waitForSysVar:
+set % . %5 # . %1 %2 %3
+if ! % . %5 && #sCnt2 < %4
+{
+Wait 1
+goto _waitForSysVar
+}
+return

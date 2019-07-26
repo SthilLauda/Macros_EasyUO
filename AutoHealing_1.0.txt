@@ -1,0 +1,196 @@
+;        |                                 /   \                   |       .
+;  _    -O-       .                )      ((   ))     (           -O-
+; (@)    |     +                  /|\      ))_((     /|\           |            .
+; |-|                            / | \    (/\|/\)   / | \                            (@)
+; | | --------------------------/--|-voV---\`|'/--Vov-|--\---------------------------|-|         .
+; |-|                                '^`   (o o)  '^`                                | |
+; | |                                      `\Y/'                                     |-|
+; |-|   _______ __ __   __                  _______ __ __                            | |
+; | |  |   |   |  |  |_|__|.--------.---.-.|   _   |  |__|.---.-.-----.-----.---.-.  |-|    .     o
+; |-|  |   |   |  |   _|  ||        |  _  ||       |  |  ||  _  |     |-- __|  _  |  | |
+; | |  |_______|__|____|__||__|__|__|___._||___|___|__|__||___._|__|__|_____|___._|  |-|
+; |_|________________________________________________________________________________| |
+; (@)                     l   /\ /         ( (          \ /\   l                   `\|-|             .
+;           o             l /   V           \ \          V   \ l       +             (@)
+;                         l/                _) )_             \I                                 +
+;      +                                    `\ /'
+;
+; Script Name: AutoHealing
+;           _____________
+;         /     __      /|
+;        /   __/ /_    / /
+;       /   /_  __/   / //
+;      /     /_/     / //
+;     /_____________/ //
+;     |______&______|//
+; ejm |_____________|/
+;
+; Author: Sthil Lauda
+; Client Tested with: 2.0.3
+; EUO version tested with: 1.5 Version 130
+; Shard: Ultima Alianza
+; Release: 26/07/2019
+; Purpose: Aplica vendas.
+;==================================
+set %version 1.0
+set %vendas_sucias AMF
+set %vendas_limpias ZLF
+set %max_vendas_sucias 10
+set %venta_timer #SCNT
+
+set #SYSMSGCOL 88
+event sysmessage ==================
+set #SYSMSGCOL 53
+event sysmessage AutoHealing %version
+set #SYSMSGCOL 88
+event sysmessage ==================
+wait 20
+
+gosub setupPilon
+
+loop:
+if ( #HITS < #MAXHITS && C Notin #CHARSTATUS ) ; Nos falta vida y no estamos envenenados...
+     {
+       if #SCNT2 > %venta_timer
+          {
+            event macro 4 0 .vendas
+            target
+            set %jstart #jindex
+            event macro 23 0
+            gosub wait_for MSG Pones_el_vendas no_necesita pero_fallas 20
+            if ( #TRUE in #RESULT )
+                 {
+                   if ( Pones_el_vendas in #RESULT )
+                        {
+                          set %venta_timer #SCNT2 + 180
+                          gosub limpiarVendas
+                          goto loop
+                        }
+                   if ( no_necesita in #RESULT )
+                        {
+                          wait 20
+                          goto loop
+                        }
+                   if ( pero_fallas in #RESULT )
+                        {
+                          set %fail_timer #SCNT2 + 30 ; 3 segundos
+                          _WaitToFail:
+                          if #SCNT2 < %fail_timer
+                             {
+                               wait 1
+                               goto _WaitToFail
+                             }
+                          goto loop
+                        }
+                 }
+          }
+     }
+goto loop
+
+;======================================================
+
+sub setupPilon
+display OK Selecciona el pilón de agua
+set #TARGCURS 1
+while #TARGCURS = 1
+      {
+        wait 1
+      }
+set %pilon #LTARGETID
+return
+
+sub limpiarVendas
+finditem %vendas_sucias C_ , #BACKPACKID
+if ( #FINDSTACK >= %max_vendas_sucias )
+     {
+       set #LOBJECTID #FINDID
+       event macro 17
+       target
+       set #LTARGETKIND 1
+       set #LTARGETID %pilon
+       event macro 22 0
+       wait 20
+       gosub agruparVendas
+     }
+return
+
+sub agruparVendas
+_agruparVendas:
+finditem %vendas_limpias C_ , #BACKPACKID
+if #FINDCNT > 1 ; Si hay más de 1 montón de vendas...
+   {
+     for #FINDINDEX 1 #FINDCNT
+         {
+           exevent drag #FINDID #FINDSTACK
+           exevent dropc #BACKPACKID
+           wait 20
+           goto _agruparVendas
+         }
+   }
+return
+
+;=================================================================
+sub wait_for
+;=================================================================
+; This "wait_for" sub package was created by Locke. If you use these subs please keep this header intact.
+; Documentation: the sub package grew to large with all the comments. To load them call the sub like this:
+; gosub wait_for docs    | or you can use doc, documention, what, or my personal favorite, kickass.
+
+; "wait_for core dispatcher" version 1.2 by Locke
+if %1 = doc || if %1 = docs || if %1 = documentation || if %1 = what || if %1 = kickass
+{
+Display ok Please click ok and wait for your browser to start.
+execute http://www.easyuo.com/forum/viewtopic.php?t=24716
+halt
+}
+nameSpace Push
+namespace local LLNS
+set #result N/A ; if #result isn't set by one of my wait_for subs it'll throw an error.
+set !LPC #lpc
+set #lpc 200
+for %i 0 %0
+set !_A . %i % . %i
+gosub wait_for_ , !_A1
+set #lpc !lpc
+namespace clear LLNS
+namespace pop
+if #result <> N/A
+return #result
+else
+display ok You specified an unknown wait_for command. Script returned #result and is halting.
+halt
+;=================================================================
+sub wait_for_MSG ; version 1.4 ~Locke
+;=================================================================
+if !_A0 < 3
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for MSG %message time_out_in_seconds$
++Script is halting
+halt
+}
+set !_timeout ( #scnt2 + !_A . !_A0 )
+_lets_wait_for_a_message:
+for %i %jstart #jindex
+{
+ scanjournal %i
+  for %ii 2 !_A0
+  {
+    if !_A . %ii in #journal && %jstart <> %i
+    set #result #true , #spc , !_A . %ii
+  }
+}
+
+if #true notin #result
+{
+set #result #false
+ if !_timeout =< #scnt2
+ return #result
+wait 1
+goto _lets_wait_for_a_message
+}
+else
+return #result
+
+wait 1
+goto _lets_wait_for_a_message

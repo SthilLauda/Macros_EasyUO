@@ -1,0 +1,350 @@
+;        |                                 /   \                   |       .
+;  _    -O-       .                )      ((   ))     (           -O-
+; (@)    |     +                  /|\      ))_((     /|\           |            .
+; |-|                            / | \    (/\|/\)   / | \                            (@)
+; | | --------------------------/--|-voV---\`|'/--Vov-|--\---------------------------|-|         .
+; |-|                                '^`   (o o)  '^`                                | |
+; | |                                      `\Y/'                                     |-|
+; |-|   _______ __ __   __                  _______ __ __                            | |
+; | |  |   |   |  |  |_|__|.--------.---.-.|   _   |  |__|.---.-.-----.-----.---.-.  |-|    .     o
+; |-|  |   |   |  |   _|  ||        |  _  ||       |  |  ||  _  |     |-- __|  _  |  | |
+; | |  |_______|__|____|__||__|__|__|___._||___|___|__|__||___._|__|__|_____|___._|  |-|
+; |_|________________________________________________________________________________| |
+; (@)                     l   /\ /         ( (          \ /\   l                   `\|-|             .
+;           o             l /   V           \ \          V   \ l       +             (@)
+;                         l/                _) )_             \I                                 +
+;      +                                    `\ /'
+;
+; Script Name: Hiding & Stealth Trainer
+; Author: Sthil Lauda
+; Version: 1.0
+; Client Tested with: 2.0.3
+; EUO version tested with: 1.5 Version 142
+; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Public Release: 26/07/2019
+; Purpose: Entrena hiding y andar oculto hasta ser GM.
+;==================================================================================
+; INSTRUCCIONES:
+;
+; 1- Responder a la pregunta (Sólo Hiding o bien Hiding + Stealth).
+; 2- Desactivar "Always Run" -> "event macro 32 0" o bien desde UO -> Opciones Macro -> Acciones -> AlwaysRun
+; 3- Pulsar el play :)
+;
+;==============================================================
+; ESQUEMA:
+;
+; Punto A ----camina--desde--A--hacia--B--> Punto B
+; Punto B <----camina--desde--B--hacia--A-- Punto A
+;
+;==============================================================
+; Ciclo para comer.
+set %tiempo_alimentacion 360 ; Cada cuántos segundos va a comprobar si tiene hambre (6 minutos).
+set %version 1.0
+; _______________________________________________
+;
+; //////////////////////////////////////////////
+; ************* FIN CONFIGURACIÓN *************
+; //////////////////////////////////////////////
+; _______________________________________________
+;
+set %comida RGG_NRD_QSD_ZBG_WLI
+ +_QRD_END_FUD_YLI_WLI_HGI_JQE
+ +_KGI_EGI_QLI_KLI_MLI_KRD_HQD
+ +_AQD_MQE_VQE_TQE_IQE_PQD_QQD
+ +_GQE_SPE_ZPE_OQE_BDF_KPE_RQE
+ +_YSD_SQD_AXI
+set %tiempo_actual #SCNT ; Reloj
+set %proxima_vez %tiempo_actual ; Trigger
+
+initevents
+chooseskill Hidi real
+set %skillinihiding #SKILL
+chooseskill Stlt real
+set %skillinistlt #SKILL
+
+set #SYSMSGCOL 88
+event sysmessage =====================
+set #SYSMSGCOL 53
+event sysmessage Hiding & Stealth %version
+set #SYSMSGCOL 88
+event sysmessage =====================
+wait 40
+
+; Selecciona el tipo de entrenamiento ^^
+display yesno *********************** [ HIDING ] ***********************$$
+            + ¿Quieres entrenar solamente la skill de Hiding?           $$
+            + NOTA: Si eliges "NO", entonces entrenará caminar oculto.  $$
+            + ********************************************************* $$
+if ( #dispres = yes )
+     {
+       set %trainHiding #TRUE
+       goto hidingLoop ; Hiding
+     }
+     else
+        {
+          set %trainHiding #FALSE
+          gosub setupCoordenadas
+          goto stealthLoop ; Hiding + Stealth
+        }
+
+;============================================================
+;
+; ******************* LOOPS PRINCIPALES ********************
+;
+;============================================================
+; *** Stealth ***
+stealthLoop:
+gosub checkHungry ; Alimentación.
+gosub checkSkill  ; Comprobar GM.
+; Ocultarse y Moverse...
+if #CHARPOSX = %X_2 && #CHARPOSY = %Y_2 || #CHARPOSX <> %X_2 || #CHARPOSY <> %Y_2
+   {
+     gosub hiding
+     move %X_1 %Y_1 0 10s ; (Timeout)
+   }
+if #CHARPOSX = %X_1 && #CHARPOSY = %Y_1 || #CHARPOSX <> %X_1 || #CHARPOSY <> %Y_1
+   {
+     gosub hiding
+     move %X_2 %Y_2 0 10s ; (Timeout)
+   }
+goto stealthLoop
+
+; *** Hiding ***
+hidingLoop:
+gosub checkHungry ; Alimentación.
+gosub checkSkill  ; Comprobar GM.
+gosub hiding      ; Ocultarse
+goto hidingLoop
+;============================================================
+;
+; ***************** FIN LOOPS PRINCIPALES ******************
+;
+;============================================================
+
+sub setupCoordenadas ; <=============================>
+if %confp = 1 || %confp = N/A
+   {
+     set #SYSMSGCOL 43
+     event sysmessage Mueve tu PJ hasta la posicon (A)
+     event sysmessage Y presiona la tecla ESC.
+     setuotitle Mueve el personaje al punto (A) y presiona ESC.
+     set %conf 1
+     set %confp 2
+     gosub TESC
+   }
+if %confp = 2
+   {
+     set #SYSMSGCOL 53
+     event sysmessage Mueve tu PJ hasta la posicon (B)
+     event sysmessage Y presiona la tecla ESC.
+     setuotitle Mueve el personaje al punto (B) y presiona ESC.
+     set %conf 2
+     gosub TESC
+   }
+return
+
+sub TESC ; <=============================>
+_TESCLOOP:
+onHotKey ESC
+       {
+         if %conf = 1
+            {
+              ; --------------------------
+              ; Las cordenadas del punto A
+              ; --------------------------
+              set %X_1 #CHARPOSX ; La puedes ver en el EasyUO -> Character Info -> #CHARPOSX
+              set %Y_1 #CHARPOSY ; La puedes ver en el EasyUO -> Character Info -> #CHARPOSY
+              return
+            }
+         if %conf = 2
+            {
+              ; --------------------------
+              ; Las cordenadas del punto B
+              ; --------------------------
+              set %X_2 #CHARPOSX ; La puedes ver en el EasyUO -> Character Info -> #CHARPOSX
+              set %Y_2 #CHARPOSY ; La puedes ver en el EasyUO -> Character Info -> #CHARPOSY
+              return ; Todo listo :-)
+            }
+       }
+wait 1
+goto _TESCLOOP
+
+sub hiding ; <=============================>
+_reHid:
+if ( H notin #CHARSTATUS || %trainHiding )
+     {
+       set %jstart #jindex
+       event macro 13 21 ; Use Skill Hiding
+       gosub wait_for MSG No_consigues Consigues_ocultarte 50
+       if ( #TRUE in #RESULT )
+            {
+              if No_consigues in #RESULT
+                 {
+                   goto _reHid
+                 }
+              if Consigues_ocultarte in #RESULT
+                 {
+                   return
+                 }
+            }
+     }
+return
+
+sub checkSkill ; <=============================>
+chooseskill Hidi real
+set %skillhidingAhora #SKILL
+chooseskill Stlt real
+set %skillstltAhora #SKILL
+; Título con skills.
+setuotitle || Skill Hiding | Ini: %skillinihiding | Actual: %skillhidingAhora || Skill Stealth | Ini: %skillinistlt | Actual: %skillstltAhora
+if ( ! %trainHiding && %skillstltAhora >= 1000 ) ; 645 para Haven
+     {
+       set #SYSMSGCOL 23
+       event sysmessage Somos GM Stealth :-)
+       halt ; Paramos
+     }
+     else
+        {
+          if ( %trainHiding && %skillhidingAhora >= 1000 ) ; 645 para Haven
+               {
+                 set #SYSMSGCOL 23
+                 event sysmessage Somos GM Hiding :-)
+                 halt ; Paramos
+               }
+        }
+return
+
+sub checkHungry ; <=============================>
+set %tiempo_actual #SCNT
+if ( %proxima_vez <= %tiempo_actual )
+     {
+       gosub comprobar_comida
+     }
+return
+
+;=====================================================
+; Rutina para, en caso de hambre, comer hasta saciarse
+;=====================================================
+; v2.4
+sub comprobar_comida ; <=============================>
+{
+  hambriento:
+  set %jrnl #JINDEX ; Marcamos un índice de las líneas del diario.
+  event macro 4 0 .hungry
+  wait 20
+  while #TRUE
+     {
+       if #JINDEX > %jrnl ; Si aparece una nueva línea.
+          {
+            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de línea.
+            scanjournal %jrnl   ; La leemos...
+            if Dentro_de_1_minuto in #JOURNAL
+               {
+                 wait 120s ; Save del server...
+               }
+            if no_te_puedes_comer_eso in #JOURNAL
+               {
+                 event exmsg #CHARID 3 48 ESTO NO ES COMIDA!!
+                 wait 40
+                 ignoreitem #FINDID ComidaID ; Lo guardamos en una lista de ID's que no se pueden comer [ ignoreitem reset ComidaID ].
+                 goto hambriento
+               }
+            if Estas_no_le_afecta_el_hambre in #JOURNAL || Estas_tan_lleno_que_no_puedes in #JOURNAL || Estas_totalmente_saciado in #JOURNAL
+               {
+                 set %proxima_vez %tiempo_actual + %tiempo_alimentacion
+                 return
+               }
+               else
+                  {
+                    if Estas_lleno in #JOURNAL || Estas_contento in #JOURNAL || Estas_en_inanicion in #JOURNAL || Estas_hambriento in #JOURNAL || Sientes_mucho in #JOURNAL || Estas_con_hambre in #JOURNAL || Estas_parcialmente in #JOURNAL || Estas_bien_lleno in #JOURNAL || Te_sientes_casi_lleno in #JOURNAL
+                       {
+                         finditem %comida C_ , #BACKPACKID
+                         if #findcnt > 0
+                            {
+                              set #LOBJECTID #FINDID
+                              event macro 17
+                              goto hambriento ; Seguimos comiendo...
+                            }
+                            else
+                               {
+                                 event exmsg #CHARID 3 48 COMPRA COMIDA!!
+                                 wait 40
+                                 set %proxima_vez %tiempo_actual + %tiempo_alimentacion
+                               }
+                       }
+                       else ; Mensaje extraño, repetimos...
+                          {
+                            goto hambriento
+                          }
+                  }
+          }
+       return
+     } ; FIN While
+}
+return
+
+;=================================================================
+sub wait_for
+;=================================================================
+; This "wait_for" sub package was created by Locke. If you use these subs please keep this header intact.
+; Documentation: the sub package grew to large with all the comments. To load them call the sub like this:
+; gosub wait_for docs    | or you can use doc, documention, what, or my personal favorite, kickass.
+
+; "wait_for core dispatcher" version 1.2 by Locke
+if %1 = doc || if %1 = docs || if %1 = documentation || if %1 = what || if %1 = kickass
+{
+Display ok Please click ok and wait for your browser to start.
+execute http://www.easyuo.com/forum/viewtopic.php?t=24716
+halt
+}
+nameSpace Push
+namespace local LLNS
+set #result N/A ; if #result isn't set by one of my wait_for subs it'll throw an error.
+set !LPC #lpc
+set #lpc 200
+for %i 0 %0
+set !_A . %i % . %i
+gosub wait_for_ , !_A1
+set #lpc !lpc
+namespace clear LLNS
+namespace pop
+if #result <> N/A
+return #result
+else
+display ok You specified an unknown wait_for command. Script returned #result and is halting.
+halt
+;=================================================================
+sub wait_for_MSG ; version 1.4 ~Locke
+;=================================================================
+if !_A0 < 3
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for MSG %message time_out_in_seconds$
++Script is halting
+halt
+}
+set !_timeout ( #scnt2 + !_A . !_A0 )
+_lets_wait_for_a_message:
+for %i %jstart #jindex
+{
+ scanjournal %i
+  for %ii 2 !_A0
+  {
+    if !_A . %ii in #journal && %jstart <> %i
+    set #result #true , #spc , !_A . %ii
+  }
+}
+
+if #true notin #result
+{
+set #result #false
+ if !_timeout =< #scnt2
+ return #result
+wait 1
+goto _lets_wait_for_a_message
+}
+else
+return #result
+
+wait 1
+goto _lets_wait_for_a_message

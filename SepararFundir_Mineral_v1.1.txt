@@ -1,0 +1,424 @@
+; Author: Sthil Lauda
+; Version: 1.1
+; Client Tested with: 2.0.3
+; EUO version tested with: EasyUO 1.5 Version 243
+; Shard: Ultima Alianza ¡Hasta la muerte!
+; Public Release: 20/01/19
+; Revised On: 20/01/19
+; Propósito: Funde menas de 1 en 1.
+; Instrucciones: Configurar bolsa de lingotes y cofre de menas.
+;________________________________
+;
+; ///////////////////////////////
+; ******** CONFIGURACIÓN ********
+; ///////////////////////////////
+;________________________________
+;
+set %CofreMenas WXOAWMD      ; Cofre con las menas
+set %BolsaLingotes WXOAWMD   ; Bolsa de lingotes
+set %maxweight 200           ; Peso máximo antes de vaciar lingotes
+set %tiempo_alimentacion 360 ; Cada cuántos segundos va a comprobar si tiene hambre (5 minutos).
+;________________________________________________
+;
+; //////////////////////////////////////////////
+; ************* FIN CONFIGURACIÓN *************
+; //////////////////////////////////////////////
+;________________________________________________
+;
+set %tiempo_actual #SCNT        ; Reloj
+set %proxima_vez %tiempo_actual ; Trigger
+set %refunde #FALSE             ; Loop para fundir
+set %stack_mineral N/A          ; ID del montón de mineral seleccionado
+set %stack_gastado #TRUE
+set %comida RGG_NRD_QSD_ZBG_WLI_QRD_END_FUD_YLI_WLI_HGI
+    +_KGI_EGI_QLI_KLI_MLI_KRD_HQD_AQD_MQE_VQE_TQE_JQE_IQE
+    +_GQE_SPE_ZPE_OQE_BDF_KPE_RQE_YSD_SQD_YWI_AXI_PQD_QQD
+
+gosub setupForja
+gosub abrirContenedor %CofreMenas
+gosub abrirContenedor %BolsaLingotes
+
+loop:
+set %tiempo_actual #SCNT ; Reloj.
+if ( %proxima_vez <= %tiempo_actual )
+     {
+       gosub comprobar_comida
+     }
+finditem DWJ_EWJ_GWJ_TVJ C_ , %CofreMenas ; Todo tipo de minerales, no sólo hierro.
+if ( #FINDCNT > 0 )
+     {
+       gosub comprobarMena
+       if ( %stack_gastado )
+            {
+              gosub seleccionarMena
+            }
+       set %peso #Weight
+       exevent Drag %stack_mineral 1
+       gosub waitForSysVar Weight <> %peso 60 ; Esperamos a que cambie el peso
+       exevent DropC #backpackid 80 80        ; Drops the mushroom @80,80... yeah, cool as a cucumber!
+       gosub waitForItem %stack_mineral C_ #BACKPACKID 60 ; Esperamos a que caiga el objeto
+       gosub fundirFast
+       if ( #weight >= %maxweight )
+            {
+              wait 5 ; Esperamos 1 vez a que la mochile se actualice.
+              set %refunde #TRUE
+              gosub fundirFast ; Fundir olvidados, si los hay... XD
+              gosub moverLingotes ; Vaciamos la mochila de lingotes.
+            }
+     }
+     else
+        {
+          gosub moverLingotes ; Limpiar
+          set #sysmsgcol 88
+          event sysmessage FIN
+          halt
+        }
+goto loop
+
+sub comprobarMena
+finditem DWJ_EWJ_GWJ_TVJ C_ , %CofreMenas
+if #FINDCNT > 0
+   {
+     for #FINDINDEX 1 #FINDCNT
+         {
+           if ( #FINDSTACK > 0 ) && ( #FINDCOL = %stack_color )
+                {
+                  set %stack_mineral #FINDID
+                  return
+                }
+         }
+     set %stack_gastado #TRUE
+   }
+return
+
+sub seleccionarMena
+finditem DWJ_EWJ_GWJ_TVJ C_ , %CofreMenas
+if #FINDCNT > 0
+   {
+     for #FINDINDEX 1 #FINDCNT
+         {
+           if ( #FINDSTACK >= 1 )
+                {
+                  set %stack_color #FINDCOL
+                  set %stack_mineral #FINDID
+                  set %stack_gastado #FALSE
+                  return
+                }
+         }
+   }
+return
+
+sub abrirContenedor
+set %contenedor %1
+finditem %contenedor
+if #FINDCNT > 0
+   {
+     if #FINDDIST <= 3
+        {
+          set #LOBJECTID %contenedor
+          event macro 17
+          gosub wait_for GUMP %contenedor 20
+        }
+        else
+           {
+             set #sysmsgcol 38
+             event sysmessage NO LLEGO AL CONTENEDOR %contenedor !
+             halt
+           }
+   }
+   else
+      {
+        set #sysmsgcol 38
+        event sysmessage NO VEO EL CONTENEDOR %contenedor !
+        halt
+      }
+return
+
+sub fundirFast
+_reFunde:
+finditem DWJ_EWJ_GWJ_TVJ C_ , #BACKPACKID
+if ( #FINDCNT > 0 )
+     {
+       set #lobjectid #findid
+       event macro 17
+       if ( %refunde )
+            {
+              wait 5
+              goto _reFunde
+            }
+     }
+set %refunde #FALSE
+return
+
+sub moverLingotes
+event macro 8	7 ; Refrescar la mochila
+gosub wait_for GUMP #BACKPACKID 20
+_mover:
+finditem RMK_XMK_TMK_NMK C_ , #BACKPACKID
+if #FINDCNT > 0
+   {
+     exevent drag #findid #FINDSTACK
+     exevent dropc %BolsaLingotes
+     wait 20
+     goto _mover
+   }
+return
+
+sub setupForja
+_reForja:
+finditem JBG_KUJ_OUJ_SOJ_HVJ_CVJ_WUJ
+if #FINDCNT > 0
+   {
+     set %forge #findid
+     if #FINDDIST >= 2 ; Tan lejos de esta forja no podemos fundir.
+        {
+          repeat
+               {
+                 set %jstart #jindex
+                 event pathfind #FINDX #FINDY #FINDZ ; Nos intentamos acercar...
+                 gosub wait_for MSG GET_THERE 20 ; No llegamos a esta forja en concreto.
+                 if ( #TRUE in #RESULT )
+                      {
+                        ignoreitem %forge
+                        goto _reForja
+                      }
+                 finditem JBG_KUJ_OUJ_SOJ_HVJ_CVJ_WUJ
+               }
+               until #FINDDIST <= 1 ; Hemos encontrado una forja cerca.
+        }
+   }
+   else
+      {
+        set #sysmsgcol 38
+        event sysmessage NO HAY FORJA!
+        halt
+      }
+return
+
+;=====================================================
+; Rutina para, en caso de hambre, comer hasta saciarse
+;=====================================================
+; v2.2
+sub comprobar_comida
+{
+  hambriento:
+  set %jrnl #jindex ; Marcamos un índice de las líneas del diario.
+  event macro 4 0 .hungry
+  wait 20
+  while #true
+     {
+       if #jindex > %jrnl ; Si aparece una nueva línea.
+          {
+            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de línea.
+            scanjournal %jrnl   ; La leemos...
+            if Dentro_de_1_minuto in #journal
+               {
+                 wait 120s ; Save del server...
+               }
+            if Estas_no_le_afecta_el_hambre in #journal || Estas_tan_lleno_que_no_puedes in #journal || Estas_totalmente_saciado in #journal
+               {
+                 set %proxima_vez %tiempo_actual + %tiempo_alimentacion
+                 return
+               }
+               else
+                  {
+                    if Estas_lleno in #journal || Estas_contento in #journal || Estas_en_inanicion in #journal || Estas_hambriento in #journal || Sientes_mucho in #journal || Estas_con_hambre in #journal || Estas_parcialmente in #journal || Estas_bien_lleno in #journal || Te_sientes_casi_lleno in #journal
+                       {
+                         finditem %comida C_ , #backpackid
+                         if #findcnt > 0
+                            {
+                              set #lobjectid #findid
+                              event macro 17
+                              wait 20
+                              goto hambriento
+                            }
+                            else
+                               {
+                                 event exmsg #charid 3 48 COMPRA COMIDA!!
+                                 wait 40
+                                 set %proxima_vez %tiempo_actual + %tiempo_alimentacion
+                               }
+                       }
+                       else ; Mensaje extraño, repetimos...
+                          {
+                            goto hambriento
+                          }
+                  }
+          }
+       return
+     } ; FIN While
+}
+return
+
+;-@ ============================== @-;
+;-@ ############################## @-;
+;-@ SUBS públicos del Foro EasyUO  @-;
+;-@ ############################## @-;
+;-@ ============================== @-;
+
+;=================================================================
+sub wait_for
+;=================================================================
+; This "wait_for" sub package was created by Locke. If you use these subs please keep this header intact.
+; Documentation: the sub package grew to large with all the comments. To load them call the sub like this:
+; gosub wait_for docs    | or you can use doc, documention, what, or my personal favorite, kickass.
+
+; "wait_for core dispatcher" version 1.2 by Locke
+if %1 = doc || if %1 = docs || if %1 = documentation || if %1 = what || if %1 = kickass
+{
+Display ok Please click ok and wait for your browser to start.
+execute http://www.easyuo.com/forum/viewtopic.php?t=24716
+halt
+}
+nameSpace Push
+namespace local LLNS
+set #result N/A ; if #result isn't set by one of my wait_for subs it'll throw an error.
+set !LPC #lpc
+set #lpc 200
+for %i 0 %0
+set !_A . %i % . %i
+gosub wait_for_ , !_A1
+set #lpc !lpc
+namespace clear LLNS
+namespace pop
+if #result <> N/A
+return #result
+else
+display ok You specified an unknown wait_for command. Script returned #result and is halting.
+halt
+;=================================================================
+sub wait_for_MSG ; version 1.4 ~Locke
+;=================================================================
+if !_A0 < 3
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for MSG %message time_out_in_seconds$
++Script is halting
+halt
+}
+set !_timeout ( #scnt2 + !_A . !_A0 )
+_lets_wait_for_a_message:
+for %i %jstart #jindex
+{
+ scanjournal %i
+  for %ii 2 !_A0
+  {
+    if !_A . %ii in #journal && %jstart <> %i
+    set #result #true , #spc , !_A . %ii
+  }
+}
+
+if #true notin #result
+{
+set #result #false
+ if !_timeout =< #scnt2
+ return #result
+wait 1
+goto _lets_wait_for_a_message
+}
+else
+return #result
+
+wait 1
+goto _lets_wait_for_a_message
+
+;======================================================================
+sub wait_for_GUMP ; version 1.4 ~Locke
+;=================================================================
+if !_A0 < 3
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for GUMP XXX_YYY % , time_out_in_seconds$
++Script is halting
+halt
+}
+if !_A3 <> CLOSE
+set !_timeout #scnt2 + !_A3
+else
+set !_timeout 0 ; no gump wait if %3 = CLOSE since we already believe it to be open.
+
+_lets_wait_for_a_gump:
+if #CONTID = !_A2 || #CONTSIZE = !_A2 || #CONTKIND = !_A2 || #CONTNAME = !_A2 || #CONTTYPE = !_A2
+{
+  if !_A5 <> N/A && !_A6 <> N/A
+  {
+  set !clickx !_A5 + #contposx
+  set !clicky !_A6 + #contposy
+  click !clickx !clicky
+  }
+  if !_A3 = CLOSE || if !_A4 = CLOSE || !_A5 = CLOSE || !_A6 = CLOSE
+  {
+  set !string #contsize
+  str pos !string _
+  set !pos #strres
+  str del !string #strres #strres
+  set !clickX #contposx + ( #strres / 2 )
+  str del !string 1 !pos
+  set !clickY #contposy + ( #strres / 2 )
+  click !clickx !clicky R
+  }
+return #true
+}
+
+if !_timeout =< #scnt2 && !_A4 = N/A
+return #false
+
+if !_A4 <> N/A && !_timeout =< #scnt2
+{
+finditem !_A4
+ if #findkind <> -1
+ {
+  for #findindex 1 #findcnt
+  {
+   if #finddist > 2
+   ignoreitem #findid LLWAITFOR
+   else
+   break
+  }
+  set #lobjectid #findid
+  event macro 17 0
+  set !_timeout #scnt2 + !_A3
+ }
+ else
+ return #false
+}
+wait 1
+goto _lets_wait_for_a_gump
+
+sub waitForItem
+{
+   namespace push
+   namespace local wfi
+   set %time #SCNT2 + %4 ; Décimas de segundo
+
+   dropwait:
+   finditem %1 %2 , %3
+   if ( #FINDKIND = -1 ) ; Not Found
+   {
+       wait 1
+       if ( #SCNT2 >= %time )
+       {
+         return #false
+       }
+       goto dropwait
+   }
+   namespace clear
+   namespace pop
+   return
+}
+
+sub waitForSysVar
+if %0 < 4 || %4 = N/A
+set %4 %_defaultWaitForTimeout
+if %0 < 5
+set %5 return
+set %4 #sCnt2 + %4
+_waitForSysVar:
+set % . %5 # . %1 %2 %3
+if ! % . %5 && #sCnt2 < %4
+{
+Wait 1
+goto _waitForSysVar
+}
+return
+
