@@ -1,0 +1,230 @@
+;        |                                 /   \                   |       .
+;  _    -O-       .                )      ((   ))     (           -O-
+; (@)    |     +                  /|\      ))_((     /|\           |            .
+; |-|                            / | \    (/\|/\)   / | \                            (@)
+; | | --------------------------/--|-voV---\`|'/--Vov-|--\---------------------------|-|         .
+; |-|                                '^`   (o o)  '^`                                | |
+; | |                                      `\Y/'                                     |-|
+; |-|   _______ __ __   __                  _______ __ __                            | |
+; | |  |   |   |  |  |_|__|.--------.---.-.|   _   |  |__|.---.-.-----.-----.---.-.  |-|    .     o
+; |-|  |   |   |  |   _|  ||        |  _  ||       |  |  ||  _  |     |-- __|  _  |  | |
+; | |  |_______|__|____|__||__|__|__|___._||___|___|__|__||___._|__|__|_____|___._|  |-|
+; |_|________________________________________________________________________________| |
+; (@)                     l   /\ /         ( (          \ /\   l                   `\|-|             .
+;           o             l /   V           \ \          V   \ l       +             (@)
+;                         l/                _) )_             \I                                 +
+;      +                                    `\ /'
+;
+; Script Name: Bestia Horrenda
+;
+;                   (    )
+;                  ((((()))
+;                  |o\ /o)|
+;                  ( (  _')
+;                   (._.  /\__
+;                  ,\___,/ '  ')
+;    '.,_,,       (  .- .   .    )
+;     \   \\     ( '        )(    )
+;      \   \\    \.  _.__ ____( .  |
+;       \  /\\   .(   .'  /\  '.  )
+;        \(  \\.-' ( /    \/    \)
+;         '  ()) _'.-|/\/\/\/\/\|
+;             '\\ .( |\/\/\/\/\/|
+;               '((  \    /\    /
+;               ((((  '.__\/__.')
+;                ((,) /   ((()   )
+;                 "..-,  (()("   /
+;            pils  _//.   ((() ."
+;          _____ //,/" ___ ((( ', ___
+;                           ((  )
+;                            / /
+;                          _/,/'
+;                        /,/,"
+; Author: Sthil Lauda
+; Version: 2.2
+; Client Tested with: 2.0.3
+; EUO version tested with: 1.5 Version 243
+; Shard: Ultima Alianza ¡Hasta la muerte!
+; Purpose: Mantiene transformado en bestia a tu personaje, lo rearma y equipa items después de castear.
+; Configuración: Ninguna ^^
+
+set %id_bestia SAB    ; Tipo de la bestia horrenda.
+set %id_humano IS     ; Tipo de los Humanos.
+set %peso_bestia 600  ; El peso que nos sirve para detectar cuándo nos hemos transformado.
+set %min_reactivos 10 ; El número de reactivos en la mochila antes de alertar
+;
+; Aquí es posible que tengas que añadir el ID del TIPO de arma que usas, aunque lo dudo.
+;
+set %armas FMH_GFF_EPH_LPH_BPH_CUO_TSF_LPO_JPH_ZTH_RMH_SOH_TLH_
+ +FUO_WSF_ATF_OMH_XPO_QPO_NMH_WOH_BNF_LTF_VPO_TOH_WTH_VRH_KTF_LMH_
+ +OLH_FFF_ZSF_YTH_BUO_ASF_ISF_BSF_QPF_KPH_CUH_NPO_MPH_UOH_TRH_XRH_CSF_
+ +KPO_POH_RRH_WPO_EMH_MSF_OPO_BUH_GUO_MMH_VTH_BFF_QMH_YSF_NSF_LSF_
+ +GMH_JTF_SRH_CNF_FBG_HNF_ZPF_GBG_OSF_INF_HSF_AUO_ZTO_FSF_WRH_MTF_JPO_
+ +RPF_HFF_XSF_YPO_JSF_DMH_XTH_PPO_QOH_URH_CQF_CFF_PMH_AUH_SPO_CPH_AQF_
+ +MPO_YRH_USF_JOH_KSF_ZRF_PPF_SMH_NPO_GUO_XHF_
+;
+; Escudos
+;
+set %escudos LIK_MIK_CLK_AIK_CIK_LYD_GIK_NIK_ZHK_HLK_BLK_FIK_BIK_OIK
+;
+; Joyas
+;
+set %joya_collar SJG
+set %joya_brazalete IJG
+set %joya_anillo UJG
+
+;
+; Reactivos
+;
+gosub comprobar_regs
+
+;
+; MACRO
+;
+loop:
+while #CHARGHOST <> YES ; Mientras estamos vivos...
+{
+  wait 1
+  chooseskill Necr real ; Comprobar la skill de Nigromancia.
+  if #SKILL >= 400
+     {
+       set %nigro_on_off #true ; NIGRO ON
+     }
+     else
+        {
+          set %nigro_on_off #false ; NIGRO OFF
+          set #sysmsgcol 38
+          event sysmessage HABILIDAD INSUFICIENTE! :-(
+          halt
+        }
+  if %nigro_on_off ; Si el personaje es Nigromante,
+     {
+       ;
+       ; Equipo: armas y joyas.
+       ;
+       finditem %armas C_ , #CHARID ; Buscamos un arma equipada,
+       if #FINDKIND <> -1  ; Si encontramos alguna,
+          {
+            set %arma #FINDID   ; la dejamos fijada.
+          }
+       finditem %escudos C_ , #CHARID ; Buscamos un escudo equipado,
+       if #FINDKIND <> -1  ; Si encontramos alguno,
+          {
+            set %escudo #FINDID ; lo dejamos fijado.
+          }
+       finditem %joya_collar C_ , #CHARID ; Buscamos un collar mágico equipado,
+       if #FINDKIND <> -1  ; Si encontramos alguno,
+          {
+            set %joya_collar_equipado #FINDID ; lo dejamos fijado.
+          }
+       finditem %joya_brazalete C_ , #CHARID ; Buscamos un brazalete mágico equipado,
+       if #FINDKIND <> -1  ; Si encontramos alguno,
+          {
+            set %joya_brazalete_equipado #FINDID ; lo dejamos fijado.
+          }
+       finditem %joya_anillo C_ , #CHARID ; Buscamos un anillo mágico equipado,
+       if #FINDKIND <> -1  ; Si encontramos alguno,
+          {
+            set %joya_anillo_equipado #FINDID ; lo dejamos fijado.
+          }
+       ;
+       ; Bestia Horrenda
+       ;
+       finditem #CHARID ; Buscamos el tipo de personaje bestia/humano...
+       set %tipo_id_pj #FINDTYPE ; Actualizamos constantemente el tipo de ID del personaje...
+       if %tipo_id_pj <> %id_bestia ; Si es distinto al de la bestia, entonces es que somos un humano...
+          {
+            if #MANA > 11 ; Si tenemos el maná necesario para invocar el hechizo...
+               {
+                 set %tiempo_cast #SCNT
+                 set %mensaje Transformando...
+                 set %color 89
+                 gosub tiempo
+                 msg $ .nigro 13 $ ; Invocamos a la Bestia!
+                 set %tiempo_cast #SCNT
+                 while #MAXWEIGHT < %peso_bestia ; Nos quedamos esperando a que nos suban las stats de la Bestia...
+                       {
+                         wait 1s
+                         set %mensaje Esperando...
+                         set %color 53
+                         gosub tiempo
+                         if %tiempo_esperando > 10
+                            {
+                              break ; Por seguridad nos salimos y repetimos si tarda demasiado (ha fallado el hechizo, etc)
+                            }
+                       } ; Dejamos de esperar...
+                 gosub equiparse ; Nos equipamos cuando ya somos bestia...
+                 gosub comprobar_regs ; Informamos de los regs que quedan...
+               }
+          }
+     }
+}
+goto loop
+
+;
+; EQUIPARSE / REARMAR
+;
+sub equiparse
+set %mensaje Equipando...
+set %color 28
+gosub tiempo
+finditem %arma C_ , #CHARID ; Buscamos el arma en el personaje,
+if #FINDKIND = -1 ; Si no la llevamos puesta,
+   {
+     set #lObjectID %arma
+     event macro 17 0 ; Equipamos el arma.
+     wait 5 ; Modo agresivo, subir hasta 20 para suavizar.
+   }
+finditem %escudo C_ , #CHARID ; Buscamos el escudo en el personaje,
+if #FINDKIND = -1 ; Si no lo llevamos puesto,
+   {
+     set #lObjectID %escudo
+     event macro 17 0 ; Equipamos el escudo.
+     wait 5 ; Modo agresivo, subir hasta 20 para suavizar.
+   }
+finditem %joya_collar_equipado C_ , #CHARID ; Buscamos el collar en el personaje,
+if #FINDKIND = -1 ; Si no lo llevamos puesto,
+   {
+     exevent drag %joya_collar_equipado
+     exevent droppd ; Equipamos el collar.
+     wait 10 ; Modo agresivo, subir hasta 30 para suavizar.
+   }
+finditem %joya_brazalete_equipado C_ , #CHARID ; Buscamos el brazalete en el personaje,
+if #FINDKIND = -1 ; Si no lo llevamos puesto,
+   {
+     exevent drag %joya_brazalete_equipado
+     exevent droppd ; Equipamos el brazalete.
+     wait 10 ; Modo agresivo, subir hasta 30 para suavizar.
+   }
+finditem %joya_anillo_equipado C_ , #CHARID ; Buscamos el anillo en el personaje,
+if #FINDKIND = -1 ; Si no lo llevamos puesto,
+   {
+     exevent drag %joya_anillo_equipado
+     exevent droppd ; Equipamos el anillo.
+     wait 10 ; Modo agresivo, subir hasta 30 para suavizar.
+   }
+set %mensaje OK!
+set %color 89
+gosub tiempo
+return
+
+;
+; MENSAJES INFORMATIVOS
+;
+sub tiempo
+set %tiempo_espera #SCNT
+set %tiempo_esperando %tiempo_espera - %tiempo_cast
+event exmsg #charid 0 %color %mensaje [ %tiempo_esperando ]
+return
+
+;
+; MONITORIZA LOS REACTIVOS
+;
+sub comprobar_regs
+finditem XZF C_ , #BACKPACKID
+event exmsg #charid 0 97 OBSI [ #FINDSTACK ]
+wait 20
+finditem VZF C_ , #BACKPACKID
+event exmsg #charid 0 200 POMEZ [ #FINDSTACK ]
+wait 20
+return
