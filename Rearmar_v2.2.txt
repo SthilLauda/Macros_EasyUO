@@ -1,0 +1,266 @@
+; ======================================================================================================
+;  '||   ||` '||`   ||                                 /.\      '||`
+;   ||   ||   ||    ||     ''                         // \\      ||   ''
+;   ||   ||   ||  ''||''   ||  '||),,(|,   '''|.     //...\\     ||   ||   '''|.  `||''|,  '''/  '''|.
+;   ||   ||   ||    ||     ||   || || ||  .|''||    //     \\    ||   ||  .|''||   ||  ||   //  .|''||
+;   `|...|'  .||.   `|..' .||. .||    ||. `|..||. .//       \\. .||. .||. `|..||. .||  ||. /... `|..||.
+; ======================================================================================================
+;
+; Script Name: Rearmar PRO
+;                                 .-.
+;                                {{@}}
+;               <>                8@8
+;             .::::.              888
+;         @\\/W\/\/W\//@          8@8                                        
+;          \\/^\/\/^\//      _    )8(    _         4$$-.
+;           \_O_<>_O_/      (@)__/8@8\__(@)         4   ".
+;      ____________________  `~"-=):(=-"~`          4    ^.
+;     |<><><>  |  |  <><><>|      |.|               4     $
+;     |<>      |  |      <>|      |S|               4     'b
+;     |<>      |  |      <>|      |'|               4      "b.
+;     |<>   .--------.   <>|      |.|               4        $
+;     |     |   ()   |     |      |P|               4        $r
+;     |_____| (O\/O) |_____|      |'|               4        $F
+;     |     \   /\   /     |      |.|    -$b========4========$b====*P=-
+;     |------\  \/  /------|      |U|               4       *$$F
+;     |       '.__.'       |      |'|               4        $$"
+;     |        |  |        |      |.|               4       .$F
+;     :        |  |        :      |N|               4       dP
+;      \<>     |  |     <>/       |'|               4      F
+;       \<>    |  |    <>/        |.|               4     @
+;        \<>   |  |   <>/         |K|               4    .
+;         `\<> |  | <>/'          |'|               J.
+;     jgs   `-.|  |.-`            \ /              '$$
+;              '--'                ^
+;
+; Author: SthiL Lauda
+; Version: 2.2
+; Client Tested with: 2.0.3
+; EUO version tested with: EasyUO 1.5 Version 243
+; Shard: Ultima Alianza ¡Hasta la muerte!
+; Purpose: Equiparse el arma y escudo, o arco/ballesta automaticamente si no están equipados.
+;
+; Instrucciones: - Iniciar la macro con el arma y el escudo equipado, y el arco en la mochila.
+;                - Guardar en el UO el ID del arma, escudo y arco. Comando: "guardar_uid 1, guardar_uid 2, guardar_uid 3"
+;                - Para cambiar de armas o escudo, configurar 3 macros en el UO: "say usar_uid 1", etc.
+;                - No hay problema por cambiar de repente a una segunda arma o arco (si llevas dos slayer distintas, etc)
+;                  o incluso al intercambiar un arma a dos manos por una de una mano, el escudo se equipará automáticamente.
+;                - La macro además de "recordar" el último arma, arco o escudo equipados en el PJ, analiza las armas
+;                  y determina qué combinaciones válidas hay entre ellas, para equiparlas cuando dejen de estarlo.
+;
+;========================================================
+set %version v2.2
+;
+; ITEM ID's
+;
+set %armas FMH_GFF_EPH_LPH_BPH_CUO_TSF_LPO_JPH_ZTH_RMH_SOH_TLH_
+ +FUO_WSF_ATF_OMH_XPO_NMH_BNF_LTF_VPO_WTH_VRH_KTF_
+ +OLH_FFF_ZSF_YTH_BUO_ASF_ISF_BSF_QPF_KPH_CUH_NPO_MPH_UOH_TRH_XRH_CSF_
+ +KPO_POH_RRH_WPO_EMH_MSF_OPO_BUH_GUO_VTH_BFF_QMH_YSF_NSF_LSF_
+ +GMH_JTF_SRH_CNF_FBG_HNF_ZPF_GBG_OSF_INF_HSF_AUO_ZTO_FSF_WRH_MTF_JPO_
+ +RPF_HFF_XSF_YPO_DMH_XTH_QOH_URH_CQF_CFF_PMH_AUH_SPO_CPH_AQF_
+ +MPO_YRH_JOH_KSF_ZRF_PPF_SMH_NPO_GUO_XHF_NPF_FUO
+set %arcos TOH_WOH_JSF_USF_LMH_MMH_QPO_PPO
+set %escudos CIK_BIK_AIK_OIK_NIK_FIK_GIK_LIK_CQF_PMH_MIK_ZHK
+; INICIO VARIABLES
+set %arma_una_mano N/A
+set %arma_dos_manos N/A
+set %arma_equipada N/A
+set %arco_equipado N/A
+set %escudo_equipado N/A
+set %escudo_on #FALSE
+set %a_dos_manos #FALSE
+;
+; COLOR
+;
+set #SYSMSGCOL 88
+
+;
+; AVISOS
+;
+event sysmessage Rearmar PRO %version
+wait 20
+
+while #CHARGHOST <> YES ; Mientras estamos con vida
+      {
+        ; ==============================================
+        ; BUCLE PARA REARMAR EL ARMA PRINCIPAL y ESCUDO
+        loop_armar:
+        wait 20
+        finditem %escudos C_ , #CHARID ; Buscamos un escudo equipado y lo configuramos...
+        if #FINDKIND <> -1
+           {
+             set %escudo_equipado #FINDID
+             set %escudo_on #TRUE
+             set %a_dos_manos #FALSE
+           }
+        finditem %armas C_ , #CHARID ; Buscamos un arma equipada y la configuramos...
+        if #FINDKIND <> -1
+           {
+             event property #FINDID
+             if Arma , #spc , A , #spc , Dos , #spc , Manos in #property
+                {
+                  set %a_dos_manos #TRUE
+                  set %escudo_on #FALSE ; Si vemos puesta un arma a dos manos, desactivamos el escudo...
+                  set %arma_dos_manos #FINDID ; Y guardamos su ID para equiparla cuando sea el caso.
+                }
+                else
+                   {
+                     if Arma , #spc , A , #spc , Una , #spc , Mano in #property
+                        {
+                          set %a_dos_manos #FALSE ; ; Si vemos puesta un arma de una mano, desactivamos las de dos manos...
+                          set %arma_una_mano #FINDID ; Y guardamos su ID para equiparla cuando sea el caso.
+                        }
+                   }
+             set %arma_equipada #FINDID ; Fijamos el arma equipada que hemos encontrado...
+           }
+        if #FINDKIND = -1 ; Si vemos que no hay un arma equipada...
+           {
+              finditem %arcos C_ , #CHARID ; Buscamos un arco por si acaso hemos cambiado de arma/arco...
+              if #FINDKIND <> -1 ; Si lo encontramos ya equipado...
+                 {
+                   goto loop_arco ; Nos vamos a controlar el arco...
+                 }
+             ; En este punto, se entiende que por algún motivo se nos ha caído el arma en la mochila...
+             finditem %arma_equipada C_ , #BACKPACKID
+             if #FINDKIND = -1 ; Si no está en la mochila, entonces se entiende que está equipada...
+                {
+                  if ( %escudo_on && ! %a_dos_manos ) ; Y si es un arma de una sola mano, y tenemos escudo...
+                       {
+                         goto Escudo ; Pasamos a comprobar el Escudo...
+                       }
+                }
+                else ; Hemos encontrado en la mochila el arma que llevábamos puesta... ¡EQUIPAMOS!
+                   {
+                     if ( %escudo_on && ! %a_dos_manos ) ; Si llevábamos un escudo y un arma de una mano...
+                          {
+                            set #LOBJECTID %arma_una_mano
+                            event macro 17 0 ; Equipamos el último arma de una mano que hemos visto equipada...
+                            gosub wait_for ITEM %arma_una_mano C_ , #CHARID 20
+                          }
+                          else ; Si no teníamos escudo pero sí un arma de dos manos...
+                             {
+                               if ( ! %escudo_on && %a_dos_manos )
+                                    {
+                                      set #LOBJECTID %arma_dos_manos
+                                      event macro 17 0 ; Equipamos el último arma de dos manos que hemos visto equipada...
+                                      gosub wait_for ITEM %arma_dos_manos C_ , #CHARID 20
+                                    }
+                                    else ; Si no teníamos escudo pero sí un arma de una mano...
+                                       {
+                                         if ( ! %escudo_on && ! %a_dos_manos )
+                                             {
+                                               set #LOBJECTID %arma_una_mano
+                                               event macro 17 0 ; Equipamos el último arma de una mano que hemos visto equipada...
+                                               gosub wait_for ITEM %arma_una_mano C_ , #CHARID 2
+                                             }
+                                       }
+                             }
+                   }
+           }
+        if ( %escudo_on || ! %a_dos_manos ) ; Si es un arma de una sola mano y llevamos escudo puesto...
+             {
+               Escudo:
+               finditem %escudos C_ , #CHARID
+               if #FINDKIND = -1
+                  {
+                    finditem %escudos C_ , #BACKPACKID
+                    if #FINDKIND = -1
+                       {
+                         goto loop_armar
+                       }
+                       else
+                          {
+                            set #LOBJECTID %escudo_equipado
+                            event macro 17 0
+                            gosub wait_for ITEM %escudo_equipado C_ , #CHARID 20
+                          }
+                  }
+             }
+        goto loop_armar
+        ;=====================================
+        ; BUCLE PARA REARMAR EL ARCO/BALLESTA
+        loop_arco:
+        wait 20
+        finditem %arcos C_ , #CHARID
+        if #FINDKIND <> -1 ; Está equipado en el PJ
+           {
+             set %arco_equipado #FINDID
+           }
+        if #FINDKIND = -1 ; No está equipado
+           {
+             finditem %armas C_ , #CHARID ; Si llevamos un arma puesta
+             if #FINDKIND <> -1
+                {
+                  goto loop_armar
+                }
+             finditem %escudos C_ , #CHARID ; Si llevamos un escudo puesto
+             if #FINDKIND <> -1
+                {
+                  goto loop_armar
+                }
+             finditem %arco_equipado c_ , #BACKPACKID ; Buscamos en la mochila el arco que teníamos equipado...
+             if #FINDKIND <> -1
+                {
+                  set #LOBJECTID %arco_equipado
+                  event macro 17 0
+                  gosub wait_for ITEM %arco_equipado C_ , #CHARID 20
+                }
+           }
+        goto loop_arco
+      }; FIN WHILE
+
+;=================================================================
+sub wait_for
+;=================================================================
+; This "wait_for" sub package was created by Locke. If you use these subs please keep this header intact.
+; // end header
+; Documentation: the sub package grew to large with all the comments. To load them call the sub like this:
+; gosub wait_for docs    | or you can use doc, documention, what, or my personal favorite, kickass.
+; Thanks to ~BookWibble~ for helping with all the debugging and spotting a bug or three.
+; "wait_for core dispatcher" version 1.3 by Locke
+if %1 = doc || if %1 = docs || if %1 = documentation || if %1 = what || if %1 = kickass
+{
+Display ok Please click ok and wait for your browser to start.
+execute http://www.easyuo.com/forum/viewtopic.php?t=24716
+halt
+}
+nameSpace Push
+namespace local LLNS
+set #result N/A ; if #result isn't set by one of my wait_for subs it'll throw an error.
+set !LPC #lpc
+set #lpc 200
+for %i 0 %0
+set !_A . %i % . %i
+gosub wait_for_ , !_A1
+ignoreitem reset LLWAITFOR
+set #lpc !lpc
+namespace clear LLNS
+namespace pop
+if #result <> N/A
+return #result
+else
+display ok You specified an unknown wait_for command. Script returned #result and is halting.
+halt
+
+;======================================================================
+sub wait_for_ITEM ; Version 0.1 ~Locke
+;=================================================================
+; %A2 = #findid ; %A3 = C_ , %mod || G_ , %mod ; %A4 = wait_time in seconds
+if !_A0 < 4
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for ITEM # , findid C_ , % , mod % , timeout
++Script is halting
+halt
+}
+set !_timeout !_A4 + #scnt2
+repeat
+{
+finditem !_A2 !_A3
+if #findkind <> -1
+return #true
+wait 1
+}
+until #scnt2 => !_timeout
+return #false
