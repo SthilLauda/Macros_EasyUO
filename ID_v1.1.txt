@@ -1,0 +1,78 @@
+; ======================================================================================================
+;  '||   ||` '||`   ||                                 /.\      '||`
+;   ||   ||   ||    ||     ''                         // \\      ||   ''
+;   ||   ||   ||  ''||''   ||  '||),,(|,   '''|.     //...\\     ||   ||   '''|.  `||''|,  '''/  '''|.
+;   ||   ||   ||    ||     ||   || || ||  .|''||    //     \\    ||   ||  .|''||   ||  ||   //  .|''||
+;   `|...|'  .||.   `|..' .||. .||    ||. `|..||. .//       \\. .||. .||. `|..||. .||  ||. /... `|..||.
+; =====================================================================================================
+; Author: Sthil Lauda
+; Version: 1.1
+; Client Tested with: 2.0.3
+; EUO version tested with: EasyUO 1.5 Version 243
+; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Public Release: 27/07/2019
+; Revised On: 27/07/2019
+; Propósito: Obtener la información de un Objeto.
+; Instrucciones: Pulsar la tecla de acción F12, y por último click en el objeto.
+
+display ok Pulsa F12
+         + y selecciona
+         + el objetivo
+
+keyLoop:
+onhotkey F12
+       {
+         initevent
+         SET #TARGCURS 1
+         TARGET
+         WHILE #TARGCURS = 1
+         WAIT 5
+         FINDITEM #LTARGETID
+         WAIT 5
+         GOSUB FindThingsDir #FINDX #FINDY Orientacion
+         event property #LTARGETID
+         DISPLAY OK ID : #LTARGETID $$
+         +TYPE : #FINDTYPE $$
+         +COLOR : #FINDCOL $$
+         +PROPIEDADES : #PROPERTY $
+         +REPUTACIÓN: #FINDREP $
+         +FINDX: #FINDX $
+         +FINDY: #FINDY $
+         +FINDZ: #FINDZ $
+         +DISTANCIA: #FINDDIST $
+         +ORIENTACION: %orientacion
+       }
+wait 1
+goto keyLoop
+
+SUB FindThingsDir ; <===================================================>
+;ver 1.2 10Jul04 by Roadkill
+;purpose: find the direction from you that a thing is
+;%1= #findx of object, it's UO world coord
+;%2=#findy of object, it's UO world coord
+;%3= the name of the return var, i.e. 'dir', 'thingsdirection' by default
+;%3 holds its dir from you 0-nw 1-n 2-ne 3-e 4-se 5-s 6-sw 7-w 8-sametile
+;* @example call rksubs.txt FindThingsDir %mapxcoord %mapycoord spotdir
+	SET !itsX %1
+	SET !itsY %2
+	if %0 < 3
+		set %3 thingsdirection
+	IF !itsX = #charposx && !itsY < #charposy
+		SET % . %3 1 ;N
+	IF !itsX > #charposx && !itsY < #charposy
+		SET % . %3 2 ;NE
+	IF !itsX > #charposx && !itsY = #charposy
+		SET % . %3 3 ;E
+	IF !itsX > #charposx && !itsY > #charposy
+		SET % . %3 4 ;SE
+	IF !itsX = #charposx && !itsY > #charposy
+		SET % . %3 5 ;S
+	IF !itsX < #charposx && !itsY > #charposy
+		SET % . %3 6 ;SW
+	IF !itsX < #charposx && !itsY = #charposy
+		SET % . %3 7 ;W
+	IF !itsX < #charposx && !itsY < #charposy
+		SET % . %3 0 ;NW
+	IF !itsX = #charposx && !itsY = #charposy
+		SET % . %3 8 ;same tile
+RETURN
