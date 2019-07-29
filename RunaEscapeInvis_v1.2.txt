@@ -1,0 +1,109 @@
+;        |                                 /   \                   |       .
+;  _    -O-       .                )      ((   ))     (           -O-
+; (@)    |     +                  /|\      ))_((     /|\           |            .
+; |-|                            / | \    (/\|/\)   / | \                            (@)
+; | | --------------------------/--|-voV---\`|'/--Vov-|--\---------------------------|-|         .
+; |-|                                '^`   (o o)  '^`                                | |
+; | |                                      `\Y/'                                     |-|
+; |-|   _______ __ __   __                  _______ __ __                            | |
+; | |  |   |   |  |  |_|__|.--------.---.-.|   _   |  |__|.---.-.-----.-----.---.-.  |-|    .     o
+; |-|  |   |   |  |   _|  ||        |  _  ||       |  |  ||  _  |     |-- __|  _  |  | |
+; | |  |_______|__|____|__||__|__|__|___._||___|___|__|__||___._|__|__|_____|___._|  |-|
+; |_|________________________________________________________________________________| |
+; (@)                     l   /\ /         ( (          \ /\   l                   `\|-|             .
+;           o             l /   V           \ \          V   \ l       +             (@)
+;                         l/                _) )_             \I                                 +
+;      +                                    `\ /'
+;
+; Script Name: Recall de Runa
+; Author: Sthil Lauda
+; Version: 1.2
+; Date: 29/07/2019
+; Client Tested with: 2.0.3
+; EUO version tested with: 1.5 Version 142
+; Shard: Ultima Alianza
+; Purpose: Recalea de Runa y también con poción de invisivilidad. ( Para mis queridos newbies, ¡ánimo! ^^ )
+;________________________________
+;
+; ///////////////////////////////
+; ******** CONFIGURACIÓN ********
+; ///////////////////////////////
+;________________________________
+;
+set %tecla_recall_simple F11
+set %tecla_recall_invis F12
+;________________________________________________
+;
+; //////////////////////////////////////////////
+; ************* FIN CONFIGURACIÓN *************
+; //////////////////////////////////////////////
+;________________________________________________
+;
+set %runa QWL_SWL_RWL_PWL
+;========================================================
+;
+; ******************* LOOP PRINCIPAL ********************
+;
+;========================================================
+recallLoop:
+onhotkey %tecla_recall_simple
+       {
+         gosub recallRuna
+       }
+onhotkey %tecla_recall_invis
+       {
+         gosub potaInvis
+         gosub recallRuna
+       }
+       wait 1
+goto recallLoop
+;========================================================
+;
+; ***************** FIN LOOP PRINCIPAL ******************
+;
+;========================================================
+;
+;============================================;
+; ****************** SUBS ****************** ;
+;============================================;
+
+sub potaInvis ;<======================>
+finditem WUF C_ , #BACKPACKID
+if #FINDCNT > 0
+   {
+     for #FINDINDEX 1 #FINDCNT
+         {
+           if #FINDCOL = 703 ; Invisivilidad.
+              {
+                set #LOBJECTID #FINDID
+                event macro 17
+              }
+              else ; Ignoramos las pociones que no sirven para ocultarse (El 2º recall será más rápido).
+                 {
+                   ignoreitem #FINDID BAD_POTIONS
+                 }
+         }
+   }
+return
+
+sub recallRuna ;<======================>
+finditem %runa C_ , #BACKPACKID
+if #FINDCNT > 0
+   {
+     for #FINDINDEX 1 #FINDCNT
+         {
+           if #FINDCOL = 0 ; Es una runa normal (No es una "Llamada al Sanador", ni hostias en vinagre).
+              {
+                event macro 15 31
+                target
+                set #LTARGETID #findid
+                set #LTARGETKIND 1
+                event macro 22
+              }
+              else ; Ignoramos las runas que no sirven para viajar.
+                 {
+                   ignoreitem #FINDID BAD_RUNES
+                 }
+         }
+   }
+return
