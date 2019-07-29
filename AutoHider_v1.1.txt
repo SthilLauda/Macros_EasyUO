@@ -20,11 +20,11 @@
 ; Version: 1.1
 ; Client Tested with: 2.0.3
 ; EUO version tested with: EasyUO 1.5 Version 243
-; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Shard: Ultima Alianza (Â¡Hasta la muerte!)
 ; Revision Date: 23-11-2018
 ; Public Release: 29-07-2019
 ; Global Variables Used:
-; Purpose: Oculta el PJ automáticamente, si es revelado.
+; Purpose: Oculta el PJ automÃ¡ticamente, si es revelado.
 ;==================================
 set %version 1.1
 ;
@@ -47,7 +47,7 @@ if ( H in #CHARSTATUS || #TARGCURS = 1 || #LLIFTEDKIND = 1 ) ; Si ya estamos ocu
      }
      else
         {
-          if ( H Notin #CHARSTATUS && #TARGCURS = 0 && #LLIFTEDKIND = 0 ) ; Si no estamos ocultos, y no vamos a hacer clicks, ni a levantar un objeto, entonces nos ocultamos...
+          if ( H Notin #CHARSTATUS && #TARGCURS = 0 && #LLIFTEDKIND = 0 ) ; Si no estamos ocultos, y no vamos a hacer clicks (o castear algÃºn hechizo), ni a levantar un objeto, entonces nos ocultamos...
                {
                  event macro 13 21 ; Use SKILL Hiding
                  gosub waitForSysVar CHARSTATUS = H 50
