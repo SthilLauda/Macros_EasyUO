@@ -1,0 +1,112 @@
+;        |                                 /   \                   |       .
+;  _    -O-       .                )      ((   ))     (           -O-
+; (@)    |     +                  /|\      ))_((     /|\           |            .
+; |-|                            / | \    (/\|/\)   / | \                            (@)
+; | | --------------------------/--|-voV---\`|'/--Vov-|--\---------------------------|-|         .
+; |-|                                '^`   (o o)  '^`                                | |
+; | |                                      `\Y/'                                     |-|
+; |-|   _______ __ __   __                  _______ __ __                            | |
+; | |  |   |   |  |  |_|__|.--------.---.-.|   _   |  |__|.---.-.-----.-----.---.-.  |-|    .     o
+; |-|  |   |   |  |   _|  ||        |  _  ||       |  |  ||  _  |     |-- __|  _  |  | |
+; | |  |_______|__|____|__||__|__|__|___._||___|___|__|__||___._|__|__|_____|___._|  |-|
+; |_|________________________________________________________________________________| |
+; (@)                     l   /\ /         ( (          \ /\   l                   `\|-|             .
+;           o             l /   V           \ \          V   \ l       +             (@)
+;                         l/                _) )_             \I                                 +
+;      +                                    `\ /'
+;
+; Script Name: Precios Vendor
+; Author: Sthil Lauda
+; Version: 1.1
+; Client Tested with: 2.0.3
+; EUO version tested with: EasyUO 1.5 Version 243
+; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Revision Date: 23-07-2019
+; Public Release: 29-07-2019
+; Global Variables Used: Ninguna.
+; Purpose: Le pone el precio a todos los objetos que hay en un contenedor.
+;==================================
+set %nombre_vendor XXXXXX ; Pon aquí el nombre de tu vendor.
+set %tecla_accion F9      ; Pon aquí la tecla que quieras usar para activar la macro.
+set %precio 25000         ; Pon aquí el precio que quieres poner a las cosas.
+
+mainloop:
+onhotkey %tecla_accion
+{
+configurar:
+if %confp = 1 || %confp = N/A
+{
+  set #sysmsgcol 53
+  setuotitle Haz CLICK el contenedor
+  event sysmessage ================
+  event sysmessage Haz click en la bolsa
+  event sysmessage ================
+  set #TARGCURS 1
+  target
+  while #TARGCURS = 1
+        {
+          wait 1
+        }
+  set %contenedor_1 #LTARGETID
+  set #LOBJECTID %contenedor_1
+  event macro 17
+  repeat
+       {
+         wait 1
+       }
+       until #CONTID = %contenedor_1
+  set %conf 1
+  goto TESC
+}
+
+TESC:
+  if %conf = 1
+     {
+       finditem * C_ , %contenedor_1
+       set #sysmsgcol 1271
+       event sysmessage Precio: [ %precio ]
+       display yesno ¿ES CORRECTO EL PRECIO?
+       if #DISPRES = yes
+          {
+            event sysmessage EMPEZANDO!
+            wait 20
+            goto VendorLoop
+          }
+          else
+             {
+               set #SYSMSGCOL 38
+               event sysmessage OK, REINICIANDO MACRO...
+               goto mainloop
+             }
+     }
+goto TESC
+
+VendorLoop:
+finditem * C_ , %contenedor_1
+if #FINDCNT > 0
+   {
+     for #FINDINDEX 1 #FINDCNT
+         {
+           set #LOBJECTID #FINDID
+           event macro 1 0 %nombre_vendor Precio %precio
+           target
+           set #LTARGETID #FINDID
+           set #LTARGETKIND 1
+           event macro 22
+           if #FINDCNT > 1 ; Control de Spam Detection...
+              {
+                wait 5s
+              }
+              else
+                 {
+                   wait 20
+                 }
+         }
+     set #sysmsgcol 1271
+     event sysmessage TERMINADO! :-)
+     goto mainloop
+   }
+goto VendorLoop
+}
+wait 1
+goto mainloop
