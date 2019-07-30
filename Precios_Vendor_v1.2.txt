@@ -20,15 +20,15 @@
 ; Version: 1.2
 ; Client Tested with: 2.0.3
 ; EUO version tested with: EasyUO 1.5 Version 243
-; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Shard: Ultima Alianza (Â¡Hasta la muerte!)
 ; Revision Date: 30-07-2019
 ; Public Release: 29-07-2019
 ; Global Variables Used: Ninguna.
 ; Purpose: Le pone el precio a todos los objetos que hay en un contenedor.
 ;==================================
-set %nombre_vendor XXXXXXX ; Pon aquí el nombre de tu vendor.
-set %tecla_accion F9       ; Pon aquí la tecla que quieras usar para activar la macro.
-set %precio 8500           ; Pon aquí el precio que quieres poner a las cosas.
+set %nombre_vendor XXXXXXX ; Pon aquÃ­ el nombre de tu vendor.
+set %tecla_accion F9       ; Pon aquÃ­ la tecla que quieras usar para activar la macro.
+set %precio 8500           ; Pon aquÃ­ el precio que quieres poner a las cosas.
 
 mainloop:
 onhotkey %tecla_accion
@@ -50,11 +50,7 @@ if %confp = 1 || %confp = N/A
   set %contenedor_1 #LTARGETID
   set #LOBJECTID %contenedor_1
   event macro 17
-  repeat
-       {
-         wait 1
-       }
-       until #CONTID = %contenedor_1
+  gosub wait_for GUMP %contenedor_1 40
   set %conf 1
   goto TESC
 }
@@ -65,7 +61,7 @@ TESC:
        finditem * C_ , %contenedor_1
        set #sysmsgcol 1271
        event sysmessage Precio: [ %precio ]
-       display yesno ¿ES CORRECTO EL PRECIO?
+       display yesno Â¿ES CORRECTO EL PRECIO?
        if #DISPRES = yes
           {
             event sysmessage EMPEZANDO!
@@ -110,3 +106,99 @@ goto VendorLoop
 }
 wait 1
 goto mainloop
+
+;=================================================================
+sub wait_for
+;=================================================================
+; This "wait_for" sub package was created by Locke. If you use these subs please keep this header intact.
+; Documentation: the sub package grew to large with all the comments. To load them call the sub like this:
+; gosub wait_for docs    | or you can use doc, documention, what, or my personal favorite, kickass.
+
+; "wait_for core dispatcher" version 1.2 by Locke
+if %1 = doc || if %1 = docs || if %1 = documentation || if %1 = what || if %1 = kickass
+{
+Display ok Please click ok and wait for your browser to start.
+execute http://www.easyuo.com/forum/viewtopic.php?t=24716
+halt
+}
+nameSpace Push
+namespace local LLNS
+set #result N/A ; if #result isn't set by one of my wait_for subs it'll throw an error.
+set !LPC #lpc
+set #lpc 200
+for %i 0 %0
+set !_A . %i % . %i
+gosub wait_for_ , !_A1
+set #lpc !lpc
+namespace clear LLNS
+namespace pop
+if #result <> N/A
+return #result
+else
+display ok You specified an unknown wait_for command. Script returned #result and is halting.
+halt
+;======================================================================
+sub wait_for_GUMP ; version 1.4 ~Locke
+;=================================================================
+; AÃ±adido #CONTID ^^
+if !_A0 < 3
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for GUMP XXX_YYY time_out_in_seconds$
++Script is halting
+halt
+}
+if !_A3 <> CLOSE
+set !_timeout #scnt2 + !_A3
+else
+set !_timeout 0 ; no gump wait if %3 = CLOSE since we already believe it to be open.
+
+_lets_wait_for_a_gump:
+if #CONTSIZE = !_A2 || #CONTKIND = !_A2 || #CONTNAME = !_A2 || #CONTTYPE = !_A2 || #CONTID = !_A2
+{
+ if !_A5 <> N/A && !_A6 <> N/A
+ {
+ set !clickx !_A5 + #contposx
+ set !clicky !_A6 + #contposy
+ click !clickx !clicky
+ }
+ if !_A3 = CLOSE || if !_A4 = CLOSE || !_A5 = CLOSE || !_A6 = CLOSE
+ {
+ set !string #contsize
+ str pos !string _
+ set !pos #strres
+ str del !string #strres #strres
+ set !clickX #contposx + ( #strres / 2 )
+ str del !string 1 !pos
+ set !clickY #contposy + ( #strres / 2 )
+ click !clickx !clicky R
+ }
+return #true
+}
+
+if ( !_timeout =< #scnt2 ) && ( !_A4 = N/A )
+   {
+     return #false
+   }
+
+if !_A4 <> N/A && !_timeout =< #scnt2
+{
+finditem !_A4
+if #findkind <> -1
+{
+ for #findindex 1 #findcnt
+ {
+  if #finddist > 2
+  ignoreitem #findid LLWAITFOR
+  else
+  break
+ }
+ set #lobjectid #findid
+ event macro 17 0
+ set !_timeout #scnt2 + !_A3
+}
+else
+return #false
+}
+wait 1
+goto _lets_wait_for_a_gump
