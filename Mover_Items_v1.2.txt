@@ -1,0 +1,296 @@
+; ======================================================================================================
+;  '||   ||` '||`   ||                                 /.\      '||`
+;   ||   ||   ||    ||     ''                         // \\      ||   ''
+;   ||   ||   ||  ''||''   ||  '||),,(|,   '''|.     //...\\     ||   ||   '''|.  `||''|,  '''/  '''|.
+;   ||   ||   ||    ||     ||   || || ||  .|''||    //     \\    ||   ||  .|''||   ||  ||   //  .|''||
+;   `|...|'  .||.   `|..' .||. .||    ||. `|..||. .//       \\. .||. .||. `|..||. .||  ||. /... `|..||.
+; =====================================================================================================
+; Author: Sthil Lauda
+; Version: 1.2
+; Client Tested with: 2.0.3
+; EUO version tested with: EasyUO 1.5 Version 243
+; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Public Release: 04/05/2019
+; Revised On: 30/07/2019
+; Propósito: Mover de un contendor a otro todos los objetos de un determinado tipo.
+; Instrucciones: Elegir las bolsas de origen y destino, y por último el tipo de objeto.
+
+configurar:
+if %confp = 1 || %confp = N/A
+{
+  set #sysmsgcol 53
+  setuotitle Haz CLICK el contenedor de ORIGEN
+  event sysmessage ================
+  event sysmessage Haz click en el origen
+  event sysmessage ================
+  set #TARGCURS 1
+  target
+  while #TARGCURS = 1
+        {
+          wait 1
+        }
+  set %contenedor_1 #LTARGETID
+  set #LOBJECTID %contenedor_1
+  event macro 17
+  gosub wait_for GUMP %contenedor_1 40
+  set %conf 1
+  set %confp 2
+  goto TESC
+}
+if %confp = 2
+{
+  set #sysmsgcol 53
+  setuotitle Haz CLICK el contenedor de DESTINO
+  event sysmessage ================
+  event sysmessage Haz click en el destino
+  event sysmessage ================
+  set #TARGCURS 1
+  target
+  while #TARGCURS = 1
+        {
+          wait 1
+        }
+  set %contenedor_2 #LTARGETID
+  set #LOBJECTID %contenedor_2
+  event macro 17
+  gosub wait_for GUMP %contenedor_2 40
+  set %conf 2
+  set %confp 3
+  goto TESC
+}
+if %confp = 3
+{
+  set #sysmsgcol 53
+  setuotitle Haz click en el OBJETO a mover
+  event sysmessage ================
+  event sysmessage Hac click en el objeto
+  event sysmessage ================
+  set %conf 3
+  set #TARGCURS 1
+  target
+  while #TARGCURS = 1
+        {
+          wait 1
+        }
+  set %pre_item #LTARGETID
+  goto TESC
+}
+
+TESC:
+  if %conf = 1
+     {
+       goto configurar
+     }
+  if %conf = 2
+     {
+       goto configurar
+     }
+  if %conf = 3
+     {
+       finditem %pre_item C_ , %contenedor_1
+       set %item_type #FINDTYPE
+       set #sysmsgcol 1271
+       event sysmessage EMPEZANDO!
+       goto loop
+     }
+goto TESC
+
+loop:
+finditem %item_type C_ , %contenedor_1
+if #FINDCNT > 0
+   {
+     gosub moveItem %item_type %contenedor_1 %contenedor_2
+   }
+   else
+      {
+        set #sysmsgcol 1271
+        event sysmessage TERMINADO! :-)
+        halt
+      }
+goto loop
+
+;=================================================================
+sub wait_for
+;=================================================================
+; This "wait_for" sub package was created by Locke. If you use these subs please keep this header intact.
+; Documentation: the sub package grew to large with all the comments. To load them call the sub like this:
+; gosub wait_for docs    | or you can use doc, documention, what, or my personal favorite, kickass.
+
+; "wait_for core dispatcher" version 1.2 by Locke
+if %1 = doc || if %1 = docs || if %1 = documentation || if %1 = what || if %1 = kickass
+{
+Display ok Please click ok and wait for your browser to start.
+execute http://www.easyuo.com/forum/viewtopic.php?t=24716
+halt
+}
+nameSpace Push
+namespace local LLNS
+set #result N/A ; if #result isn't set by one of my wait_for subs it'll throw an error.
+set !LPC #lpc
+set #lpc 200
+for %i 0 %0
+set !_A . %i % . %i
+gosub wait_for_ , !_A1
+set #lpc !lpc
+namespace clear LLNS
+namespace pop
+if #result <> N/A
+return #result
+else
+display ok You specified an unknown wait_for command. Script returned #result and is halting.
+halt
+;======================================================================
+sub wait_for_GUMP ; version 1.4 ~Locke
+;=================================================================
+; Añadido #CONTID ^^
+if !_A0 < 3
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for GUMP XXX_YYY time_out_in_seconds$
++Script is halting
+halt
+}
+if !_A3 <> CLOSE
+set !_timeout #scnt2 + !_A3
+else
+set !_timeout 0 ; no gump wait if %3 = CLOSE since we already believe it to be open.
+
+_lets_wait_for_a_gump:
+if #CONTSIZE = !_A2 || #CONTKIND = !_A2 || #CONTNAME = !_A2 || #CONTTYPE = !_A2 || #CONTID = !_A2
+{
+ if !_A5 <> N/A && !_A6 <> N/A
+ {
+ set !clickx !_A5 + #contposx
+ set !clicky !_A6 + #contposy
+ click !clickx !clicky
+ }
+ if !_A3 = CLOSE || if !_A4 = CLOSE || !_A5 = CLOSE || !_A6 = CLOSE
+ {
+ set !string #contsize
+ str pos !string _
+ set !pos #strres
+ str del !string #strres #strres
+ set !clickX #contposx + ( #strres / 2 )
+ str del !string 1 !pos
+ set !clickY #contposy + ( #strres / 2 )
+ click !clickx !clicky R
+ }
+return #true
+}
+
+if ( !_timeout =< #scnt2 ) && ( !_A4 = N/A )
+   {
+     return #false
+   }
+
+if !_A4 <> N/A && !_timeout =< #scnt2
+{
+finditem !_A4
+if #findkind <> -1
+{
+ for #findindex 1 #findcnt
+ {
+  if #finddist > 2
+  ignoreitem #findid LLWAITFOR
+  else
+  break
+ }
+ set #lobjectid #findid
+ event macro 17 0
+ set !_timeout #scnt2 + !_A3
+}
+else
+return #false
+}
+wait 1
+goto _lets_wait_for_a_gump
+
+;==================================
+; Script Name: sub moveItem *ExEvent*
+; Author: Tecmo, Bad_Maniac, Sthil
+; Version: 1.12
+; Client Tested with: 5.0.1a patch 21
+; EUO version tested with: 1.50 build 60
+; Shard OSI / FS: OSI and FS
+; Revision Date: 2005-Oct-07
+; Public Release: 2005-Aug-04
+; Copyright: Tecmo, Bad_Maniac
+; *********************************
+;* @packageversion   1.12
+;* @purpose   move an item from one location to another
+;* @author   Tecmo, Bad_Maniac
+;* @param
+;      %1 req Item to move
+;      %2 req Move from location
+;      %3 req Move to location
+;      %4 opt Quantity
+;* @return      Returns the value True or False
+;* @Calling Example
+;           Inside script = gosub moveItem [Item to Move] [From location] [To location] [Quantity] (nothing in qty uses #findstack)
+;         Outside calling = call subMoveItem.txt [Item to Move] [From location] [To location] [Quantity] (nothing in qty uses #findstack)
+; Examples:
+     ;user Variable such as %loot
+     ;system Variable such as #findid
+
+;--> Move from Location - 2nd Variable aka %2 (Required)
+; This is the variable that tells the sub where to look for the items.
+; Examples:
+     ;user Variable      = a storage container, etc., %lootBag
+     ;system Variable    = #contid, #backpackid, etc.
+     ;open Containers    = C
+     ;specific Container = C_ , %corpse
+     ;Ground             = G_4
+
+;--> Move to Location - 3rd Variable aka %3 (Required)
+; This is the variable that tells the sub where to move the item(s) to.
+; Examples:
+     ;user Variable    = a storage container, etc., %storageBag
+     ;system Variable  = #contid, #backpackid, etc.
+     ;Ground           = G_4
+
+;--> Quantity - 4th Variable aka %4 (Optional)
+; This is the variable that tells the sub how many of the item(s) you wish to move.
+; Examples:
+     ;nothing / left blank = Sub will grab the complete stack if #findstack >
+     ;1 or more            = grabs up to specified amount.
+; Calling the sub
+; You are required to include AT LEAST 3 parameters when calling this sub. The 4th is optional as noted above.
+; Examples:
+;  gosub moveItem %loot %corpse #BACKPACKID  (moves all selected loot from corpse to your pack)
+;  gosub moveItem %loot %corpse #BACKPACKID 1 (moves 1 item from stack off of corpse to pack
+;  gosub moveItem %loot C #BACKPACKID (moves selected items from any open pack to your main pack)
+;==================================
+SUB moveItem
+{
+    SET %_itemId %1
+    SET %_itemLocation C_ , %2
+    SET %_newItemLocation %3
+    IF %0 = 4
+        SET %_qty %4
+    ELSE
+        SET %_qty 0
+    moveLoop:
+    set %peso #WEIGHT
+    FINDITEM %_itemId %_itemLocation
+    IF #FINDKIND <> -1
+    {
+       SET %_litemID #FINDID
+       SET %_litemTypeID #FINDTYPE
+       SET %qty %_qty
+       IF %qty = 0
+          SET %qty #FINDSTACK
+              EXEVENT drag %_litemID %qty
+              WAIT 10
+              SET %droptimeout #SYSTIME + 1000 ; Timeout del DROP en milisegundos
+              dropwait:
+              EXEVENT dropC %_newItemLocation
+              FINDITEM %_litemID %_itemLocation
+              IF ( #FINDKIND <> -1 ) && ( #SYSTIME < %droptimeout )
+                   {
+                     GOTO dropwait
+                   }
+            set %count %count + 1
+       GOTO moveLoop
+    }
+    RETURN
+}
