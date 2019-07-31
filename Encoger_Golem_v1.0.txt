@@ -1,0 +1,121 @@
+; ======================================================================================================
+;  '||   ||` '||`   ||                                 /.\      '||`
+;   ||   ||   ||    ||     ''                         // \\      ||   ''
+;   ||   ||   ||  ''||''   ||  '||),,(|,   '''|.     //...\\     ||   ||   '''|.  `||''|,  '''/  '''|.
+;   ||   ||   ||    ||     ||   || || ||  .|''||    //     \\    ||   ||  .|''||   ||  ||   //  .|''||
+;   `|...|'  .||.   `|..' .||. .||    ||. `|..||. .//       \\. .||. .||. `|..||. .||  ||. /... `|..||.
+; ======================================================================================================
+;
+; Script: Encoger Golem
+; Author: Sthil Lauda
+; Version: 1.0
+; Client Tested with: 2.0.3
+; EUO version tested with: EasyUO 1.5 Version 243
+; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Public Release: 31/07/2019
+; Revised On: 31/07/2019
+; Purpose: Desarma, quita la armor, y encoge a tu Golem.
+; Instrucciones: "B" es el nombre del Golem, si le cambias el nombre, también tienes que cambiarlo en esta macro ^^
+;________________________________
+;
+; ///////////////////////////////
+; ******** CONFIGURACIÓN ********
+; ///////////////////////////////
+;________________________________
+;
+set %tecla_reducir F9
+;________________________________________________
+;
+; //////////////////////////////////////////////
+; ************* FIN CONFIGURACIÓN *************
+; //////////////////////////////////////////////
+;________________________________________________
+;
+set %golems YAB
+gosub setupGolem ; Configurar el Golem.
+;========================================================
+;
+; ******************* LOOP PRINCIPAL ********************
+;
+;========================================================
+Loop:
+onhotkey %tecla_reducir
+       {
+         event macro 3 0 Golem / %nombre_golem Soltar armadura
+         wait 10
+         event macro 3 0 Golem / %nombre_golem Desarmar
+         wait 10
+         event macro 3 0 Golem / %nombre_golem Reducir
+         wait 10
+       }
+       wait 1
+goto Loop
+;========================================================
+;
+; ***************** FIN LOOP PRINCIPAL ******************
+;
+;========================================================
+
+sub setupGolem ;<=======================================>
+_ClickGolem:
+finditem %golems
+if #FINDCNT > 0
+   {
+     display OK Selecciona el Golem con el que quieres macrear
+     set #TARGCURS 1
+     target
+     while #TARGCURS = 1
+           {
+             wait 1
+           }
+     set %golem_id #LTARGETID
+     finditem %golem_id ; Comprobar si es un Golem o es otra cosa... XD
+     if #FINDCNT > 0
+        {
+          if %golems NotIn #FINDTYPE
+             {
+               set #SYSMSGCOL 39
+               event sysmessage ESTO NO PARECE SER UN GOLEM!
+               wait 20
+               goto _ClickGolem
+             }
+             else ; OK, parece un Golem: Sacamos su nombre...
+                {
+                  set #SYSMSGCOL 73
+                  gosub GetName %golem_id nombre_golem
+                  event sysmessage OK GOLEM: %nombre_golem
+                  wait 40
+                }
+        }
+   }
+   else
+      {
+        set #SYSMSGCOL 39
+        event sysmessage NO HAY GOLEMS EN LA ZONA!
+        halt
+      }
+return
+
+;**
+;* @name GetName
+;* @author Roadkill
+;* @ver 1.0 24Jan04
+;* @purpose get the name of a creature/vendor
+;* @params %1= the id of the thing whose name you want, required
+;*  @%2= variable name to return the ID in, required
+;* @returns @%2 and #result
+;* @changes #property, #strres, @%2, !strlength
+;* @example call rksubs.txt GetName %beetle beetlename
+;* @status: tested
+sub GetName
+  finditem %1
+  if #findkind = -1
+    return error-cant_find
+  event property #findid
+  str pos #property $
+  set !strlength #strres - 2
+  str left #property !strlength
+  set %string #strres
+  str Del %string 1 1
+  set % . %2 #strres
+return % . %2
