@@ -1,0 +1,674 @@
+;==================================
+; Script Name:  EUO Skill Monitor
+; Author:  WarLocke, CEO
+; Version: 1.1
+; Client Tested with: 4.0.2a
+; EUO version tested with: 1.42.007B
+; Shard OSI / FS: Both
+; Revision Date: 3/28/2004
+; Public Release: 3/27/2004
+; Global Variables Used: None
+; Purpose: GUI to monitor the progress of any selected skills.
+;==================================
+set %gvar 90
+set %scriptname EUOSkillMonitor
+gosub init
+gosub menuSelection
+gosub selection_InputLoop
+if #result 2
+        gosub saveSkillList
+        gosub monitor
+menu clear
+menu hide
+halt
+ 
+sub saveSkillList
+        gosub putGlobalVar %gvar %scriptname #charid numskills
+        if %numskills > 0
+        {
+                for %i 1 %numskills
+                {
+                        gosub putGlobalVar %gvar %scriptname #charid skills_ , %i
+                }
+        }
+return
+ 
+sub init
+        gosub getGlobalVar %gvar %scriptname #charid numskills NOLOCK
+        if ! #result
+        {
+        set %numskills 0
+        gosub putGlobalVar %gvar %scriptname #charid numskills
+        }
+        if %numskills = 0
+                return
+        for %i 1 %numskills
+        {
+        gosub getGlobalVar %gvar %scriptname #charid skills_ , %i NOLOCK
+        }
+return
+ 
+sub menuSelection
+        set %tmp #lpc
+        set #lpc 1000
+        menu Clear
+        menu Window Title EasyUO Skill Monitor v1.1
+        menu Window Color BtnFace
+        menu Window Size 235 170
+        menu Font Color WindowText
+        menu Font Name Verdana
+        menu Font Size 11
+        menu Font Style b
+        menu Font Align Left
+        menu Font Color $666666
+        menu Text left 138 42 <
+        menu Text right 138 74 >
+        menu Text ex 139 106 X
+        menu font style
+        menu Font Color WindowText
+        menu Font Size 7
+        menu Button cmdAddSkill 152 40 75 25 &Add Skill
+        menu Button cmdRemSkill 152 72 75 25 &Remove Skill
+        menu Button cmdReset 152 104 75 25 Rese&t Skills
+        menu Button cmdStart 8 136 131 25 Start &Monitoring
+        menu Button cmdClose 152 136 75 25 &Close
+        menu Font BGColor white
+        menu font size 9
+        menu Combo Create cmbSkills 8 8 220
+        gosub popCombo
+        menu List Create listMonSkills 8 40 129 89
+        menu Font BGColor BtnFace
+        menu Show 421 270
+        set #lpc %tmp
+        if %numskills <> 0
+                gosub RebuildList
+return
+ 
+sub popCombo
+        menu Combo Add cmbSkills Alchemy
+        set %sk_1 alchAlchemy
+        menu Combo Select cmbSkills 1
+        menu Combo Add cmbSkills Anatomy
+        set %sk_2 anatAnatomy
+        menu Combo Add cmbSkills Animal Lore
+        set %sk_3 anilAnimal , #spc , Lore
+        menu Combo Add cmbSkills Animal Taming
+        set %sk_4 animAnimal , #spc , Taming
+        menu Combo Add cmbSkills Archery
+        set %sk_5 archArchery
+        menu Combo Add cmbSkills Arms Lore
+        set %sk_6 armsArms , #spc , Lore
+        menu Combo Add cmbSkills Begging
+        set %sk_7 beggBegging
+        menu Combo Add cmbSkills Blacksmithy
+        set %sk_8 blacBlacksmithy
+        menu Combo Add cmbSkills Bowcraft
+        set %sk_9 bowcBowcraft
+        menu Combo Add cmbSkills Camping
+        set %sk_10 campCamping
+        menu Combo Add cmbSkills Carpentry
+        set %sk_11 carpCarpentry
+        menu Combo Add cmbSkills Cartography
+        set %sk_12 cartCartography
+        menu Combo Add cmbSkills Chivalry
+        set %sk_13 chivChivalry
+        menu Combo Add cmbSkills Cooking
+        set %sk_14 cookCooking
+        menu Combo Add cmbSkills Detect Hidden
+        set %sk_15 deteDetect , #spc , Hidden
+        menu Combo Add cmbSkills Discordance
+        set %sk_16 discDiscordance
+        menu Combo Add cmbSkills Eval Int
+        set %sk_17 evalEval , #spc , Int
+        menu Combo Add cmbSkills Fencing
+        set %sk_18 fencFencing
+        menu Combo Add cmbSkills Fishing
+        set %sk_19 fishFishing
+        menu Combo Add cmbSkills Focus
+        set %sk_20 focuFocus
+        menu Combo Add cmbSkills Forensics
+        set %sk_21 foreForensics
+        menu Combo Add cmbSkills Healing
+        set %sk_22 healHealing
+        menu Combo Add cmbSkills Herding
+        set %sk_23 herdHerding
+        menu Combo Add cmbSkills Hiding
+        set %sk_24 hidiHiding
+        menu Combo Add cmbSkills Inscription
+        set %sk_25 inscInscription
+        menu Combo Add cmbSkills Item Id
+        set %sk_26 itemItem , #spc , Id
+        menu Combo Add cmbSkills Lockpicking
+        set %sk_27 lockLockpicking
+        menu Combo Add cmbSkills Lumberjacking
+        set %sk_28 lumbLumberjacking
+        menu Combo Add cmbSkills Mace Fighting
+        set %sk_29 maceMace , #spc , Fighting
+        menu Combo Add cmbSkills Magery
+        set %sk_30 mageMagery
+        menu Combo Add cmbSkills Meditation
+        set %sk_31 mediMeditation
+        menu Combo Add cmbSkills Mining
+        set %sk_32 miniMining
+        menu Combo Add cmbSkills Musicianship
+        set %sk_33 musiMusicianship
+        menu Combo Add cmbSkills Necromancy
+        set %sk_34 necrNecromancy
+        menu Combo Add cmbSkills Parrying
+        set %sk_35 parrParrying
+        menu Combo Add cmbSkills Peacemaking
+        set %sk_36 peacPeacemaking
+        menu Combo Add cmbSkills Poisoning
+        set %sk_37 poisPoisoning
+        menu Combo Add cmbSkills Provocation
+        set %sk_38 provProvocation
+        menu Combo Add cmbSkills Remove Trap
+        set %sk_39 remoRemove , #spc , Traps
+        menu Combo Add cmbSkills Resisting Spells
+        set %sk_40 resiResisting , #spc , Spells
+        menu Combo Add cmbSkills Snooping
+        set %sk_41 snooSnooping
+        menu Combo Add cmbSkills Spirit Speak
+        set %sk_42 spirSpirit , #spc , Speak
+        menu Combo Add cmbSkills Stealing
+        set %sk_43 steaStealing
+        menu Combo Add cmbSkills Stealth
+        set %sk_44 stltStealth
+        menu Combo Add cmbSkills Swordsmanship
+        set %sk_45 sworSwordsmanship
+        menu Combo Add cmbSkills Tactics
+        set %sk_46 tactTactics
+        menu Combo Add cmbSkills Tailoring
+        set %sk_47 tailTailoring
+        menu Combo Add cmbSkills Taste Id
+        set %sk_48 tastTaste , #spc , ID
+        menu Combo Add cmbSkills Tinkering
+        set %sk_49 tinkTinkering
+        menu Combo Add cmbSkills Tracking
+        set %sk_50 tracTracking
+        menu Combo Add cmbSkills Veterinary
+        set %sk_51 veteVeterinary
+        menu Combo Add cmbSkills Wrestling
+        set %sk_52 wresWrestling
+return
+ 
+sub selection_InputLoop
+        selinpstart:
+                set #menubutton N/A
+        selinp:
+                if #menubutton <> N/A
+                {
+                        if #menubutton = cmdAddSkill
+                        {
+                                menu get cmbSkills
+                                str left #menures 4
+                                if #strres <> N/A
+                                {
+                                        gosub SkillsAdd #strres
+                                        if #result
+                                                gosub RebuildList
+                                        goto selinpstart
+                                }
+                        }
+                        if #menubutton = cmdReset
+                        {
+                                gosub ListReset
+                                goto selinpstart
+                        }
+                        if #menubutton = cmdRemSkill
+                        {
+                                menu get listMonSkills
+                                gosub RemoveSkill #menures
+                                if #result
+                                        gosub RebuildList
+                                goto selinpstart
+                        }
+                        if ( #menubutton = cmdClose ) || ( #menubutton = CLOSED )
+                        {
+                                return #false
+                        }
+                        if #menubutton = cmdStart
+                                return #true
+                }
+        goto selinp
+        selinp_exit:
+return #true
+ 
+sub SkillsAdd
+        if %numskills = 0
+        {
+                set %numskills 1
+                set %skills_1 %sk_ . %1
+                goto sa_exit
+        }
+        if %numskills > 0
+        {
+                for %s 1 %numskills
+                {
+                                if %skills_ . %s = %sk_ . %1
+                                return #false
+                }
+                set %numskills %numskills + 1
+                set %skills_ , %numskills %sk_ . %1
+        }
+sa_exit:
+return #true
+ 
+sub ListReset
+        set %numskills 0
+        gosub RebuildList
+return
+ 
+sub RemoveSkill
+        if %numskills = 1 2
+                set %numskills 0
+                return #true
+        if %1 = %numskills 2
+                set %numskills %numskills - 1
+                return #true
+        if %numskills > 1
+        {
+                set %walk %numskills - 1
+                for %n %1 %walk
+                {
+                        set %nex %n + 1
+                        set %skills_ , %n %skills_ . %nex
+                }
+                set %numskills %numskills - 1
+                return #true
+        }
+return #false
+ 
+sub RebuildList
+        menu delete listMonSkills
+        menu font bgcolor white
+        menu List Create listMonSkills 8 40 129 89
+        if %numskills > 0
+        {  
+                for %i 1 %numskills
+                {
+                         str len %skills_ . %i
+                        set %x #strres - 4
+                        str right %skills_ . %i %x
+                        menu List Add listMonSkills #strres
+                }
+        }
+return
+ 
+sub monitor
+        gosub monitorInit
+        set #menubutton N/A
+        monloop:
+        if %numskills > 0
+        {
+                for %m 1 %numskills
+                {
+                        chooseskill %mon_ . %m real
+                        if ( #skill <> %curr_ . %m ) || ( ! ( %init_ . %m ) )
+                        {
+                                gosub updateStats %m
+                                gosub drawSkill %m
+                        }
+                }
+                if #menubutton = CLOSED
+                        return #true
+                goto monloop
+        }        
+return #false
+ 
+sub updateStats
+        set %snum %1
+        if ( %snum > 0 ) && ( %snum <= %numskills )
+        {
+                chooseskill %mon_ . %snum real
+                set %curr_ , %snum #skill
+                set %diff %start_ . %snum - %curr_ . %snum
+                set %en #false
+                if %curr_ . %snum < %start_ . %snum
+                        set %en #true
+                gosub getDecimal %diff 10 %en
+                set %sDiff_ , %snum #result
+                gosub getDecimal %curr_ . %snum 10
+                set %sCurr_ , %snum #result
+                set %cap_ , %snum #skillcap
+        }
+return
+ 
+sub getDecimal
+        set %1 %1 abs
+        set %sup %1 / %2
+        set %sub %1 % %2
+        set %r %sup , . . %sub
+        if %1 <> 0
+        {
+                if ( %0 = 3 ) && ( %3 = #true )
+                        set %r - , %r
+                if ( %0 = 3 ) && ( %3 = #false )
+                        set %r + , %r
+        }
+return %r
+ 
+sub monitorInit
+        if %numskills > 0
+        {
+                menu Clear
+                menu Window Color BtnFace
+                menu Font Transparent #false
+                menu font BGCOLOR BtnFace
+                set %winh ( %numskills * 80 ) + 5
+                menu Window Size 361 %winh
+                set %mi_tmp #lpc
+                set #lpc 1000
+                for %initc 1 %numskills
+                {
+                        set %work %skills_ . %initc
+                        str left %work 4
+                        set %mon_ , %initc #strres
+                        str len %work
+                        set %strlen #strres - 4
+                        str right %work %strlen
+                        set %disp_ , %initc #strres
+                        chooseskill %mon_ . %initc real
+                        set %start_ , %initc #skill
+                        gosub getDecimal %start_ . %initc 10
+                        set %sStart_ , %initc #result
+                        set %curr_ , %initc X
+                        set %cap_ , %initc #skillcap
+                        gosub updateStats %initc
+                        gosub drawSkill %initc
+                }
+                set #lpc %mi_tmp
+                return #true
+        }
+return #false
+ 
+sub drawBar
+        set %drawnum %1
+        set %yoff %2
+        set %pref %mon_ . %drawnum
+        menu delete %pref , _0line
+        menu delete %pref , _25line
+        menu delete %pref , _50line
+        menu delete %pref , _75line
+        menu delete %pref , _100line
+        menu delete %pref , _110line
+        menu delete %pref , _120line
+        menu delete %pref , _capline
+        menu delete %pref , _progress
+        set %useoff %yoff + 24
+        set %perc ( %curr_ . %drawnum ) / 5
+        if %curr_ . %drawnum = %cap_ . %drawnum
+                set %color Lime
+        else
+                set %color Red
+        menu Shape %pref , _progress 113 %useoff %perc 17 3 7 1 Black 7 %color
+        set %useoff %yoff + 16
+        menu Shape %pref , _0line 113 %useoff 1 25 3 7 1 Black 7 White
+        menu Shape %pref , _25line 162 %useoff 1 25 3 7 1 Black 7 White
+        menu Shape %pref , _50line 212 %useoff 1 25 3 7 1 Black 7 White
+        menu Shape %pref , _75line 262 %useoff 1 25 3 7 1 Black 7 White
+        menu Shape %pref , _100line 312 %useoff 1 25 3 7 1 Black 7 White
+        menu Shape %pref , _110line 332 %useoff 1 25 3 7 1 Black 7 White
+        menu Shape %pref , _120line 352 %useoff 1 25 3 7 1 Black 7 White
+        set %xoff 113 + ( %cap_ . %drawnum / 5 ) - 1
+        menu Shape %pref , _capline %xoff %useoff 1 25 3 7 1 Blue 7 White
+return
+ 
+sub drawStats
+        set %drawnum %1
+        set %yoff %2
+        set %pref %mon_ . %drawnum
+        menu delete %pref , _cskill
+        menu delete %pref , _statCurr
+        menu delete %pref , _statStart
+        menu delete %pref , _statDiff
+        menu Font Size 8
+        menu Font Style b
+        if %curr_ . %drawnum > 200
+        {
+                menu Font BGColor Lime
+                set %useoff %yoff + 26
+                if %curr_ . %drawnum = %cap_ . %drawnum
+                        set %color Lime
+                else
+                        set %color Red
+                menu Font BGColor %color
+                menu Text %pref , _cskill 120 %useoff %sCurr_ . %drawnum
+                menu Font BGColor BtnFace
+        }
+        set %useoff %yoff + 56
+        menu Text %pref , _statCurr 104 %useoff %sCurr_ . %drawnum
+        menu Text %pref , _statStart 232 %useoff %sStart_ . %drawnum
+        menu Text %pref , _statDiff 307 %useoff %sDiff_ . %drawnum
+return
+ 
+sub drawStatics
+        set %pref %mon_ . %1
+        set %yoff %2
+        menu Font Size 8
+        menu Font Align Right
+        set %uoff %yoff + 26
+        menu Text %pref , _label 104 %uoff Current Skill:
+        menu Font Align Left
+        menu Font Style
+        set %uoff %yoff + 50
+        menu Shape %pref , _statbox 16 %uoff 337 25 3 7 1 Black 7 BtnFace
+        set %uoff %yoff + 56
+        menu Font Style
+        menu Text %pref , _statlbl1 37 %uoff Current Skill:
+        menu Text %pref , _statlbl2 165 %uoff Starting Skill:
+        menu Text %pref , _statlbl3 283 %uoff Diff:
+        set %uoff %yoff + 43
+        menu Text %pref , _statlabel 24 %uoff #spc , Statistics: , #spc
+        menu Font Size 10
+        menu Font Style b
+        set %uoff %yoff + 5
+        menu Text %pref , _skillname 5 %uoff %disp_ . %1
+        menu Font Size 7
+        menu Font Style  
+        set %uoff %yoff + 5
+        menu Text %pref , _nums 160 %uoff 25 , #spc , #spc , #spc , #spc , #spc , #spc , #spc , #spc , #spc , #spc , #spc , #spc , #spc , 50
+        menu Text %pref , _nums2 257 %uoff 75 , #spc , #spc , #spc , #spc , #spc , #spc , #spc , #spc , #spc , #spc , #spc , 100  #spc , 110 , #spc , 120
+        set %init_ , %1 #true
+ 
+return
+ 
+sub drawSkill
+        set %lpct #lpc
+        set #lpc 500
+        set %sn %1
+        set %offset 80 * ( %sn - 1 )
+        if ! ( %init_ . %sn )
+                gosub drawStatics %sn %offset
+        gosub drawBar %sn %offset
+        gosub drawStats %sn %offset
+        set #lpc %lpct
+return
+ 
+;==================================
+; Script Name: CEO's * variable management subs (pseudo filesystem)
+; Author: CEO
+; Version: 1.0
+; Client Tested with: 4.0.1b
+; EUO version tested with: 1_41_103
+; Shard OSI / FS: OSI
+; Revision Date: 040219
+; Public Release: 040219
+; Globals Used: User specified (2 total)
+; Purpose: Allows you to use a * variable as a pseudo-filesystem
+;=======================================
+; CEO's global variable management subs:
+; getGlobalVar . putGlobalVar . delGlobalVar
+;=======================================
+Sub getGlobalVar
+;ver 1.0 posted 19Feb04 by CEO
+;purpose: Allows you to store multiple variables in one global variable unique to
+; each player and script. getGlobaVar retrieves a value from a global variable.
+;@returns: #result = #false if variable not found, #true if found
+; % . %3 contains variable value
+;%1 is the global/persistant variable to use ( %1 + 1 is used for locking)
+;%2 is the script identifer or pseudo filename
+;%3 is #charid or pseudo filename
+;%4 is the variable to search for and return in %. %3
+;%5 is for lock control. By default getGlobalVar uses a lock to return a value. In some cases you may want to
+; retrieve a variable (mostly for speed) without needing a lock as long as you are aware of
+; any potentional conflicts, that very rarely may occur. Set this param to NOLOCK to access
+; global storage without a lock.
+; sample usage:
+; gosub getGlobalVar 50 MyScript backpackid
+; Using global var *50 finds the variable labeled MyScript#charidbackpackid and returns it in %backpackid
+;
+; gosub getGlobalVar 50 MyScript clothstat NOLOCK
+; Using global var *50 find the variable labeled MyScript#charidclothstat and returns it in %clothstat without using a lock
+; Warning: do not use *1000. * %1 + 1 is used for locking and there is no *1001!
+        nameSpace push
+        nameSpace local #systime , _ , %2 , _ , %3 , _ , %4 , _ , GET
+        set !lpc #lpc
+        set #lpc 1000
+        set !lock %1 + 1
+        if ( %0 = 5 ) && ( %5 = NOLOCK )
+        goto getGlobalVar_skiplock
+        set !lockcount 0
+        getGlobalVar_waitforlock:
+        if * . !lock <> N/A && * . !lock <> #nsname
+        {
+                wait 1 4
+                set !lockcount !lockcount + 1
+                if !lockcount < 10
+                goto getGlobalVar_waitforlock
+                if * . !lock <> N/A
+                {
+                        set !currentlock * . !lock
+                        if !currentlock = N/A
+                        goto getGlobalVar_waitforlock
+                        str pos !currentlock _
+                        set !strres #strres - 1
+                        str left !currentlock !strres
+                        set !systime #systime - #strres
+                        if !systime < 10000 ; if over 10 seconds assume a broken lock and take it
+                        {
+                                set !lockcount 0
+                                goto getGlobalVar_waitforlock
+                        }
+                }
+        }
+        set * . !lock #nsname
+        wait 3 2
+        if * . !lock <> #nsname
+        {
+                set !lockcount 0
+                goto getGlobalVar_waitforlock
+        }
+        getGlobalVar_skiplock:
+        set !global * . %1
+        set !varName %2 , ^ , %3 , ^ , %4 , |
+        str pos !global !varName
+        set #result #strres <> 0
+        if #result
+        {
+                set !varNamePos #strres
+                str len !varName
+                set !delString !varNamePos + #strres - 1
+                str del !global 1 !delString
+                set !global #strres
+                str pos !global |
+                set !varNamePos #strres - 1
+                str left !global !varNamePos
+                set % . %4 #strres
+        }
+        if ( %0 < 5 || %5 <> NOLOCK ) && * . !lock = #nsname
+                set * . !lock N/A
+        set #lpc !lpc
+        nameSpace Clear
+        nameSpace Pop
+return #result
+ 
+Sub putGlobalVar
+;ver 1.0 posted 19Feb04 by CEO
+;purpose: Allows you to store multiple variables in one global variable unique to
+; each player and script. putGlobaVar stores a value into a global variable.
+ 
+;@returns: #result = #false if variable not found, #true if found
+; % . %3 contains variable
+;%1 is the global/persistant variable to use
+;%2 is the script identifer or pseudo filename
+;%3 #charid or other identifier
+;%4 is the variable name of the variable to save into the* variable identified in %1
+;sample usage:
+; gosub putGlovalVar 50 MyScript backpackid
+; Using global var *50 stores/updates the variable labeled MyScript#charidbackpackid with %backpackid
+; Warning: do not use *1000. * %1 + 1 is used for locking and there is no *1001!
+        nameSpace push
+        nameSpace local #systime , _ , %2 , _ , %3 , _ , %4 , _ , PUT
+        set !lpc #lpc
+        set #lpc 1000
+        set !lock %1 + 1
+        set !lockcount 0
+        putGlobalVar_waitforlock:
+        if * . !lock <> N/A && * . !lock <> #nsname
+        {
+                wait 1 4
+                set !lockcount !lockcount + 1
+                if !lockcount < 10
+                goto putGlobalVar_waitforlock
+                if * . !lock <> N/A
+                {
+                        set !currentlock * . !lock
+                        if !currentlock = N/A
+                        goto putGlobalVar_waitforlock
+                        str pos !currentlock _
+                        set !strres #strres - 1
+                        str left !currentlock !strres
+                        set !systime #systime - #strres
+                        if !systime < 10000 ; if over 10 seconds assume a hung lock and take it
+                        {
+                                set !lockcount 0
+                                goto putGlobalVar_waitforlock
+                        }
+                }
+        }
+        set * . !lock #nsname
+        wait 4
+        set !global * . %1
+        set !varName %2 , ^ , %3 , ^ , %4 , |
+        str pos !global !varName
+        if #strres = 0
+        {
+                if * . !lock <> #nsname
+                {
+                        set !lockcount 0
+                        goto putGlobalVar_waitforlock
+                }
+                if |CEO*FILESYSTEM| notin !global
+                set !global |CEO*FILESYSTEM|
+                set * . %1 !global , !varName , % . %4 , |
+                set * . !lock N/A
+                set #lpc !lpc
+                nameSpace clear
+                nameSpace pop
+                return #true
+        }
+        set !varNamePos #strres
+        str len !varName
+        set !splitString !varNamePos + #strres - 1
+        str left !global !splitstring
+        set !globalPart1 #strres
+        str del !global 1 !splitString
+        set !global #strres
+        str len !global
+        set !globalLen #strres
+        str pos !global |
+        set !splitString !globalLen - #strres + 1
+        str right !global !splitstring
+        set !global #strres
+        if * . !lock <> #nsname
+        {
+                set !lockcount 0
+                goto putGlobalVar_waitforlock
+        }
+        set * . %1 !globalPart1 , % . %4 , !global
+        set * . !lock N/A
+        set #lpc !lpc
+        nameSpace clear
+        nameSpace pop
+return #true
