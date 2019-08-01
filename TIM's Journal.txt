@@ -1,0 +1,234 @@
+; Script Name: TIM's Journal Scanner
+; Author: TIM (timginter)
+; Version: 1.1
+; Client Tested with: 5.0.1j
+; EUO version tested with: 1.5 v. 102
+; Shard OSI / FS:  OSI/FS
+; Revision Date: 28/01/09
+; Public Release: 28/01/09
+; Purpose: Muestra entradas de diario a través del menú redimensionable. Guarda entradas de diario en un archivo especificado C:\Diario_UA.txt. Filtra mensajes para mostrar.
+
+gosub menuBody
+
+; magery
+set %wordsOfPower Uus_Jux__In_Mani_Ylem__Rel_Wis__In_Mani__In_Por_Ylem__In_Lor__Flam_Sanct__Des_Mani__Ex_Uus__Uus_Wis__An_Nox__An_Mani__In_Jux__An_Jux__Uus_Sanct__Uus_Mani__
+set %wordsOfPower %wordsOfPower , Rel_Sanct__Vas_Flam__An_Por__In_Nox__Ort_Por__Rel_Por__Ex_Por__In_Sanct_Ylem__Vas_An_Nox__Vas_Uus_Sanct__Des_Sanct__In_Flam_Grav__In_Vas_Mani__
+set %wordsOfPower %wordsOfPower , Por_Ort_Grav__Ort_Rel__Kal_Ort_Por__In_Jux_Hur_Ylem__An_Grav__Kal_In_Ex__In_Jux_Sanct__Por_Corp_Wis__An_Ex_Por__In_Nox_Grav__Kal_Xen__An_Ort__
+set %wordsOfPower %wordsOfPower , Corp_Por__Vas_Ort_Flam__An_Lor_Xen__Kal_Por_Ylem__Vas_Des_Sanct__In_Ex_Grav__Wis_Quas__Vas_Ort_Grav__In_Sanct_Grav__Kal_Vas_Flam__Vas_Rel_Por__
+set %wordsOfPower %wordsOfPower , Ort_Sanct__Vas_An_Ort__Flam_Kal_Des_Ylem__Vas_Ylem_Rel__In_Vas_Por__Vas_Corp_Por__An_Corp__Kal_Vas_Xen_Hur__Kal_Vas_Xen_Corp__Kal_Vas_Xen_Ylem__
+set %wordsOfPower %wordsOfPower , Kal_Vas_Xen_Flam__Kal_Vas_Xen_An_Flam__
+; necromancy
+set %wordsOfPower %wordsOfPower , Uus_Corp__In_Jux_Mani_Xen__In_Agle_Corp_Ylem__An_Sanct_Gra_Char__Pas_Tym_An_Sanct__Rel_Xen_Vas_Bal__Rel_Xen_Corp_Ort__Wis_An_Ben__In_Sar__
+set %wordsOfPower %wordsOfPower , In_Vas_Nox__In_Bal_Nox__Kal_Xen_Bal__Rel_Xen_An_Sanct__Kal_Xen_Bal_Beh__Kal_Vas_An_Flam__Rel_Xen_Um__Ort_Corp_Grav__
+; chivlary
+set %wordsOfPower %wordsOfPower , Expor_Flamus__Obsu_Vulni__Consecrus_Arma__Dispiro_Malas__Divinum_Furis__Forul_Solum__Augus_Luminos__Dium_Prostra__Extermo_Vomica__Sanctum_Viatas__
+; spellweaving
+set %wordsOfPower %wordsOfPower , Myrshalee__Olorisstra__Thalshara__Haeldril__Erelonia__Rauvvrae__Alalithra__Nylisstra__Tarisstree__Haelyn__Anathrae__Rathril__Orlavdra__Nyraxle__
+set %wordsOfPower %wordsOfPower , Illorae__Aslavdra__
+
+set %jEntry #jIndex
+set %listIndex 0
+  mainLoop:
+if ( %jEntry < #jIndex || %jEntry = N/A )
+{
+  set %scanLine #jIndex - %jEntry
+  scanJournal %scanLine
+  set %journal #journal
+  menu get filter_spam
+  set *filterSpam #menuRes
+  menu get filter_spells
+  set *filterSpells #menuRes
+  menu get chat_only
+  set *chatOnly #menuRes
+  menu get filter_spotting
+  set *filterSpotting #menuRes
+  if *filterSpells = #true
+  {
+    str pos %journal : 1
+    str del %journal 1 #strRes
+    set %spellCheckStr #strRes
+  }
+
+; ------------- THE "IF" BELOW FILTERS MESSAGES -------------
+
+  if ( %journal <> %lastEntry || *filterSpam = #false ) && ( %spellCheckStr notIn %wordsOfPower || *filterSpells = #false ) &&
+  +  ( :_ in %journal || *chatOnly = #false ) && ( You_see:_ notIn %journal || *filterSpotting = #false )
+  {
+    set %lastEntry %journal
+    str count %journal _
+    while #strRes > 0
+    {
+      str pos %journal _
+      set %underscorePos #strRes
+      str del %journal #strRes 1
+      str ins #strRes #spc %underscorePos
+      set %journal #strRes
+      str count %journal _
+    }
+    set %listIndex %listIndex + 1
+    gosub time
+    set %line_ . %listIndex %time , #spc , %journal
+    menu list add journal %line_ . %listIndex
+    menu list select journal %listIndex
+  }
+  set %jEntry %jEntry + 1
+}
+if #menuButton <> NONE
+{
+  gosub #menuButton
+  set #menuButton NONE
+}
+goto mainLoop
+
+; ------------------------------------------------------
+
+sub save
+  menu get path
+  set %file #menuRes
+  gosub time
+  set %listIndex %listIndex + 1
+  set %line_ . %listIndex %time , #spc , SAVING , #SPC , TO: , #SPC , %file
+  menu list add journal %line_ . %listIndex
+  menu list select journal %listIndex
+  set %jEntry %jEntry + 1
+  if %saveIndex = N/A
+  {
+    set %saveIndex 1
+  }
+  set %saveGroupIndex 1
+  set %groups ( %listIndex - %saveIdex ) / 20
+  event sysMessage %groups
+    saveLoop:
+  set %params %listIndex - %saveIndex
+  if %params > 20
+  {
+    set %params %saveIndex + 18
+    set %lastParam %saveIndex + 19
+    set %saveGroup . %saveGroupIndex
+    for %save_i %saveIndex %params
+    {
+      set %saveLine %line_ . %save_i
+      set %saveGroup . %saveGroupIndex %saveGroup . %saveGroupIndex , #SPC , %saveLine , #SPC , >> , #SPC , %file , #SPC , && , #SPC , echo
+    }
+    set %saveLine %line_ . %lastParam
+    set %saveGroup . %saveGroupIndex %saveGroup . %saveGroupIndex , #SPC , %saveLine , #SPC , >> , #SPC , %file
+    set %saveGroupIndex %saveGroupIndex + 1
+    set %saveIndex %params + 1
+    goto saveLoop
+  }
+  else
+  {
+    set %params %params - 1
+    set %params %saveIndex + %params
+    set %lastParam %saveIndex + %params + 1
+    set %saveGroup . %saveGroupIndex
+    for %save_i %saveIndex %params
+    {
+      set %saveLine %line_ . %save_i
+      set %saveGroup . %saveGroupIndex %saveGroup . %saveGroupIndex , #SPC , %saveLine , #SPC , >> , #SPC , %file , #SPC , && , #SPC , echo
+    }
+    set %saveLine %line_ . %lastParam
+    set %saveGroup . %saveGroupIndex %saveGroup . %saveGroupIndex , #SPC , %saveLine , #SPC , >> , #SPC , %file
+  }
+  for %save_i 1 %saveGroupIndex
+  {
+    execute cmd.exe /c echo %saveGroup . %save_i
+  }
+  gosub time
+  set %listIndex %listIndex + 1
+  set %line_ . %listIndex %time , #spc , SAVING , #SPC , DONE
+  menu list add journal %line_ . %listIndex
+  menu list select journal %listIndex
+  set %jEntry %jEntry + 1
+return
+
+sub left
+  if %width > 300
+  {
+    gosub menuBody -100 0
+  }
+  gosub rewriteList
+return
+
+sub right
+  if %width < 1200
+  {
+    gosub menuBody 100 0
+  }
+  gosub rewriteList
+return
+
+sub rewriteList
+  menu list clear journal
+  for %restoreList_i 1 %listIndex
+  {
+      menu list add journal %line_ . %restoreList_i
+  }
+  menu list select journal %listIndex
+return
+
+sub closed
+  stop
+return
+
+; -----------------------------------------------------
+
+sub time
+  set %time #time
+  str ins %time : 5
+  str ins #strRes : 3
+  set %time [ , #strRes , ]
+return
+
+sub menuBody
+  menu Clear
+  menu Font Name Comic Sans MS
+  menu Window title TIM's Journal
+ menu Window color black
+ menu Font Name Verdana
+ menu Font color green
+ menu Font bgcolor black
+ menu Font size 8
+ if %width = N/A
+ {
+    set %width 500
+ }
+ if %height = N/A
+ {
+    set %height 120
+ }
+ set %yCoordinate 5
+ if %0 > 0
+ {
+   set %width %width + %1
+ }
+ menu list create journal 5 %yCoordinate %width %height
+
+ menu Font Name Comic Sans MS
+ set %yCoordinate %yCoordinate + %height
+ set %yCoordinate %yCoordinate + 5
+ if *filterSpam = N/A || *filterSpells = N/A || *filterSpotting = N/A || *chatOnly = N/A
+ {
+   set *filterSpam #false
+   set *filterSpells #false
+   set *filterSpotting #false
+   set *chatOnly #false
+ }
+ menu check filter_spam 5 %yCoordinate 100 20 *filterSpam Filter spam?
+ menu check filter_spells 100 %yCoordinate 100 20 *filterSpells Filter spells?
+ menu check filter_spotting 200 %yCoordinate 100 20 *filterSpotting Filter spotting?
+ menu check chat_only 400 %yCoordinate 100 20 *chatOnly Chat only?
+
+ set %yCoordinate %yCoordinate + 20
+ menu button save 5 %yCoordinate 100 20 SAVE
+ menu edit path 110 %yCoordinate 150 C:\Diario_UA.txt
+
+ menu button left 265 %yCoordinate 20 20 <
+ menu button right 287 %yCoordinate 20 20 >
+
+ set %yCoordinate %yCoordinate + 25
+ set %windowSize %width + 10
+ menu Window Size %windowSize %yCoordinate
+ menu Show
+ set #menuButton NONE
+return
