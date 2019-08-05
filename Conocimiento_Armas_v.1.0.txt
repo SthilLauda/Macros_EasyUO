@@ -10,7 +10,7 @@
 ; Version: 1.0
 ; Client Tested with: 2.0.3
 ; EUO version tested with: EasyUO 1.5 Version 243
-; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Shard: Ultima Alianza (Â¡Hasta la muerte!)
 ; Public Release: 05/08/2019
 ; Revised On: 05/08/2019
 ; Purpose: Entrena conocimiento de armas.
@@ -58,7 +58,7 @@ chooseskill Arms real ; Comprobar GM
 if #SKILL >= 1000
    {
      set #SYSMSGCOL 19
-     event sysmessage ¡Somos GM Arms Lore! :)
+     event sysmessage Â¡Somos GM Arms Lore! :)
      halt
    }
 return
@@ -85,7 +85,7 @@ if ( %proxima_vez_comer <= %tiempo_actual )
      {
        gosub comprobarcomida
      }
-rteturn
+return
 
 ;=====================================================
 ; Rutina para, en caso de hambre, comer hasta saciarse
@@ -94,14 +94,14 @@ rteturn
 sub comprobar_comida
 {
   hambriento:
-  set %jrnl #jindex ; Marcamos un índice de las líneas del diario.
+  set %jrnl #jindex ; Marcamos un Ã­ndice de las lÃ­neas del diario.
   event macro 4 0 .hungry
   wait 20
   while #true
      {
-       if #jindex > %jrnl ; Si aparece una nueva línea.
+       if #jindex > %jrnl ; Si aparece una nueva lÃ­nea.
           {
-            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de línea.
+            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de lÃ­nea.
             scanjournal %jrnl   ; La leemos...
             if Dentro_de_1_minuto in #journal
                {
@@ -144,7 +144,7 @@ sub comprobar_comida
                                        }
                                }
                        }
-                       else ; Mensaje extraño, repetimos...
+                       else ; Mensaje extraÃ±o, repetimos...
                           {
                             goto hambriento
                           }
