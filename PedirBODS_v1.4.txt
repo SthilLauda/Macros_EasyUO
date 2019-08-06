@@ -1,0 +1,288 @@
+; =====================================================================================================
+; '||   ||` '||`   ||                                 /.\      '||`
+;  ||   ||   ||    ||     ''                         // \\      ||   ''
+;  ||   ||   ||  ''||''   ||  '||),,(|,   '''|.     //...\\     ||   ||   '''|.  `||''|,  '''/  '''|.
+;  ||   ||   ||    ||     ||   || || ||  .|''||    //     \\    ||   ||  .|''||   ||  ||   //  .|''||
+;  `|...|'  .||.   `|..' .||. .||    ||. `|..||. .//       \\. .||. .||. `|..||. .||  ||. /... `|..||.
+; =====================================================================================================
+;
+; Author: Sthil Lauda
+; Version: 1.4
+; Client Tested with: 2.0.3
+; EUO version tested with: 1.5 Version 142
+; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Fecha: 06/08/2019
+; Purpose: Pide BODs estando oculto en la herrería, o avisa para ir a pedir uno manualmente.
+;==================================
+set %bod_stats #SCNT
+set %hid_timer #SCNT2
+set %bod_timer #SCNT
+set %alert_bod #SCNT
+set %bod_time 9000 ; 150 Minutos
+set %last_bod 0
+gosub setupMode ; Modo = [ Automático ] / [ Manual ].
+gosub setupHid  ; Hiding = [ Sí ] / [ NO ].
+
+loop:
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 50 130
+if ( #SCNT > %bod_stats )
+     {
+       set %next_bod %bod_timer - #SCNT ; Segundos hasta el siguiente BOD.
+       set %bod_mins abs ( %next_bod / 60 ) ; Minutos hasta el siguiente BOD.
+       set #SYSMSGCOL 88
+       event sysmessage OK: Siguiente bod [ %bod_mins mins ]
+       wait 20
+       set %bod_stats #SCNT + 61 ; Informar cada minuto...
+     }
+if ( #SCNT > %bod_timer )
+     {
+       if ( %auto )
+            {
+              event macro 1 0 bod
+              set %bod_timer #SCNT + %bod_time ; Fijar el tiempo del siguiente BOD.
+            }
+            else
+               {
+                 sound c:\windows\media\notify.wav
+                 wait 40
+                 display OK ¡Hora de coger un BOD! :-)
+                 set %jstart #jindex
+                 repeat
+                      {
+                        if ( #SCNT > %alert_bod )
+                             {
+                               set #SYSMSGCOL 18
+                               event sysmessage HAY UN BOD ESPERANDO! :-)
+                               sound c:\windows\media\notify.wav
+                               wait 20
+                               set %alert_bod #SCNT + 30 ; ¡Alertamos cada 30 segundos!
+                             }
+                        gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 50 130
+                        gosub hiding ; Nos ocultamos si está activada la opción de "Hiding".
+                        gosub wait_for MSG Pones_el_Orden_de_pedido Tengo_un_trabajo_para_ti 40 ; Hemos pedido un BOD :-)
+                      }
+                      until #TRUE in #RESULT
+                      set %bod_timer #SCNT + %bod_time ; Fijar el tiempo del siguiente BOD.
+               }
+     }
+gosub hiding
+wait 1
+goto loop
+
+sub hiding ; <==============================>
+if ( %hiding )
+     {
+       if ( H <> #CHARSTATUS )
+            {
+              if ( #SCNT2 > %hid_timer )
+                   {
+                     event macro 13 21 ; Use skill Hiding.
+                     set %hid_timer #SCNT2 + 55
+                   }
+            }
+     }
+return
+
+sub setupMode ; <==============================>
+display yesno ****************** [ MODO ] ******************$$
+            + ¿Quieres pedir los BOD's automáticamente?     $$
+            + *********************************************** $$
+if ( #dispres = yes )
+     {
+       set %auto #TRUE
+     }
+     else
+        {
+          set %auto #FALSE
+        }
+return
+
+sub setupHid ; <==============================>
+display yesno ********************** [ HIDING ] **********************$$
+            + ¿Quieres intentar OCULTAR tu PJ mientras macreas?       $$
+            + ******************************************************* $$
+if ( #dispres = yes )
+     {
+       set %hiding #TRUE
+     }
+     else
+        {
+          set %hiding #FALSE
+        }
+return
+
+;-@ ============================== @-;
+;-@ ############################## @-;
+;-@ SUBS públicos del Foro EasyUO  @-;
+;-@ ############################## @-;
+;-@ ============================== @-;
+;
+;-----------------------------------------------------------
+; Script Name: CEOWorldSaveChecker
+; Author: CEO
+; Version: 1.0
+; Client Tested with: 4.0.10b
+; EUO version tested with: 1.42.00A5
+; Shard OSI / FS: OSI
+; Revision Date: 060105
+; Public Release: 060105
+; Global Variables Used:  *CEOWorldSaving
+; Purpose: Used to catch the world save message for freeshards and temporarily pause mainscript during save.
+;-------------------------------------------------------------
+sub CEOWorldSaveChecker
+; sub to pause a script during a RunUO world save.
+set %_text1 %1
+set %_text2 %2
+set %_text3 %3
+if %_worldsaveupcoming
+{
+        if %_worldsavetimer < #scnt
+        {
+                set %_worldsavetimer #scnt + %5
+                gosub popupworldsave 25 15 blue
+                goto _WSC_WAIT1
+        }
+        return
+}
+_WSC1:
+if %_worldsavejournalindex > #jindex
+        return
+scanjournal %_worldsavejournalindex
+if %_text1  in #JOURNAL
+{
+        set %_worldsaveupcoming #true
+        set %_worldsavetimer #scnt + %4
+        set %_worldsavejournalindex  %_worldsavejournalindex + 1
+        return
+}
+set %_worldsavejournalindex  %_worldsavejournalindex + 1
+goto _WSC1
+_WSC_WAIT1:
+if %_worldsavetimer < #scnt
+        goto _WSC_Complete
+wait 5
+set *CEOWorldSaving #true
+if %_worldsavejournalindex > #jindex
+        goto _WSC_WAIT1
+scanjournal %_worldsavejournalindex
+if %_text2 in #journal
+{
+        gosub popupworldsave 25 15 yellow
+        set %_worldsavejournalindex  %_worldsavejournalindex + 1
+        goto _WSC_WAIT2
+}
+set %_worldsavejournalindex  %_worldsavejournalindex + 1
+goto _WSC_WAIT1
+_WSC_WAIT2:
+if %_worldsavetimer < #scnt
+        goto _WSC_Complete
+wait 5
+if %_worldsavejournalindex > #jindex
+        goto _WSC_WAIT2
+scanjournal %_worldsavejournalindex
+if %_text3 notin #journal
+{
+        set %_worldsavejournalindex  %_worldsavejournalindex + 1
+        goto _WSC_WAIT2
+}
+_WSC_Complete:
+set %_worldsavejournalindex  #jindex
+set %_worldsaveupcoming #false
+set *CEOWorldSaving #false
+menu delete worldsave
+return
+
+sub popupworldsave
+set %x %1
+set %y %2
+set %worldcolor %3
+menu Clear
+menu Window Title World Save Monitor
+menu Window Color Black
+menu Window Size 160 160
+menu shape worldsave 20 15 125 125 1 7 2 olive 7 %worldcolor
+menu font bgcolor %worldcolor
+menu font color lime
+menu font type b
+menu font size 15
+set %x %x + 30
+set %y %y + 30
+menu text worldsave %x %y World
+set %x %x + 15
+set %y %y + 20
+menu text worldsave %x %y Save
+set %x %x + 15
+set %y %y + 20
+menu text worldsave %x %y Wait
+menu font size 9
+menu font bgcolor black
+menu font color lime
+menu font type n
+menu Show 920 770
+return
+
+;=================================================================
+sub wait_for
+;=================================================================
+; This "wait_for" sub package was created by Locke. If you use these subs please keep this header intact.
+; Documentation: the sub package grew to large with all the comments. To load them call the sub like this:
+; gosub wait_for docs    | or you can use doc, documention, what, or my personal favorite, kickass.
+
+; "wait_for core dispatcher" version 1.2 by Locke
+if %1 = doc || if %1 = docs || if %1 = documentation || if %1 = what || if %1 = kickass
+{
+Display ok Please click ok and wait for your browser to start.
+execute http://www.easyuo.com/forum/viewtopic.php?t=24716
+halt
+}
+nameSpace Push
+namespace local LLNS
+set #result N/A ; if #result isn't set by one of my wait_for subs it'll throw an error.
+set !LPC #lpc
+set #lpc 200
+for %i 0 %0
+set !_A . %i % . %i
+gosub wait_for_ , !_A1
+set #lpc !lpc
+namespace clear LLNS
+namespace pop
+if #result <> N/A
+return #result
+else
+display ok You specified an unknown wait_for command. Script returned #result and is halting.
+halt
+;=================================================================
+sub wait_for_MSG ; version 1.4 ~Locke
+;=================================================================
+if !_A0 < 3
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for MSG %message time_out_in_seconds$
++Script is halting
+halt
+}
+set !_timeout ( #scnt2 + !_A . !_A0 )
+_lets_wait_for_a_message:
+for %i %jstart #jindex
+{
+ scanjournal %i
+  for %ii 2 !_A0
+  {
+    if !_A . %ii in #journal && %jstart <> %i
+    set #result #true , #spc , !_A . %ii
+  }
+}
+
+if #true notin #result
+{
+set #result #false
+ if !_timeout =< #scnt2
+ return #result
+wait 1
+goto _lets_wait_for_a_message
+}
+else
+return #result
+
+wait 1
+goto _lets_wait_for_a_message
