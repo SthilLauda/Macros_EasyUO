@@ -1,0 +1,410 @@
+;=============================================================================================
+;== Cantar cancion de "LABOR" a objetivo by BoXeR [ MOD+ Sthil ] =============================
+;=============================================================================================
+;La macro para marcar el objetivo usara una venda y te pedira una vez pulses "play" marcar
+;el objetivo al que quieres cantar.
+;=============================================================================================
+;Selecciona la cancion a cantar:
+set %EleccionHabilidad 1
+; 1-Mineria
+; 2-Herreria
+; 3-Talar
+; 4-Carpinteria
+; 5-Artesania
+; 6-Escriba
+; 7-Alquimia
+; 8-Sastreria
+;=============================================================================================
+;== No toques nada a partir de aquí ==========================================================
+;=============================================================================================
+set %cancion .cancion15 ; Cancion de "LABOR"
+set %TiempoDuracion 168
+set %MineriaX 70
+set %MineriaY 100
+set %herreriaX 70
+set %herreriaY 125
+set %TalarX 70
+set %TalarY 150
+set %CarpinteriaX 70
+set %CarpinteriaY 175
+set %ArtesaniaX 70
+set %ArtesaniaY 200
+set %EscribaX 70
+set %EscribaY 225
+set %AlquimiaX 70
+set %AlquimiaY 250
+set %SastreriaX 70
+set %SastreriaY 275
+set %TiempoEncantado #SCNT
+set %hid_timer #SCNT2
+set %_worldsavejournalindex #jindex ; Journal para escanear en busca de save's del server.
+set *CEOWorldSaving #FALSE          ; Indica si hay un save del server en marcha.
+;=============================================================================================
+;== Comienza la macro: =======================================================================
+;=============================================================================================
+gosub setupPlayer
+gosub setupHid
+
+Comienzo:
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+finditem %ObjetivoCancion G_
+if ( #FINDCNT > 0 ) ; El PJ está presente...
+{
+if ( #SCNT > %TiempoEncantado ) ; Y ya le podemos cantar...
+{
+event macro 1 0 %cancion
+gosub wait_for GUMP 247_264 15
+if ( #RESULT )
+     {
+       if %EleccionHabilidad = 1 ; Mineria
+          {
+            event exmsg #CHARID 3 30 Cantando Mineria
+            wait 20
+            click %MineriaX %MineriaY f dmc
+          }
+       if %EleccionHabilidad = 2 ; Herreria
+          {
+            event exmsg #CHARID 3 30 Cantando Herreria
+            wait 20
+            click %herreriaX %herreriaY f dmc
+          }
+       if %EleccionHabilidad = 3 ; Talar
+          {
+            event exmsg #CHARID 3 30 Cantando Talar
+            click %TalarX %TalarY f dmc
+          }
+       if %EleccionHabilidad = 4 ; Carpinteria
+          {
+            event exmsg #CHARID 3 30 Cantando Carpinteria
+            wait 20
+            click %CarpinteriaX %CarpinteriaY f dmc
+          }
+       if %EleccionHabilidad = 5 ; Artesania
+          {
+            event exmsg #CHARID 3 30 Cantando Artesania
+            wait 20
+            click %ArtesaniaX %ArtesaniaY f dmc
+          }
+       if %EleccionHabilidad = 6 ; Escriba
+          {
+            event exmsg #CHARID 3 30 Cantando Escriba
+            wait 20
+            click %EscribaX %EscribaY f dmc
+          }
+       if %EleccionHabilidad = 7 ; Alquimia
+          {
+            event exmsg #CHARID 3 30 Cantando Alquimia
+            wait 20
+            click %AlquimiaX %AlquimiaY f dmc
+          }
+       if %EleccionHabilidad = 8 ; Sastre
+          {
+            event exmsg #CHARID 3 30 Cantando Sastre
+            wait 20
+            click %SastreriaX %SastreriaY f dmc
+          }
+       finditem %ObjetivoCancion G_
+       if ( #FINDCNT > 0 )
+            {
+              target 10s
+              gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+              set #LTARGETID %ObjetivoCancion
+              set #LTARGETKIND 1
+              set %jstart #jindex
+              event macro 22
+              gosub wait_for MSG ya_se_encuentra_bajo_los_efectos 50
+              if ( #TRUE in #RESULT )
+                   {
+                     set #SYSMSGCOL 88
+                     event sysmessage AMPLIANDO LA HORA [ +5s ]...
+                     wait 20
+                     set %TiempoEncantado %TiempoEncantado + 10 ; En segundos.
+                     goto Comienzo
+                   }
+                   else
+                      {
+                        set %TiempoEncantado #SCNT + %TiempoDuracion
+                      }
+            }
+     }
+}
+}
+gosub hiding
+wait 1
+goto Comienzo
+
+sub hiding ; <==============================>
+if ( %hiding )
+     {
+       if ( H Notin #CHARSTATUS && #TARGCURS = 0 && #LLIFTEDKIND = 0 ) ; Si no estamos ocultos, y no vamos a hacer clicks, ni a levantar nada, entonces nos ocultamos...
+            {
+              if ( #SCNT2 >= %hid_timer )
+                   {
+                     event macro 13 21 ; Use SKILL Hiding
+                     set %hid_timer #SCNT2 + 55
+                   }
+            }
+     }
+return
+
+sub setupPlayer
+display OK Marca el objetivo al que quieres cantar...
+set #TARGCURS 1
+target
+while #TARGCURS = 1
+      {
+        wait 1
+      }
+set %ObjetivoCancion #LTARGETID
+event exmsg %ObjetivoCancion 3 90 Objetivo GUARDADO: %ObjetivoCancion
+wait 40
+return
+
+sub setupHid ; <==============================>
+display yesno ********************** [ HIDING ] **********************$$
+            + ¿Quieres intentar OCULTAR tu PJ mientras macreas?       $$
+            + ******************************************************* $$
+if ( #dispres = yes )
+     {
+       set %hiding #TRUE
+     }
+     else
+        {
+          set %hiding #FALSE
+        }
+return
+
+;=================================================================
+sub wait_for
+;=================================================================
+; This "wait_for" sub package was created by Locke. If you use these subs please keep this header intact.
+; Documentation: the sub package grew to large with all the comments. To load them call the sub like this:
+; gosub wait_for docs    | or you can use doc, documention, what, or my personal favorite, kickass.
+
+; "wait_for core dispatcher" version 1.2 by Locke
+if %1 = doc || if %1 = docs || if %1 = documentation || if %1 = what || if %1 = kickass
+{
+Display ok Please click ok and wait for your browser to start.
+execute http://www.easyuo.com/forum/viewtopic.php?t=24716
+halt
+}
+nameSpace Push
+namespace local LLNS
+set #result N/A ; if #result isn't set by one of my wait_for subs it'll throw an error.
+set !LPC #lpc
+set #lpc 200
+for %i 0 %0
+set !_A . %i % . %i
+gosub wait_for_ , !_A1
+set #lpc !lpc
+namespace clear LLNS
+namespace pop
+if #result <> N/A
+return #result
+else
+display ok You specified an unknown wait_for command. Script returned #result and is halting.
+halt
+;=================================================================
+sub wait_for_MSG ; version 1.4 ~Locke
+;=================================================================
+if !_A0 < 3
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for MSG %message time_out_in_seconds$
++Script is halting
+halt
+}
+set !_timeout ( #scnt2 + !_A . !_A0 )
+_lets_wait_for_a_message:
+for %i %jstart #jindex
+{
+ scanjournal %i
+  for %ii 2 !_A0
+  {
+    if !_A . %ii in #journal && %jstart <> %i
+    set #result #true , #spc , !_A . %ii
+  }
+}
+
+if #true notin #result
+{
+set #result #false
+ if !_timeout =< #scnt2
+ return #result
+wait 1
+goto _lets_wait_for_a_message
+}
+else
+return #result
+
+wait 1
+goto _lets_wait_for_a_message
+;======================================================================
+sub wait_for_GUMP ; version 1.4 ~Locke
+;=================================================================
+; Añadido #CONTID ^^
+if !_A0 < 3
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for GUMP XXX_YYY time_out_in_seconds$
++Script is halting
+halt
+}
+if !_A3 <> CLOSE
+set !_timeout #scnt2 + !_A3
+else
+set !_timeout 0 ; no gump wait if %3 = CLOSE since we already believe it to be open.
+
+_lets_wait_for_a_gump:
+if #CONTSIZE = !_A2 || #CONTKIND = !_A2 || #CONTNAME = !_A2 || #CONTTYPE = !_A2 || #CONTID = !_A2
+{
+ if !_A5 <> N/A && !_A6 <> N/A
+ {
+ set !clickx !_A5 + #contposx
+ set !clicky !_A6 + #contposy
+ click !clickx !clicky
+ }
+ if !_A3 = CLOSE || if !_A4 = CLOSE || !_A5 = CLOSE || !_A6 = CLOSE
+ {
+ set !string #contsize
+ str pos !string _
+ set !pos #strres
+ str del !string #strres #strres
+ set !clickX #contposx + ( #strres / 2 )
+ str del !string 1 !pos
+ set !clickY #contposy + ( #strres / 2 )
+ click !clickx !clicky R
+ }
+return #true
+}
+
+if ( !_timeout =< #scnt2 ) && ( !_A4 = N/A )
+   {
+     return #false
+   }
+
+if !_A4 <> N/A && !_timeout =< #scnt2
+{
+finditem !_A4
+if #findkind <> -1
+{
+ for #findindex 1 #findcnt
+ {
+  if #finddist > 2
+  ignoreitem #findid LLWAITFOR
+  else
+  break
+ }
+ set #lobjectid #findid
+ event macro 17 0
+ set !_timeout #scnt2 + !_A3
+}
+else
+return #false
+}
+wait 1
+goto _lets_wait_for_a_gump
+
+;-----------------------------------------------------------
+; Script Name: CEOWorldSaveChecker
+; Author: CEO
+; Version: 1.0
+; Client Tested with: 4.0.10b
+; EUO version tested with: 1.42.00A5
+; Shard OSI / FS: OSI
+; Revision Date: 060105
+; Public Release: 060105
+; Global Variables Used:  *CEOWorldSaving
+; Purpose: Used to catch the world save message for freeshards and temporarily pause mainscript during save.
+;-------------------------------------------------------------
+sub CEOWorldSaveChecker
+; sub to pause a script during a RunUO world save.
+set %_text1 %1
+set %_text2 %2
+set %_text3 %3
+if %_worldsaveupcoming
+{
+        if %_worldsavetimer < #scnt
+        {
+                set %_worldsavetimer #scnt + %5
+                gosub popupworldsave 25 15 blue
+                goto _WSC_WAIT1
+        }
+        return
+}
+_WSC1:
+if %_worldsavejournalindex > #jindex
+        return
+scanjournal %_worldsavejournalindex
+if %_text1  in #JOURNAL
+{
+        set %_worldsaveupcoming #true
+        set %_worldsavetimer #scnt + %4
+        set %_worldsavejournalindex  %_worldsavejournalindex + 1
+        return
+}
+set %_worldsavejournalindex  %_worldsavejournalindex + 1
+goto _WSC1
+_WSC_WAIT1:
+if %_worldsavetimer < #scnt
+        goto _WSC_Complete
+wait 5
+set *CEOWorldSaving #true
+if %_worldsavejournalindex > #jindex
+        goto _WSC_WAIT1
+scanjournal %_worldsavejournalindex
+if %_text2 in #journal
+{
+        gosub popupworldsave 25 15 yellow
+        set %_worldsavejournalindex  %_worldsavejournalindex + 1
+        goto _WSC_WAIT2
+}
+set %_worldsavejournalindex  %_worldsavejournalindex + 1
+goto _WSC_WAIT1
+_WSC_WAIT2:
+if %_worldsavetimer < #scnt
+        goto _WSC_Complete
+wait 5
+if %_worldsavejournalindex > #jindex
+        goto _WSC_WAIT2
+scanjournal %_worldsavejournalindex
+if %_text3 notin #journal
+{
+        set %_worldsavejournalindex  %_worldsavejournalindex + 1
+        goto _WSC_WAIT2
+}
+_WSC_Complete:
+set %_worldsavejournalindex  #jindex
+set %_worldsaveupcoming #false
+set *CEOWorldSaving #false
+menu delete worldsave
+return
+
+sub popupworldsave
+set %x %1
+set %y %2
+set %worldcolor %3
+menu Clear
+menu Window Title World Save Monitor
+menu Window Color Black
+menu Window Size 160 160
+menu shape worldsave 20 15 125 125 1 7 2 olive 7 %worldcolor
+menu font bgcolor %worldcolor
+menu font color lime
+menu font type b
+menu font size 15
+set %x %x + 30
+set %y %y + 30
+menu text worldsave %x %y World
+set %x %x + 15
+set %y %y + 20
+menu text worldsave %x %y Save
+set %x %x + 15
+set %y %y + 20
+menu text worldsave %x %y Wait
+menu font size 9
+menu font bgcolor black
+menu font color lime
+menu font type n
+menu Show 920 770
+return
