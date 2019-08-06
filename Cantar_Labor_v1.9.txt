@@ -1,10 +1,10 @@
 ;=============================================================================================
 ;== Cantar cancion de "LABOR" a objetivo by BoXeR [ MOD+ Sthil ] =============================
 ;=============================================================================================
-;La macro para marcar el objetivo usara una venda y te pedira una vez pulses "play" marcar
-;el objetivo al que quieres cantar.
+; La macro para marcar el objetivo usara una venda y te pedira una vez pulses "play" marcar
+; el objetivo al que quieres cantar.
 ;=============================================================================================
-;Selecciona la cancion a cantar:
+; Selecciona la cancion a cantar:
 set %EleccionHabilidad 1
 ; 1-Mineria
 ; 2-Herreria
@@ -15,7 +15,7 @@ set %EleccionHabilidad 1
 ; 7-Alquimia
 ; 8-Sastreria
 ;=============================================================================================
-;== No toques nada a partir de aquí ==========================================================
+;== No toques nada a partir de aquÃ­ ==========================================================
 ;=============================================================================================
 set %cancion .cancion15 ; Cancion de "LABOR"
 set %TiempoDuracion 168
@@ -48,7 +48,7 @@ gosub setupHid
 Comienzo:
 gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
 finditem %ObjetivoCancion G_
-if ( #FINDCNT > 0 ) ; El PJ está presente...
+if ( #FINDCNT > 0 ) ; El PJ estÃ¡ presente...
 {
 if ( #SCNT > %TiempoEncantado ) ; Y ya le podemos cantar...
 {
@@ -162,7 +162,7 @@ return
 
 sub setupHid ; <==============================>
 display yesno ********************** [ HIDING ] **********************$$
-            + ¿Quieres intentar OCULTAR tu PJ mientras macreas?       $$
+            + Â¿Quieres intentar OCULTAR tu PJ mientras macreas?       $$
             + ******************************************************* $$
 if ( #dispres = yes )
      {
@@ -242,7 +242,7 @@ goto _lets_wait_for_a_message
 ;======================================================================
 sub wait_for_GUMP ; version 1.4 ~Locke
 ;=================================================================
-; Añadido #CONTID ^^
+; AÃ±adido #CONTID ^^
 if !_A0 < 3
 {
 display ok You haven't specified enough vars.$
