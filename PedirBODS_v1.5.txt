@@ -41,8 +41,8 @@ if ( #SCNT > %bod_stats )
        set %bod_mins abs ( %next_bod / 60 ) ; Minutos hasta el siguiente BOD.
        set #SYSMSGCOL 88
        event sysmessage OK: Siguiente bod [ %bod_mins mins ]
+       set %bod_stats #SCNT + 60 ; Informar cada minuto...
        wait 20
-       set %bod_stats #SCNT + 61 ; Informar cada minuto...
      }
 if ( #SCNT > %bod_timer )
      {
