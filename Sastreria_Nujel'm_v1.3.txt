@@ -20,25 +20,25 @@
 ; Version: 1.3
 ; Client Tested with: 2.0.3
 ; EUO version tested with: EasyUO 1.5 Version 243
-; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Shard: Ultima Alianza (Â¡Hasta la muerte!)
 ; Revision Date: 040710
 ; Public Release:  040710
-; Purpose: Subir la skill de Sastrería fabricando bandanas y vendiéndolas en Nujel'm :-)
+; Purpose: Subir la skill de SastrerÃ­a fabricando bandanas y vendiÃ©ndolas en Nujel'm :-)
 ;
 set %version 1.3
 ;
-; LUGAR DE MACREO: Sastrería de Nujel'm [ Tiene 2 vendors ^^ ]
+; LUGAR DE MACREO: SastrerÃ­a de Nujel'm [ Tiene 2 vendors ^^ ]
 ;
 ;________________________________
 ;
 ; ///////////////////////////////
-; ******** CONFIGURACIÓN ********
+; ******** CONFIGURACIÃ“N ********
 ; ///////////////////////////////
 ;________________________________
 ;
-set %tiempo 360 ; Cada cuántos segundos va a comprobar si tiene hambre.
-set %ignora_vendor_x 3773 ; La posición X de un NPC que es comerciante, pero no vende telas, y que por tanto hay que ignorar.
-set %ignora_vendor_y 1260 ; La posición Y de un NPC que es comerciante, pero no vende telas, y que por tanto hay que ignorar.
+set %tiempo 360 ; Cada cuÃ¡ntos segundos va a comprobar si tiene hambre.
+set %ignora_vendor_x 3773 ; La posiciÃ³n X de un NPC que es comerciante, pero no vende telas, y que por tanto hay que ignorar.
+set %ignora_vendor_y 1260 ; La posiciÃ³n Y de un NPC que es comerciante, pero no vende telas, y que por tanto hay que ignorar.
 ; Modo "Friki" (Saluda al vendor y da las gracias XD)
 set %friki_mode #TRUE
 set %tecla_saludo_1 b    ; Bow
@@ -48,7 +48,7 @@ set %tecla_macreo_4 ctrl
 ;________________________________________________
 ;
 ; //////////////////////////////////////////////
-; ************* FIN CONFIGURACIÓN *************
+; ************* FIN CONFIGURACIÃ“N *************
 ; //////////////////////////////////////////////
 ;________________________________________________
 ;
@@ -77,6 +77,14 @@ event sysmessage Sastreria PRO %version
 event sysmessage =====================
 wait 2s
 
+if ( #STR < 100 ) ; No tenemos la fuerza a tope... :-(
+     {
+       set #SYSMSGCOL 38
+       display OK NO TIENES SUFICIENTE FUERZA [ 100 ]
+       event sysmessage NO TIENES SUFICIENTE FUERZA :-(
+       halt
+     }
+
 ignoreitem reset
 ignoreitem #CHARID ; Quitamos nuestro PJ de la lista de NPC's...
 set #sysmsgcol 16
@@ -92,9 +100,9 @@ gosub recoger ; Limpiamos el suelo de telas por si las moscas... XD
 set #sysmsgcol 23
 event sysmessage Comprobando hambre...
 wait 10
-gosub comprobar_comida ; Alimentación del PJ...
+gosub comprobar_comida ; AlimentaciÃ³n del PJ...
 ; Comprobar la suerte (Influye un poco en el crafteo...)
-if ( #LUCK < 75 ) ; 75 es una armadura de oro, se le puede añadir un escudo o ballesta de oro ^^
+if ( #LUCK < 75 ) ; 75 es una armadura de oro, se le puede aÃ±adir un escudo o ballesta de oro ^^
      {
        set #SYSMSGCOL 1264
        event sysmessage ===============================
@@ -112,7 +120,7 @@ inicio:
 chooseskill Tail real
 if #SKILL >= 1000
    {
-     display ¡Somos GM Tailor! :-) ; Somos GM Tailor
+     display Â¡Somos GM Tailor! :-) ; Somos GM Tailor
      gosub limpiar_ventanas
      halt
    }
@@ -219,7 +227,7 @@ if %start_macro = 0
    }
    else
       {
-        if ( #CONTNAME <> generic_gump ) && ( #CONTSIZE <> 530_480 ) ; Menú de crafteo cerrado
+        if ( #CONTNAME <> generic_gump ) && ( #CONTSIZE <> 530_480 ) ; MenÃº de crafteo cerrado
              {
                goto Costura
              }
@@ -229,7 +237,7 @@ if %start_macro = 0
         if ( #FINDCNT >= %bandanas_vender )
              {
                gosub busca_vendor ; Comprobamos que hay un vendor
-               gosub vender ; Vendemos las bandanas crafteadas si llegamos al límite...
+               gosub vender ; Vendemos las bandanas crafteadas si llegamos al lÃ­mite...
              }
       }
 return
@@ -306,7 +314,7 @@ if #findkind <> -1
             set %nombre_vendor %PROPIEDADES1
             set %pos_vendor_x #FINDX ; Coordenadas X del vendor
             set %pos_vendor_y #FINDY ; Coordenadas Y del vendor
-            ; Ignoramos todo lo que no sea un vendor, o el que hay en la sastrería de Nujel'm y que no vende telas...
+            ; Ignoramos todo lo que no sea un vendor, o el que hay en la sastrerÃ­a de Nujel'm y que no vende telas...
             if ( Comerciante Notin %PROPIEDADES2 ) || ( %pos_vendor_x = %ignora_vendor_x && %pos_vendor_y = %ignora_vendor_y )
                  {
                    ignoreitem #FINDID
@@ -352,20 +360,20 @@ return
 
 sub limpiar_ventanas
 event sysmessage Limpiando ventanas...
-gosub wait_for GUMP 800_590 10 ; Cerrar el menú del vendor
+gosub wait_for GUMP 800_590 10 ; Cerrar el menÃº del vendor
 if #true
    {
      click 601 537
      gosub wait_for GUMP 800_590 CLOSE
    }
-gosub wait_for GUMP 530_480 CLOSE ; Cerrar el menú de craftear
-gosub wait_for GUMP 800_590 10 ; Cerrar el menú del vendor
+gosub wait_for GUMP 530_480 CLOSE ; Cerrar el menÃº de craftear
+gosub wait_for GUMP 800_590 10 ; Cerrar el menÃº del vendor
 if #true
    {
      click 601 537
      gosub wait_for GUMP 800_590 CLOSE
    }
-gosub wait_for GUMP 530_480 CLOSE ; Cerrar el menú de craftear
+gosub wait_for GUMP 530_480 CLOSE ; Cerrar el menÃº de craftear
 return
 
 ;=====================================================
@@ -375,14 +383,14 @@ return
 sub comprobar_comida
 {
   hambriento:
-  set %jrnl #jindex ; Marcamos un índice de las líneas del diario.
+  set %jrnl #jindex ; Marcamos un Ã­ndice de las lÃ­neas del diario.
   msg .hungry $
   wait 20
   while #true
      {
-       if #jindex > %jrnl ; Si aparece una nueva línea.
+       if #jindex > %jrnl ; Si aparece una nueva lÃ­nea.
           {
-            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de línea.
+            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de lÃ­nea.
              scanjournal %jrnl   ; La leemos...
             if Estas_tan_lleno_que_no_puedes in #journal || Estas_totalmente_saciado in #journal
                {
@@ -400,7 +408,7 @@ sub comprobar_comida
                          wait 20
                          goto hambriento
                        }
-                       else ; Mensaje extraño, repetimos...
+                       else ; Mensaje extraÃ±o, repetimos...
                           {
                             goto hambriento
                           }
@@ -413,7 +421,7 @@ return
 
 ;-@ ============================== @-;
 ;-@ ############################## @-;
-;-@ SUBS públicos del Foro EasyUO  @-;
+;-@ SUBS pÃºblicos del Foro EasyUO  @-;
 ;-@ ############################## @-;
 ;-@ ============================== @-;
 ;
@@ -569,7 +577,7 @@ goto _lets_wait_for_a_message
 ;======================================================================
 sub wait_for_GUMP ; version 1.4 ~Locke
 ;=================================================================
-; Añadido #CONTID para "sub abrir_cofre"
+; AÃ±adido #CONTID para "sub abrir_cofre"
 if !_A0 < 3
 {
 display ok You haven't specified enough vars.$
