@@ -1,0 +1,73 @@
+set %myaccount default
+set %mypass xxxxx ; Aquí va tu contraseña del UO ( ¡Mucho cuidado! ¡NO compartas la macro sin haberla borrado antes! ¬¬ )
+set %mycharnum 1  ; Personaje con el que quieres que logear.
+
+mainloop:
+if #contname = MainMenu_gump
+{
+if %myaccount <> default
+{
+set %x #contposx + 520
+set %y #contposy + 350
+click %x %y f
+gosub sendstring %myaccount
+}
+set %x #contposx + 520
+set %y #contposy + 395
+click %x %y f
+gosub sendstring %mypass
+gosub clickgreen
+}
+if #contname = waiting_gump
+{
+if #contsize = 203_121
+{
+set %x #contposx + 100
+set %y #contposy + 100
+click %x %y f
+}
+if #contsize = 408_288
+{
+set %x #contposx + 205
+set %y #contposy + 250
+click %x %y f ; Nuevo intento
+}
+}
+if #contname = Login_gump
+{
+set %x #contposx + 360
+set %y #contposy + 140 + ( ( %mycharnum - 1 ) * 40 )
+click %x %y f
+gosub clickgreen
+}
+if #contname = normal_gump
+gosub clickgreen
+goto mainloop
+
+;-------------------------------------------
+sub clickgreen
+set %x #contposx + 620
+set %y #contposy + 445
+click %x %y f
+wait 5
+return
+;-------------------------------------------
+sub clickred
+set %x1 #contposx + 600
+set %y1 #contposy + 445
+click %x1 %y1 f
+wait 5
+return
+;-------------------------------------------
+sub sendstring
+str Len %1
+set %len #strRes
+for %i 1 16
+key back
+for %i 1 %len
+{
+str Mid %1 %i 1
+key #strRes
+}
+return
+;--------------------------------------------
