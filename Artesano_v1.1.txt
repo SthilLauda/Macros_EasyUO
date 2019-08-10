@@ -20,7 +20,7 @@
 ; |       |  /              /       .'       \\_.-'            ````
 ; |       | /              |_.-.___|  .-.   .'~
 ; |       `(               | `-'      `-'  ;`._
-; |         `.     jgs      \__       ___.'  //`-._          _,,,
+; |         `.              \__       ___.'  //`-._          _,,,
 ; |           )                ``--../   \  //     `-.,,,..-'    `;
 ; `----------'                            \//,_               _.-'
 ;                                          ^   ```--...___..-'
@@ -28,14 +28,14 @@
 ; Version: 1.1
 ; Client Tested with: 2.0.3
 ; EUO version tested with: EasyUO 1.5 Version 243
-; Shard: Ultima Alianza (°Hasta la muerte!)
+; Shard: Ultima Alianza (¬°Hasta la muerte!)
 ; Revision Date: 10/08/2019
 ; Public Release:  05/08/2019
-; Purpose: Subir la skill de ArtesanÌa fabricando resortes y fundiÈndolos para recuperar mineral :-)
+; Purpose: Subir la skill de Artesan√≠a fabricando resortes y fundi√©ndolos para recuperar mineral :-)
 ;________________________________
 ;
 ; ///////////////////////////////
-; ******** CONFIGURACI”N ********
+; ******** CONFIGURACI√ìN ********
 ; ///////////////////////////////
 ;________________________________
 ;
@@ -44,7 +44,7 @@ set %tiempo_alimentacion 360
 ;________________________________________________
 ;
 ; //////////////////////////////////////////////
-; ************* FIN CONFIGURACI”N *************
+; ************* FIN CONFIGURACI√ìN *************
 ; //////////////////////////////////////////////
 ;________________________________________________
 ;
@@ -81,7 +81,7 @@ goto inicio
 ;========================================================
 
 ;*************************************************
-;                  øCOMER?
+;                  ¬øCOMER?
 ;*************************************************
 sub checkHungry
 set %tiempo_actual #SCNT
@@ -235,14 +235,14 @@ goto inicio
 sub comprobar_comida
 {
   hambriento:
-  set %jrnl #jindex ; Marcamos un Ìndice de las lÌneas del diario.
+  set %jrnl #jindex ; Marcamos un √≠ndice de las l√≠neas del diario.
   event macro 4 0 .hungry
   wait 20
   while #true
      {
-       if #jindex > %jrnl ; Si aparece una nueva lÌnea.
+       if #jindex > %jrnl ; Si aparece una nueva l√≠nea.
           {
-            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de lÌnea.
+            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de l√≠nea.
             scanjournal %jrnl   ; La leemos...
             if Dentro_de_1_minuto in #journal
                {
@@ -272,7 +272,7 @@ sub comprobar_comida
                                  set %proxima_vez %tiempo_actual + %tiempo_alimentacion
                                }
                        }
-                       else ; Mensaje extraÒo, repetimos...
+                       else ; Mensaje extra√±o, repetimos...
                           {
                             goto hambriento
                           }
@@ -456,7 +456,7 @@ goto _lets_wait_for_a_message
 ;======================================================================
 sub wait_for_GUMP ; version 1.4 ~Locke
 ;=================================================================
-; AÒadido #CONTID ^^
+; A√±adido #CONTID ^^
 if !_A0 < 3
 {
 display ok You haven't specified enough vars.$
