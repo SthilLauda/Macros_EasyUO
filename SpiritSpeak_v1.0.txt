@@ -1,0 +1,359 @@
+;        |                                 /   \                   |       .
+;  _    -O-       .                )      ((   ))     (           -O-
+; (@)    |     +                  /|\      ))_((     /|\           |            .
+; |-|                            / | \    (/\|/\)   / | \                            (@)
+; | | --------------------------/--|-voV---\`|'/--Vov-|--\---------------------------|-|         .
+; |-|                                '^`   (o o)  '^`                                | |
+; | |                                      `\Y/'                                     |-|
+; |-|   _______ __ __   __                  _______ __ __                            | |
+; | |  |   |   |  |  |_|__|.--------.---.-.|   _   |  |__|.---.-.-----.-----.---.-.  |-|    .     o
+; |-|  |   |   |  |   _|  ||        |  _  ||       |  |  ||  _  |     |-- __|  _  |  | |
+; | |  |_______|__|____|__||__|__|__|___._||___|___|__|__||___._|__|__|_____|___._|  |-|
+; |_|________________________________________________________________________________| |
+; (@)                     l   /\ /         ( (          \ /\   l                   `\|-|             .
+;           o             l /   V           \ \          V   \ l       +             (@)
+;                         l/                _) )_             \I                                 +
+;      +                                    `\ /'
+;
+; Script Name: Spirit Speak
+:      .-.
+;    .'   `.
+;   :g g   :
+;   : o    `.
+;   :         ``.
+;   :             `.
+;   :  :         .   `.
+;   :   :          ` . `.
+;   `.. :            `. ``;
+;      `:;             `:'
+;        :              `.
+;  jgs    `.              `.     .
+;           `'`'`'`---..,___`;.-'
+;
+; Author: Sthil Lauda
+; Client Tested with: 2.0.3
+; EUO version tested with: EasyUO 1.5 Version 243
+; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Revision Date: 01/08/2019
+; Public Release: 01/08/2019
+; Global Variables Used:
+; Purpose: Sube Spirit Speak de ~30 a 100
+; *************************************************
+set %version 1.0
+;________________________________
+;
+; ///////////////////////////////
+; ******** CONFIGURACIÓN ********
+; ///////////////////////////////
+;________________________________
+;
+set %tiempo_alimentacion 360 ; En segundos, el tiempo para comprobar la comida en el PJ.
+;________________________________________________
+;
+; //////////////////////////////////////////////
+; ************* FIN CONFIGURACIÓN *************
+; //////////////////////////////////////////////
+;________________________________________________
+;
+set %comida RGG_NRD_QSD_ZBG_WLI_QRD_END_FUD_YLI_WLI_HGI
+ +_KGI_EGI_QLI_KLI_MLI_KRD_HQD_AQD_MQE_VQE_TQE_JQE_IQE
+ +_GQE_SPE_ZPE_OQE_BDF_KPE_RQE_YSD_SQD_YWI_AXI_PQD_QQD
+set %tiempo_actual #SCNT            ; Reloj
+set %proxima_vez #SCNT              ; Trigger de alimentación
+set %_worldsavejournalindex #jindex ; Journal para escanear en busca de save's del server.
+set *CEOWorldSaving #FALSE          ; Indica si hay un save del server en marcha.
+chooseskill Spir Real
+set %skill_ini #SKILL               ; Info Skill
+
+set #SYSMSGCOL 88
+event sysmessage ==================
+set #SYSMSGCOL 53
+event sysmessage  Spirit Speak %version
+set #SYSMSGCOL 88
+event sysmessage ==================
+wait 40
+;
+;========================================================
+;
+; ******************* LOOP PRINCIPAL ********************
+;
+;========================================================
+;
+Loop:
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 50 130
+gosub CheckHungry
+gosub SpiritSpeak
+gosub InfoSkill
+goto Loop
+;
+;========================================================
+;
+; ***************** FIN LOOP PRINCIPAL *****************
+;
+;========================================================
+;
+
+sub SpiritSpeak ; <=====================================> ; Contactar con el Infieno... ¡ojú! >;-]
+set %jstart #jindex
+event macro 13 32
+gosub wait_for MSG Intentas_contactar_con_el_infierno 50
+if ( #TRUE in #RESULT ) ; Empezamos a contactar...
+     {
+       set %jstart #jindex
+       gosub wait_for MSG Logras_contactar No_logras_contactar 100
+       if ( #TRUE in #RESULT ) ; Finaniza el contacto con el Inframundo...
+            {
+              return
+            }
+     }
+return
+
+sub InfoSkill ; <=======================================> ; Comprobar Skill.
+set %skill_gain #SKILL - %skill_ini
+setuotitle | Skill Inicial: %skill_ini | Skill Actual: #skill | P. Ganados: %skill_gain
+return
+
+sub checkHungry ; <=====================================> ; Comprobar comida.
+set %tiempo_actual #SCNT
+if ( %proxima_vez <= %tiempo_actual )
+     {
+       gosub comprobar_comida
+     }
+return
+
+;=====================================================
+; Rutina para, en caso de hambre, comer hasta saciarse
+;=====================================================
+; v2.4
+sub comprobar_comida ; <=============================>
+{
+  hambriento:
+  set %jrnl #JINDEX ; Marcamos un índice de las líneas del diario.
+  event macro 4 0 .hungry
+  wait 20
+  while #TRUE
+     {
+       if #JINDEX > %jrnl ; Si aparece una nueva línea.
+          {
+            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de línea.
+            scanjournal %jrnl   ; La leemos...
+            if Dentro_de_1_minuto in #JOURNAL
+               {
+                 wait 120s ; Save del server...
+               }
+            if no_te_puedes_comer_eso in #JOURNAL
+               {
+                 event exmsg #CHARID 3 48 ESTO NO ES COMIDA!!
+                 wait 40
+                 ignoreitem #FINDID ComidaID ; Lo guardamos en una lista de ID's que no se pueden comer [ ignoreitem reset ComidaID ].
+                 goto hambriento
+               }
+            if Estas_no_le_afecta_el_hambre in #JOURNAL || Estas_tan_lleno_que_no_puedes in #JOURNAL || Estas_totalmente_saciado in #JOURNAL
+               {
+                 set %proxima_vez %tiempo_actual + %tiempo_alimentacion
+                 return
+               }
+               else
+                  {
+                    if Estas_lleno in #JOURNAL || Estas_contento in #JOURNAL || Estas_en_inanicion in #JOURNAL || Estas_hambriento in #JOURNAL || Sientes_mucho in #JOURNAL || Estas_con_hambre in #JOURNAL || Estas_parcialmente in #JOURNAL || Estas_bien_lleno in #JOURNAL || Te_sientes_casi_lleno in #JOURNAL
+                       {
+                         finditem %comida C_ , #BACKPACKID
+                         if #findcnt > 0
+                            {
+                              set #LOBJECTID #FINDID
+                              event macro 17
+                              goto hambriento ; Seguimos comiendo...
+                            }
+                            else
+                               {
+                                 event exmsg #CHARID 3 48 COMPRA COMIDA!!
+                                 wait 40
+                                 set %proxima_vez %tiempo_actual + %tiempo_alimentacion
+                               }
+                       }
+                       else ; Mensaje extraño, repetimos...
+                          {
+                            goto hambriento
+                          }
+                  }
+          }
+       return
+     } ; FIN While
+}
+return
+
+;-@ ============================== @-;
+;-@ ############################## @-;
+;-@ SUBS públicos del Foro EasyUO  @-;
+;-@ ############################## @-;
+;-@ ============================== @-;
+;
+;-----------------------------------------------------------
+; Script Name: CEOWorldSaveChecker
+; Author: CEO
+; Version: 1.0
+; Client Tested with: 4.0.10b
+; EUO version tested with: 1.42.00A5
+; Shard OSI / FS: OSI
+; Revision Date: 060105
+; Public Release: 060105
+; Global Variables Used:  *CEOWorldSaving
+; Purpose: Used to catch the world save message for freeshards and temporarily pause mainscript during save.
+;-------------------------------------------------------------
+sub CEOWorldSaveChecker
+; sub to pause a script during a RunUO world save.
+set %_text1 %1
+set %_text2 %2
+set %_text3 %3
+if %_worldsaveupcoming
+{
+        if %_worldsavetimer < #scnt
+        {
+                set %_worldsavetimer #scnt + %5
+                gosub popupworldsave 25 15 blue
+                goto _WSC_WAIT1
+        }
+        return
+}
+_WSC1:
+if %_worldsavejournalindex > #jindex
+        return
+scanjournal %_worldsavejournalindex
+if %_text1  in #JOURNAL
+{
+        set %_worldsaveupcoming #true
+        set %_worldsavetimer #scnt + %4
+        set %_worldsavejournalindex  %_worldsavejournalindex + 1
+        return
+}
+set %_worldsavejournalindex  %_worldsavejournalindex + 1
+goto _WSC1
+_WSC_WAIT1:
+if %_worldsavetimer < #scnt
+        goto _WSC_Complete
+wait 5
+set *CEOWorldSaving #true
+if %_worldsavejournalindex > #jindex
+        goto _WSC_WAIT1
+scanjournal %_worldsavejournalindex
+if %_text2 in #journal
+{
+        gosub popupworldsave 25 15 yellow
+        set %_worldsavejournalindex  %_worldsavejournalindex + 1
+        goto _WSC_WAIT2
+}
+set %_worldsavejournalindex  %_worldsavejournalindex + 1
+goto _WSC_WAIT1
+_WSC_WAIT2:
+if %_worldsavetimer < #scnt
+        goto _WSC_Complete
+wait 5
+if %_worldsavejournalindex > #jindex
+        goto _WSC_WAIT2
+scanjournal %_worldsavejournalindex
+if %_text3 notin #journal
+{
+        set %_worldsavejournalindex  %_worldsavejournalindex + 1
+        goto _WSC_WAIT2
+}
+_WSC_Complete:
+set %_worldsavejournalindex  #jindex
+set %_worldsaveupcoming #false
+set *CEOWorldSaving #false
+menu delete worldsave
+return
+
+sub popupworldsave
+set %x %1
+set %y %2
+set %worldcolor %3
+menu Clear
+menu Window Title World Save Monitor
+menu Window Color Black
+menu Window Size 160 160
+menu shape worldsave 20 15 125 125 1 7 2 olive 7 %worldcolor
+menu font bgcolor %worldcolor
+menu font color lime
+menu font type b
+menu font size 15
+set %x %x + 30
+set %y %y + 30
+menu text worldsave %x %y World
+set %x %x + 15
+set %y %y + 20
+menu text worldsave %x %y Save
+set %x %x + 15
+set %y %y + 20
+menu text worldsave %x %y Wait
+menu font size 9
+menu font bgcolor black
+menu font color lime
+menu font type n
+menu Show 920 770
+return
+
+;=================================================================
+sub wait_for
+;=================================================================
+; This "wait_for" sub package was created by Locke. If you use these subs please keep this header intact.
+; Documentation: the sub package grew to large with all the comments. To load them call the sub like this:
+; gosub wait_for docs    | or you can use doc, documention, what, or my personal favorite, kickass.
+
+; "wait_for core dispatcher" version 1.2 by Locke
+if %1 = doc || if %1 = docs || if %1 = documentation || if %1 = what || if %1 = kickass
+{
+Display ok Please click ok and wait for your browser to start.
+execute http://www.easyuo.com/forum/viewtopic.php?t=24716
+halt
+}
+nameSpace Push
+namespace local LLNS
+set #result N/A ; if #result isn't set by one of my wait_for subs it'll throw an error.
+set !LPC #lpc
+set #lpc 200
+for %i 0 %0
+set !_A . %i % . %i
+gosub wait_for_ , !_A1
+set #lpc !lpc
+namespace clear LLNS
+namespace pop
+if #result <> N/A
+return #result
+else
+display ok You specified an unknown wait_for command. Script returned #result and is halting.
+halt
+;=================================================================
+sub wait_for_MSG ; version 1.4 ~Locke
+;=================================================================
+if !_A0 < 3
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for MSG %message time_out_in_seconds$
++Script is halting
+halt
+}
+set !_timeout ( #scnt2 + !_A . !_A0 )
+_lets_wait_for_a_message:
+for %i %jstart #jindex
+{
+ scanjournal %i
+  for %ii 2 !_A0
+  {
+    if !_A . %ii in #journal && %jstart <> %i
+    set #result #true , #spc , !_A . %ii
+  }
+}
+
+if #true notin #result
+{
+set #result #false
+ if !_timeout =< #scnt2
+ return #result
+wait 1
+goto _lets_wait_for_a_message
+}
+else
+return #result
+wait 1
+goto _lets_wait_for_a_message
+
