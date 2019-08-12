@@ -61,25 +61,25 @@
 ; Version: 2.10
 ; Client Tested with: 2.0.3
 ; EUO version tested with: 1.5 Version 142
-; Shard OSI / FS: Ultima Alianza ¡Hasta la muerte!
+; Shard OSI / FS: Ultima Alianza Â¡Hasta la muerte!
 ; Revision Date: 25/03/2019
 ; Public Release: 15/07/2019
-; Purpose: Lanza flechas a un Golem para entrenar la skill de Archery. Recoge las flechas del Golem automáticamente ^^
+; Purpose: Lanza flechas a un Golem para entrenar la skill de Archery. Recoge las flechas del Golem automÃ¡ticamente ^^
 set %version 2.10
 ;________________________________
 ;
 ; ///////////////////////////////
-; ******** CONFIGURACIÓN ********
+; ******** CONFIGURACIÃ“N ********
 ; ///////////////////////////////
 ;________________________________
 ;
-set %lote_flechas 100 ; Número de flechas a gastar en cada ronda.
-set %tiempo_attack 3  ; En segundos, cada cuánto ordenar el ataque al Golem.
+set %lote_flechas 100 ; NÃºmero de flechas a gastar en cada ronda.
+set %tiempo_attack 3  ; En segundos, cada cuÃ¡nto ordenar el ataque al Golem.
 set %tiempo_alimentacion 360 ; En segundos, cada cuanto recoger flechas del suelo y comer (5 minutos).
 ;________________________________________________
 ;
 ; //////////////////////////////////////////////
-; ************* FIN CONFIGURACIÓN *************
+; ************* FIN CONFIGURACIÃ“N *************
 ; //////////////////////////////////////////////
 ;________________________________________________
 ;
@@ -129,7 +129,7 @@ goto loop                                                                       
 
 sub setupCofre ;<=====================================================>
 display OK Haz click en el Cofre que contiene las flechas $$
-         + ¡Debes estar cerca de él para abrirlo y cogerlas!.
+         + Â¡Debes estar cerca de Ã©l para abrirlo y cogerlas!.
 set #TARGCURS 1
 target
 while #TARGCURS = 1
@@ -150,7 +150,7 @@ chooseskill Arch real ; Comprobar GM
 if #SKILL >= 1000
    {
      set #SYSMSGCOL 19
-     event sysmessage ¡Somos GM Archery! :)
+     event sysmessage Â¡Somos GM Archery! :)
      halt
    }
 return
@@ -184,7 +184,7 @@ if %proxima_vez_comer <= %tiempo_actual
     event macro 1 0 all drop ; Recuperar flechas ^^
     wait 40
     _recoge:
-    finditem %flechas G_4 ; Máxima distancia a la que podemos recoger algo.
+    finditem %flechas G_4 ; MÃ¡xima distancia a la que podemos recoger algo.
     if #FINDCNT > 0
        {
          event sysmessage Recogiendo del suelo...
@@ -194,7 +194,7 @@ if %proxima_vez_comer <= %tiempo_actual
          wait 30
          goto _recoge
        }
-    gosub comprobar_comida ; Alimentación.
+    gosub comprobar_comida ; AlimentaciÃ³n.
   }
 return
 
@@ -208,7 +208,7 @@ if #FINDCNT > 0
            set %total_flechas %total_flechas + #FINDSTACK
          }
    }
-if %total_flechas <= 10 ; Mínimo de flechas en la mochila antes de reponer más.
+if %total_flechas <= 10 ; MÃ­nimo de flechas en la mochila antes de reponer mÃ¡s.
    {
      event sysmessage Reponiendo flechas...
      wait 20
@@ -235,7 +235,7 @@ if %proxima_vez_attack <= %tiempo_actual ; Seleccionar y atacar al Golem cada X 
     if #FINDCNT > 0 ; Hemos encontrado el Golem
        {
          set #LTARGETID %golem_id
-         event macro 27 ; ¡ Attack Last !
+         event macro 27 ; Â¡ Attack Last !
          set %proxima_vez_attack %tiempo_actual + %tiempo_attack
        }
   }
@@ -246,7 +246,7 @@ _ClickGolem:
 finditem %golems
 if #FINDCNT > 0
    {
-     if #FINDCNT > 1 ; Hay más de 1 Golem en la ZONA - [ Modo manual ]
+     if #FINDCNT > 1 ; Hay mÃ¡s de 1 Golem en la ZONA - [ Modo manual ]
         {
           display OK Selecciona el Golem con el que quieres macrear
           set #TARGCURS 1
@@ -275,7 +275,7 @@ if #FINDCNT > 0
                      }
              }
         }
-        else ; Sólo vemos 1 Golem en la ZONA - [ Modo automático ]
+        else ; SÃ³lo vemos 1 Golem en la ZONA - [ Modo automÃ¡tico ]
           {
             if #FINDCNT = 1
                {
@@ -298,14 +298,14 @@ return
 sub comprobar_comida
 {
   hambriento:
-  set %jrnl #jindex ; Marcamos un índice de las líneas del diario.
+  set %jrnl #jindex ; Marcamos un Ã­ndice de las lÃ­neas del diario.
   event macro 4 0 .hungry
   wait 20
   while #true
      {
-       if #jindex > %jrnl ; Si aparece una nueva línea.
+       if #jindex > %jrnl ; Si aparece una nueva lÃ­nea.
           {
-            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de línea.
+            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de lÃ­nea.
             scanjournal %jrnl   ; La leemos...
             if Dentro_de_1_minuto in #journal
                {
@@ -343,12 +343,12 @@ sub comprobar_comida
                                        {
                                          event exmsg #CHARID 3 48 COMPRA COMIDA!! :-(
                                          wait 40
-                                         set %proxima_vez %tiempo_actual + %tiempo_alimentacion
+                                         set %proxima_vez_comer %tiempo_actual + %tiempo_alimentacion
                                          return
                                        }
                                }
                        }
-                       else ; Mensaje extraño, repetimos...
+                       else ; Mensaje extraÃ±o, repetimos...
                           {
                             goto hambriento
                           }
@@ -361,7 +361,7 @@ return
 
 ;-@ ============================== @-;
 ;-@ ############################## @-;
-;-@ SUBS públicos del Foro EasyUO  @-;
+;-@ SUBS pÃºblicos del Foro EasyUO  @-;
 ;-@ ############################## @-;
 ;-@ ============================== @-;
 ;
@@ -527,7 +527,7 @@ halt
 ;======================================================================
 sub wait_for_GUMP ; version 1.4 ~Locke
 ;=================================================================
-; Añadido #CONTID ^^
+; AÃ±adido #CONTID ^^
 if !_A0 < 3
 {
 display ok You haven't specified enough vars.$
