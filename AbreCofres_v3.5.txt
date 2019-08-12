@@ -33,31 +33,32 @@
 ; Version: 3.5
 ; Client Tested with: 2.0.3
 ; EUO version tested with: EasyUO 1.5 Version 243
-; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Shard: Ultima Alianza (Â¡Hasta la muerte!)
 ; Public Release: 04/03/18
 ; Revised On: 12/08/19
-; Propósito: Procesa cofres del tesoro; Desactiva la trampa, fuerza la cerradura, y lotea el cofre.
-; Instrucciones: Se requieren ganzúas en la mochila, una bolsa para el loot, y opcionalmente pergas de In Vas Mani... ^^
+; PropÃ³sito: Procesa cofres del tesoro; Desactiva la trampa, fuerza la cerradura, y lotea el cofre.
+; Instrucciones: - Se requieren ganzÃºas en la mochila, una bolsa para el loot, y opcionalmente pergas de In Vas Mani... ^^
+;                - Es posible que tengÃ¡is que ir aÃ±adiendo ID's de objetos a lotear en %tesoros.
 ;
 ;========================================================
 set %version 3.5
 ;________________________________
 ;
 ; ///////////////////////////////
-; ******** CONFIGURACIÓN ********
+; ******** CONFIGURACIÃ“N ********
 ; ///////////////////////////////
 ;________________________________
 ;
 set %TeclaAuto z       ; Tecla "AUTO", para desactivar la trampa, forzar, y lotear el cofre.
 set %TeclaCerradura x  ; Tecla para forzar cofres.
 set %TeclaAbrir c      ; Tecla para lotear cofres.
-set %min_ganzuas 10    ; Mínimo de ganzúas en la mochila antes de alertar.
+set %min_ganzuas 10    ; MÃ­nimo de ganzÃºas en la mochila antes de alertar.
 set %puntos_vida_1 15  ; In Vas Mani
 set %puntos_vida_2 5   ; In Mani
 ;________________________________________________
 ;
 ; //////////////////////////////////////////////
-; ************* FIN CONFIGURACIÓN *************
+; ************* FIN CONFIGURACIÃ“N *************
 ; //////////////////////////////////////////////
 ;________________________________________________
 ;
@@ -67,7 +68,7 @@ set %tesoros AXE_BXE_CXE_DXE_EXE_FXE_GXE_HXE_IXE_
 set %oro POF
 set %gemas BVF_EVF_FVF_GVF_HVF_OVF_RVF_UVF_VUF
 set %flechas RWF_LNK
-set %items_cofres TVH ; Escrituras decoración, etc
+set %items_cofres TVH ; Escrituras decoraciÃ³n, etc
 set %loot %oro , _ , %gemas , _ , %flechas , _ , %items_cofres ; Lista de todos los Items
 set %pergas ZTL
 set %vida_minima_1 #MAXHITS - %puntos_vida_1  ; In Vas Mani
@@ -105,7 +106,7 @@ chooseskill Hidi real
 set %skillhiding #SKILL
 if ( %skillhiding >= 300 )
      {
-       gosub setupHid ; Configuración del "Modo Oculto".
+       gosub setupHid ; ConfiguraciÃ³n del "Modo Oculto".
      }
      else
         {
@@ -113,7 +114,7 @@ if ( %skillhiding >= 300 )
         }
 
 ; ============================
-; Comprobar número de Ganzuas
+; Comprobar nÃºmero de Ganzuas
 ; ============================
 finditem NWH C_ , #BACKPACKID
 if #FINDCNT > 0
@@ -140,7 +141,7 @@ if #FINDCNT > 0
         halt
       }
 
-; Loop de configuración
+; Loop de configuraciÃ³n
 configurar:
 set #sysmsgcol 53
 if %configurado = 0
@@ -161,7 +162,7 @@ event macro 17
 gosub wait_for GUMP %bolsa_loot 4 ; Esperamos 4 segundos a detectar la bolsa.
 if ( #RESULT ) ; Detectamos la bolsa abierta...
      {
-       if ( #CONTID <> #BACKPACKID ) && ( #CONTSIZE = 230_204 || #CONTSIZE = 176_194 ) ; Si no es nuestra propia mochila, y el tamaño es el de una bolsa...
+       if ( #CONTID <> #BACKPACKID ) && ( #CONTSIZE = 230_204 || #CONTSIZE = 176_194 ) ; Si no es nuestra propia mochila, y el tamaÃ±o es el de una bolsa...
             {
               set #SYSMSGCOL 68
               set %configurado 1 ; Ok, bolsa encontrada
@@ -364,7 +365,7 @@ if ( #HITS <= %vida_minima_1 )
                         event property %perga ; Leemos el perga
                         set %string #property
                         gosub split %string $ Propiedades ; Partimos las distintas propiedades en un array
-                        if Gran , #spc , Curacion in %PROPIEDADES1 ; Si encontramos de "Gran Curación"
+                        if Gran , #spc , Curacion in %PROPIEDADES1 ; Si encontramos de "Gran CuraciÃ³n"
                            {
                              set %pergas_curacion #TRUE
                              set #LOBJECTID %perga
@@ -375,7 +376,7 @@ if ( #HITS <= %vida_minima_1 )
                              goto greater_heal ; Volvemos a comprobar stats
                           }
                       }
-                      if ( ! %pergas_curacion ) ; No hay pergas de curación :-(
+                      if ( ! %pergas_curacion ) ; No hay pergas de curaciÃ³n :-(
                            {
                              goto in_vas_mani
                            }
@@ -396,7 +397,7 @@ if ( #HITS <= %vida_minima_1 )
                      event macro 23 0
                      wait 3s
                    }
-                   else ; No hay maná para un In Vas Mani... :-(
+                   else ; No hay manÃ¡ para un In Vas Mani... :-(
                       {
                         goto in_mani
                       }
@@ -432,7 +433,7 @@ return
 
 sub setupHid ; <==============================>
 display yesno ********************** [ HIDING ] **********************$$
-            + ¿Quieres intentar OCULTAR tu PJ mientras macreas?       $$
+            + Â¿Quieres intentar OCULTAR tu PJ mientras macreas?       $$
             + ******************************************************* $$
 if ( #dispres = yes )
      {
@@ -518,7 +519,7 @@ sub waitforitem
 {
    namespace push
    namespace local wfi
-   set %time #SCNT2 + %3 ; Décimas de segundo
+   set %time #SCNT2 + %3 ; DÃ©cimas de segundo
 
    dropwait:
    finditem %1 C_ , %2
@@ -527,7 +528,7 @@ sub waitforitem
        wait 1
        if ( #SCNT2 >= %time )
        {
-         return #FALSE ; Aquí podemos repetir la última acción; goto blabla, etc.
+         return #FALSE ; AquÃ­ podemos repetir la Ãºltima acciÃ³n; goto blabla, etc.
        }
        goto dropwait
    }
@@ -538,7 +539,7 @@ sub waitforitem
 
 ;-@ ============================== @-;
 ;-@ ############################## @-;
-;-@ SUBS públicos del Foro EasyUO  @-;
+;-@ SUBS pÃºblicos del Foro EasyUO  @-;
 ;-@ ############################## @-;
 ;-@ ============================== @-;
 
@@ -694,7 +695,7 @@ goto _lets_wait_for_a_message
 ;======================================================================
 sub wait_for_GUMP ; version 1.4 ~Locke
 ;=================================================================
-; Añadido #CONTID para "sub abrir_cofre"
+; AÃ±adido #CONTID para "sub abrir_cofre"
 if !_A0 < 3
 {
 display ok You haven't specified enough vars.$
