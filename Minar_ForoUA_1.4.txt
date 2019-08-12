@@ -1,49 +1,49 @@
 ; ------------------------------------------------------
 ; Macro de Minar para UA-Sphere (Sphere 0.56b-Nightly)
 ; Creado por: Alex
-; Ultima ediciÛn: 08/08/2019 por Sthil Lauda
+; Ultima edici√≥n: 08/08/2019 por Sthil Lauda
 ; Modificaciones de: DaviD JoneS, darksplit, Sthil Lauda.
 ; ------------------------------------------------------
 ;
 ; Modificaciones:
 ;
 ; 12/08/2019:
-; Correcciones de cÛdigo: - AÒadida funciÛn para comer desde el cofre.
-;                         - AÒadida funciÛn para detectar los save's del server.
+; Correcciones de c√≥digo: - A√±adida funci√≥n para comer desde el cofre.
+;                         - A√±adida funci√≥n para detectar los save's del server.
 ;
 ; 08/08/2019:
-; Correcciones de cÛdigo: - Eliminados mensajes que hacÌan petar el client despuÈs de abrir el cofre.
+; Correcciones de c√≥digo: - Eliminados mensajes que hac√≠an petar el client despu√©s de abrir el cofre.
 ;
 ; 27/07/2019
-; Correcciones de cÛdigo: - AÒadido "#LTARGETKIND 3" para no fallar el target a la hora de usar el pico en el suelo.
+; Correcciones de c√≥digo: - A√±adido "#LTARGETKIND 3" para no fallar el target a la hora de usar el pico en el suelo.
 ;                         - Sustituido el antiguo "event drag" y "click", por el nuevo "exevent drag" y "exevent dropc".
 ;                         - Sustituido "wait 10" por "target" al usar el pico.
 ;                         - Sustituido "wait 20" por "wait_for GUMP 452_236" para esperar a que se abra el libro de runas.
 ;                         - Sustituido "wait 20" por "wait_for GUMP %idcaja" para esperar a que se abra el cofre de casa.
-;                         - AÒadido "contpos 0 0" para no fallar al hacer click en el cartel del libro de runas, si este se ha movido de sitio.
-;                         - Sustituido "wait 10s" "wait_for RECALL" para aÒadir robustez en el recaleo.
+;                         - A√±adido "contpos 0 0" para no fallar al hacer click en el cartel del libro de runas, si este se ha movido de sitio.
+;                         - Sustituido "wait 10s" "wait_for RECALL" para a√±adir robustez en el recaleo.
 ;
 ; 23/05/2010
-; CorrecciÛn de cÛdigo: cambiado el sub del peso, para que recalee en funciÛn del #maxweight de cada pj
-; seg˙n su fuerza.
+; Correcci√≥n de c√≥digo: cambiado el sub del peso, para que recalee en funci√≥n del #maxweight de cada pj
+; seg√∫n su fuerza.
 ;
 ; 08/04/2010
-; CorrecciÛn de bugs: variables mal escritas, aÒadido cÛdigo de Journal para que no se quede parado.
-; AÒadidos: Comprobar y coger Regs autom·ticamente al llegar a casa para tener siempre 5 de cada,
-; simplificaciÛn de algunos nuevos comandos para evitar bugs (exevent Dropc, exevent Drag),
-; se ha implementado un cÛdigo para desarmar la mano derecha al empezar para poder encontrar el pico.
-; Creada descripciÛn de la Macro y mejora de la explicaciÛn de su funcionamiento.
+; Correcci√≥n de bugs: variables mal escritas, a√±adido c√≥digo de Journal para que no se quede parado.
+; A√±adidos: Comprobar y coger Regs autom√°ticamente al llegar a casa para tener siempre 5 de cada,
+; simplificaci√≥n de algunos nuevos comandos para evitar bugs (exevent Dropc, exevent Drag),
+; se ha implementado un c√≥digo para desarmar la mano derecha al empezar para poder encontrar el pico.
+; Creada descripci√≥n de la Macro y mejora de la explicaci√≥n de su funcionamiento.
 ; Comentarios explicativos y mejora visual de los Sysmessage.
-; PrÛximamente se aÒadir· la posibilidad de recalear al Bank en vez de a Casa.
+; Pr√≥ximamente se a√±adir√° la posibilidad de recalear al Bank en vez de a Casa.
 ;
-; ExplicaciÛn:
+; Explicaci√≥n:
 ; Esta macro ha sido creada para Minar dejando el mineral en casa con la ayuda de Runas.
-; Al comienzo y cada vez que vuelva a casa, se comprobar· el n˙mero de regs del personaje,
-; y se coger·n los necesarios para volver a tener 5 de cada para evitar pÈrdidas en el caso de una
+; Al comienzo y cada vez que vuelva a casa, se comprobar√° el n√∫mero de regs del personaje,
+; y se coger√°n los necesarios para volver a tener 5 de cada para evitar p√©rdidas en el caso de una
 ; matanza de un PK en la mina.
-; Se meditar· antes y despuÈs de recalear para subir el man· para acelerar el proceso,
-; a˙n asÌ, no es realmente necesaria la skill de Meditar.
-; Minar· por toda la mina, de manera aleatoria, pero evitando volver a minar allÌ dÛnde ya lo hiciste.
+; Se meditar√° antes y despu√©s de recalear para subir el man√° para acelerar el proceso,
+; a√∫n as√≠, no es realmente necesaria la skill de Meditar.
+; Minar√° por toda la mina, de manera aleatoria, pero evitando volver a minar all√≠ d√≥nde ya lo hiciste.
 ;
 ;
 ;
@@ -51,29 +51,29 @@
 ; - Debes estar, al dar Play, en el lugar donde te deja la runa que te devuelve a casa.
 ; - Las runas de las minas deben estar marcadas DENTRO de ellas.
 ; - No se funde el material, macro de separar/fundir disponible en el foro
-; - SÛlo se podr· utilizar la macro en las minas preestablecidas, mostradas a continuaciÛn.
-; - No es necesario tener regs de recall encima al iniciar la Macro, lo comprueba y coge autom·ticamente.
+; - S√≥lo se podr√° utilizar la macro en las minas preestablecidas, mostradas a continuaci√≥n.
+; - No es necesario tener regs de recall encima al iniciar la Macro, lo comprueba y coge autom√°ticamente.
 ; - Regs y Mineral deberan estar en el MISMO CONTENEDOR.
-; - Esta macro mina ˙nicamente en una mina de tu elecciÛn.
+; - Esta macro mina √∫nicamente en una mina de tu elecci√≥n.
 ; - Skill de Magia a 30 para poder recalear.
 ;
 ;
-; ConfiguraciÛn:
+; Configuraci√≥n:
 ;
-; - Hueco donde tengas la runa que te llevar· al cofre para guardar los minerales (1-16)
+; - Hueco donde tengas la runa que te llevar√° al cofre para guardar los minerales (1-16)
 ;--------------------
 set %runacasa 1
 ;--------------------
-; - Hueco donde tengas la runa que te llevar· DENTRO de la mina (1-16)
+; - Hueco donde tengas la runa que te llevar√° DENTRO de la mina (1-16)
 ;--------------------
 set %runamina 2
 ;--------------------
-; - Elige una mina de la lista a continuaciÛn y escribe su n˙mero en la variante siguiente:
+; - Elige una mina de la lista a continuaci√≥n y escribe su n√∫mero en la variante siguiente:
 ; -------------------
-set %lugar 0 ; Mina en la que actuar· la macro
+set %lugar 0 ; Mina en la que actuar√° la macro
 ; -------------------
 ; Las Minas actuales son:
-; 0- Ninguna (Mina solo igual, pero si se sale de dentro de la mina no se volver· a meter, deber·s moverlo tu)
+; 0- Ninguna (Mina solo igual, pero si se sale de dentro de la mina no se volver√° a meter, deber√°s moverlo tu)
 ; 1- Shame (Norte de la entrada Shame (Trabajos Forzados))
 ; 2- Covetous 1 (Primera Mina a la derecha de la Dungeon Covetous)
 ; 3- Covetous 2 (Segunda Mina a la derecha de la Dungeon Covetous)
@@ -87,15 +87,15 @@ set %lugar 0 ; Mina en la que actuar· la macro
 ; 11- Destard 1 (Un poco a la izquierda de La Dungeon Destard)
 ; 12- Destard 2 (Desde la entrada de Destard Dungeon bajando bordeando, la primera mina que encuentras)
 ; 13- Destard 3 (Desde la entrada de Destard Dungeon bajando bordeando, la segunda mina que encuentras)
-; 14- Destard 4 (Desde la entrada de Destard Dungeon bajando bordeando, la terera mina que encuentras, en la de la parte derecha de la montaÒa)
+; 14- Destard 4 (Desde la entrada de Destard Dungeon bajando bordeando, la terera mina que encuentras, en la de la parte derecha de la monta√±a)
 ; 15- Wrong 1 (Junto a la entrada de la Dungeon de Wrong)
-; 16- Wrong 2 (Bordendo la montaÒa desde la entrada de Wrong hacia la izquierda, la primera que encuentras)
-; 17- Wrong 3 (Bordendo la montaÒa desde la entrada de Wrong hacia la izquierda, la segunda que encuentras)
-; 18- Hythloth 1 (Bordeando la montaÒa, hacia arriba desde Hythloth, la primera que encuentras)
-; 19- Hythloth 2 (Bordeando la montaÒa, hacia abajo derecha de Hythloth, la primera Mina que encuentras)
-; 20- Hythloth 3 (Bordeando la montaÒa, hacia abajo derecha de Hythloth, la segunda Mina que encuentras)
-; 22- Avatar Norte 1 (De la montaÒa del Norte de Avatar, la primera que encuentas)
-; 23- Avatar Norte 2 (De la montaÒa del Norte de Avatar, desde la primera, a la derecha bordeando, la primera que encuentras)
+; 16- Wrong 2 (Bordendo la monta√±a desde la entrada de Wrong hacia la izquierda, la primera que encuentras)
+; 17- Wrong 3 (Bordendo la monta√±a desde la entrada de Wrong hacia la izquierda, la segunda que encuentras)
+; 18- Hythloth 1 (Bordeando la monta√±a, hacia arriba desde Hythloth, la primera que encuentras)
+; 19- Hythloth 2 (Bordeando la monta√±a, hacia abajo derecha de Hythloth, la primera Mina que encuentras)
+; 20- Hythloth 3 (Bordeando la monta√±a, hacia abajo derecha de Hythloth, la segunda Mina que encuentras)
+; 22- Avatar Norte 1 (De la monta√±a del Norte de Avatar, la primera que encuentas)
+; 23- Avatar Norte 2 (De la monta√±a del Norte de Avatar, desde la primera, a la derecha bordeando, la primera que encuentras)
 ; 24- Desierto (En el cruce de caminos)
 ; 25- Shame Sur
 ; ==================================
@@ -281,6 +281,10 @@ goto moverse
 goto comienzo
 
 recallcasa:
+if #MANA < 11
+   {
+     gosub meditar
+   }
 set %posruna %runacasa
 gosub librecall
 set #LOBJECTID %runebook
@@ -309,6 +313,10 @@ goto recallcasa
 
 
 recallmina:
+if #MANA < 11
+   {
+     gosub meditar
+   }
 set %posruna %runamina
 gosub librecall
 set #LOBJECTID %runebook
@@ -447,7 +455,7 @@ if ( #TRUE in #result )
      {
        if pierdes in #result
           {
-            goto _reMedit ; Meditamos hasta que no perdamos la concentraciÛn
+            goto _reMedit ; Meditamos hasta que no perdamos la concentraci√≥n
           }
        if trance in #result
           {
@@ -457,7 +465,7 @@ if ( #TRUE in #result )
                  {
                    goto _reMedit
                  }
-                 else ; Meditamos hasta llenar la barra al m·ximo...
+                 else ; Meditamos hasta llenar la barra al m√°ximo...
                     {
                       repeat
                            {
@@ -466,7 +474,7 @@ if ( #TRUE in #result )
                            until #MANA = #MAXMANA
                     }
           }
-       if en_paz in #result ; OK, estamos bien de man·.
+       if en_paz in #result ; OK, estamos bien de man√°.
           {
             return
           }
@@ -484,14 +492,14 @@ return
 sub comprobar_comida
 {
   hambriento:
-  set %jrnl #jindex ; Marcamos un Ìndice de las lÌneas del diario.
+  set %jrnl #jindex ; Marcamos un √≠ndice de las l√≠neas del diario.
   event macro 4 0 .hungry
   wait 20
   while #true
      {
-       if #jindex > %jrnl ; Si aparece una nueva lÌnea.
+       if #jindex > %jrnl ; Si aparece una nueva l√≠nea.
           {
-            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de lÌnea.
+            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de l√≠nea.
             scanjournal %jrnl   ; La leemos...
             if Dentro_de_1_minuto in #journal
                {
@@ -534,7 +542,7 @@ sub comprobar_comida
                                        }
                                }
                        }
-                       else ; Mensaje extraÒo, repetimos...
+                       else ; Mensaje extra√±o, repetimos...
                           {
                             goto hambriento
                           }
@@ -732,7 +740,7 @@ return
 
 ;-@ ============================== @-;
 ;-@ ############################## @-;
-;-@ SUBS p˙blicos del Foro EasyUO  @-;
+;-@ SUBS p√∫blicos del Foro EasyUO  @-;
 ;-@ ############################## @-;
 ;-@ ============================== @-;
 
@@ -909,7 +917,7 @@ goto _lets_wait_for_a_message
 ;======================================================================
 sub wait_for_GUMP ; version 1.4 ~Locke
 ;=================================================================
-; AÒadido #CONTID ^^
+; A√±adido #CONTID ^^
 if !_A0 < 3
 {
 display ok You haven't specified enough vars.$
