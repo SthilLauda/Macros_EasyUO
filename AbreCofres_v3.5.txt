@@ -1,0 +1,727 @@
+; ======================================================================================================
+;  '||   ||` '||`   ||                                 /.\      '||`
+;   ||   ||   ||    ||     ''                         // \\      ||   ''
+;   ||   ||   ||  ''||''   ||  '||),,(|,   '''|.     //...\\     ||   ||   '''|.  `||''|,  '''/  '''|.
+;   ||   ||   ||    ||     ||   || || ||  .|''||    //     \\    ||   ||  .|''||   ||  ||   //  .|''||
+;   `|...|'  .||.   `|..' .||. .||    ||. `|..||. .//       \\. .||. .||. `|..||. .||  ||. /... `|..||.
+; ======================================================================================================
+;
+; Nombre Script: Abre Cofres [ DUNGEONS ]
+;
+; *******************************************************************************
+;           |                   |                  |                     |
+;  _________|________________.=""_;=.______________|_____________________|_______
+; |                   |  ,-"_,=""     `"=.|                  |
+; |___________________|__"=._o`"-._        `"=.______________|___________________
+;           |                `"=._o`"=._      _`"=._                     |
+;  _________|_____________________:=._o "=._."_.-="'"=.__________________|_______
+; |                   |    __.--" , ; `"=._o." ,-"""-._ ".   |
+; |___________________|_._"  ,. .` ` `` ,  `"-._"-._   ". '__|___________________
+;           |           |o`"=._` , "` `; .". ,  "-._"-._; ;              |
+;  _________|___________| ;`-.o`"=._; ." ` '`."\` . "-._ /_______________|_______
+; |                   | |o;    `"-.o`"=._``  '` " ,__.--o;   |
+; |___________________|_| ;     (#) `-.o `"=.`_.--"_o.-; ;___|___________________
+; ____/______/______/___|o;._    "      `".o|o_.--"    ;o;____/______/______/____
+; /______/______/______/_"=._o--._        ; | ;        ; ;/______/______/______/_
+; ____/______/______/______/__"=._o--._   ;o|o;     _._;o;____/______/______/____
+; /______/______/______/______/____"=._o._; | ;_.--"o.--"_/______/______/______/_
+; ____/______/______/______/______/_____"=.o|o_.--""___/______/______/______/____
+; /______/______/______/______/______/______/______/______/______/______/[TomekK]
+; *******************************************************************************
+;
+; Author: Sthil Lauda
+; Version: 3.5
+; Client Tested with: 2.0.3
+; EUO version tested with: EasyUO 1.5 Version 243
+; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Public Release: 04/03/18
+; Revised On: 12/08/19
+; Propósito: Procesa cofres del tesoro; Desactiva la trampa, fuerza la cerradura, y lotea el cofre.
+; Instrucciones: Se requieren ganzúas en la mochila, una bolsa para el loot, y opcionalmente pergas de In Vas Mani ^^
+;
+;========================================================
+set %version 3.5
+;________________________________
+;
+; ///////////////////////////////
+; ******** CONFIGURACIÓN ********
+; ///////////////////////////////
+;________________________________
+;
+set %TeclaAuto z     ; Tecla "auto", para desactivar la trampa, forzar, y lotear el cofre.
+set %TeclaCerradura x  ; Tecla para forzar cofres.
+set %TeclaAbrir c      ; Tecla para lotear cofres.
+set %min_ganzuas 10    ; Mínimo de ganzúas en la mochila antes de alertar.
+set %puntos_vida_1 15  ; In Vas Mani
+set %puntos_vida_2 5   ; In Mani
+;________________________________________________
+;
+; //////////////////////////////////////////////
+; ************* FIN CONFIGURACIÓN *************
+; //////////////////////////////////////////////
+;________________________________________________
+;
+set %tesoros AXE_BXE_CXE_DXE_EXE_FXE_GXE_HXE_IXE_
+    +JXE_KXE_LXE_MXD_NXE_PUI_VWE_MWE_RGH_MPG_BUD_
+    +HIF_JIF_IIF_KIF_IKF
+set %oro POF
+set %gemas BVF_EVF_FVF_GVF_HVF_OVF_RVF_UVF_VUF
+set %flechas RWF_LNK
+set %items_cofres TVH ; Escrituras decoración, etc
+set %loot %oro , _ , %gemas , _ , %flechas , _ , %items_cofres ; Lista de todos los Items
+set %pergas ZTL
+set %vida_minima_1 #MAXHITS - %puntos_vida_1  ; In Vas Mani
+set %vida_minima_2 #MAXHITS - %puntos_vida_2  ; In Mani
+set %num_cofres 0
+set %configurado 0
+set %bolsa_loot XXXXXX
+set %desarmado logra_desarmar
+set %sin_trampa no_tiene_ninguna_trampa
+set %fallo_desarmando falla_al_desarmar
+set %trampa_activada Has_accionado_la_trampa
+set %faltan_regs Necesitas
+set %cerradura_cede La_cerradura_cede
+set %sin_cerrar cofre_no_parece_estar_cerrado
+set %fallo_forzando no_logra_forzar_cofre
+set %no_se_puede el_cofre_no_puede_ser_forzado
+set %no_puedes no_puedes_forzar_cofre
+; Variables globales
+set *num_ganzuas 0
+set *ID_cofre XXXXX
+set *cofres_abiertos 0
+;
+set #SYSMSGCOL 88
+event sysmessage ===================
+set #SYSMSGCOL 53
+event sysmessage Abre Cofres %version
+set #SYSMSGCOL 88
+event sysmessage ===================
+wait 40
+
+chooseskill Hidi real
+set %skillhiding #SKILL
+
+; ============================
+; Comprobar número de Ganzuas
+; ============================
+finditem NWH C_ , #BACKPACKID
+if #FINDCNT > 0
+   {
+     set *num_ganzuas #FINDSTACK
+     if *num_ganzuas < %min_ganzuas
+        {
+          set #SYSMSGCOL 48
+          event sysmessage POCAS GANZUAS!! [ *num_ganzuas ]
+          sound
+          wait 40
+        }
+        else
+           {
+             set #SYSMSGCOL 68
+             event sysmessage OK GANZUAS: [ *num_ganzuas ]
+             wait 40
+           }
+   }
+   else
+      {
+        set #SYSMSGCOL 38
+        event sysmessage NO HAY GANZUAS!!
+        halt
+      }
+
+; Loop de configuración
+configurar:
+set #sysmsgcol 53
+if %configurado = 0
+{
+event sysmessage ==============================
+event sysmessage Click en la bolsa del loot.
+event sysmessage ==============================
+setuotitle Haz Click en la bolsa en la que quieres guardar el loot.
+set #TARGCURS 1
+target
+while #TARGCURS = 1
+      {
+        wait 1
+      }
+set %bolsa_loot #LTARGETID
+set #LOBJECTID %bolsa_loot
+event macro 17
+gosub wait_for GUMP %bolsa_loot 4 ; Esperamos 4 segundos a detectar la bolsa.
+if ( #RESULT ) ; Detectamos la bolsa abierta...
+     {
+       if ( #CONTID <> #BACKPACKID ) && ( #CONTSIZE = 230_204 || #CONTSIZE = 176_194 ) ; Si no es nuestra propia mochila, y el tamaño es el de una bolsa...
+            {
+              set #SYSMSGCOL 68
+              set %configurado 1 ; Ok, bolsa encontrada
+              event sysmessage OK! Bolsa: %bolsa_loot
+              wait 20
+              gosub wait_for GUMP %bolsa_loot CLOSE ; Carramos la bolsa de Loot
+              goto loop ; Pasamos al Loop principal de la macro.
+           }
+           else
+              {
+                set #SYSMSGCOL 38
+                event sysmessage NO ME GUSTA ESTA BOLSA :-(
+                wait 20
+                goto error
+              }
+   }
+   else
+      {
+        error:
+        set #SYSMSGCOL 35
+        event sysmessage ==========================
+        event sysmessage ERROR! REINICIANDO...
+        event sysmessage ==========================
+        wait 40
+      }
+goto configurar
+
+;========================================================
+;
+; ******************* LOOP PRINCIPAL ********************
+;
+;========================================================
+loop:
+OnHotKey %TeclaAuto ; ** Desactivar Trampa + Forzar + Lotear **
+{
+  ignoreitem reset
+  Inicio:
+  finditem %tesoros G_1
+  if #FINDCNT > 0
+     {
+       set %num_cofres #FINDCNT
+       for %i 1 %num_cofres
+           {
+             finditem %tesoros G_1
+             set %idcaja #findid
+             set *ID_cofre %idcaja ; Variable global para la macro "Radar Cofres"
+             event macro 13 48 ; Use Skill Remove Trap
+             target 3s
+             set #ltargetid %idcaja
+             set #LtargetKind
+             gosub ResetJournal
+             set %jstart #jindex ; Marcamos el journal
+             event macro 22
+             gosub wait_for MSG %desarmado %sin_trampa %fallo_desarmando %trampa_activada 15
+             if #true in #result
+                {
+                  if ( %desarmado in #result ) || ( %sin_trampa in #result )
+                       {
+                         goto forzar
+                       }
+                  if ( %fallo_desarmando in #result ) || ( %trampa_activada in #result )
+                       {
+                         gosub curarse
+                         goto Inicio
+                       }
+                }
+           }
+     }
+     else
+        {
+          event exmsg #charid 0 63 COFRES OK!
+          wait 1s
+          goto loop
+        }
+goto Inicio
+}
+
+OnHotKey %TeclaCerradura ; ** Forzar Cerradura **
+{
+  forzar:
+  finditem %tesoros G_1
+  if #FINDCNT > 0
+     {
+       gosub ResetJournal
+       finditem NWH c_ , #backpackid
+       set *num_ganzuas #FINDSTACK
+       if *num_ganzuas > 0
+          {
+            set #LOBJECTID #FINDID
+            event macro 17 0
+            target 3s
+            set #LtargetKind 1
+            set #Ltargetid %idcaja
+            set %jstart #jindex ; Marcamos el journal
+            event macro 22 0
+          }
+          else
+             {
+               event exmsg #charid 0 140 NO HAY GANZUAS!
+               wait 1s
+               goto loop
+             }
+       gosub wait_for MSG %cerradura_cede %sin_cerrar %trampa_activada %fallo_forzando %no_se_puede %no_puedes 15
+       if #true in #result
+          {
+            if ( %cerradura_cede in #result ) || ( %sin_cerrar in #result )
+                 {
+                   gosub hiding
+                   goto abrir
+                 }
+            if ( %trampa_activada in #result )
+                 {
+                   goto Inicio
+                 }
+            if ( %fallo_forzando in #result )
+                 {
+                   goto forzar
+                 }
+            if ( %no_se_puede in #result ) || ( %no_puedes in #result )
+                 {
+                   event exmsg #charid 0 140 IMPOSIBLE!
+                   ignoreitem %idcaja
+                   gosub hiding
+                   goto loop
+                 }
+          }
+       return
+     }
+     else
+        {
+          event exmsg #charid 0 140 NO HAY COFRES!
+          wait 1s
+          goto loop
+        }
+}
+
+OnHotKey %TeclaAbrir ; ** Abrir cofre del tesoro **
+{
+  abrir:
+  finditem %tesoros G_1
+  if #FINDCNT > 0
+     {
+       gosub ResetJournal
+       set #lobjectid %idcaja
+       event macro 17 0
+       gosub wait_for GUMP %idcaja 15 ; Esperamos 15 segundos a detectar una ventana.
+       if ( #RESULT )
+            {
+              event macro 3 0 .resend ; Libera del bloqueo debido a poner y quitar los pack's de heno.
+              set *cofres_abiertos *cofres_abiertos + 1
+              set *ID_cofre %idcaja ; Variable global para la macro "Radar Cofres".
+              gosub lotear
+              ignoreitem %idcaja
+              goto Inicio ; Seguimos con el resto de cofres...
+           }
+           else
+              {
+                goto abrir
+              }
+     }
+     else
+        {
+          event exmsg #charid 0 63 COFRES OK!
+          wait 1s
+          goto loop
+        }
+}
+goto loop
+;========================================================
+;
+; ***************** FIN LOOP PRINCIPAL ******************
+;
+;========================================================
+
+; ============================================
+; Recuperar vida usando pergas de In Vas Mani
+; ============================================
+;            _____________
+;          /     __      /|
+;         /   __/ /_    / /
+;        /   /_  __/   / //
+;       /     /_/     / //
+;      /_____________/ //
+;      |______&______|//
+; ejm  |_____________|/
+;
+sub curarse
+greater_heal:
+if ( #HITS <= %vida_minima_1 )
+    {
+      finditem %pergas C_ , #backpackid
+      if #FINDCNT > 0
+         {
+           if ( #MANA >= 5 )
+                {
+                  set %pergas_curacion #FALSE
+                  for %p 1 #FINDSTACK
+                      {
+                        set %perga #FINDID
+                        event property %perga ; Leemos el perga
+                        set %string #property
+                        gosub split %string $ Propiedades ; Partimos las distintas propiedades en un array
+                        if Gran , #spc , Curacion in %PROPIEDADES1 ; Si encontramos de "Gran Curación"
+                           {
+                             set %pergas_curacion #TRUE
+                             set #LOBJECTID %perga
+                             event macro 17 0
+                             target 3s
+                             event macro 23 0
+                             wait 3s
+                             goto greater_heal ; Volvemos a comprobar stats
+                          }
+                      }
+                      if ( ! %pergas_curacion ) ; No hay pergas de curación :-(
+                           {
+                             goto in_vas_mani
+                           }
+                }
+         }
+         else ; Si no hay pergas, lo intentamos con regs...
+            {
+              in_vas_mani:
+              if ( #MANA >= 10 )
+                   {
+                     event macro 15 28 ; In Vas Mani
+                     gosub wait_for MSG %faltan_regs 2
+                     if #true in #result ; Si no hay regs, volvemos al principio
+                        {
+                          goto Inicio
+                        }
+                     target 4s
+                     event macro 23 0
+                     wait 3s
+                   }
+                   else ; No hay maná para un In Vas Mani... :-(
+                      {
+                        goto in_mani
+                      }
+            }
+    }
+    else
+       {
+         ; ==================================
+         ; Curar con magia normal ( In Mani )
+         ; ==================================
+         lesser_heal:
+         if ( #HITS <= %vida_minima_2 )
+              {
+                in_mani:
+                if ( #MANA >= 4 )
+                     {
+                       gosub ResetJournal
+                       set %jstart #jindex ; Marcamos el journal
+                       event macro 15 3 ; In Mani
+                       gosub wait_for MSG %faltan_regs 2
+                       if #true in #result ; Si no hay regs, volvemos al principio
+                          {
+                            goto Inicio
+                          }
+                       target 4s
+                       event macro 23 0
+                       wait 2s
+                       goto lesser_heal ; Volvemos a comprobar stats
+                     }
+              }
+         }
+return
+
+; ============================================
+; Busca items en el cofre de forma secuencial
+; ============================================
+sub lotear
+_reLoot:
+finditem %loot C_ , %idcaja
+if #FINDCNT > 0
+   {
+     gosub mover_item
+     goto _reLoot
+   }
+return
+
+; ===========================================
+; Esperar a Ocultarse con la skill de Hiding
+; ===========================================
+sub hiding
+if ( %skillhiding >= 300 )
+     {
+       ocultarse:
+       set %status_pj H
+       if ( H <> #CHARSTATUS )
+            {
+              event macro 13 21 ; Use Skill Hiding
+              gosub waitForSysVar CHARSTATUS = %status_pj 55
+              goto ocultarse
+            }
+     }
+return
+
+; ============================================
+; Mover items del cofre a la bolsa de looteo.
+; ============================================
+sub mover_item
+set %peso #Weight
+exevent Drag #FINDID #FINDSTACK
+gosub waitForSysVar Weight <> %peso 20
+exevent Dropc %bolsa_loot
+gosub waitforitem #FINDID %bolsa_loot 20
+return
+
+; ==============================
+; Elimina el mensaje del diario
+; ==============================
+sub ResetJournal
+scanjournal 1
+deletejournal
+return
+
+; =========================================
+; Cierra una bolsa abierta en primer plano
+; =========================================
+sub cerrar_bolsas
+if ( #CONTID <> #BACKPACKID )
+     {
+       gosub wait_for GUMP 230_204 CLOSE
+       gosub wait_for GUMP 176_194 CLOSE
+       wait 20
+     }
+return
+
+; =============================================
+; Espera a que un objeto caiga en un contenedor
+; =============================================
+sub waitforitem
+{
+   namespace push
+   namespace local wfi
+   set %time #SCNT2 + %3 ; Décimas de segundo
+
+   dropwait2:
+   finditem %1 C_ , %2
+   if ( #FINDKIND = -1 ) ; Not Found
+   {
+       wait 1
+       if ( #SCNT2 >= %time )
+       {
+         return #FALSE ; Aquí podemos repetir la última acción; goto blabla, etc.
+       }
+       goto dropwait2
+   }
+   namespace clear
+   namespace pop
+   return
+}
+
+;-@ ============================== @-;
+;-@ ############################## @-;
+;-@ SUBS públicos del Foro EasyUO  @-;
+;-@ ############################## @-;
+;-@ ============================== @-;
+
+sub waitForSysVar
+if %0 < 4 || %4 = N/A
+set %4 %_defaultWaitForTimeout
+if %0 < 5
+set %5 return
+set %4 #sCnt2 + %4
+_waitForSysVar:
+set % . %5 # . %1 %2 %3
+if ! % . %5 && #sCnt2 < %4
+{
+Wait 1
+goto _waitForSysVar
+}
+return
+
+;**
+;* Splits a string by a divider into an array and
+;* copies the result into the desired namespace
+;* @param %1 The string to split
+;* @param %2 Divider
+;* @param %3 Array name
+;* @param %4 {optional} Result namespace. If no
+;*           namespace is given it will create the
+;*           array using the %-notation
+;* @sideEffects Creates a number of variables
+;*              with name as given in %3 followed by
+;*              a digit
+;* @returns The length of the array
+sub split
+  namespace Push
+  namespace Local split , #systime
+  set !lpc #lpc
+  if #lpc < 500
+     set #lpc 500
+
+  set !string %1
+  set !divider %2
+  set !arrayName %3
+  if %0 > 3
+     set !namespace %4
+  else
+     set !namespace #false
+
+  set !length 0
+  repeat
+  {
+     set !length !length + 1
+     str Pos !string !divider 1
+     if #strRes = 0
+     {
+        set !done #true
+        set ! . !arrayName , !length !string
+     }
+     else
+     {
+        set !pos #strRes
+        set !len !pos - 1
+        str Left !string !len
+        set ! . !arrayName , !length #strRes
+        str Del !string 1 !pos
+        set !string #strRes
+     }
+  }
+  until ( !done = #true )
+  set #result !length
+
+  if !namespace <> #false
+  {
+     namespace Copy !arrayName , * To Local !namespace
+  }
+  else
+  {
+    for !i 1 #result
+    {
+       set !value !arrayName , !i
+       set % . !arrayName , !i ! . !value
+    }
+  }
+  set #lpc !lpc
+  namespace Clear
+  namespace Pop
+return #result
+
+;=================================================================
+sub wait_for
+;=================================================================
+; This "wait_for" sub package was created by Locke. If you use these subs please keep this header intact.
+; Documentation: the sub package grew to large with all the comments. To load them call the sub like this:
+; gosub wait_for docs    | or you can use doc, documention, what, or my personal favorite, kickass.
+
+; "wait_for core dispatcher" version 1.2 by Locke
+if %1 = doc || if %1 = docs || if %1 = documentation || if %1 = what || if %1 = kickass
+{
+Display ok Please click ok and wait for your browser to start.
+execute http://www.easyuo.com/forum/viewtopic.php?t=24716
+halt
+}
+nameSpace Push
+namespace local LLNS
+set #result N/A ; if #result isn't set by one of my wait_for subs it'll throw an error.
+set !LPC #lpc
+set #lpc 200
+for %i 0 %0
+set !_A . %i % . %i
+gosub wait_for_ , !_A1
+set #lpc !lpc
+namespace clear LLNS
+namespace pop
+if #result <> N/A
+return #result
+else
+display ok You specified an unknown wait_for command. Script returned #result and is halting.
+halt
+;=================================================================
+sub wait_for_MSG ; version 1.4 ~Locke
+;=================================================================
+if !_A0 < 3
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for MSG %message time_out_in_seconds$
++Script is halting
+halt
+}
+set !_timeout ( #scnt + !_A . !_A0 )
+_lets_wait_for_a_message:
+for %i %jstart #jindex
+{
+ scanjournal %i
+  for %ii 2 !_A0
+  {
+    if !_A . %ii in #journal && %jstart <> %i
+    set #result #true , #spc , !_A . %ii
+  }
+}
+
+if #true notin #result
+{
+set #result #false
+ if !_timeout =< #scnt
+ return #result
+wait 1
+goto _lets_wait_for_a_message
+}
+else
+return #result
+
+wait 1
+goto _lets_wait_for_a_message
+
+;======================================================================
+sub wait_for_GUMP ; version 1.4 ~Locke
+;=================================================================
+; Añadido #CONTID para "sub abrir_cofre"
+if !_A0 < 3
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for GUMP XXX_YYY time_out_in_seconds$
++Script is halting
+halt
+}
+if !_A3 <> CLOSE
+set !_timeout #scnt + !_A3
+else
+set !_timeout 0 ; no gump wait if %3 = CLOSE since we already believe it to be open.
+
+_lets_wait_for_a_gump:
+if #CONTSIZE = !_A2 || #CONTKIND = !_A2 || #CONTNAME = !_A2 || #CONTTYPE = !_A2 || #CONTID = !_A2
+{
+ if !_A5 <> N/A && !_A6 <> N/A
+ {
+ set !clickx !_A5 + #contposx
+ set !clicky !_A6 + #contposy
+ click !clickx !clicky
+ }
+ if !_A3 = CLOSE || if !_A4 = CLOSE || !_A5 = CLOSE || !_A6 = CLOSE
+ {
+ set !string #contsize
+ str pos !string _
+ set !pos #strres
+ str del !string #strres #strres
+ set !clickX #contposx + ( #strres / 2 )
+ str del !string 1 !pos
+ set !clickY #contposy + ( #strres / 2 )
+ click !clickx !clicky R
+ }
+return #true
+}
+
+if ( !_timeout =< #scnt ) && ( !_A4 = N/A )
+   {
+     return #false
+   }
+
+if !_A4 <> N/A && !_timeout =< #scnt
+{
+finditem !_A4
+if #findkind <> -1
+{
+ for #findindex 1 #findcnt
+ {
+  if #finddist > 2
+  ignoreitem #findid LLWAITFOR
+  else
+  break
+ }
+ set #lobjectid #findid
+ event macro 17 0
+ set !_timeout #scnt + !_A3
+}
+else
+return #false
+}
+wait 1
+goto _lets_wait_for_a_gump
