@@ -62,7 +62,7 @@ set %runacasa 1
 ;--------------------
 ; - Hueco donde tengas la runa que te llevará DENTRO de la mina (1-16)
 ;--------------------
-set %runamina 9
+set %runamina 2
 ;--------------------
 ; - Elige una mina de la lista a continuación y escribe su número en la variante siguiente:
 ; -------------------
