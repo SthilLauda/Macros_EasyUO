@@ -467,6 +467,7 @@ if ( #TRUE in #result )
                     {
                       repeat
                            {
+                             gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
                              wait 1
                            }
                            until #MANA = #MAXMANA
@@ -490,6 +491,7 @@ return
 sub comprobar_comida
 {
   hambriento:
+  gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
   set %jrnl #jindex ; Marcamos un índice de las líneas del diario.
   event macro 4 0 .hungry
   wait 20
