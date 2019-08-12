@@ -38,7 +38,7 @@
 ; Revised On: 12/08/19
 ; Propósito: Procesa cofres del tesoro; Desactiva la trampa, fuerza la cerradura, y lotea el cofre.
 ; Instrucciones: - Se requieren ganzúas en la mochila, una bolsa para el loot, y opcionalmente pergas de In Vas Mani... ^^
-;                - Es posible que tengáis que ir añadiendo ID's de objetos a lotear en %tesoros.
+;                - Es posible que tengáis que ir añadiendo ID's de objetos a lotear en %tesoros, %items_cofres, etc.
 ;
 ;========================================================
 set %version 3.5
