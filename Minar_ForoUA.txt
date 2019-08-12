@@ -20,6 +20,7 @@
 ; 12/08/2019:
 ; Correcciones de código: - Añadida función para comer desde el cofre.
 ;                         - Añadida función para detectar los save's del server.
+;                         - Sustituído "msg .resend $" por "event macro 3 0 .resend" (Más estable).
 ;
 ; 08/08/2019:
 ; Correcciones de código: - Eliminados mensajes que hacían petar el client después de abrir el cofre.
@@ -55,8 +56,12 @@
 ; aún así, no es realmente necesaria la skill de Meditar.
 ; Minará por toda la mina, de manera aleatoria, pero evitando volver a minar allí dónde ya lo hiciste.
 ;
+;________________________________
 ;
-; Configuración:
+; ///////////////////////////////
+; ******** CONFIGURACIÓN ********
+; ///////////////////////////////
+;________________________________
 ;
 ; - Hueco donde tengas la runa que te llevará al cofre para guardar los minerales (1-16)
 ;--------------------
@@ -69,8 +74,15 @@ set %runamina 2
 ; - Elige una mina de la lista a continuación y escribe su número en la variante siguiente:
 ; -------------------
 set %lugar 0 ; Mina en la que actuará la macro
-; -------------------
+;________________________________________________
+;
+; //////////////////////////////////////////////
+; ************* FIN CONFIGURACIÓN *************
+; //////////////////////////////////////////////
+;________________________________________________
+;
 ; Las Minas actuales son:
+;
 ; 0- Ninguna (Mina solo igual, pero si se sale de dentro de la mina no se volverá a meter, deberás moverlo tu)
 ; 1- Shame (Norte de la entrada Shame (Trabajos Forzados))
 ; 2- Covetous 1 (Primera Mina a la derecha de la Dungeon Covetous)
@@ -108,7 +120,7 @@ set %comida RGG_NRD_QSD_ZBG_WLI_QRD_END_FUD_YLI_WLI_HGI
  +_GQE_SPE_ZPE_OQE_BDF_KPE_RQE_YSD_SQD_AXI_PQD_QQD
 set %proxima_vez_comer #SCNT
 set %_worldsavejournalindex #jindex ; Journal para escanear en busca de save's del server.
-set *CEOWorldSaving #FALSE        ; Indica si hay un save del server en marcha.
+set *CEOWorldSaving #FALSE          ; Indica si hay un save del server en marcha.
 set #sysmsgcol 88
 event sysmessage Iniciando Macro...
 event sysmessage
@@ -293,7 +305,7 @@ click %runex %runey f
 event macro 13 46
 gosub wait_for RECALL 15
 event macro 13 46
-msg .resend $
+event macro 3 0 .resend
 wait 10
 if #CHARPOSX = %dondecasax && #CHARPOSY = %dondecasay
 {
@@ -325,7 +337,7 @@ click %runex %runey f
 event macro 13 46
 gosub wait_for RECALL 15
 event macro 13 46
-msg .resend $
+event macro 3 0 .resend
 wait 10
 if %dondeminax = 0
 {
