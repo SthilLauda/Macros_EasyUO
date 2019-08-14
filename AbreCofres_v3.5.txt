@@ -68,7 +68,7 @@ set %tesoros AXE_BXE_CXE_DXE_EXE_FXE_GXE_HXE_IXE_
 set %oro POF
 set %gemas BVF_EVF_FVF_GVF_HVF_OVF_RVF_UVF_VUF
 set %flechas RWF_LNK
-set %items_cofres TVH ; Escrituras decoración, etc
+set %items_cofres TVH_KWI_HWK_MQF_XVH ; Escrituras, Sombrero Aventurero, Cabeza Nigromante, Tambor Mágico, Mapa del Cartógrafo, etc...
 set %loot %oro , _ , %gemas , _ , %flechas , _ , %items_cofres ; Lista de todos los Items
 set %pergas ZTL
 set %vida_minima_1 #MAXHITS - %puntos_vida_1  ; In Vas Mani
