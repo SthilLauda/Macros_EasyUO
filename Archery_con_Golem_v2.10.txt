@@ -75,7 +75,7 @@ set %version 2.10
 ;
 set %lote_flechas 100 ; Número de flechas a gastar en cada ronda.
 set %tiempo_attack 3  ; En segundos, cada cuánto ordenar el ataque al Golem.
-set %tiempo_alimentacion 360 ; En segundos, cada cuanto recoger flechas del suelo y comer (5 minutos).
+set %tiempo_alimentacion 360 ; En segundos, cada cuanto recoger flechas del suelo y comer (6 minutos).
 ;________________________________________________
 ;
 ; //////////////////////////////////////////////
