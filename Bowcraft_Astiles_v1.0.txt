@@ -1,0 +1,483 @@
+; ======================================================================================================
+;  '||   ||` '||`   ||                                 /.\      '||`
+;   ||   ||   ||    ||     ''                         // \\      ||   ''
+;   ||   ||   ||  ''||''   ||  '||),,(|,   '''|.     //...\\     ||   ||   '''|.  `||''|,  '''/  '''|.
+;   ||   ||   ||    ||     ||   || || ||  .|''||    //     \\    ||   ||  .|''||   ||  ||   //  .|''||
+;   `|...|'  .||.   `|..' .||. .||    ||. `|..||. .//       \\. .||. .||. `|..||. .||  ||. /... `|..||.
+; ======================================================================================================
+;
+; Script Name: Bowcraft [ Astiles ]
+;
+;        _.-"/______________________/////
+; jgs    `'-.\~~~~~~~~~~~~~~~~~~~~~~\\\\\
+;
+; Author: Sthil Lauda
+; Version: 1.0
+; Client Tested with: 2.0.3
+; EUO version tested with: EasyUO 1.5 Version 243
+; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Revision Date: 16/08/2019
+; Public Release: 16/08/2019
+; Global Variables Used: none
+; Purpose: Entrenar la habilidad de fabricar arcos haciendo astiles ( Después podrás reutilizarlos haciendo flechas ^^ )
+; Instrucciones: Poner un cofre con madera, una bolsa para dejar los astiles, y varias bolsas con 255 dagas en cada una... :P
+set %version v1.0
+;________________________________
+;
+; ///////////////////////////////
+; ******** CONFIGURACIÓN ********
+; ///////////////////////////////
+;________________________________
+;
+set %cofre UXVXMND
+set %bolsa_astiles WEJDKOD
+set %bolsa_dagas WPDTUND , _ , HTTWMQD , _ , ZPFXMND
+;________________________________
+;
+; ///////////////////////////////
+; ****** FIN CONFIGURACIÓN ******
+; ///////////////////////////////
+;________________________________
+;
+
+set #LPC 500
+set %daga TSF_WSF
+set %astiles SLK
+set %tronco ZLK
+set %_worldsavejournalindex #jindex ; Journal para escanear en busca de save's del server.
+set *CEOWorldSaving #FALSE        ; Indica si hay un save del server en marcha.
+
+set #SYSMSGCOL 88
+event sysmessage ==============
+set #SYSMSGCOL 53
+event sysmessage Bowcraft %version
+set #SYSMSGCOL 88
+event sysmessage ==============
+wait 20
+
+; Abrir el cofre con la madera.
+set #LOBJECTID %cofre
+event macro 17 0
+gosub wait_for GUMP %cofre 40
+
+;
+;========================================================
+;
+; ******************* LOOP PRINCIPAL ********************
+;
+;========================================================
+;
+ciclo:
+gosub checkSkill
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+gosub refrescarMochila
+gosub vaciarAstiles
+gosub reponerDagas
+gosub reponerTroncos
+separando:
+if #CONTSIZE <> 530_480
+   {
+     _dagger:
+     ignoreitem reset PJ
+     finditem %daga C_ , #CHARID
+     if #FINDCNT > 0
+        {
+          set #LOBJECTID #FINDID
+          finditem %tronco C_ , #BACKPACKID
+          if #FINDCNT > 0
+             {
+               event macro 17
+               target
+               set #LTARGETID #FINDID
+               set #LTARGETKIND 1
+               event macro 22
+             }
+        }
+        else
+           {
+             finditem %daga C_ , #BACKPACKID
+             if #FINDCNT > 0
+                {
+                  set #LOBJECTID #FINDID
+                  event macro 17
+                  goto _dagger
+                }
+           }
+   }
+astillando:
+for %a 1 %stack
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+gosub reponerDagas
+repeat
+until #contname <> waiting_gump && #contname <> MainMenu_gump && #contname <> Login_gump && #contname <> normal_gump
+set %tiempo #SCNT2 + 20
+repeat
+finditem %tronco C_ , #BACKPACKID
+if #FINDSTACK = 0
+   {
+     goto ciclo
+   }
+if #SCNT2 > %tiempo
+   {
+     goto ciclo
+   }
+until #CONTSIZE = 530_480
+contpos #CONTPOSX #CONTPOSY
+set %clickx #CONTPOSX + 230
+set %clicky #CONTPOSY + 90
+click %clickx %clicky f dmc
+}
+finditem %tronco C_ , #BACKPACKID
+if #FINDKIND <> -1
+{
+set %stack #FINDSTACK
+goto astillando
+}
+goto ciclo
+;
+;========================================================
+;
+; ***************** FIN LOOP PRINCIPAL *****************
+;
+;========================================================
+;
+; ######################################################################################
+;
+; **************************************** SUBS ****************************************
+;
+; ######################################################################################
+
+sub checkSkill ;<======================================>
+chooseskill Bowc real ; [  Bowcraft Fletching ]
+if #SKILL >= 1000
+   {
+     set #SYSMSGCOL 73
+     event sysmessage SOMOS GM BOWCRAFT! :-)
+     display ¡Somos GM Bowcraft! :-)
+     halt
+   }
+return
+
+sub refrescarMochila ;<===============>
+event macro 8	7 ; Refrescar la  mochila
+gosub wait_for GUMP #BACKPACKID 40
+contpos 796 333
+return
+
+sub vaciarAstiles ;<========================================>
+finditem %astiles C_ , #BACKPACKID
+if #FINDSTACK >= 70
+   {
+     gosub mover %astiles C_ #BACKPACKID dropc %bolsa_astiles
+     goto ciclo
+   }
+return
+
+sub mover ;<==================>
+finditem %1 %2 , %3
+if %6 = N/A
+exevent drag #FINDID #FINDSTACK
+if %6 <> N/A
+exevent drag #FINDID %6
+wait 7
+exevent %4 %5
+wait 7
+return
+
+sub reponerDagas ;<=================================>
+finditem %daga C_ , #BACKPACKID
+if #FINDCNT < 3
+   {
+     ignoreitem #CHARID PJ
+     set %repeticiones 6 - #FINDCNT
+     for %d 0 %repeticiones
+         {
+            _searchBag:
+            finditem %daga C
+            if #FINDCNT > 0
+               {
+                 if #FINDBAGID in %bolsa_dagas
+                    {
+                      exevent drag #FINDID #FINDSTACK
+                      wait 7
+                      exevent dropc #BACKPACKID
+                      wait 7
+                    }
+                    else
+                       {
+                         ignoreitem #FINDID bad_dagas
+                         goto _searchBag
+                      }
+               }
+         }
+         ignoreitem reset bad_dagas
+   }
+return
+
+sub reponerTroncos ;<============================================>
+set %stack ( ( #MAXWEIGHT - #WEIGHT ) / 2 ) - 10
+finditem %tronco C_ , #BACKPACKID
+if #FINDSTACK <= %stack
+   {
+     finditem %tronco C_ , %cofre
+     if #FINDCNT > 0
+        {
+          for #FINDINDEX 1 #FINDCNT
+              {
+                if #FINDCOL = 0
+                   {
+                     if #FINDSTACK >= %stack
+                        {
+                          exevent drag #FINDID %stack
+                          exevent dropc #BACKPACKID
+                          wait 30
+                        }
+                        else
+                           {
+                             set #SYSMSGCOL 38
+                             event sysmessage NO QUEDA MADERA! :-(
+                             halt
+                           }
+                   }
+              }
+        }
+   }
+return
+
+;=================================================================
+sub wait_for
+;=================================================================
+; This "wait_for" sub package was created by Locke. If you use these subs please keep this header intact.
+; Documentation: the sub package grew to large with all the comments. To load them call the sub like this:
+; gosub wait_for docs    | or you can use doc, documention, what, or my personal favorite, kickass.
+
+; "wait_for core dispatcher" version 1.2 by Locke
+if %1 = doc || if %1 = docs || if %1 = documentation || if %1 = what || if %1 = kickass
+{
+Display ok Please click ok and wait for your browser to start.
+execute http://www.easyuo.com/forum/viewtopic.php?t=24716
+halt
+}
+nameSpace Push
+namespace local LLNS
+set #result N/A ; if #result isn't set by one of my wait_for subs it'll throw an error.
+set !LPC #lpc
+set #lpc 200
+for %i 0 %0
+set !_A . %i % . %i
+gosub wait_for_ , !_A1
+set #lpc !lpc
+namespace clear LLNS
+namespace pop
+if #result <> N/A
+return #result
+else
+display ok You specified an unknown wait_for command. Script returned #result and is halting.
+halt
+;=================================================================
+sub wait_for_MSG ; version 1.4 ~Locke
+;=================================================================
+if !_A0 < 3
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for MSG %message time_out_in_seconds$
++Script is halting
+halt
+}
+set !_timeout ( #scnt2 + !_A . !_A0 )
+_lets_wait_for_a_message:
+for %i %jstart #jindex
+{
+ scanjournal %i
+  for %ii 2 !_A0
+  {
+    if !_A . %ii in #journal && %jstart <> %i
+    set #result #true , #spc , !_A . %ii
+  }
+}
+
+if #true notin #result
+{
+set #result #false
+ if !_timeout =< #scnt2
+ return #result
+wait 1
+goto _lets_wait_for_a_message
+}
+else
+return #result
+
+wait 1
+goto _lets_wait_for_a_message
+
+;======================================================================
+sub wait_for_GUMP ; version 1.4 ~Locke
+;=================================================================
+; Añadido #CONTID para "sub abrir_cofre"
+if !_A0 < 3
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for GUMP XXX_YYY time_out_in_seconds$
++Script is halting
+halt
+}
+if !_A3 <> CLOSE
+set !_timeout #scnt2 + !_A3
+else
+set !_timeout 0 ; no gump wait if %3 = CLOSE since we already believe it to be open.
+
+_lets_wait_for_a_gump:
+if #CONTSIZE = !_A2 || #CONTKIND = !_A2 || #CONTNAME = !_A2 || #CONTTYPE = !_A2 || #CONTID = !_A2
+{
+ if !_A5 <> N/A && !_A6 <> N/A
+ {
+ set !clickx !_A5 + #contposx
+ set !clicky !_A6 + #contposy
+ click !clickx !clicky
+ }
+ if !_A3 = CLOSE || if !_A4 = CLOSE || !_A5 = CLOSE || !_A6 = CLOSE
+ {
+ set !string #contsize
+ str pos !string _
+ set !pos #strres
+ str del !string #strres #strres
+ set !clickX #contposx + ( #strres / 2 )
+ str del !string 1 !pos
+ set !clickY #contposy + ( #strres / 2 )
+ click !clickx !clicky R
+ }
+return #true
+}
+
+if ( !_timeout =< #scnt2 ) && ( !_A4 = N/A )
+   {
+     return #false
+   }
+
+if !_A4 <> N/A && !_timeout =< #scnt2
+{
+finditem !_A4
+if #findkind <> -1
+{
+ for #findindex 1 #findcnt
+ {
+  if #finddist > 2
+  ignoreitem #findid LLWAITFOR
+  else
+  break
+ }
+ set #lobjectid #findid
+ event macro 17 0
+ set !_timeout #scnt2 + !_A3
+}
+else
+return #false
+}
+wait 1
+goto _lets_wait_for_a_gump
+
+;-----------------------------------------------------------
+; Script Name: CEOWorldSaveChecker
+; Author: CEO
+; Version: 1.0
+; Client Tested with: 4.0.10b
+; EUO version tested with: 1.42.00A5
+; Shard OSI / FS: OSI
+; Revision Date: 060105
+; Public Release: 060105
+; Global Variables Used:  *CEOWorldSaving
+; Purpose: Used to catch the world save message for freeshards and temporarily pause mainscript during save.
+;-------------------------------------------------------------
+sub CEOWorldSaveChecker
+; sub to pause a script during a RunUO world save.
+set %_text1 %1
+set %_text2 %2
+set %_text3 %3
+if %_worldsaveupcoming
+{
+        if %_worldsavetimer < #scnt
+        {
+                set %_worldsavetimer #scnt + %5
+                gosub popupworldsave 25 15 blue
+                goto _WSC_WAIT1
+        }
+        return
+}
+_WSC1:
+if %_worldsavejournalindex > #jindex
+        return
+scanjournal %_worldsavejournalindex
+if %_text1  in #JOURNAL
+{
+        set %_worldsaveupcoming #true
+        set %_worldsavetimer #scnt + %4
+        set %_worldsavejournalindex  %_worldsavejournalindex + 1
+        return
+}
+set %_worldsavejournalindex  %_worldsavejournalindex + 1
+goto _WSC1
+_WSC_WAIT1:
+if %_worldsavetimer < #scnt
+        goto _WSC_Complete
+wait 5
+set *CEOWorldSaving #true
+if %_worldsavejournalindex > #jindex
+        goto _WSC_WAIT1
+scanjournal %_worldsavejournalindex
+if %_text2 in #journal
+{
+        gosub popupworldsave 25 15 yellow
+        set %_worldsavejournalindex  %_worldsavejournalindex + 1
+        goto _WSC_WAIT2
+}
+set %_worldsavejournalindex  %_worldsavejournalindex + 1
+goto _WSC_WAIT1
+_WSC_WAIT2:
+if %_worldsavetimer < #scnt
+        goto _WSC_Complete
+wait 5
+if %_worldsavejournalindex > #jindex
+        goto _WSC_WAIT2
+scanjournal %_worldsavejournalindex
+if %_text3 notin #journal
+{
+        set %_worldsavejournalindex  %_worldsavejournalindex + 1
+        goto _WSC_WAIT2
+}
+_WSC_Complete:
+set %_worldsavejournalindex  #jindex
+set %_worldsaveupcoming #false
+set *CEOWorldSaving #false
+menu delete worldsave
+return
+
+sub popupworldsave
+set %x %1
+set %y %2
+set %worldcolor %3
+menu Clear
+menu Window Title World Save Monitor
+menu Window Color Black
+menu Window Size 160 160
+menu shape worldsave 20 15 125 125 1 7 2 olive 7 %worldcolor
+menu font bgcolor %worldcolor
+menu font color lime
+menu font type b
+menu font size 15
+set %x %x + 30
+set %y %y + 30
+menu text worldsave %x %y World
+set %x %x + 15
+set %y %y + 20
+menu text worldsave %x %y Save
+set %x %x + 15
+set %y %y + 20
+menu text worldsave %x %y Wait
+menu font size 9
+menu font bgcolor black
+menu font color lime
+menu font type n
+menu Show 920 770
+return
+
