@@ -6,6 +6,31 @@
 ;   `|...|'  .||.   `|..' .||. .||    ||. `|..||. .//       \\. .||. .||. `|..||. .||  ||. /... `|..||.
 ; =====================================================================================================
 ;
+; Script Name: Conocimiento de Armas
+;         __                                           __
+;        (**)                                         (**)
+;        IIII                                         IIII
+;        ####                                         ####
+;        HHHH     Madness comes, and madness goes     HHHH
+;        HHHH    An insane place, with insane moves   HHHH
+;        ####   Battles without, for battles within   ####
+;     ___IIII___        Where evil lives,          ___IIII___
+;  .-`_._"**"_._`-.      and evil rules         .-`_._"**"_._`-.
+; |/``  .`\/`.  ``\|    Breaking them up,      |/``  .`\/`.  ``\|
+; `     }    {     '  just breaking them in    `     }    {     '
+;       ) () (  Quickest way out, quickest way wins  ) () (
+;       ( :: )      Never disclose, never betray     ( :: )
+;       | :: |   Cease to speak or cease to breath   | :: |
+;       | )( |        And when you kill a man,       | )( |
+;       | || |          you're a murderer            | || |
+;       | || |             Kill many                 | || |
+;       | || |        and you're a conqueror         | || |
+;       | || |        Kill them all ... Ooh..        | || |
+;       | || |           Oh you're a God!            | || |
+;       ( () )                       -Megadeth       ( () )
+;        \  /                                         \  /
+;         \/                                           \/
+;
 ; Author: Sthil Lauda
 ; Version: 1.0
 ; Client Tested with: 2.0.3
