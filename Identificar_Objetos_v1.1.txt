@@ -5,6 +5,7 @@
 ;   ||   ||   ||    ||     ||   || || ||  .|''||    //     \\    ||   ||  .|''||   ||  ||   //  .|''||
 ;   `|...|'  .||.   `|..' .||. .||    ||. `|..||. .//       \\. .||. .||. `|..||. .||  ||. /... `|..||.
 ; ======================================================================================================
+;
 ; Script Name: Identificar Objetos
 ;
 ;        _.-----._
@@ -35,6 +36,7 @@ set %comida RGG_NRD_QSD_ZBG_WLI_QRD_END_FUD_YLI_WLI_HGI
  +_GQE_SPE_ZPE_OQE_BDF_KPE_RQE_YSD_SQD_YWI_AXI_PQD_QQD
 set %tiempo_actual #SCNT ; Reloj
 set %proxima_vez #SCNT ; Trigger
+
 gosub setupObject ; Configurar el objeto a identificar.
 
 ;
@@ -45,6 +47,7 @@ gosub setupObject ; Configurar el objeto a identificar.
 ;========================================================
 ;
 loop:
+gosub checkSkill
 gosub checkHungry
 _repite:
 event macro 13 3
@@ -73,6 +76,16 @@ goto loop
 ;
 ;========================================================
 ;
+
+sub checkSkill ;<===========================>
+chooseskill Item real ; Comprobar GM
+if #SKILL >= 1000
+   {
+     set #SYSMSGCOL 19
+     event sysmessage ¡Somos GM Item ID! :)
+     halt
+   }
+return
 
 sub checkHungry ;<==================>
 set %tiempo_actual #SCNT
