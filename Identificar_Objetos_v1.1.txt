@@ -28,7 +28,8 @@
 ; Purpose: Entrenar la habilidad de identificar objetos.
 ; Instrucciones; Darle al play y elegir el objeto con el que practicar la habilidad.
 ;==================================
-set %mensaje_ok Estimas_aproximadamente
+set %mensaje_ok_1 Estimas_aproximadamente
+set %mensaje_ok_2 El_objeto_no_parece_tener_valor
 set %mensaje_fail No_consigues_identificar
 set %tiempo_alimentacion 360
 set %comida RGG_NRD_QSD_ZBG_WLI_QRD_END_FUD_YLI_WLI_HGI
@@ -56,10 +57,10 @@ target 3s
 set #LTARGETID %target
 set #LTARGETKIND 1
 event macro 22
-gosub wait_for MSG %mensaje_ok %mensaje_fail 10
+gosub wait_for MSG %mensaje_ok_1 %mensaje_ok_2 %mensaje_fail 10
 if ( #true in #result )
      {
-       if ( %mensaje_ok in #result )
+       if ( %mensaje_ok_1 in #result || %mensaje_ok_2 in #result )
             {
               goto loop
             }
