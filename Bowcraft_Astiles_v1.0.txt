@@ -8,24 +8,23 @@
 ;
 ; Script Name: Bowcraft [ Astiles ]
 ;
-;        _.-"/______________________/////
-; jgs    `'-.\~~~~~~~~~~~~~~~~~~~~~~\\\\\
+;  >>>>>----------------------->
 ;
 ; Author: Sthil Lauda
 ; Version: 1.0
 ; Client Tested with: 2.0.3
 ; EUO version tested with: EasyUO 1.5 Version 243
-; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Shard: Ultima Alianza (Â¡Hasta la muerte!)
 ; Revision Date: 16/08/2019
 ; Public Release: 16/08/2019
 ; Global Variables Used: none
-; Purpose: Entrenar la habilidad de fabricar arcos haciendo astiles ( Después podrás reutilizarlos haciendo flechas ^^ )
+; Purpose: Entrenar la habilidad de fabricar arcos haciendo astiles ( DespuÃ©s podrÃ¡s reutilizarlos haciendo flechas ^^ )
 ; Instrucciones: Poner un cofre con madera, una bolsa para dejar los astiles, y varias bolsas con 255 dagas en cada una... :P
 set %version v1.0
 ;________________________________
 ;
 ; ///////////////////////////////
-; ******** CONFIGURACIÓN ********
+; ******** CONFIGURACIÃ“N ********
 ; ///////////////////////////////
 ;________________________________
 ;
@@ -35,7 +34,7 @@ set %bolsa_dagas WPDTUND , _ , HTTWMQD , _ , ZPFXMND
 ;________________________________
 ;
 ; ///////////////////////////////
-; ****** FIN CONFIGURACIÓN ******
+; ****** FIN CONFIGURACIÃ“N ******
 ; ///////////////////////////////
 ;________________________________
 ;
@@ -154,7 +153,7 @@ if #SKILL >= 1000
    {
      set #SYSMSGCOL 73
      event sysmessage SOMOS GM BOWCRAFT! :-)
-     display ¡Somos GM Bowcraft! :-)
+     display Â¡Somos GM Bowcraft! :-)
      halt
    }
 return
@@ -314,7 +313,7 @@ goto _lets_wait_for_a_message
 ;======================================================================
 sub wait_for_GUMP ; version 1.4 ~Locke
 ;=================================================================
-; Añadido #CONTID para "sub abrir_cofre"
+; AÃ±adido #CONTID para "sub abrir_cofre"
 if !_A0 < 3
 {
 display ok You haven't specified enough vars.$
