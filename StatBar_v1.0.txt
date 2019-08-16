@@ -122,9 +122,9 @@ sub menu
         menu Font Style b
         menu Font Color Red
         menu Font Align Left
-        menu Text EUOLabel1 45 5 H
+        menu Text EUOLabel1 43 5 H
         menu Font Color Blue
-        menu Text EUOLabel2 80 5 M
+        menu Text EUOLabel2 78 5 M
         menu Font Color Yellow
         menu Text EUOLabel3 115 5 S
         menu Shape hitsquare 35 25 30 90 3 7 1 Black 7 Red
