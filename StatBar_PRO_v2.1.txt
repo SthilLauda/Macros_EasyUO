@@ -1,0 +1,143 @@
+;======================================================================================================
+; '||   ||` '||`   ||                                 /.\      '||`
+;  ||   ||   ||    ||     ''                         // \\      ||   ''
+;  ||   ||   ||  ''||''   ||  '||),,(|,   '''|.     //...\\     ||   ||   '''|.  `||''|,  '''/  '''|.
+;  ||   ||   ||    ||     ||   || || ||  .|''||    //     \\    ||   ||  .|''||   ||  ||   //  .|''||
+;  `|...|'  .||.   `|..' .||. .||    ||. `|..||. .//       \\. .||. .||. `|..||. .||  ||. /... `|..||.
+;======================================================================================================
+;
+; Script Name: Stat Bar
+;    _____________________
+;   |  _________________  |
+;   | |              /  | |
+;   | |       /\    /   | |
+;   | |  /\  /  \  /    | |
+;   | | /  \/    \/     | |
+;   | |/             JO | |
+;   | |_________________| |
+;   |  __ __ __ __ __ __  |
+;
+; Author: LordSiD [ MOD+ Sthil ]
+; Version: 1.0
+; Client Tested with: 2.0.3
+; EUO version tested with: EasyUO 1.5 Version 243
+; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Revision Date: 040710
+; Public Release:  040710
+; Purpose: Monitoriza tus stats con unas bonitas barras de colores ^^
+;==================================
+set %version 1.0
+
+;================================
+; ******** CONFIGURACIÖN ********
+;================================
+; Tecla para activar la Transparecia del Menú:
+; El hotkey por defecto es INSERT (puede que tengas que apretarla varias veces seguidas hasta que se active).
+set %hk1 INSERT ; ESC, BACK, ENTER, PAUSE, CAPSLOCK, SPACE, PGDN, PGUP, END, HOME, LEFT, RIGHT, UP, DOWN, PRNSCR, INSERT, DELETE, NUMLOCK o SCROLLLOCK.
+;================================
+; ************* FIN *************
+;================================
+set #SYSMSGCOL 88
+event sysmessage ============
+set #SYSMSGCOL 53
+event sysmessage StatBar %version
+set #SYSMSGCOL 88
+event sysmessage ============
+wait 20
+
+;==================================
+; Es necesario mostrar la barra
+;==================================
+if #HITS = n/a
+   {
+     set #SYSMSGCOL 53
+     event sysmessage Abriendo la Barra de estado
+     wait 20
+     event macro 8 2 ; Abrir la barra de estado
+     wait 20
+     event macro 10 2 ;  Minimizar la barra de estado
+     contpos 0 600
+   }
+
+gosub menu
+
+loop:
+if #hits <> %ohits
+{
+menu delete hitsquare
+set %height ( #hits * 100 ) / #maxhits
+menu shape hitsquare 35 25 30 %height 3 7 1 Black 7 Red
+menu set hitbox #hits
+set %ohits #hits
+}
+if #mana <> %omana
+{
+menu delete manasquare
+set %height ( #mana * 100 ) / #maxmana
+menu shape manasquare 70 25 30 %height 3 7 1 Black 7 Blue
+menu set manabox #mana
+set %omana #mana
+}
+if #stamina <> %ostam
+{
+menu delete stamsquare
+set %height ( #stamina * 100 ) / #maxstam
+menu shape stamsquare 105 25 30 %height 3 7 1 Black 7 Yellow
+menu set stambox #stamina
+set %ostam #stamina
+}
+onhotkey %hk1
+       {
+         gosub toggle
+       }
+       wait 1
+goto loop
+
+sub toggle
+if %toggle
+{
+menu window transparent 60
+set %toggle #false
+}
+else
+{
+menu window transparent 100
+set %toggle #true
+}
+wait 3
+return
+
+sub menu
+        menu Clear
+        menu Window Color black
+        menu Window Size 170 170
+        menu Font Transparent #true
+        menu Font Align Right
+        menu Shape EUOShape1 30 5 110 125 3 7 1 Black 7 Silver
+        menu Shape EUOShape2 35 25 30 100 3 7 1 Black 6 Black
+        menu Shape EUOShape3 70 25 30 100 3 7 1 Black 6 Black
+        menu Shape EUOShape4 105 25 30 100 3 7 1 Black 6 Black
+        menu Font Name MS Sans Serif
+        menu Font Size 12
+        menu Font Style b
+        menu Font Color Red
+        menu Font Align Left
+        menu Text EUOLabel1 45 5 H
+        menu Font Color Blue
+        menu Text EUOLabel2 80 5 M
+        menu Font Color Yellow
+        menu Text EUOLabel3 115 5 S
+        menu Shape hitsquare 35 25 30 90 3 7 1 Black 7 Red
+        menu Shape manasquare 70 25 30 90 3 7 1 Black 7 Blue
+        menu Shape stamsquare 105 25 30 90 3 7 1 Black 7 Yellow
+        menu Font Size 8
+        menu Font Style
+        menu Font Color WindowText
+        menu Font BGColor Window
+        menu Edit hitbox 35 135 30 #hits
+        menu Edit manabox 70 135 30 #mana
+        menu Edit stambox 105 135 30 #stamina
+        menu Font Size 14
+        menu Font BGColor BtnFace
+        menu Show 0 0
+return
