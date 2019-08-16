@@ -1,7 +1,16 @@
+; ======================================================================================================
+;  '||   ||` '||`   ||                                 /.\      '||`
+;   ||   ||   ||    ||     ''                         // \\      ||   ''
+;   ||   ||   ||  ''||''   ||  '||),,(|,   '''|.     //...\\     ||   ||   '''|.  `||''|,  '''/  '''|.
+;   ||   ||   ||    ||     ||   || || ||  .|''||    //     \\    ||   ||  .|''||   ||  ||   //  .|''||
+;   `|...|'  .||.   `|..' .||. .||    ||. `|..||. .//       \\. .||. .||. `|..||. .||  ||. /... `|..||.
+; =====================================================================================================
+;  
 ; *** NOTAS "MÁGICAS" ^^ *** :
 ; - Si la macro de domarse os para en un determinado sitio y el pj no se mueve, pausad la macro,
 ;   abrid una nueva pestaña en el EasyUO, y poned lo siguiente: set *posicion 0
 ;   Le dais al play una vez, y otra al stop. Una vez hecho esto, volver a encender la macro de domar.
+;
 ; MEJORAS :
 ; - Añadido un "sub" para comer cada cierto tiempo hasta quedar saciado.
 ; - Añadido un "sub" para activar el modo "always run" para que vaya corriendo por el mapa en lugar de ir andando.
