@@ -21,7 +21,7 @@
 ; Version: 1.0
 ; Client Tested with: 2.0.3
 ; EUO version tested with: EasyUO 1.5 Version 243
-; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Shard: Ultima Alianza (Â¡Hasta la muerte!)
 ; Revision Date: 040710
 ; Public Release:  040710
 ; Purpose: Monitoriza tus stats con unas bonitas barras de colores ^^
@@ -29,9 +29,9 @@
 set %version 1.0
 
 ;================================
-; ******** CONFIGURACIÖN ********
+; ******** CONFIGURACIÃ–N ********
 ;================================
-; Tecla para activar la Transparecia del Menú:
+; Tecla para activar la Transparecia del MenÃº:
 ; El hotkey por defecto es INSERT (puede que tengas que apretarla varias veces seguidas hasta que se active).
 set %hk1 INSERT ; ESC, BACK, ENTER, PAUSE, CAPSLOCK, SPACE, PGDN, PGUP, END, HOME, LEFT, RIGHT, UP, DOWN, PRNSCR, INSERT, DELETE, NUMLOCK o SCROLLLOCK.
 ;================================
