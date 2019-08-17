@@ -32,6 +32,7 @@
 ; Release: 26/07/2019
 ; Purpose: Aplica vendas.
 ;==================================
+
 set %version 1.0
 set %vendas_sucias AMF
 set %vendas_limpias ZLF
@@ -90,7 +91,7 @@ goto loop
 ;======================================================
 
 sub setupPilon
-display OK Selecciona el pilÛn de agua
+display OK Selecciona el pil√≥n de agua
 set #TARGCURS 1
 while #TARGCURS = 1
       {
@@ -117,7 +118,7 @@ return
 sub agruparVendas
 _agruparVendas:
 finditem %vendas_limpias C_ , #BACKPACKID
-if #FINDCNT > 1 ; Si hay m·s de 1 montÛn de vendas...
+if #FINDCNT > 1 ; Si hay m√°s de 1 mont√≥n de vendas...
    {
      for #FINDINDEX 1 #FINDCNT
          {
