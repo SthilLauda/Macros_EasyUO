@@ -1,6 +1,6 @@
 set %myaccount default
 set %mypass xxxxx ; Aquí va tu contraseña del UO ( ¡Mucho cuidado! ¡NO compartas la macro sin haberla borrado antes! ¬¬ )
-set %mycharnum 1  ; Personaje con el que quieres que logear...
+set %mycharnum 1  ; Personaje con el que quieres que logear.
 
 mainloop:
 if #contname = MainMenu_gump
