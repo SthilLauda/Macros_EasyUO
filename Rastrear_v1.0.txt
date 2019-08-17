@@ -11,14 +11,14 @@
 ; Version: 1.0
 ; Client Tested with: 2.0.3
 ; EUO version tested with: EasyUO 1.5 Version 243
-; Shard: Ultima Alianza (°Hasta la muerte!)
+; Shard: Ultima Alianza (¬°Hasta la muerte!)
 ; Public Release: 31/07/2019
 ; Revised On: 31/07/2019
-; Purpose: Entrena la habilidad de Rastrear/Tracking
+; Purpose: Entrena la habilidad de Rastrear/Tracking.
 ; Instrucciones: - Necesitas un Golem y comida en la mochila.
-;                - Si quieres usar otra cosa para rastrear que no estÈ en la categorÌa de "Monstruos", debes cambiar las coordenadas de las dos lÌneas que ejecutan los dos "click".
+;                - Si quieres usar otra cosa para rastrear que no est√© en la categor√≠a de "Monstruos", debes cambiar las coordenadas de las dos l√≠neas que ejecutan los dos "click".
 ;==================================
-set %tiempo_alimentacion 360 ; Cada cu·ntos segundos va a comprobar si tiene hambre.
+set %tiempo_alimentacion 360 ; Cada cu√°ntos segundos va a comprobar si tiene hambre.
 set %comida RGG_NRD_QSD_ZBG_WLI_QRD_END_FUD_YLI_WLI_HGI
  +_KGI_EGI_QLI_KLI_MLI_KRD_HQD_AQD_MQE_VQE_TQE_JQE_IQE
  +_GQE_SPE_ZPE_OQE_BDF_KPE_RQE_YSD_SQD_YWI_AXI_PQD_QQD
@@ -26,7 +26,7 @@ set %tiempo_actual #SCNT
 set %proxima_vez #SCNT
 chooseskill trac real
 set %SkillIni #SKILL
-display OK Sit˙ate al lado del golem y pulsa play.
+display OK Sit√∫ate al lado del golem y pulsa play.
 
 inicio:
 set %tiempo_actual #SCNT
@@ -38,7 +38,7 @@ set %subidos #skill - %SkillIni
 setuotitle | Rastrear | S.Inicial: %SkillIni | S. Actual: #SKILL | Incremento: %subidos
 if #skill >= 1000
    {
-     display °Somos GM Tracking! :-) ; FIN
+     display ¬°Somos GM Tracking! :-) ; FIN
      halt
    }
 event macro 13 38
@@ -60,14 +60,14 @@ goto inicio
 sub comprobar_comida
 {
   hambriento:
-  set %jrnl #jindex ; Marcamos un Ìndice de las lÌneas del diario.
+  set %jrnl #jindex ; Marcamos un √≠ndice de las l√≠neas del diario.
   event macro 3 0 .hungry
   wait 20
   while #true
      {
-       if #jindex > %jrnl ; Si aparece una nueva lÌnea.
+       if #jindex > %jrnl ; Si aparece una nueva l√≠nea.
           {
-            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de lÌnea.
+            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de l√≠nea.
              scanjournal %jrnl   ; La leemos...
             if Estas_no_le_afecta_el_hambre in #journal || Estas_tan_lleno_que_no_puedes in #journal || Estas_totalmente_saciado in #journal
                {
@@ -94,7 +94,7 @@ sub comprobar_comida
                                  set %proxima_vez %tiempo_actual + %tiempo_alimentacion
                                }
                        }
-                       else ; Mensaje extraÒo, repetimos...
+                       else ; Mensaje extra√±o, repetimos...
                           {
                             goto hambriento
                           }
@@ -174,7 +174,7 @@ goto _lets_wait_for_a_message
 ;=================================================================
 sub wait_for_GUMP ; version 1.4 ~Locke
 ;=================================================================
-; AÒadido #CONTID para "sub abrir_cofre"
+; A√±adido #CONTID para "sub abrir_cofre"
 if !_A0 < 3
 {
 display ok You haven't specified enough vars.$
