@@ -39,7 +39,9 @@
 ; ///////////////////////////////
 ;________________________________
 ;
-set %cofre UXVXMND      ; Donde tienes lingotes, Mazas de herrero, y Herramientas de artesano.
+set %cofre UXVXMND                ; Donde tienes lingotes.
+set %bolsa_herramientas UXVXMND   ; Bolsa con Herramientas de artesano.
+set %bolsa_mazas UXVXMND          ; Bolsa con Mazas de Herrero.
 set %tiempo_alimentacion 360
 ;________________________________________________
 ;
@@ -125,7 +127,7 @@ if #FINDCNT = 0
   finditem %herramientas C_ , #BACKPACKID
   if #FINDCNT < 2
      {
-       finditem %herramientas C_ , %cofre
+       finditem %herramientas C_ , %bolsa_herramientas
        if #FINDCNT > 2
           {
             exevent drag #FINDID 1
@@ -154,7 +156,7 @@ if #FINDCNT = 0
   finditem %martillos C_ , #BACKPACKID
   if #FINDCNT < 2
      {
-       finditem %martillos C_ , %cofre
+       finditem %martillos C_ , %bolsa_mazas
        if #FINDCNT >= 2
           {
             exevent drag #FINDID 1
@@ -165,7 +167,7 @@ if #FINDCNT = 0
           else
              {
                set #SYSMSGCOL 38
-               event sysmessage NO QUEDAN MARTILLOS! :-(
+               event sysmessage NO QUEDAN MAZAS! :-(
                halt
              }
      }
