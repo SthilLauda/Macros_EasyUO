@@ -28,24 +28,24 @@
 ; Version: 1.1
 ; Client Tested with: 2.0.3
 ; EUO version tested with: EasyUO 1.5 Version 243
-; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Shard: Ultima Alianza (Â¡Hasta la muerte!)
 ; Revision Date: 040710
 ; Public Release:  040710
-; Purpose: Subir skill de tactics, sword, etc, peleando contra presencias incorpóreas.
+; Purpose: Subir skill de tactics, sword, etc, peleando contra presencias incorpÃ³reas.
 set %version v1.1
 ;________________________________
 ;
 ; ///////////////////////////////
-; ******** CONFIGURACIÓN ********
+; ******** CONFIGURACIÃ“N ********
 ; ///////////////////////////////
 ;________________________________
 ;
 set %tiempo_attack 3 ; En segundos, cada cuanto ordenar el ataque.
-set %tiempo_comer 360 ; Cada cuántos segundos va a comprobar si tiene hambre.
+set %tiempo_comer 360 ; Cada cuÃ¡ntos segundos va a comprobar si tiene hambre.
 ;________________________________________________
 ;
 ; //////////////////////////////////////////////
-; ************* FIN CONFIGURACIÓN *************
+; ************* FIN CONFIGURACIÃ“N *************
 ; //////////////////////////////////////////////
 ;________________________________________________
 ;
@@ -77,8 +77,8 @@ wait 2s
 ;
 ;========================================================
 loop:
-set %tiempo_actual #SCNT ; Actualiza el reloj
-if %proxima_vez <= %tiempo_actual ; Triger de alimentación
+set %tiempo_actual #SCNT ; Actualiza el reloj.
+if %proxima_vez <= %tiempo_actual ; Triger de alimentaciÃ³n.
    {
      gosub comprobar_comida
    }
@@ -101,7 +101,7 @@ goto loop
 ;========================================================
 
 ;=====================================================
-; Rutina para buscar y atacar una presencia incorpórea
+; Rutina para buscar y atacar una presencia incorpÃ³rea
 ;=====================================================
 sub atacar
 finditem %presencia G_2
@@ -119,7 +119,7 @@ return
 ;=====================================================
 sub comprobar_arma
 finditem %tipos_armas C_ , #CHARID
-if #FINDKIND = -1 ; Si no está en el pj, entonces se ha roto...
+if #FINDKIND = -1 ; Si no estÃ¡ en el pj, entonces se ha roto...
    {
      finditem %tipos_armas C_ , #BACKPACKID ; Buscamos una en la mochila, y la equipamos...
      if #FINDKIND <> -1
@@ -162,7 +162,7 @@ sub comprobar_comida ;<=========================>
                          wait 20
                          goto hambriento
                        }
-                       else ; Mensaje extraño, repetimos...
+                       else ; Mensaje extraÃ±o, repetimos...
                           {
                             goto hambriento
                           }
