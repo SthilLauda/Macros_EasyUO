@@ -1,4 +1,4 @@
-;        |                                 /   \                   |       .
+;        |                                 /   \                   |       .               .
 ;  _    -O-       .                )      ((   ))     (           -O-
 ; (@)    |     +                  /|\      ))_((     /|\           |            .
 ; |-|                            / | \    (/\|/\)   / | \                            (@)
@@ -30,7 +30,7 @@
 ; Version: 2.0
 ; Client Tested with: 2.0.3
 ; EUO version tested with: 1.5 Version 142
-; Shard: Ultima Alianza ¡Hasta la muerte!
+; Shard: Ultima Alianza Â¡Hasta la muerte!
 ; Public Release: 05/04/2019
 ; Purpose: Entrena habilidades de combate usando tres (3) dummy's.
 ; ================================
@@ -38,7 +38,7 @@ set %version v2.0
 ; ________________________________
 ;
 ; ///////////////////////////////
-; ******** CONFIGURACIÓN ********
+; ******** CONFIGURACIÃ“N ********
 ; ///////////////////////////////
 ; ________________________________
 ;
@@ -46,7 +46,7 @@ set %tiempo_alimentacion 360 ; En segundos = 5 minutos.
 ; _______________________________________________
 ;
 ; //////////////////////////////////////////////
-; ************* FIN CONFIGURACIÓN *************
+; ************* FIN CONFIGURACIÃ“N *************
 ; //////////////////////////////////////////////
 ; _______________________________________________
 ;
@@ -191,14 +191,14 @@ return
 sub comprobar_comida
 {
   hambriento:
-  set %jrnl #jindex ; Marcamos un índice de las líneas del diario.
+  set %jrnl #jindex ; Marcamos un Ã­ndice de las lÃ­neas del diario.
   event macro 3 0 .hungry
   wait 20
   while #true
      {
-       if #jindex > %jrnl ; Si aparece una nueva línea.
+       if #jindex > %jrnl ; Si aparece una nueva lÃ­nea.
           {
-            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de línea.
+            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de lÃ­nea.
             scanjournal %jrnl   ; La leemos...
             if Dentro_de_1_minuto in #journal
                {
@@ -228,7 +228,7 @@ sub comprobar_comida
                                  set %proxima_vez %tiempo_actual + %tiempo_alimentacion
                                }
                        }
-                       else ; Mensaje extraño, repetimos...
+                       else ; Mensaje extraÃ±o, repetimos...
                           {
                             goto hambriento
                           }
@@ -241,7 +241,7 @@ return
 
 ;-@ ============================== @-;
 ;-@ ############################## @-;
-;-@ SUBS públicos del Foro EasyUO  @-;
+;-@ SUBS pÃºblicos del Foro EasyUO  @-;
 ;-@ ############################## @-;
 ;-@ ============================== @-;
 ;
