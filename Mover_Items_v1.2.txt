@@ -9,11 +9,11 @@
 ; Version: 1.2
 ; Client Tested with: 2.0.3
 ; EUO version tested with: EasyUO 1.5 Version 243
-; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Shard: Ultima Alianza (Â¡Hasta la muerte!)
 ; Public Release: 04/05/2019
-; Revised On: 30/07/2019
-; Propósito: Mover de un contendor a otro todos los objetos de un determinado tipo.
-; Instrucciones: Elegir las bolsas de origen y destino, y por último el tipo de objeto.
+; Revised On: 29/07/2019
+; PropÃ³sito: Mover de un contendor a otro todos los objetos de un determinado tipo.
+; Instrucciones: Elegir las bolsas de origen y destino, y por Ãºltimo el tipo de objeto.
 
 configurar:
 if %confp = 1 || %confp = N/A
@@ -142,7 +142,7 @@ halt
 ;======================================================================
 sub wait_for_GUMP ; version 1.4 ~Locke
 ;=================================================================
-; Añadido #CONTID ^^
+; AÃ±adido #CONTID ^^
 if !_A0 < 3
 {
 display ok You haven't specified enough vars.$
