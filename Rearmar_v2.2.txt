@@ -37,16 +37,16 @@
 ; Version: 2.2
 ; Client Tested with: 2.0.3
 ; EUO version tested with: EasyUO 1.5 Version 243
-; Shard: Ultima Alianza ¡Hasta la muerte!
-; Purpose: Equiparse el arma y escudo, o arco/ballesta automaticamente si no están equipados.
+; Shard: Ultima Alianza Â¡Hasta la muerte!
+; Purpose: Equiparse el arma y escudo, o arco/ballesta automaticamente si no estÃ¡n equipados.
 ;
 ; Instrucciones: - Iniciar la macro con el arma y el escudo equipado, y el arco en la mochila.
-;                - Guardar en el UO el ID del arma, escudo y arco. Comando: "guardar_uid 1, guardar_uid 2, guardar_uid 3"
+;                - Guardar en el UO el ID del arma, escudo y arco. Comando: "guardar_uid 1, guardar_uid 2, guardar_uid 3".
 ;                - Para cambiar de armas o escudo, configurar 3 macros en el UO: "say usar_uid 1", etc.
 ;                - No hay problema por cambiar de repente a una segunda arma o arco (si llevas dos slayer distintas, etc)
-;                  o incluso al intercambiar un arma a dos manos por una de una mano, el escudo se equipará automáticamente.
-;                - La macro además de "recordar" el último arma, arco o escudo equipados en el PJ, analiza las armas
-;                  y determina qué combinaciones válidas hay entre ellas, para equiparlas cuando dejen de estarlo.
+;                  o incluso al intercambiar un arma a dos manos por una de una mano, el escudo se equiparÃ¡ automÃ¡ticamente.
+;                - La macro ademÃ¡s de "recordar" el Ãºltimo arma, arco o escudo equipados en el PJ, analiza las armas
+;                  y determina quÃ© combinaciones vÃ¡lidas hay entre ellas, para equiparlas cuando dejen de estarlo.
 ;
 ;========================================================
 set %version v2.2
@@ -121,37 +121,37 @@ while #CHARGHOST <> YES ; Mientras estamos con vida
                  {
                    goto loop_arco ; Nos vamos a controlar el arco...
                  }
-             ; En este punto, se entiende que por algún motivo se nos ha caído el arma en la mochila...
+             ; En este punto, se entiende que por algÃºn motivo se nos ha caÃ­do el arma en la mochila...
              finditem %arma_equipada C_ , #BACKPACKID
-             if #FINDKIND = -1 ; Si no está en la mochila, entonces se entiende que está equipada...
+             if #FINDKIND = -1 ; Si no estÃ¡ en la mochila, entonces se entiende que estÃ¡ equipada...
                 {
                   if ( %escudo_on && ! %a_dos_manos ) ; Y si es un arma de una sola mano, y tenemos escudo...
                        {
                          goto Escudo ; Pasamos a comprobar el Escudo...
                        }
                 }
-                else ; Hemos encontrado en la mochila el arma que llevábamos puesta... ¡EQUIPAMOS!
+                else ; Hemos encontrado en la mochila el arma que llevÃ¡bamos puesta... Â¡EQUIPAMOS!
                    {
-                     if ( %escudo_on && ! %a_dos_manos ) ; Si llevábamos un escudo y un arma de una mano...
+                     if ( %escudo_on && ! %a_dos_manos ) ; Si llevÃ¡bamos un escudo y un arma de una mano...
                           {
                             set #LOBJECTID %arma_una_mano
-                            event macro 17 0 ; Equipamos el último arma de una mano que hemos visto equipada...
+                            event macro 17 0 ; Equipamos el Ãºltimo arma de una mano que hemos visto equipada...
                             gosub wait_for ITEM %arma_una_mano C_ , #CHARID 20
                           }
-                          else ; Si no teníamos escudo pero sí un arma de dos manos...
+                          else ; Si no tenÃ­amos escudo pero sÃ­ un arma de dos manos...
                              {
                                if ( ! %escudo_on && %a_dos_manos )
                                     {
                                       set #LOBJECTID %arma_dos_manos
-                                      event macro 17 0 ; Equipamos el último arma de dos manos que hemos visto equipada...
+                                      event macro 17 0 ; Equipamos el Ãºltimo arma de dos manos que hemos visto equipada...
                                       gosub wait_for ITEM %arma_dos_manos C_ , #CHARID 20
                                     }
-                                    else ; Si no teníamos escudo pero sí un arma de una mano...
+                                    else ; Si no tenÃ­amos escudo pero sÃ­ un arma de una mano...
                                        {
                                          if ( ! %escudo_on && ! %a_dos_manos )
                                              {
                                                set #LOBJECTID %arma_una_mano
-                                               event macro 17 0 ; Equipamos el último arma de una mano que hemos visto equipada...
+                                               event macro 17 0 ; Equipamos el Ãºltimo arma de una mano que hemos visto equipada...
                                                gosub wait_for ITEM %arma_una_mano C_ , #CHARID 2
                                              }
                                        }
@@ -183,11 +183,11 @@ while #CHARGHOST <> YES ; Mientras estamos con vida
         loop_arco:
         wait 20
         finditem %arcos C_ , #CHARID
-        if #FINDKIND <> -1 ; Está equipado en el PJ
+        if #FINDKIND <> -1 ; EstÃ¡ equipado en el PJ
            {
              set %arco_equipado #FINDID
            }
-        if #FINDKIND = -1 ; No está equipado
+        if #FINDKIND = -1 ; No estÃ¡ equipado
            {
              finditem %armas C_ , #CHARID ; Si llevamos un arma puesta
              if #FINDKIND <> -1
@@ -199,7 +199,7 @@ while #CHARGHOST <> YES ; Mientras estamos con vida
                 {
                   goto loop_armar
                 }
-             finditem %arco_equipado c_ , #BACKPACKID ; Buscamos en la mochila el arco que teníamos equipado...
+             finditem %arco_equipado c_ , #BACKPACKID ; Buscamos en la mochila el arco que tenÃ­amos equipado...
              if #FINDKIND <> -1
                 {
                   set #LOBJECTID %arco_equipado
