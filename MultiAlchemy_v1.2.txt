@@ -1,0 +1,1115 @@
+; =====================================================================================================
+;  '||   ||` '||`   ||                                 /.\      '||`
+;   ||   ||   ||    ||     ''                         // \\      ||   ''
+;   ||   ||   ||  ''||''   ||  '||),,(|,   '''|.     //...\\     ||   ||   '''|.  `||''|,  '''/  '''|.
+;   ||   ||   ||    ||     ||   || || ||  .|''||    //     \\    ||   ||  .|''||   ||  ||   //  .|''||
+;   `|...|'  .||.   `|..' .||. .||    ||. `|..||. .//       \\. .||. .||. `|..||. .||  ||. /... `|..||.
+; =====================================================================================================
+;
+; Script Name: Multi Alchemist
+;
+;                CHECK ME OUT I'M
+; (       "     )  APPLYING WHAT I LEARNED
+;  ( _  *         FROM THE HARRY POTTER BOOKS
+;     * (     /      \    ___
+;        "     "        _/ /
+;       (   *  )    ___/   |
+;         )   "     _ o)'-./__
+;        *  _ )    (_, . $$$
+;        (  )   __ __ 7_ $$$$
+;         ( :  { _)  '---  $\
+;    ______'___//__\   ____, \
+;     )           ( \_/ _____\_
+;   .'             \   \------''.
+;   |='           '=|  |         )
+;   |               |  |  .    _/
+;    \    (. ) ,   /  /__I_____\
+;snd  '._/_)_(\__.'   (__,(__,_]
+;    @---()_.'---@      `"""""""`
+;
+set %version v1.2
+;
+; Author: Sthil Lauda
+; Version: 1.2
+; Client Tested with: 2.0.3
+; EUO version tested with: 1.5 Version 142
+; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Public Release: 08/12/2019
+; Revised On: 17/08/2019
+; Purpose: Fabrica Kegs de varios tipos y tamaños :-)
+; Instrucciones; Configurar y abrir todas las bolsas, activar un tipo de KEG, el tamaño que van a tener, y el número de KEGS que quieres hacer.
+;*************************************************
+set #SYSMSGCOL 88
+event sysmessage =====================
+set #SYSMSGCOL 53
+event sysmessage Multi Alchemist %version
+set #SYSMSGCOL 88
+event sysmessage =====================
+wait 20
+;________________________________
+;
+; ///////////////////////////////
+; ******** CONFIGURACIÓN ********
+; ///////////////////////////////
+;________________________________
+;
+; Contenedores con *** Materiales ***
+set %contenedor1 OAZMEPD ; Bolsa o cofre con Regs.
+set %contenedor2 TJKQEPD ; Bolsa o cofre con Barriles llenos.
+set %contenedor3 NDIRIOD ; Bolsa o cofre con Barriles vacíos.
+set %contenedor4 IRDTUND ; Bolsa de Morteros o cofre con bolsas de Morteros (abiertas).
+set %contenedor5 WTMMPQD ; Bolsa o cofre con Botellas vacías.
+; Alimentacioón; Cada cuántos segundos va a comprobar si tiene hambre.
+; [ 60 = 1 Minuto ]
+set %tiempo_alimentacion 360
+; Tamaño del Keg
+; [ 100, 500, 1000, Lo que quieras... ^^ ]
+set %tamano_keg 1000
+; Cuántos Kegs del mismo tipo quieres hacer.
+set %numero_kegs 1
+; Cuántos regs reponer en la mochila de una tacada.
+set %cantidad_regs 100 ; Esto lo puedes ir viendo según el peso que puedas cargar, y el tamaño del Keg que quieras hacer...
+;--------------------------------------------------------------------
+; Tipo de Keg [ ¡Sólo se puede activar 1 tipo de Keg al mismo tiempo! ]
+; [ #TRUE = Activado | #FALSE = Desactivado ]
+;--------------------------------------------
+set %veneno_menor #TRUE
+set %invis #FALSE
+set %curacion #FALSE
+set %fuerza #FALSE
+set %agilidad #FALSE
+set %antidoto #FALSE
+set %resistencia #FALSE
+set %inteligencia #FALSE
+set %bendecir #FALSE
+set %encojer #FALSE
+set %piel_piedra #FALSE
+set %explosion #FALSE
+set %mana #FALSE
+;________________________________________________
+;
+; //////////////////////////////////////////////
+; ************* FIN CONFIGURACIÓN *************
+; //////////////////////////////////////////////
+;________________________________________________
+;
+set %comida RGG_NRD_QSD_ZBG_WLI_QRD_END_FUD_YLI_WLI_HGI
+ +_KGI_EGI_QLI_KLI_MLI_KRD_HQD_AQD_MQE_VQE_TQE_JQE_IQE
+ +_GQE_SPE_ZPE_OQE_BDF_KPE_RQE_YSD_SQD_YWI_AXI_PQD_QQD
+set %regs_ids WZF_QZF_JZF_MZF_JUF_KZF_KUF_RZF_IUF_FUF_LZF_SZF
+set %regs_veneno WZF       ; Belladona
+set %regs_invis QZF        ; Sangre de Dragón
+set %regs_curacion JZF     ; Ginseng
+set %regs_fuerza MZF       ; Raíz de Mandrágora
+set %regs_agilidad JUF     ; Musgo de Sangre
+set %regs_antidoto KZF     ; Ajo
+set %regs_resistencia KUF  ; Perla Nigga
+set %regs_inteligencia KZF_RZF ; Ajo + Seda
+set %regs_bendecir KZF_MZF ; Ajo + Mandrágora
+set %regs_encojer IUF      ; Alas de Murciélago
+set %regs_piel_piedra FUF  ; Azufre
+set %regs_explosion SZF    ; Ceniza Sulfurusa
+set %regs_mana LZF         ; Ojos de Tritón
+set %botellas WUF          ; Frascos Vacíos
+set %barril QMJ_YBK_XBK    ; Barriles Vacíos
+set %morteros RQF          ; ¬¬
+set %tiempo_actual #SCNT
+set %proxima_vez #SCNT
+set %start1 #TRUE
+set %start2 #TRUE
+set %num_kegs 0
+set %tamano_keg %tamano_keg - 1 ; Little fix XD
+set %_worldsavejournalindex #jindex ; Journal para escanear en busca de save's del server.
+set *CEOWorldSaving #FALSE          ; Indica si hay un save del server en marcha.
+ignoreitem reset
+
+gosub checkGuantes   ; Avisar si no llevamos +10 de bonificación a Alquimia (Guantes del Alquimista)
+gosub checkLuck      ; Comprobar la suerte (Influye un poco en el crafteo...)
+gosub wait_for GUMP 530_480 CLOSE ; Cerrar el menú de craftear
+gosub setupHid       ; Modo alquimista "oculto" :P
+gosub limpiarMochila ; Limpiar regs antes de arrnacar la macro
+gosub selectReg      ; Seleccionar el REG que vamos a usar
+gosub hiding         ; Nos ocultamos en donde estemos... XD
+
+;========================================================
+;
+; ******************* LOOP PRINCIPAL ********************
+;
+;========================================================
+
+;-----------------------------------------------------------------------------------------
+  Loop:                                                                                  ;
+  gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120 ;
+  gosub checkHungry                                                                      ;
+  gosub cogerBa                                                                          ;
+  gosub cogerBo                                                                          ;
+  gosub cogerM                                                                           ;
+  gosub cogerR                                                                           ;
+  gosub pociones                                                                         ;
+  goto Loop                                                                              ;
+;-----------------------------------------------------------------------------------------
+
+;========================================================
+;
+; ***************** FIN LOOP PRINCIPAL ******************
+;
+;========================================================
+
+;*************************************************
+;                 COGER BARRILES
+;*************************************************
+sub cogerBa
+set %peso #WEIGHT
+finditem %barril C_ , #BACKPACKID
+if #FINDCNT < 1
+   {
+     finditem %barril C_ , %contenedor3
+     if #FINDCNT >= 1
+        {
+          for #FINDINDEX 1 #FINDCNT
+              {
+                if #FINDTYPE in %barril
+                   {
+                     if #FINDCOL = 0
+                        {
+                          exevent drag #FINDID
+                          gosub waitForSysVar Weight <> %peso 50 ; Esperamos a que cambie el peso del PJ
+                          exevent dropc #BACKPACKID
+                          gosub waitforitem #FINDID 50 #BACKPACKID ; Esperamos a que caiga el objeto en la mochila
+                          return
+                        }
+                   }
+              }
+        }
+        else
+           {
+             set #SYSMSGCOL 38
+             event sysmessage NO QUEDAN BARRILES!
+             halt
+           }
+   }
+return
+
+;*************************************************
+;                  COGER BOTELLAS
+;*************************************************
+sub cogerBo
+gosub comprobarBo
+finditem %botellas C_ , #BACKPACKID
+if #FINDCNT = 0 ; Si no hay nada de nada
+   {
+     finditem %botellas C_ , %contenedor5 ; Echamos una botella
+     if #FINDSTACK > 0
+        {
+          exevent drag #FINDID 1
+          gosub waitForSysVar Weight <> %peso 50 ; Esperamos a que cambie el peso del PJ
+          exevent dropc #BACKPACKID
+          gosub waitforitem #FINDID 50 #BACKPACKID ; Esperamos a que caiga el objeto en la mochila
+        }
+        else
+           {
+             set #SYSMSGCOL 38
+             event sysmessage NO QUEDAN BOTELLAS!
+             halt
+           }
+   }
+return
+
+;*************************************************
+;                  COMPROBAR BOTELLAS
+;*************************************************
+sub comprobarBo
+_botella:
+set %peso #WEIGHT
+finditem %botellas C_ , #BACKPACKID
+for #FINDINDEX 1 #FINDCNT
+    {
+      if #FINDCNT > 0
+         {
+           if #FINDCOL = 0 ; Botella vacía
+              {
+                return ; Ya tenemos una
+              }
+              else
+                 {
+                   ; Hemos encontrado una botella en la mochila. Comprobamos si es de las que estamos macreando, y la metemos en el KEG...
+                   if ( #FINDCOL = 368 && %veneno_menor ) || ( #FINDCOL = 703 && %invis ) || ( #FINDCOL = 254 && %curacion ) || ( #FINDCOL = 696 && %fuerza ) || ( #FINDCOL = 99 && %agilidad ) || ( #FINDCOL = 40 && %antidoto ) || ( #FINDCOL = 37 && %resistencia ) || ( #FINDCOL = 1965 && %inteligencia ) || ( #FINDCOL = 1953 && %bendecir ) || ( #FINDCOL = 1082 && %encojer ) || ( #FINDCOL = 1870 && %piel_piedra ) || ( #FINDCOL = 18 && %explosion ) || ( #FINDCOL = 904 && %mana )
+                        {
+                          gosub llenar
+                          goto _botella
+                        }
+                 }
+         }
+    }
+return
+
+;*************************************************
+;                 COGER MORTEROS
+;*************************************************
+sub cogerM
+set %peso #WEIGHT
+finditem %morteros C_ , #BACKPACKID
+if #FINDCNT < 2
+   {
+     ignoreitem #FINDID
+     finditem %morteros C , %contenedor4 ; Buscamos en todas las bolsas abiertas...
+     if #FINDCNT > 0
+        {
+          exevent drag #FINDID
+          gosub waitForSysVar Weight <> %peso 50 ; Esperamos a que cambie el peso del PJ
+          exevent dropc #BACKPACKID
+          gosub waitforitem #FINDID 50 #BACKPACKID ; Esperamos a que caiga el objeto en la mochila
+        }
+        else
+           {
+             set #SYSMSGCOL 38
+             event sysmessage NO QUEDAN MORTEROS!
+             halt
+           }
+   }
+ignoreitem reset
+return
+
+;*************************************************
+;                   COGER REGS
+;*************************************************
+sub cogerR
+_checkReg:
+set %peso #WEIGHT
+str len %regs
+set %num_letras #STRRES
+if %num_letras = 3 ; Necesitamos un único tipo de REG
+   {
+     finditem %regs C_ , #BACKPACKID
+     if #FINDSTACK < 10 ; Nos quedan pocos en la mochila
+        {
+          gosub reponerReg %regs
+        }
+   }
+   else
+      {
+        if %num_letras = 7 ; Necesitamos más de un REG
+           {
+             if ( %start2 )
+                  {
+                    str Del %regs 4 7 ; Borrar de la letra 4 a la 7
+                    set %reg1 #strres ; Primer REG
+                  }
+             finditem %reg1 C_ , #BACKPACKID
+             if #FINDSTACK < 10 ; Nos quedan pocos en la mochila
+                {
+                  gosub reponerReg %reg1
+                }
+             if ( %start2 )
+                  {
+                    str Del %regs 1 4 ; Borrar de la letra 1 a la 4
+                    set %reg2 #strres ; Segundo REG
+                    set %start2 #FALSE
+                  }
+             finditem %reg2 C_ , #BACKPACKID
+             if #FINDSTACK < 5 ; Nos quedan pocos en la mochila
+                {
+                  gosub reponerReg %reg2
+                }
+           }
+      }
+return
+
+;*************************************************
+;                   MOVER REGS
+;*************************************************
+sub reponerReg
+set %tipo_reg %1
+finditem %tipo_reg C_ , %contenedor1 ; Buscamos en el cofre
+if #FINDSTACK >= %cantidad_regs
+   {
+     exevent drag #FINDID %cantidad_regs
+     gosub waitForSysVar Weight <> %peso 50 ; Esperamos a que cambie el peso del PJ
+     exevent dropc #BACKPACKID
+     gosub waitforitem #FINDID 50 #BACKPACKID ; Esperamos a que caiga el objeto en la mochila
+   }
+   else
+      {
+        set #SYSMSGCOL 38
+        event sysmessage NO QUEDAN MAS REGS!
+        halt
+      }
+return
+
+;*************************************************
+;                  HACER POCIONES
+;*************************************************
+sub pociones
+if ( %start1 )
+     {
+       set %start1 #false
+       _craft_menu:
+       finditem %morteros C_ , #BACKPACKID
+       if #FINDCNT > 0
+          {
+            set #LOBJECTID #FINDID
+            event macro 17 0
+            gosub wait_for GUMP 530_480 30
+            gosub clickPoti
+            gosub checkllenar
+            return
+          }
+     }
+     else
+        {
+          if ( #CONTNAME <> generic_gump ) && ( #CONTSIZE <> 530_480 )
+               {
+                 goto _craft_menu
+               }
+          click 326 495 f dmc
+          gosub wait_for GUMP 530_480 50
+          gosub checkllenar
+          return
+        }
+return
+
+;*************************************************
+;     COMPROBAR SI SE PUEDE LLENAR EL BARRIL
+;*************************************************
+sub checkllenar
+finditem %botellas C_ , #BACKPACKID
+if ( #FINDKIND <> -1 )
+     {
+       for #FINDINDEX 1 #FINDCNT
+           {
+             if #FINDCNT > 0
+                {
+                  if ( #FINDCOL = 368 && %veneno_menor ) || ( #FINDCOL = 703 && %invis ) || ( #FINDCOL = 254 && %curacion ) || ( #FINDCOL = 696 && %fuerza ) || ( #FINDCOL = 99 && %agilidad ) || ( #FINDCOL = 40 && %antidoto ) || ( #FINDCOL = 37 && %resistencia ) || ( #FINDCOL = 1965 && %inteligencia ) || ( #FINDCOL = 1953 && %bendecir ) || ( #FINDCOL = 1082 && %encojer ) || ( #FINDCOL = 1870 && %piel_piedra ) || ( #FINDCOL = 18 && %explosion ) || ( #FINDCOL = 904 && %mana )
+                       {
+                         gosub llenar
+                       }
+                }
+           }
+     }
+return
+
+;*************************************************
+;                  LLENAR BARRIL
+;*************************************************
+sub llenar
+finditem %barril , _ , %botellas C_ , #BACKPACKID
+for #FINDINDEX 1 #FINDCNT
+    {
+      if #FINDTYPE in %barril
+         {
+           set #LOBJECTID #FINDID
+           set %keg_id #FINDID
+         }
+      if #FINDTYPE in %botellas
+         {
+           set #LTARGETID #FINDID
+         }
+    }
+event macro 17
+target 3s
+set %jstart #jindex
+set #LTARGETKIND 1
+event macro 22
+set %peso #WEIGHT
+gosub wait_for MSG rellenas lleno 50
+if ( #true in #result )
+     {
+       gosub check_keg
+     }
+return
+
+;*************************************************
+;                  COMPROBAR EL BARRIL
+;*************************************************
+sub check_keg
+event property %keg_id
+str pos #PROPERTY [
+set %i #strRes + 1
+str pos #PROPERTY ]
+set %d #strRes - %i
+str mid #PROPERTY %i %d
+set %cantidad_keg #strRes
+if %cantidad_keg >= %tamano_keg
+   {
+     set %num_kegs %num_kegs + 1
+     gosub mover_keg
+   }
+return
+
+;*************************************************
+;                  MOVER EL BARRIL
+;*************************************************
+sub mover_keg
+_mover_keg:
+finditem %keg_id C_ , #BACKPACKID
+if #FINDKIND <> -1
+   {
+     exevent drag %keg_id
+     exevent dropc %contenedor2
+     gosub waitForSysVar Weight <> %peso 50 ; Esperamos a que cambie el peso del PJ
+     gosub waitforitem %keg_id 50 %contenedor2 ; Esperamos a que caiga el objeto en la mochila
+     goto _mover_keg
+   }
+if %num_kegs = %numero_kegs
+   {
+     set #SYSMSGCOL 68
+     event sysmessage HEMOS ACABADO :-)
+     halt
+   }
+return
+
+;*************************************************
+;                  SELECCIONAR EL REG
+;*************************************************
+sub selectReg
+set %max_reg 0
+if %veneno_menor
+   {
+     set %regs %regs_veneno
+     set %max_reg %max_reg + 1
+   }
+if %invis
+   {
+     set %regs %regs_invis
+     set %max_reg %max_reg + 1
+   }
+if %curacion
+   {
+     set %regs %regs_curacion
+     set %max_reg %max_reg + 1
+   }
+if %fuerza
+   {
+     set %regs %regs_fuerza
+     set %max_reg %max_reg + 1
+   }
+if %agilidad
+   {
+     set %regs %regs_agilidad
+     set %max_reg %max_reg + 1
+   }
+if %antidoto
+   {
+     set %regs %regs_antidoto
+     set %max_reg %max_reg + 1
+   }
+if %resistencia
+   {
+     set %regs %regs_resistencia
+     set %max_reg %max_reg + 1
+   }
+if %inteligencia
+   {
+     set %regs %regs_inteligencia
+     set %max_reg %max_reg + 1
+   }
+if %bendecir
+   {
+     set %regs %regs_bendecir
+     set %max_reg %max_reg + 1
+   }
+if %encojer
+   {
+     set %regs %regs_encojer
+     set %max_reg %max_reg + 1
+   }
+if %piel_piedra
+   {
+     set %regs %regs_piel_piedra
+     set %max_reg %max_reg + 1
+   }
+if %explosion
+   {
+     set %regs %regs_explosion
+     set %max_reg %max_reg + 1
+   }
+if %mana
+   {
+     set %regs %regs_mana
+     set %max_reg %max_reg + 1
+   }
+if ( %max_reg = 0 || %max_reg > 1 )
+     {
+       display OK Hay algún problema en la configuración de los REGS :-(
+       set #SYSMSGCOL 53
+       event sysmessage PROBLEMA EN LA CONFIGURACION
+       wait 20
+       set #SYSMSGCOL 38
+       event sysmessage PARANDO LA MACRO... :-(
+       halt
+     }
+return
+
+;*************************************************
+;            ELEGIR EL MENU DE POCIONES
+;*************************************************
+sub clickPoti
+if %veneno_menor ; Venenos
+   {
+     click 64 210 f
+     gosub wait_for GUMP 530_480 30
+     click 269 109 f
+     gosub wait_for GUMP 530_480 50
+     return
+   }
+if %invis ; Mixturas
+   {
+     click 67 270 f
+     gosub wait_for GUMP 530_480 30
+     click 275 250 f
+     gosub wait_for GUMP 530_480 50
+     return
+   }
+if %curacion ; Curación
+   {
+     click 67 190 f
+     gosub wait_for GUMP 530_480 30
+     click 273 149 f
+     gosub wait_for GUMP 530_480 50
+     return
+   }
+if %fuerza ; Atributos
+   {
+     click 67 130 f
+     gosub wait_for GUMP 530_480 30
+     click 274 170 f
+     gosub wait_for GUMP 530_480 50
+     return
+   }
+if %agilidad ; Atributos
+   {
+     click 67 130 f
+     gosub wait_for GUMP 530_480 30
+     click 274 130 f
+     gosub wait_for GUMP 530_480 50
+     return
+   }
+if %antidoto ; Antídoto
+   {
+     click 67 230 f
+     gosub wait_for GUMP 530_480 30
+     click 274 150 f
+     gosub wait_for GUMP 530_480 50
+     return
+   }
+if %resistencia ; Resistencia
+   {
+     click 67 150 f
+     gosub wait_for GUMP 530_480 30
+     click 274 130 f
+     gosub wait_for GUMP 530_480 50
+     return
+   }
+if %inteligencia ; Atributos
+   {
+     click 67 130 f
+     gosub wait_for GUMP 530_480 30
+     click 274 210 f
+     gosub wait_for GUMP 530_480 50
+     return
+   }
+if %bendecir ; Atributos
+   {
+     click 67 130 f
+     gosub wait_for GUMP 530_480 30
+     click 274 230 f
+     gosub wait_for GUMP 530_480 50
+     return
+   }
+if %encojer ; Mixturas
+   {
+     click 67 270 f
+     gosub wait_for GUMP 530_480 30
+     click 274 169 f
+     gosub wait_for GUMP 530_480 50
+     return
+   }
+if %piel_piedra ; Mixturas
+   {
+     click 67 270 f
+     gosub wait_for GUMP 530_480 30
+     click 274 230 f
+     gosub wait_for GUMP 530_480 50
+     return
+   }
+if %explosion ; Explosión
+   {
+     click 67 250 f
+     gosub wait_for GUMP 530_480 30
+     click 274 150 f
+     gosub wait_for GUMP 530_480 50
+     return
+   }
+if %mana ; Maná
+   {
+     click 67 170 f
+     gosub wait_for GUMP 530_480 30
+     click 274 130 f
+     gosub wait_for GUMP 530_480 50
+     return
+   }
+return
+
+;*************************************************
+;           COMPROBAR LA SUERTE DEL PJ
+;*************************************************
+sub checkLuck
+if ( #LUCK < 75 ) ; 75 es una armadura de oro, se le puede añadir un escudo o ballesta de oro ^^
+     {
+       set #SYSMSGCOL 38
+       event sysmessage ============================
+       event sysmessage Llevas poca suerte encima :-(
+       event sysmessage ============================
+       wait 40
+     }
+return
+
+;*************************************************
+;         COMPROBAR GUANTES DE ALQUIMISTA
+;*************************************************
+sub checkGuantes
+chooseskill Alch real
+if ( #SKILL >= 1000 ) ; Somos GM Alchemy.
+     {
+       if ( #SKILL < 1100 ) ; Pero no tenemos +10 de Alchemy...
+            {
+              set #SYSMSGCOL 18
+              event sysmessage =================================
+              event sysmessage No tienes Guantes de Alquimista  :-(
+              event sysmessage =================================
+              wait 40
+            }
+     }
+return
+
+;*************************************************
+;            LIMPIAR DE REGS LA MOCHILA
+;*************************************************
+sub limpiarMochila
+_limpia:
+finditem %regs_ids C_ , #BACKPACKID
+if #FINDCNT > 0
+   {
+     exevent drag #FINDID #FINDSTACK
+     exevent dropc %contenedor1
+     wait 30
+     goto _limpia
+   }
+return
+
+;*************************************************
+;                OCULTAR EL PJ
+;*************************************************
+sub hiding
+if ( %hiding )
+     {
+       _reHid:
+       if H Notin #CHARSTATUS
+          {
+            event macro 13 21 ; Use SKILL Hiding
+            gosub waitForSysVar CHARSTATUS = H 50
+            goto _reHid
+          }
+     }
+return
+
+sub setupHid ; <==============================>
+display yesno ********************** [ HIDING ] **************$$
+            + ¿Quieres OCULTAR tu PJ mientras macreas?        $$
+            + *********************************************** $$
+if ( #dispres = yes )
+     {
+       set %hiding #TRUE
+     }
+     else
+        {
+          set %hiding #FALSE
+        }
+return
+
+;*************************************************
+;            TRIGGER DE ALIMENTACIÓN
+;*************************************************
+sub checkHungry
+set %tiempo_actual #SCNT
+if %proxima_vez <= %tiempo_actual
+   {
+     gosub comprobar_comida
+   }
+return
+
+;=====================================================
+; Rutina para, en caso de hambre, comer hasta saciarse
+;=====================================================
+; v2.2
+sub comprobar_comida
+{
+  hambriento:
+  set %jrnl #jindex ; Marcamos un índice de las líneas del diario.
+  event macro 4 0 .hungry
+  wait 20
+  while #true
+     {
+       if #jindex > %jrnl ; Si aparece una nueva línea.
+          {
+            set %jrnl %jrnl + 1 ; Seleccionamos ese numero de línea.
+            scanjournal %jrnl   ; La leemos...
+            if Estas_no_le_afecta_el_hambre in #journal || Estas_tan_lleno_que_no_puedes in #journal || Estas_totalmente_saciado in #journal
+               {
+                 set %proxima_vez %tiempo_actual + %tiempo_alimentacion
+                 return
+               }
+               else
+                  {
+                    if Estas_lleno in #journal || Estas_contento in #journal || Estas_en_inanicion in #journal || Estas_hambriento in #journal || Sientes_mucho in #journal || Estas_con_hambre in #journal || Estas_parcialmente in #journal || Estas_bien_lleno in #journal || Te_sientes_casi_lleno in #journal
+                       {
+                         finditem %comida C_ , #BACKPACKID
+                         if #findcnt > 0
+                            {
+                              set #LOBJECTID #FINDID
+                              event macro 17
+                              wait 20
+                              goto hambriento
+                            }
+                            else
+                               {
+                                 event exmsg #CHARID 3 48 COMPRA COMIDA!!
+                                 wait 40
+                                 set %proxima_vez %tiempo_actual + %tiempo_alimentacion
+                               }
+                       }
+                       else ; Mensaje extraño, repetimos...
+                          {
+                            goto hambriento
+                          }
+                  }
+          }
+       return
+     } ; FIN While
+}
+return
+
+;-@ ============================== @-;
+;-@ ############################## @-;
+;-@ SUBS públicos del Foro EasyUO  @-;
+;-@ ############################## @-;
+;-@ ============================== @-;
+;
+;-----------------------------------------------------------
+; Script Name: CEOWorldSaveChecker
+; Author: CEO
+; Version: 1.0
+; Client Tested with: 4.0.10b
+; EUO version tested with: 1.42.00A5
+; Shard OSI / FS: OSI
+; Revision Date: 060105
+; Public Release: 060105
+; Global Variables Used:  *CEOWorldSaving
+; Purpose: Used to catch the world save message for freeshards and temporarily pause mainscript during save.
+;-------------------------------------------------------------
+sub CEOWorldSaveChecker
+; sub to pause a script during a RunUO world save.
+set %_text1 %1
+set %_text2 %2
+set %_text3 %3
+if %_worldsaveupcoming
+{
+        if %_worldsavetimer < #scnt
+        {
+                set %_worldsavetimer #scnt + %5
+                gosub popupworldsave 25 15 blue
+                goto _WSC_WAIT1
+        }
+        return
+}
+_WSC1:
+if %_worldsavejournalindex > #jindex
+        return
+scanjournal %_worldsavejournalindex
+if %_text1  in #JOURNAL
+{
+        set %_worldsaveupcoming #true
+        set %_worldsavetimer #scnt + %4
+        set %_worldsavejournalindex  %_worldsavejournalindex + 1
+        return
+}
+set %_worldsavejournalindex  %_worldsavejournalindex + 1
+goto _WSC1
+_WSC_WAIT1:
+if %_worldsavetimer < #scnt
+        goto _WSC_Complete
+wait 5
+set *CEOWorldSaving #true
+if %_worldsavejournalindex > #jindex
+        goto _WSC_WAIT1
+scanjournal %_worldsavejournalindex
+if %_text2 in #journal
+{
+        gosub popupworldsave 25 15 yellow
+        set %_worldsavejournalindex  %_worldsavejournalindex + 1
+        goto _WSC_WAIT2
+}
+set %_worldsavejournalindex  %_worldsavejournalindex + 1
+goto _WSC_WAIT1
+_WSC_WAIT2:
+if %_worldsavetimer < #scnt
+        goto _WSC_Complete
+wait 5
+if %_worldsavejournalindex > #jindex
+        goto _WSC_WAIT2
+scanjournal %_worldsavejournalindex
+if %_text3 notin #journal
+{
+        set %_worldsavejournalindex  %_worldsavejournalindex + 1
+        goto _WSC_WAIT2
+}
+_WSC_Complete:
+set %_worldsavejournalindex  #jindex
+set %_worldsaveupcoming #false
+set *CEOWorldSaving #false
+menu delete worldsave
+return
+
+sub popupworldsave
+set %x %1
+set %y %2
+set %worldcolor %3
+menu Clear
+menu Window Title World Save Monitor
+menu Window Color Black
+menu Window Size 160 160
+menu shape worldsave 20 15 125 125 1 7 2 olive 7 %worldcolor
+menu font bgcolor %worldcolor
+menu font color lime
+menu font type b
+menu font size 15
+set %x %x + 30
+set %y %y + 30
+menu text worldsave %x %y World
+set %x %x + 15
+set %y %y + 20
+menu text worldsave %x %y Save
+set %x %x + 15
+set %y %y + 20
+menu text worldsave %x %y Wait
+menu font size 9
+menu font bgcolor black
+menu font color lime
+menu font type n
+menu Show 920 770
+return
+
+;**
+;* Splits a string by a divider into an array and
+;* copies the result into the desired namespace
+;* @param %1 The string to split
+;* @param %2 Divider
+;* @param %3 Array name
+;* @param %4 {optional} Result namespace. If no
+;*           namespace is given it will create the
+;*           array using the %-notation
+;* @sideEffects Creates a number of variables
+;*              with name as given in %3 followed by
+;*              a digit
+;* @returns The length of the array
+sub split
+  namespace Push
+  namespace Local split , #systime
+  set !lpc #lpc
+  if #lpc < 500
+     set #lpc 500
+
+  set !string %1
+  set !divider %2
+  set !arrayName %3
+  if %0 > 3
+     set !namespace %4
+  else
+     set !namespace #false
+
+  set !length 0
+  repeat
+  {
+     set !length !length + 1
+     str Pos !string !divider 1
+     if #strRes = 0
+     {
+        set !done #true
+        set ! . !arrayName , !length !string
+     }
+     else
+     {
+        set !pos #strRes
+        set !len !pos - 1
+        str Left !string !len
+        set ! . !arrayName , !length #strRes
+        str Del !string 1 !pos
+        set !string #strRes
+     }
+  }
+  until ( !done = #true )
+  set #result !length
+
+  if !namespace <> #false
+  {
+     namespace Copy !arrayName , * To Local !namespace
+  }
+  else
+  {
+    for !i 1 #result
+    {
+       set !value !arrayName , !i
+       set % . !arrayName , !i ! . !value
+    }
+  }
+  set #lpc !lpc
+  namespace Clear
+  namespace Pop
+return #result
+
+;=================================================================
+sub wait_for
+;=================================================================
+; This "wait_for" sub package was created by Locke. If you use these subs please keep this header intact.
+; Documentation: the sub package grew to large with all the comments. To load them call the sub like this:
+; gosub wait_for docs    | or you can use doc, documention, what, or my personal favorite, kickass.
+
+; "wait_for core dispatcher" version 1.2 by Locke
+if %1 = doc || if %1 = docs || if %1 = documentation || if %1 = what || if %1 = kickass
+{
+Display ok Please click ok and wait for your browser to start.
+execute http://www.easyuo.com/forum/viewtopic.php?t=24716
+halt
+}
+nameSpace Push
+namespace local LLNS
+set #result N/A ; if #result isn't set by one of my wait_for subs it'll throw an error.
+set !LPC #lpc
+set #lpc 200
+for %i 0 %0
+set !_A . %i % . %i
+gosub wait_for_ , !_A1
+set #lpc !lpc
+namespace clear LLNS
+namespace pop
+if #result <> N/A
+return #result
+else
+display ok You specified an unknown wait_for command. Script returned #result and is halting.
+halt
+;=================================================================
+sub wait_for_MSG ; version 1.4 ~Locke
+;=================================================================
+if !_A0 < 3
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for MSG %message time_out_in_seconds$
++Script is halting
+halt
+}
+set !_timeout ( #scnt2 + !_A . !_A0 )
+_lets_wait_for_a_message:
+for %i %jstart #jindex
+{
+ scanjournal %i
+  for %ii 2 !_A0
+  {
+    if !_A . %ii in #journal && %jstart <> %i
+    set #result #true , #spc , !_A . %ii
+  }
+}
+
+if #true notin #result
+{
+set #result #false
+ if !_timeout =< #scnt2
+ return #result
+wait 1
+goto _lets_wait_for_a_message
+}
+else
+return #result
+
+wait 1
+goto _lets_wait_for_a_message
+
+;======================================================================
+sub wait_for_GUMP ; version 1.4 ~Locke
+;=================================================================
+; Añadido #CONTID ^^
+if !_A0 < 3
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for GUMP XXX_YYY time_out_in_seconds$
++Script is halting
+halt
+}
+if !_A3 <> CLOSE
+set !_timeout #scnt2 + !_A3
+else
+set !_timeout 0 ; no gump wait if %3 = CLOSE since we already believe it to be open.
+
+_lets_wait_for_a_gump:
+if #CONTSIZE = !_A2 || #CONTKIND = !_A2 || #CONTNAME = !_A2 || #CONTTYPE = !_A2 || #CONTID = !_A2
+{
+ if !_A5 <> N/A && !_A6 <> N/A
+ {
+ set !clickx !_A5 + #contposx
+ set !clicky !_A6 + #contposy
+ click !clickx !clicky
+ }
+ if !_A3 = CLOSE || if !_A4 = CLOSE || !_A5 = CLOSE || !_A6 = CLOSE
+ {
+ set !string #contsize
+ str pos !string _
+ set !pos #strres
+ str del !string #strres #strres
+ set !clickX #contposx + ( #strres / 2 )
+ str del !string 1 !pos
+ set !clickY #contposy + ( #strres / 2 )
+ click !clickx !clicky R
+ }
+return #true
+}
+
+if ( !_timeout =< #scnt2 ) && ( !_A4 = N/A )
+   {
+     return #false
+   }
+
+if !_A4 <> N/A && !_timeout =< #scnt2
+{
+finditem !_A4
+if #findkind <> -1
+{
+ for #findindex 1 #findcnt
+ {
+  if #finddist > 2
+  ignoreitem #findid LLWAITFOR
+  else
+  break
+ }
+ set #lobjectid #findid
+ event macro 17 0
+ set !_timeout #scnt2 + !_A3
+}
+else
+return #false
+}
+wait 1
+goto _lets_wait_for_a_gump
+
+sub waitForSysVar
+if %0 < 4 || %4 = N/A
+set %4 %_defaultWaitForTimeout
+if %0 < 5
+set %5 return
+set %4 #sCnt2 + %4
+_waitForSysVar:
+set % . %5 # . %1 %2 %3
+if ! % . %5 && #sCnt2 < %4
+{
+Wait 1
+goto _waitForSysVar
+}
+return
