@@ -25,7 +25,7 @@
 ; `----------'                            \//,_               _.-'
 ;                                          ^   ```--...___..-'
 ; Author: Sthil Lauda
-; Version: 1.1
+; Version: 1.2
 ; Client Tested with: 2.0.3
 ; EUO version tested with: EasyUO 1.5 Version 243
 ; Shard: Ultima Alianza (¡Hasta la muerte!)
