@@ -32,24 +32,24 @@
 ; Version: 1.6
 ; Client Tested with: 2.0.3
 ; EUO version tested with: EasyUO 1.5 Version 243
-; Shard: Ultima Alianza ¡Hasta la muerte!
+; Shard: Ultima Alianza Â¡Hasta la muerte!
 ; Revision Date: 25/01/2019
 ; Public Release: 08/02/2019
 ; Purpose: Entrenar skill de lockpicking desde 40-50 hasta 75, parando la macro cada 5 puntos para seguir subiendo con
-;          nuevas cajas fabricadas con un mayor nivel (+5 puntos) de skill de Artesanía/Tinker.
-; Instrucciones: Colocar dos cofres, uno con todas las cajas y ganzúas, y otro más que esté vacío.
+;          nuevas cajas fabricadas con un mayor nivel (+5 puntos) de skill de ArtesanÃ­a/Tinker.
+; Instrucciones: Colocar dos cofres, uno con todas las cajas y ganzÃºas, y otro mÃ¡s que estÃ© vacÃ­o.
 ;
 ;________________________________
 ;
 ; ///////////////////////////////
-; ******** CONFIGURACIÓN ********
+; ******** CONFIGURACIÃ“N ********
 ; ///////////////////////////////
 set %nivel_skill 550 ; Parar la macro al llegar a este nivel de skill lockpicking *** Ejem: 550 (55 puntos de skill) ***.
-set %cofreo XXXXXXX ; Cofre con cajas y ganzúas.
-set %cofred XXXXXXX ; Cofre vacío.
-set %tiempo_alimentacion 360 ; Cada cuántos segundos va a comprobar si tiene hambre (5 minutos).
+set %cofreo XXXXXXX ; Cofre con cajas y ganzÃºas.
+set %cofred XXXXXXX ; Cofre vacÃ­o.
+set %tiempo_alimentacion 360 ; Cada cuÃ¡ntos segundos va a comprobar si tiene hambre (5 minutos).
 ; //////////////////////////////////////////////
-; ************* FIN CONFIGURACIÓN *************
+; ************* FIN CONFIGURACIÃ“N *************
 ; //////////////////////////////////////////////
 ;________________________________________________
 ;
@@ -79,17 +79,17 @@ if %proxima_vez <= %tiempo_actual
    {
      gosub comprobar_comida ; Macro para comer
    }
-_comienzoLockpicking: ; Termina macro para comer y comienza lockpick
+_comienzoLockpicking: ; Termina macro para comer y comienza lockpick.
 finditem %caja c_ , %cofred
 if #FINDCNT > 0
    {
-     ; Abre la caja con cerradura para sacar la llave a la mochila
-     set %jstart #jindex ; Marcamos el journal antes de ejecutar la acción
+     ; Abre la caja con cerradura para sacar la llave a la mochila.
+     set %jstart #jindex ; Marcamos el journal antes de ejecutar la acciÃ³n.
      set %cajaid #FINDID
      set #LOBJECTID %cajaid
      event macro 17
      gosub wait_for GUMP %cajaid 2
-     if #TRUE in #RESULT ; Si se abre, es que ya está estrenada...
+     if #TRUE in #RESULT ; Si se abre, es que ya estÃ¡ estrenada...
         {
           goto _preLlave
         }
@@ -116,13 +116,13 @@ if #FINDCNT > 0
                finditem %llave C_ , #backpackid
                if #FINDCNT = 0 ; No hay llave en la mochila
                   {
-                    finditem %llave C_ , %cajaid ; Miramos a ver si la caja está abierta con la llave
+                    finditem %llave C_ , %cajaid ; Miramos a ver si la caja estÃ¡ abierta con la llave
                     if #FINDCNT = 0 ; No hay llave en la caja, y tampoco en la mochila... mal asunto.
                        {
                          ignoreitem %cajaid ; Pasamos de esta caja... XDDDD
                          goto Inicio
                        }
-                       else ; La caja está abierta y con la llave dentro...
+                       else ; La caja estÃ¡ abierta y con la llave dentro...
                           {
                             gosub cogerLlave
                             goto Cerrar
@@ -150,7 +150,7 @@ if #FINDCNT > 0
      target 3s
      set #LTARGETID %cajaid
      set #LTARGETKIND 1
-     set %jstart #jindex ; Marcamos el journal antes de ejecutar la acción
+     set %jstart #jindex ; Marcamos el journal antes de ejecutar la acciÃ³n
      event macro 22
      gosub wait_for MSG abierta cerrada no_puedes_usar_la_llave Dentro_de_1_minuto 10
      if #TRUE in #RESULT
@@ -197,7 +197,7 @@ if #FINDCNT > 0
           event macro 17
           target 3s
           set #LTARGETKIND 1
-          set %jstart #jindex ; Marcamos el journal antes de ejecutar la acción
+          set %jstart #jindex ; Marcamos el journal antes de ejecutar la acciÃ³n
           event macro 22
           gosub wait_for MSG no_logra_forzar Rompes_la_cerradura La_cerradura_cede no_parece_estar_cerrada Dentro_de_1_minuto 15
           if #TRUE in #RESULT
@@ -221,18 +221,18 @@ if #FINDCNT > 0
                     goto Cerrar
                   }
              }
-             else ; Por alguna razón extraña no hemos pillado el mensaje en el diario ¿? ¡REPETIMOS!
+             else ; Por alguna razÃ³n extraÃ±a no hemos pillado el mensaje en el diario Â¿? Â¡REPETIMOS!
                 {
                   goto Forzar
                 }
         }
-        else ; No hay ganzuas ¿?
+        else ; No hay ganzuas Â¿?
            {
              gosub reponerGanzuas
              goto _repiteForzar
            }
    }
-   else ; Si ya no está la caja que habíamos seleccionado
+   else ; Si ya no estÃ¡ la caja que habÃ­amos seleccionado
       {
         goto Inicio
       }
@@ -249,14 +249,14 @@ if #FINDCNT > 0
 sub comprobar_comida
 {
   hambriento:
-  set %jrnl #jindex ; Marcamos un índice de las líneas del diario.
+  set %jrnl #jindex ; Marcamos un Ã­ndice de las lÃ­neas del diario.
   event macro 3 0 .hungry
   wait 20
   while #true
      {
-       if #jindex > %jrnl ; Si aparece una nueva línea.
+       if #jindex > %jrnl ; Si aparece una nueva lÃ­nea.
           {
-            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de línea.
+            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de lÃ­nea.
             scanjournal %jrnl   ; La leemos...
             if Dentro_de_1_minuto in #journal
                {
@@ -286,7 +286,7 @@ sub comprobar_comida
                                  set %proxima_vez %tiempo_actual + %tiempo_alimentacion
                                }
                        }
-                       else ; Mensaje extraño, repetimos...
+                       else ; Mensaje extraÃ±o, repetimos...
                           {
                             goto hambriento
                           }
