@@ -6,7 +6,7 @@
 ; Shard OSI / FS:  OSI/FS
 ; Revision Date: 28/01/09
 ; Public Release: 28/01/09
-; Purpose: Muestra entradas de diario a través del menú redimensionable. Guarda entradas de diario en un archivo especificado C:\Diario_UA.txt. Filtra mensajes para mostrar.
+; Purpose: Muestra entradas de diario a travÃ©s del menÃº redimensionable. Guarda entradas de diario en un archivo especificado. C:\Diario_UA.txt. Filtra mensajes para mostrar.
 
 gosub menuBody
 
