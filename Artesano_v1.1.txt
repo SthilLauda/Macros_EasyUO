@@ -50,7 +50,7 @@ set %tiempo_alimentacion 360
 ;
 set %resortes TCG
 set %herramientas GTL
-set %martillos GBG
+set %martillos GBG_FBG_TLH_CGG
 set %hierro RMK
 set %comida RGG_NRD_QSD_ZBG_WLI_QRD_END_FUD_YLI_WLI_HGI
  +_KGI_EGI_QLI_KLI_MLI_KRD_HQD_AQD_MQE_VQE_TQE_JQE_IQE
