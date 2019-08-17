@@ -39,13 +39,6 @@ set %version v1.2
 ; Purpose: Fabrica Kegs de varios tipos y tamaños :-)
 ; Instrucciones; Configurar y abrir todas las bolsas, activar un tipo de KEG, el tamaño que van a tener, y el número de KEGS que quieres hacer.
 ;*************************************************
-set #SYSMSGCOL 88
-event sysmessage =====================
-set #SYSMSGCOL 53
-event sysmessage Multi Alchemist %version
-set #SYSMSGCOL 88
-event sysmessage =====================
-wait 20
 ;________________________________
 ;
 ; ///////////////////////////////
@@ -121,6 +114,14 @@ set %num_kegs 0
 set %tamano_keg %tamano_keg - 1 ; Little fix XD
 set %_worldsavejournalindex #jindex ; Journal para escanear en busca de save's del server.
 set *CEOWorldSaving #FALSE          ; Indica si hay un save del server en marcha.
+
+set #SYSMSGCOL 88
+event sysmessage =====================
+set #SYSMSGCOL 53
+event sysmessage Multi Alchemist %version
+set #SYSMSGCOL 88
+event sysmessage =====================
+wait 20
 ignoreitem reset
 
 gosub checkGuantes   ; Avisar si no llevamos +10 de bonificación a Alquimia (Guantes del Alquimista)
