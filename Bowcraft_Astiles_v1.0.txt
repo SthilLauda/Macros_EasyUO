@@ -186,10 +186,10 @@ return
 
 sub reponerDagas ;<=================================>
 finditem %daga C_ , #BACKPACKID
-if #FINDCNT < 3
+if #FINDCNT < 2
    {
      ignoreitem #CHARID PJ
-     set %repeticiones 6 - #FINDCNT
+     set %repeticiones 3 - #FINDCNT
      for %d 0 %repeticiones
          {
             _searchBag:
