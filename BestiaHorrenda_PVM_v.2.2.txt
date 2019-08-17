@@ -44,16 +44,16 @@
 ; Version: 2.2
 ; Client Tested with: 2.0.3
 ; EUO version tested with: 1.5 Version 243
-; Shard: Ultima Alianza °Hasta la muerte!
-; Purpose: Mantiene transformado en bestia a tu personaje, lo rearma y equipa items despuÈs de castear.
-; ConfiguraciÛn: Ninguna ^^
+; Shard: Ultima Alianza ¬°Hasta la muerte!
+; Purpose: Mantiene transformado en bestia a tu personaje, lo rearma y equipa items despu√©s de castear.
+; Configuraci√≥n: Ninguna ^^
 
 set %id_bestia SAB    ; Tipo de la bestia horrenda.
 set %id_humano IS     ; Tipo de los Humanos.
-set %peso_bestia 600  ; El peso que nos sirve para detectar cu·ndo nos hemos transformado.
-set %min_reactivos 10 ; El n˙mero de reactivos en la mochila antes de alertar
+set %peso_bestia 600  ; El peso que nos sirve para detectar cu√°ndo nos hemos transformado.
+set %min_reactivos 10 ; El n√∫mero de reactivos en la mochila antes de alertar.
 ;
-; AquÌ es posible que tengas que aÒadir el ID del TIPO de arma que usas, aunque lo dudo.
+; Aqu√≠ es posible que tengas que a√±adir el ID del TIPO de arma que usas, aunque lo dudo.
 ;
 set %armas FMH_GFF_EPH_LPH_BPH_CUO_TSF_LPO_JPH_ZTH_RMH_SOH_TLH_
  +FUO_WSF_ATF_OMH_XPO_QPO_NMH_WOH_BNF_LTF_VPO_TOH_WTH_VRH_KTF_LMH_
@@ -112,17 +112,17 @@ while #CHARGHOST <> YES ; Mientras estamos vivos...
           {
             set %escudo #FINDID ; lo dejamos fijado.
           }
-       finditem %joya_collar C_ , #CHARID ; Buscamos un collar m·gico equipado,
+       finditem %joya_collar C_ , #CHARID ; Buscamos un collar m√°gico equipado,
        if #FINDKIND <> -1  ; Si encontramos alguno,
           {
             set %joya_collar_equipado #FINDID ; lo dejamos fijado.
           }
-       finditem %joya_brazalete C_ , #CHARID ; Buscamos un brazalete m·gico equipado,
+       finditem %joya_brazalete C_ , #CHARID ; Buscamos un brazalete m√°gico equipado,
        if #FINDKIND <> -1  ; Si encontramos alguno,
           {
             set %joya_brazalete_equipado #FINDID ; lo dejamos fijado.
           }
-       finditem %joya_anillo C_ , #CHARID ; Buscamos un anillo m·gico equipado,
+       finditem %joya_anillo C_ , #CHARID ; Buscamos un anillo m√°gico equipado,
        if #FINDKIND <> -1  ; Si encontramos alguno,
           {
             set %joya_anillo_equipado #FINDID ; lo dejamos fijado.
@@ -134,7 +134,7 @@ while #CHARGHOST <> YES ; Mientras estamos vivos...
        set %tipo_id_pj #FINDTYPE ; Actualizamos constantemente el tipo de ID del personaje...
        if %tipo_id_pj <> %id_bestia ; Si es distinto al de la bestia, entonces es que somos un humano...
           {
-            if #MANA > 11 ; Si tenemos el man· necesario para invocar el hechizo...
+            if #MANA > 11 ; Si tenemos el man√° necesario para invocar el hechizo...
                {
                  set %tiempo_cast #SCNT
                  set %mensaje Transformando...
