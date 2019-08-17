@@ -46,7 +46,6 @@ set %ignore_locs_Y 936_833_809_804_806
 set %ignore_locs_Z -4_-3
 set %tiempo_actual #SCNT ; Reloj
 set %proxima_vez #SCNT ; Trigger
-set %hid_timer #SCNT2
 set %comida RGG_NRD_QSD_ZBG_WLI_QRD_END_FUD_YLI_WLI_HGI
      +_KGI_EGI_QLI_KLI_MLI_KRD_HQD_AQD_MQE_VQE_TQE_JQE_IQE
      +_GQE_SPE_ZPE_OQE_BDF_KPE_RQE_YSD_SQD_YWI_AXI_PQD_QQD
