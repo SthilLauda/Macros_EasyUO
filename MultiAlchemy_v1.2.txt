@@ -10,7 +10,7 @@
 ;
 ;                CHECK ME OUT I'M
 ; (       "     )  APPLYING WHAT I LEARNED
-;  ( _  *         FROM THE HARRY POTTER BOOKS
+;  ( _  *         FROM THE HARRY POTTER BOOKS.
 ;     * (     /      \    ___
 ;        "     "        _/ /
 ;       (   *  )    ___/   |
@@ -33,11 +33,11 @@ set %version v1.2
 ; Version: 1.2
 ; Client Tested with: 2.0.3
 ; EUO version tested with: 1.5 Version 142
-; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Shard: Ultima Alianza (Â¡Hasta la muerte!)
 ; Public Release: 08/12/2019
 ; Revised On: 17/08/2019
-; Purpose: Fabrica Kegs de varios tipos y tamaños :-)
-; Instrucciones; Configurar y abrir todas las bolsas, activar un tipo de KEG, el tamaño que van a tener, y el número de KEGS que quieres hacer.
+; Purpose: Fabrica Kegs de varios tipos y tamaÃ±os :-)
+; Instrucciones; Configurar y abrir todas las bolsas, activar un tipo de KEG, el tamaÃ±o que van a tener, y el nÃºmero de KEGS que quieres hacer.
 ;*************************************************
 set #SYSMSGCOL 88
 event sysmessage =====================
@@ -49,28 +49,28 @@ wait 20
 ;________________________________
 ;
 ; ///////////////////////////////
-; ******** CONFIGURACIÓN ********
+; ******** CONFIGURACIÃ“N ********
 ; ///////////////////////////////
 ;________________________________
 ;
 ; Contenedores con *** Materiales ***
 set %contenedor1 OAZMEPD ; Bolsa o cofre con Regs.
 set %contenedor2 TJKQEPD ; Bolsa o cofre con Barriles llenos.
-set %contenedor3 NDIRIOD ; Bolsa o cofre con Barriles vacíos.
+set %contenedor3 NDIRIOD ; Bolsa o cofre con Barriles vacÃ­os.
 set %contenedor4 IRDTUND ; Bolsa de Morteros o cofre con bolsas de Morteros (abiertas).
-set %contenedor5 WTMMPQD ; Bolsa o cofre con Botellas vacías.
-; Alimentacioón; Cada cuántos segundos va a comprobar si tiene hambre.
+set %contenedor5 WTMMPQD ; Bolsa o cofre con Botellas vacÃ­as.
+; AlimentacioÃ³n; Cada cuÃ¡ntos segundos va a comprobar si tiene hambre.
 ; [ 60 = 1 Minuto ]
 set %tiempo_alimentacion 360
-; Tamaño del Keg
+; TamaÃ±o del Keg
 ; [ 100, 500, 1000, Lo que quieras... ^^ ]
 set %tamano_keg 1000
-; Cuántos Kegs del mismo tipo quieres hacer.
+; CuÃ¡ntos Kegs del mismo tipo quieres hacer.
 set %numero_kegs 1
-; Cuántos regs reponer en la mochila de una tacada.
-set %cantidad_regs 100 ; Esto lo puedes ir viendo según el peso que puedas cargar, y el tamaño del Keg que quieras hacer...
+; CuÃ¡ntos regs reponer en la mochila de una tacada.
+set %cantidad_regs 100 ; Esto lo puedes ir viendo segÃºn el peso que puedas cargar, y el tamaÃ±o del Keg que quieras hacer...
 ;--------------------------------------------------------------------
-; Tipo de Keg [ ¡Sólo se puede activar 1 tipo de Keg al mismo tiempo! ]
+; Tipo de Keg [ Â¡SÃ³lo se puede activar 1 tipo de Keg al mismo tiempo! ]
 ; [ #TRUE = Activado | #FALSE = Desactivado ]
 ;--------------------------------------------
 set %veneno_menor #TRUE
@@ -89,7 +89,7 @@ set %mana #FALSE
 ;________________________________________________
 ;
 ; //////////////////////////////////////////////
-; ************* FIN CONFIGURACIÓN *************
+; ************* FIN CONFIGURACIÃ“N *************
 ; //////////////////////////////////////////////
 ;________________________________________________
 ;
@@ -98,21 +98,21 @@ set %comida RGG_NRD_QSD_ZBG_WLI_QRD_END_FUD_YLI_WLI_HGI
  +_GQE_SPE_ZPE_OQE_BDF_KPE_RQE_YSD_SQD_YWI_AXI_PQD_QQD
 set %regs_ids WZF_QZF_JZF_MZF_JUF_KZF_KUF_RZF_IUF_FUF_LZF_SZF
 set %regs_veneno WZF       ; Belladona
-set %regs_invis QZF        ; Sangre de Dragón
+set %regs_invis QZF        ; Sangre de DragÃ³n
 set %regs_curacion JZF     ; Ginseng
-set %regs_fuerza MZF       ; Raíz de Mandrágora
+set %regs_fuerza MZF       ; RaÃ­z de MandrÃ¡gora
 set %regs_agilidad JUF     ; Musgo de Sangre
 set %regs_antidoto KZF     ; Ajo
 set %regs_resistencia KUF  ; Perla Nigga
 set %regs_inteligencia KZF_RZF ; Ajo + Seda
-set %regs_bendecir KZF_MZF ; Ajo + Mandrágora
-set %regs_encojer IUF      ; Alas de Murciélago
+set %regs_bendecir KZF_MZF ; Ajo + MandrÃ¡gora
+set %regs_encojer IUF      ; Alas de MurciÃ©lago
 set %regs_piel_piedra FUF  ; Azufre
 set %regs_explosion SZF    ; Ceniza Sulfurusa
-set %regs_mana LZF         ; Ojos de Tritón
-set %botellas WUF          ; Frascos Vacíos
-set %barril QMJ_YBK_XBK    ; Barriles Vacíos
-set %morteros RQF          ; ¬¬
+set %regs_mana LZF         ; Ojos de TritÃ³n
+set %botellas WUF          ; Frascos VacÃ­os
+set %barril QMJ_YBK_XBK    ; Barriles VacÃ­os
+set %morteros RQF          ; Â¬Â¬
 set %tiempo_actual #SCNT
 set %proxima_vez #SCNT
 set %start1 #TRUE
@@ -123,9 +123,9 @@ set %_worldsavejournalindex #jindex ; Journal para escanear en busca de save's d
 set *CEOWorldSaving #FALSE          ; Indica si hay un save del server en marcha.
 ignoreitem reset
 
-gosub checkGuantes   ; Avisar si no llevamos +10 de bonificación a Alquimia (Guantes del Alquimista)
+gosub checkGuantes   ; Avisar si no llevamos +10 de bonificaciÃ³n a Alquimia (Guantes del Alquimista)
 gosub checkLuck      ; Comprobar la suerte (Influye un poco en el crafteo...)
-gosub wait_for GUMP 530_480 CLOSE ; Cerrar el menú de craftear
+gosub wait_for GUMP 530_480 CLOSE ; Cerrar el menÃº de craftear
 gosub setupHid       ; Modo alquimista "oculto" :P
 gosub limpiarMochila ; Limpiar regs antes de arrnacar la macro
 gosub selectReg      ; Seleccionar el REG que vamos a usar
@@ -226,7 +226,7 @@ for #FINDINDEX 1 #FINDCNT
     {
       if #FINDCNT > 0
          {
-           if #FINDCOL = 0 ; Botella vacía
+           if #FINDCOL = 0 ; Botella vacÃ­a
               {
                 return ; Ya tenemos una
               }
@@ -278,7 +278,7 @@ _checkReg:
 set %peso #WEIGHT
 str len %regs
 set %num_letras #STRRES
-if %num_letras = 3 ; Necesitamos un único tipo de REG
+if %num_letras = 3 ; Necesitamos un Ãºnico tipo de REG
    {
      finditem %regs C_ , #BACKPACKID
      if #FINDSTACK < 10 ; Nos quedan pocos en la mochila
@@ -288,7 +288,7 @@ if %num_letras = 3 ; Necesitamos un único tipo de REG
    }
    else
       {
-        if %num_letras = 7 ; Necesitamos más de un REG
+        if %num_letras = 7 ; Necesitamos mÃ¡s de un REG
            {
              if ( %start2 )
                   {
@@ -530,7 +530,7 @@ if %mana
    }
 if ( %max_reg = 0 || %max_reg > 1 )
      {
-       display OK Hay algún problema en la configuración de los REGS :-(
+       display OK Hay algÃºn problema en la configuraciÃ³n de los REGS :-(
        set #SYSMSGCOL 53
        event sysmessage PROBLEMA EN LA CONFIGURACION
        wait 20
@@ -560,7 +560,7 @@ if %invis ; Mixturas
      gosub wait_for GUMP 530_480 50
      return
    }
-if %curacion ; Curación
+if %curacion ; CuraciÃ³n
    {
      click 67 190 f
      gosub wait_for GUMP 530_480 30
@@ -584,7 +584,7 @@ if %agilidad ; Atributos
      gosub wait_for GUMP 530_480 50
      return
    }
-if %antidoto ; Antídoto
+if %antidoto ; AntÃ­doto
    {
      click 67 230 f
      gosub wait_for GUMP 530_480 30
@@ -632,7 +632,7 @@ if %piel_piedra ; Mixturas
      gosub wait_for GUMP 530_480 50
      return
    }
-if %explosion ; Explosión
+if %explosion ; ExplosiÃ³n
    {
      click 67 250 f
      gosub wait_for GUMP 530_480 30
@@ -640,7 +640,7 @@ if %explosion ; Explosión
      gosub wait_for GUMP 530_480 50
      return
    }
-if %mana ; Maná
+if %mana ; ManÃ¡
    {
      click 67 170 f
      gosub wait_for GUMP 530_480 30
@@ -654,7 +654,7 @@ return
 ;           COMPROBAR LA SUERTE DEL PJ
 ;*************************************************
 sub checkLuck
-if ( #LUCK < 75 ) ; 75 es una armadura de oro, se le puede añadir un escudo o ballesta de oro ^^
+if ( #LUCK < 75 ) ; 75 es una armadura de oro, se le puede aÃ±adir un escudo o ballesta de oro ^^
      {
        set #SYSMSGCOL 38
        event sysmessage ============================
@@ -715,7 +715,7 @@ return
 
 sub setupHid ; <==============================>
 display yesno ********************** [ HIDING ] **************$$
-            + ¿Quieres OCULTAR tu PJ mientras macreas?        $$
+            + Â¿Quieres OCULTAR tu PJ mientras macreas?        $$
             + *********************************************** $$
 if ( #dispres = yes )
      {
@@ -728,7 +728,7 @@ if ( #dispres = yes )
 return
 
 ;*************************************************
-;            TRIGGER DE ALIMENTACIÓN
+;            TRIGGER DE ALIMENTACIÃ“N
 ;*************************************************
 sub checkHungry
 set %tiempo_actual #SCNT
@@ -745,14 +745,14 @@ return
 sub comprobar_comida
 {
   hambriento:
-  set %jrnl #jindex ; Marcamos un índice de las líneas del diario.
+  set %jrnl #jindex ; Marcamos un Ã­ndice de las lÃ­neas del diario.
   event macro 4 0 .hungry
   wait 20
   while #true
      {
-       if #jindex > %jrnl ; Si aparece una nueva línea.
+       if #jindex > %jrnl ; Si aparece una nueva lÃ­nea.
           {
-            set %jrnl %jrnl + 1 ; Seleccionamos ese numero de línea.
+            set %jrnl %jrnl + 1 ; Seleccionamos ese numero de lÃ­nea.
             scanjournal %jrnl   ; La leemos...
             if Estas_no_le_afecta_el_hambre in #journal || Estas_tan_lleno_que_no_puedes in #journal || Estas_totalmente_saciado in #journal
                {
@@ -778,7 +778,7 @@ sub comprobar_comida
                                  set %proxima_vez %tiempo_actual + %tiempo_alimentacion
                                }
                        }
-                       else ; Mensaje extraño, repetimos...
+                       else ; Mensaje extraÃ±o, repetimos...
                           {
                             goto hambriento
                           }
@@ -791,7 +791,7 @@ return
 
 ;-@ ============================== @-;
 ;-@ ############################## @-;
-;-@ SUBS públicos del Foro EasyUO  @-;
+;-@ SUBS pÃºblicos del Foro EasyUO  @-;
 ;-@ ############################## @-;
 ;-@ ============================== @-;
 ;
@@ -1036,7 +1036,7 @@ goto _lets_wait_for_a_message
 ;======================================================================
 sub wait_for_GUMP ; version 1.4 ~Locke
 ;=================================================================
-; Añadido #CONTID ^^
+; AÃ±adido #CONTID ^^
 if !_A0 < 3
 {
 display ok You haven't specified enough vars.$
