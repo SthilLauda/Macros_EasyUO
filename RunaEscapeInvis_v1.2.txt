@@ -1,4 +1,4 @@
-;        |                                 /   \                   |       .
+;        |                                 /   \                   |       .             .
 ;  _    -O-       .                )      ((   ))     (           -O-
 ; (@)    |     +                  /|\      ))_((     /|\           |            .
 ; |-|                            / | \    (/\|/\)   / | \                            (@)
@@ -22,11 +22,11 @@
 ; Client Tested with: 2.0.3
 ; EUO version tested with: 1.5 Version 142
 ; Shard: Ultima Alianza
-; Purpose: Recalea de Runa y tambiÈn con pociÛn de invisivilidad. ( Para mis queridos newbies, °·nimo! ^^ )
+; Purpose: Recalea de Runa y tambi√©n con poci√≥n de invisivilidad. ( Para mis queridos newbies, ¬°√°nimo! ^^ )
 ;________________________________
 ;
 ; ///////////////////////////////
-; ******** CONFIGURACI”N ********
+; ******** CONFIGURACI√ìN ********
 ; ///////////////////////////////
 ;________________________________
 ;
@@ -35,7 +35,7 @@ set %tecla_recall_invis F12
 ;________________________________________________
 ;
 ; //////////////////////////////////////////////
-; ************* FIN CONFIGURACI”N *************
+; ************* FIN CONFIGURACI√ìN *************
 ; //////////////////////////////////////////////
 ;________________________________________________
 ;
@@ -78,7 +78,7 @@ if #FINDCNT > 0
                 set #LOBJECTID #FINDID
                 event macro 17
               }
-              else ; Ignoramos las pociones que no sirven para ocultarse (El 2∫ recall ser· m·s r·pido).
+              else ; Ignoramos las pociones que no sirven para ocultarse (El 2¬∫ recall ser√° m√°s r√°pido).
                  {
                    ignoreitem #FINDID BAD_POTIONS
                  }
