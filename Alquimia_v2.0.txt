@@ -1,0 +1,578 @@
+; =====================================================================================================
+; '||   ||` '||`   ||                                 /.\      '||`
+;  ||   ||   ||    ||     ''                         // \\      ||   ''
+;  ||   ||   ||  ''||''   ||  '||),,(|,   '''|.     //...\\     ||   ||   '''|.  `||''|,  '''/  '''|.
+;  ||   ||   ||    ||     ||   || || ||  .|''||    //     \\    ||   ||  .|''||   ||  ||   //  .|''||
+;  `|...|'  .||.   `|..' .||. .||    ||. `|..||. .//       \\. .||. .||. `|..||. .||  ||. /... `|..||.
+; =====================================================================================================
+; Script Name: Alquimia [ Veneno Menor ]
+;        _________
+;       [_________]
+;        |  .-.  |
+;        |,(o.o).|
+;        | >|n|< |
+;        |` `"` `|
+;        |POISON!|
+;       `"""""""`
+;
+set %version v2.0
+;
+; Author: Sthil Lauda
+; Version: 2.0
+; Client Tested with: 2.0.3
+; EUO version tested with: 1.5 Version 142
+; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Fecha: 08/12/2018
+; Purpose: Fabrica Kegs de veneno menor.
+;*************************************************
+;________________________________
+;
+; ///////////////////////////////
+; ******** CONFIGURACIÓN ********
+; ///////////////////////////////
+;________________________________
+;
+set %contenedor1 UXVXMND ; Regs, Barriles, botellas vacías (1 stack de 1000), y bolsas con Morteros (abiertas).
+set %contenedor2 ILYTFPD ; bariles llenos
+set %tiempo_alimentacion 360 ; Cada cuántos segundos va a comprobar si tiene hambre.
+;________________________________________________
+;
+; //////////////////////////////////////////////
+; ************* FIN CONFIGURACIÓN *************
+; //////////////////////////////////////////////
+;________________________________________________
+;
+set %comida RGG_NRD_QSD_ZBG_WLI_QRD_END_FUD_YLI_WLI_HGI
+ +_KGI_EGI_QLI_KLI_MLI_KRD_HQD_AQD_MQE_VQE_TQE_JQE_IQE
+ +_GQE_SPE_ZPE_OQE_BDF_KPE_RQE_YSD_SQD_YWI_AXI_PQD_QQD
+set %regs WZF
+set %botellas WUF
+set %barril QMJ_YBK
+set %morteros RQF
+set %tiempo_actual #SCNT
+set %proxima_vez #SCNT
+set %start #true
+
+set #SYSMSGCOL 88
+event sysmessage =====================
+set #SYSMSGCOL 53
+event sysmessage Macro Alquimia %version
+set #SYSMSGCOL 88
+event sysmessage =====================
+wait 20
+
+ignoreitem reset
+
+Inicio:
+chooseskill Alch real
+if #SKILL >= 1000
+   {
+     display ¡Somos GM Alchemy! :-) ; Somos GM Alchemy
+     halt
+   }
+set %tiempo_actual #SCNT
+if %proxima_vez <= %tiempo_actual
+   {
+     gosub comprobar_comida
+   }
+gosub cogerBa
+gosub cogerBo
+gosub cogerM
+gosub cogerR
+gosub pociones
+goto inicio
+
+;*************************************************
+;                 COGER BARRILES
+;*************************************************
+sub cogerBa
+set %peso #WEIGHT
+finditem %barril C_ , #BACKPACKID
+if #FINDCNT < 1
+   {
+     finditem %barril C_ , %contenedor1
+     if #FINDTYPE in %barril
+         {
+           if #FINDCNT >= 1
+              {
+                exevent drag #FINDID
+                gosub waitForSysVar Weight <> %peso 50 ; Esperamos a que cambie el peso del PJ
+                exevent dropc #BACKPACKID
+                gosub waitforitem #FINDID 50 #BACKPACKID ; Esperamos a que caiga el objeto en la mochila
+              }
+         }
+         else
+            {
+              event sysmessage No hay barriles!
+              halt
+            }
+   }
+return
+
+;*************************************************
+;                  COGER BOTELLAS
+;*************************************************
+sub cogerBo
+_botella:
+set %peso #WEIGHT
+finditem %botellas C_ , #BACKPACKID
+for #FINDINDEX 1 #FINDCNT
+    {
+      if #FINDCNT > 0
+         {
+           if #FINDCOL = 0 ; Botella vacía
+              {
+                return ; Ya tenemos una
+              }
+              else
+                 {
+                   if #FINDCOL = 368 ; Verde Poison
+                      {
+                        gosub llenar
+                        goto _botella
+                      }
+                 }
+         }
+    }
+finditem %botellas C_ , #BACKPACKID
+if #FINDCNT = 0 ; Si no hay nada de nada
+   {
+     finditem %botellas C_ , %contenedor1 ; Echamos una botella
+     if #FINDSTACK > 0
+        {
+          exevent drag #FINDID 1
+          gosub waitForSysVar Weight <> %peso 50 ; Esperamos a que cambie el peso del PJ
+          exevent dropc #BACKPACKID
+          gosub waitforitem #FINDID 50 #BACKPACKID ; Esperamos a que caiga el objeto en la mochila
+        }
+        else
+           {
+             event sysmessage No hay botellas!
+             halt
+           }
+   }
+return
+
+;*************************************************
+;                 COGER MORTEROS
+;*************************************************
+sub cogerM
+set %peso #WEIGHT
+finditem %morteros C_ , #BACKPACKID
+if #FINDCNT < 2
+   {
+     ignoreitem #FINDID
+     finditem %morteros C , %contenedor1 ; Buscamos en todas las bolsas abiertas...
+     if #FINDCNT > 0
+        {
+          exevent drag #FINDID
+          gosub waitForSysVar Weight <> %peso 50 ; Esperamos a que cambie el peso del PJ
+          exevent dropc #BACKPACKID
+          gosub waitforitem #FINDID 50 #BACKPACKID ; Esperamos a que caiga el objeto en la mochila
+        }
+        else
+           {
+             event sysmessage No hay morteros!
+             halt
+           }
+   }
+ignoreitem reset
+return
+
+;*************************************************
+;                   COGER REGS
+;*************************************************
+sub cogerR
+set %peso #WEIGHT
+finditem %regs C_ , #BACKPACKID
+if #FINDSTACK < 5
+   {
+     finditem %regs C_ , %contenedor1
+     if #FINDSTACK >= 50
+        {
+          exevent drag #FINDID 150
+          gosub waitForSysVar Weight <> %peso 50 ; Esperamos a que cambie el peso del PJ
+          exevent dropc #BACKPACKID
+          gosub waitforitem #FINDID 50 #BACKPACKID ; Esperamos a que caiga el objeto en la mochila
+        }
+        else
+           {
+             event sysmessage No hay mas regs!
+             halt
+           }
+   }
+return
+
+;*************************************************
+;                  HACER POCIONES
+;*************************************************
+sub pociones
+if ( %start )
+     {
+       set %start #false
+       _craft_menu:
+       finditem %morteros C_ , #BACKPACKID
+       if #FINDCNT > 0
+          {
+            set #LOBJECTID #FINDID
+            event macro 17 0
+            gosub wait_for GUMP 530_480 30
+            click 64 210  f
+            gosub wait_for GUMP 530_480 30
+            click 269 109 f
+            gosub wait_for GUMP 530_480 50
+          }
+     }
+     else
+        {
+          if ( #CONTNAME <> generic_gump ) && ( #CONTSIZE <> 530_480 )
+               {
+                 goto _craft_menu
+               }
+          click 326 495 f
+          gosub wait_for GUMP 530_480 50
+        }
+finditem %botellas C_ , #BACKPACKID
+if ( #FINDKIND <> -1 )
+     {
+       for #FINDINDEX 1 #FINDCNT
+           {
+             if #FINDCNT > 0
+                {
+                  if #FINDCOL = 368 ; Hemos logrado crear una poción de veneno [ color verde ]
+                     {
+                       gosub llenar
+                     }
+                }
+           }
+     }
+return
+
+;*************************************************
+;                  LLENAR BARRIL
+;*************************************************
+sub llenar
+finditem %barril , _ , %botellas C_ , #BACKPACKID
+for #FINDINDEX 1 #FINDCNT
+    {
+      if #FINDTYPE in %barril
+         {
+           set #LOBJECTID #FINDID
+           set %keg_id #FINDID
+         }
+      if #FINDTYPE in %botellas
+         {
+           set #LTARGETID #FINDID
+         }
+    }
+set #LTARGETKIND 1
+event macro 17
+target 3s
+set %jstart #jindex
+event macro 22 0
+set %peso #WEIGHT
+gosub wait_for MSG rellenas lleno 50
+if ( #true in #result )
+     {
+       gosub check_keg
+     }
+return
+
+sub check_keg
+event property %keg_id
+str pos #PROPERTY [
+set %i #strRes + 1
+str pos #PROPERTY ]
+set %d #strRes - %i
+str mid #PROPERTY %i %d
+set %cantidad_keg #strRes
+if %cantidad_keg = 1000
+   {
+     gosub mover_keg
+   }
+return
+
+sub mover_keg
+_mover_keg:
+finditem %keg_id C_ , #BACKPACKID
+if #FINDKIND <> -1
+   {
+     exevent drag %keg_id
+     exevent dropc %contenedor2
+     gosub waitForSysVar Weight <> %peso 50 ; Esperamos a que cambie el peso del PJ
+     gosub waitforitem %keg_id 50 %contenedor2 ; Esperamos a que caiga el objeto en la mochila
+     goto _mover_keg
+   }
+return
+
+;=====================================================
+; Rutina para, en caso de hambre, comer hasta saciarse
+;=====================================================
+; v2.2
+sub comprobar_comida
+{
+  hambriento:
+  set %jrnl #jindex ; Marcamos un índice de las líneas del diario.
+  event macro 4 0 .hungry
+  wait 20
+  while #true
+     {
+       if #jindex > %jrnl ; Si aparece una nueva línea.
+          {
+            set %jrnl %jrnl + 1 ; Seleccionamos ese numero de línea.
+            scanjournal %jrnl   ; La leemos...
+            if Estas_no_le_afecta_el_hambre in #journal || Estas_tan_lleno_que_no_puedes in #journal || Estas_totalmente_saciado in #journal
+               {
+                 set %proxima_vez %tiempo_actual + %tiempo_alimentacion
+                 return
+               }
+               else
+                  {
+                    if Estas_lleno in #journal || Estas_contento in #journal || Estas_en_inanicion in #journal || Estas_hambriento in #journal || Sientes_mucho in #journal || Estas_con_hambre in #journal || Estas_parcialmente in #journal || Estas_bien_lleno in #journal || Te_sientes_casi_lleno in #journal
+                       {
+                         finditem %comida C_ , #BACKPACKID
+                         if #findcnt > 0
+                            {
+                              set #LOBJECTID #FINDID
+                              event macro 17
+                              wait 20
+                              goto hambriento
+                            }
+                            else
+                               {
+                                 event exmsg #CHARID 3 48 COMPRA COMIDA!!
+                                 wait 40
+                                 set %proxima_vez %tiempo_actual + %tiempo_alimentacion
+                               }
+                       }
+                       else ; Mensaje extraño, repetimos...
+                          {
+                            goto hambriento
+                          }
+                  }
+          }
+       return
+     } ; FIN While
+}
+return
+
+;-@ ============================== @-;
+;-@ ############################## @-;
+;-@ SUBS públicos del Foro EasyUO  @-;
+;-@ ############################## @-;
+;-@ ============================== @-;
+
+;**
+;* Splits a string by a divider into an array and
+;* copies the result into the desired namespace
+;* @param %1 The string to split
+;* @param %2 Divider
+;* @param %3 Array name
+;* @param %4 {optional} Result namespace. If no
+;*           namespace is given it will create the
+;*           array using the %-notation
+;* @sideEffects Creates a number of variables
+;*              with name as given in %3 followed by
+;*              a digit
+;* @returns The length of the array
+sub split
+  namespace Push
+  namespace Local split , #systime
+  set !lpc #lpc
+  if #lpc < 500
+     set #lpc 500
+
+  set !string %1
+  set !divider %2
+  set !arrayName %3
+  if %0 > 3
+     set !namespace %4
+  else
+     set !namespace #false
+
+  set !length 0
+  repeat
+  {
+     set !length !length + 1
+     str Pos !string !divider 1
+     if #strRes = 0
+     {
+        set !done #true
+        set ! . !arrayName , !length !string
+     }
+     else
+     {
+        set !pos #strRes
+        set !len !pos - 1
+        str Left !string !len
+        set ! . !arrayName , !length #strRes
+        str Del !string 1 !pos
+        set !string #strRes
+     }
+  }
+  until ( !done = #true )
+  set #result !length
+
+  if !namespace <> #false
+  {
+     namespace Copy !arrayName , * To Local !namespace
+  }
+  else
+  {
+    for !i 1 #result
+    {
+       set !value !arrayName , !i
+       set % . !arrayName , !i ! . !value
+    }
+  }
+  set #lpc !lpc
+  namespace Clear
+  namespace Pop
+return #result
+
+;=================================================================
+sub wait_for
+;=================================================================
+; This "wait_for" sub package was created by Locke. If you use these subs please keep this header intact.
+; Documentation: the sub package grew to large with all the comments. To load them call the sub like this:
+; gosub wait_for docs    | or you can use doc, documention, what, or my personal favorite, kickass.
+
+; "wait_for core dispatcher" version 1.2 by Locke
+if %1 = doc || if %1 = docs || if %1 = documentation || if %1 = what || if %1 = kickass
+{
+Display ok Please click ok and wait for your browser to start.
+execute http://www.easyuo.com/forum/viewtopic.php?t=24716
+halt
+}
+nameSpace Push
+namespace local LLNS
+set #result N/A ; if #result isn't set by one of my wait_for subs it'll throw an error.
+set !LPC #lpc
+set #lpc 200
+for %i 0 %0
+set !_A . %i % . %i
+gosub wait_for_ , !_A1
+set #lpc !lpc
+namespace clear LLNS
+namespace pop
+if #result <> N/A
+return #result
+else
+display ok You specified an unknown wait_for command. Script returned #result and is halting.
+halt
+;=================================================================
+sub wait_for_MSG ; version 1.4 ~Locke
+;=================================================================
+if !_A0 < 3
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for MSG %message time_out_in_seconds$
++Script is halting
+halt
+}
+set !_timeout ( #scnt2 + !_A . !_A0 )
+_lets_wait_for_a_message:
+for %i %jstart #jindex
+{
+ scanjournal %i
+  for %ii 2 !_A0
+  {
+    if !_A . %ii in #journal && %jstart <> %i
+    set #result #true , #spc , !_A . %ii
+  }
+}
+
+if #true notin #result
+{
+set #result #false
+ if !_timeout =< #scnt2
+ return #result
+wait 1
+goto _lets_wait_for_a_message
+}
+else
+return #result
+
+wait 1
+goto _lets_wait_for_a_message
+
+;======================================================================
+sub wait_for_GUMP ; version 1.4 ~Locke
+;=================================================================
+; Añadido #CONTID ^^
+if !_A0 < 3
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for GUMP XXX_YYY time_out_in_seconds$
++Script is halting
+halt
+}
+if !_A3 <> CLOSE
+set !_timeout #scnt2 + !_A3
+else
+set !_timeout 0 ; no gump wait if %3 = CLOSE since we already believe it to be open.
+
+_lets_wait_for_a_gump:
+if #CONTSIZE = !_A2 || #CONTKIND = !_A2 || #CONTNAME = !_A2 || #CONTTYPE = !_A2 || #CONTID = !_A2
+{
+ if !_A5 <> N/A && !_A6 <> N/A
+ {
+ set !clickx !_A5 + #contposx
+ set !clicky !_A6 + #contposy
+ click !clickx !clicky
+ }
+ if !_A3 = CLOSE || if !_A4 = CLOSE || !_A5 = CLOSE || !_A6 = CLOSE
+ {
+ set !string #contsize
+ str pos !string _
+ set !pos #strres
+ str del !string #strres #strres
+ set !clickX #contposx + ( #strres / 2 )
+ str del !string 1 !pos
+ set !clickY #contposy + ( #strres / 2 )
+ click !clickx !clicky R
+ }
+return #true
+}
+
+if ( !_timeout =< #scnt2 ) && ( !_A4 = N/A )
+   {
+     return #false
+   }
+
+if !_A4 <> N/A && !_timeout =< #scnt2
+{
+finditem !_A4
+if #findkind <> -1
+{
+ for #findindex 1 #findcnt
+ {
+  if #finddist > 2
+  ignoreitem #findid LLWAITFOR
+  else
+  break
+ }
+ set #lobjectid #findid
+ event macro 17 0
+ set !_timeout #scnt2 + !_A3
+}
+else
+return #false
+}
+wait 1
+goto _lets_wait_for_a_gump
+
+sub waitForSysVar
+if %0 < 4 || %4 = N/A
+set %4 %_defaultWaitForTimeout
+if %0 < 5
+set %5 return
+set %4 #sCnt2 + %4
+_waitForSysVar:
+set % . %5 # . %1 %2 %3
+if ! % . %5 && #sCnt2 < %4
+{
+Wait 1
+goto _waitForSysVar
+}
+return
