@@ -148,9 +148,9 @@ if ( #FINDCNT > 0 )
 return
 
 sub moverLingotes
-event macro 8	7 ; Refrescar la mochila
-gosub wait_for GUMP #BACKPACKID 20
 _mover:
+event macro 8 7 ; Refrescar la mochila
+gosub wait_for GUMP #BACKPACKID 20
 finditem RMK_XMK_TMK_NMK C_ , #BACKPACKID
 if #FINDCNT > 0
    {
