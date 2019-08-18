@@ -14,7 +14,7 @@
 ; Public Release: 20/01/2019
 ; Revised On: 27/07/2019
 ; Propósito: Funde menas de 1 en 1 para subir la habilidad de Minar desde casa o en el banco (Haven).
-; Instrucciones: Configurar bolsa de lingotes, cofre de menas (Pueden ser la misma ^^), y mochila.
+; Instrucciones: Configurar bolsa de lingotes, bolsa de menas (Pueden ser la misma ^^), y la posición de la mochila.
 ;________________________________
 ;
 ; ///////////////////////////////
