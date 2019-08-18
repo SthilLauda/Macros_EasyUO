@@ -186,7 +186,7 @@ display yesno ************** ¿BANK? **************$$
                   {
                     _bolsa:
                     set #SYSMSGCOL 88
-                    event sysmessage CLICK EN EL COFRE DE MENAS
+                    event sysmessage CLICK EN LA BOLSA DE MENAS
                     wait 20
                     set #TARGCURS 1
                     target
