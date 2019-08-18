@@ -1,0 +1,104 @@
+; ======================================================================================================
+;  '||   ||` '||`   ||                                 /.\      '||`
+;   ||   ||   ||    ||     ''                         // \\      ||   ''
+;   ||   ||   ||  ''||''   ||  '||),,(|,   '''|.     //...\\     ||   ||   '''|.  `||''|,  '''/  '''|.
+;   ||   ||   ||    ||     ||   || || ||  .|''||    //     \\    ||   ||  .|''||   ||  ||   //  .|''||
+;   `|...|'  .||.   `|..' .||. .||    ||. `|..||. .//       \\. .||. .||. `|..||. .||  ||. /... `|..||.
+; ======================================================================================================
+; Author: Sthil Lauda
+; Version: 1.1
+; Client Tested with: 2.0.3
+; EUO version tested with: EasyUO 1.5 Version 243
+; Shard: Ultima Alianza ¡Hasta la muerte!
+; Public Release: 27/07/2019
+; Revised On: 18/08/2019
+; Propósito: Evita que el sistema te expulse de Haven por super el límite de skills.
+; Instrucciones: Ninguna
+;----------------------------------------------------------------------------------------
+set %habilidad_1 Alch ;- Alchemy
+set %habilidad_2 Blac ;- Blacksmithy
+set %habilidad_3 Bowc ;- Bowcraft Fletching
+set %habilidad_4 Bush ;- Bushido
+set %habilidad_5 Carp ;- Carpentry
+set %habilidad_6 Chiv ;- Chivalry
+set %habilidad_7 Cook ;- Cooking
+set %habilidad_8 Fish ;- Fishing
+set %habilidad_9 Focu ;- Focus
+set %habilidad_10 Heal ;- Healing
+set %habilidad_11 Herd ;- Herding
+set %habilidad_12 Lock ;- Lockpicking
+set %habilidad_13 Lumb ;- Lumberjacking
+set %habilidad_14 Mage ;- Magery
+set %habilidad_15 Medi ;- Meditation
+set %habilidad_16 Mini ;- Mining
+set %habilidad_17 Musi ;- Musicianship
+set %habilidad_18 Necr ;- Necromancy
+set %habilidad_19 Ninj ;- Ninjitsu
+set %habilidad_20 Remo ;- Remove Trap
+set %habilidad_21 Resi ;- Resisting Spells
+set %habilidad_22 Snoo ;- Snooping
+set %habilidad_23 Stea ;- Stealing
+set %habilidad_24 Stlt ;- Stealth
+set %habilidad_25 Tail ;- Tailoring
+set %habilidad_26 Tink ;- Tinkering
+set %habilidad_27 Vete ;- Veterinary
+set %habilidad_28 Arch ;- Archery
+set %habilidad_29 Fenc ;- Fencing
+set %habilidad_30 Mace ;- Mace Fighting
+set %habilidad_31 Parr ;- Parrying
+set %habilidad_32 Swor ;- Swordsmanship
+set %habilidad_33 Tact ;- Tactics
+set %habilidad_34 Wres ;- Wrestling
+set %habilidad_35 Anim ;- Animal Taming
+set %habilidad_36 Begg ;- Begging
+set %habilidad_37 Camp ;- Camping
+set %habilidad_38 Dete ;- Detecting Hidden
+set %habilidad_39 Disc ;- Discordance
+set %habilidad_40 Hidi ;- Hiding
+set %habilidad_41 Insc ;- Inscription
+set %habilidad_42 Peac ;- Peacemaking
+set %habilidad_43 Pois ;- Poisoning
+set %habilidad_44 Prov ;- Provocation
+set %habilidad_45 Spir ;- Spirit Speak
+set %habilidad_46 Trac ;- Tracking
+set %habilidad_47 Anat ;- Anatomy
+set %habilidad_48 Anil ;- Animal Lore
+set %habilidad_49 Arms ;- Arms Lore
+set %habilidad_50 Eval ;- Evaluating Intelligence
+set %habilidad_51 Fore ;- Forensic Evaluation
+set %habilidad_52 Item ;- Item Identification
+set %habilidad_53 Tast ;- Taste Identification
+
+loop:
+gosub evitarExpulsion
+wait 20
+goto loop:
+
+sub evitarExpulsion
+set %skills_totales 0
+for %s 1 53 ; Comprobar las 53 habilidades ^^
+    {
+      chooseskill %habilidad_ . %s real
+      set %skills_totales %skills_totales + #SKILL
+      if ( #SKILL >= 648 ) && ( #skillLock <> locked )
+           {
+             exevent skilllock %habilidad locked
+             if #skillLock <> locked
+                {
+                  set #SYSMSGCOL 38
+                  event SysMessage La habilidad no pudo ser bloqueada, macro detenida
+                  halt
+                }
+             set #SYSMSGCOL 73
+             event SysMessage La habilidad ha sido bloqueada
+           }
+    }
+    if ( %skills_totales >= 5195 ) ; Max 5200 ( 650 x 8 skills )
+         {
+           set #SYSMSGCOL 18
+           event sysmessage PELIGRO DE EXPULSIÓN! :-(
+           display OK PELIGRO DE EXPULSIÓN!
+                    + HABILIDADES: %skills_totales / 5200 MÁXIMO
+           halt
+         }
+return
