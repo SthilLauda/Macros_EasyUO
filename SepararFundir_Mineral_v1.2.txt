@@ -1,28 +1,20 @@
-;        |                                 /   \                   |       .
-;  _    -O-       .                )      ((   ))     (           -O-
-; (@)    |     +                  /|\      ))_((     /|\           |            .
-; |-|                            / | \    (/\|/\)   / | \                            (@)
-; | | --------------------------/--|-voV---\`|'/--Vov-|--\---------------------------|-|         .
-; |-|                                '^`   (o o)  '^`                                | |
-; | |                                      `\Y/'                                     |-|
-; |-|   _______ __ __   __                  _______ __ __                            | |
-; | |  |   |   |  |  |_|__|.--------.---.-.|   _   |  |__|.---.-.-----.-----.---.-.  |-|    .     o
-; |-|  |   |   |  |   _|  ||        |  _  ||       |  |  ||  _  |     |-- __|  _  |  | |
-; | |  |_______|__|____|__||__|__|__|___._||___|___|__|__||___._|__|__|_____|___._|  |-|
-; |_|________________________________________________________________________________| |
-; (@)                     l   /\ /         ( (          \ /\   l                   `\|-|             .
-;           o             l /   V           \ \          V   \ l       +             (@)
-;                         l/                _) )_             \I                                 +
-;      +                                    `\ /'
+; ======================================================================================================
+;  '||   ||` '||`   ||                                 /.\      '||`
+;   ||   ||   ||    ||     ''                         // \\      ||   ''
+;   ||   ||   ||  ''||''   ||  '||),,(|,   '''|.     //...\\     ||   ||   '''|.  `||''|,  '''/  '''|.
+;   ||   ||   ||    ||     ||   || || ||  .|''||    //     \\    ||   ||  .|''||   ||  ||   //  .|''||
+;   `|...|'  .||.   `|..' .||. .||    ||. `|..||. .//       \\. .||. .||. `|..||. .||  ||. /... `|..||.
+; ======================================================================================================
 ;
+; Script Name: Separar y Fundir [ Mining ]
 ; Author: Sthil Lauda
 ; Version: 1.1
 ; Client Tested with: 2.0.3
 ; EUO version tested with: EasyUO 1.5 Version 243
 ; Shard: Ultima Alianza ¡Hasta la muerte!
 ; Public Release: 20/01/2019
-; Revised On: 27/07/2019
-; Propósito: Funde menas de 1 en 1.
+; Revised On: 18/08/2019
+; Propósito: Funde menas de 1 en 1 para subir la habilidad de minería.
 ; Instrucciones: Configurar bolsa de lingotes y el cofre de menas (Pueden ser la misma ^^).
 ;________________________________
 ;
@@ -71,12 +63,11 @@ if ( #FINDCNT > 0 )
        exevent Drag %stack_mineral 1
        gosub waitForSysVar Weight <> %peso 60 ; Esperamos a que cambie el peso
        exevent DropC #backpackid 80 80        ; Drops the mushroom @80,80... yeah, cool as a cucumber!
-       gosub waitForItem %stack_mineral C_ #BACKPACKID 60 ; Esperamos a que caiga el objeto
+       wait 5
        gosub fundirFast
        if ( #weight >= %maxweight )
             {
               wait 5 ; Esperamos 1 vez a que la mochile se actualice.
-              set %refunde #TRUE
               gosub fundirFast ; Fundir olvidados, si los hay... XD
               gosub moverLingotes ; Vaciamos la mochila de lingotes.
             }
@@ -145,15 +136,15 @@ _reFunde:
 finditem DWJ_EWJ_GWJ_TVJ C_ , #BACKPACKID
 if ( #FINDCNT > 0 )
      {
+       set %jstart #jindex
        set #lobjectid #findid
        event macro 17
-       if ( %refunde )
+       gosub wait_for MSG Pones_el_lingote no_sacas_nada_util 5
+       if ( #TRUE in #result )
             {
-              wait 5
               goto _reFunde
             }
      }
-set %refunde #FALSE
 return
 
 sub moverLingotes
@@ -171,17 +162,34 @@ if #FINDCNT > 0
 return
 
 sub setupCofre
-set #SYSMSGCOL 88
-event sysmessage SELECIONA EL COFRE CON LAS MENAS
-wait 20
-set #TARGCURS 1
-target
-while #TARGCURS = 1
-      {
-        wait 1
-      }
-set %CofreMenas #LTARGETID
-gosub abrirContenedor %CofreMenas
+display yesno ************** ¿BANK? **************$$
+            + ¿Quieres trabajar desde el bank? $$
+            + *************************************$
+            if #dispres = yes ; PVP
+               {
+                 event macro 1 0 Bank
+                 gosub wait_for GUMP 180_240 40
+                 set %contenedor #CONTID
+                 set #SYSMSGCOL 73
+                 event sysmessage Bank: %contenedor
+                 wait 40
+                 goto _bolsa
+               }
+               else
+                  {
+                    _bolsa:
+                    set #SYSMSGCOL 88
+                    event sysmessage SELECCIONA EL COFRE CON LAS MENAS
+                    wait 20
+                    set #TARGCURS 1
+                    target
+                    while #TARGCURS = 1
+                          {
+                            wait 1
+                          }
+                    set %CofreMenas #LTARGETID
+                    gosub abrirContenedor %CofreMenas
+                  }
 return
 
 sub setupBolsa
@@ -455,4 +463,3 @@ Wait 1
 goto _waitForSysVar
 }
 return
-
