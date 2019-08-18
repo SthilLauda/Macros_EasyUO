@@ -6,16 +6,15 @@
 ;   `|...|'  .||.   `|..' .||. .||    ||. `|..||. .//       \\. .||. .||. `|..||. .||  ||. /... `|..||.
 ; ======================================================================================================
 ;
-; Script Name: Separar y Fundir [ Mining ]
 ; Author: Sthil Lauda
 ; Version: 1.1
 ; Client Tested with: 2.0.3
 ; EUO version tested with: EasyUO 1.5 Version 243
 ; Shard: Ultima Alianza ¡Hasta la muerte!
 ; Public Release: 20/01/2019
-; Revised On: 18/08/2019
-; Propósito: Funde menas de 1 en 1 para subir la habilidad de minería.
-; Instrucciones: Configurar bolsa de lingotes y el cofre de menas (Pueden ser la misma ^^).
+; Revised On: 27/07/2019
+; Propósito: Funde menas de 1 en 1 para subir la habilidad de Minar desde casa o en el banco (Haven).
+; Instrucciones: Configurar bolsa de lingotes, cofre de menas (Pueden ser la misma ^^), y mochila.
 ;________________________________
 ;
 ; ///////////////////////////////
@@ -44,6 +43,7 @@ set %comida RGG_NRD_QSD_ZBG_WLI_QRD_END_FUD_YLI_WLI_HGI
 gosub setupForja
 gosub setupCofre
 gosub setupBolsa
+gosub setupBackpack
 
 loop:
 set %tiempo_actual #SCNT ; Reloj.
@@ -150,8 +150,9 @@ return
 sub moverLingotes
 event macro 9 7 ; Close Backpack
 wait 20
-event macro 8 7 ; Open Backpack
+event macro 8	7 ; Open Backpack
 gosub wait_for GUMP #BACKPACKID 20
+contpos %backpack_X %backpack_Y
 _mover:
 finditem RMK_XMK_TMK_NMK C_ , #BACKPACKID
 if #FINDCNT > 0
@@ -181,7 +182,7 @@ display yesno ************** ¿BANK? **************$$
                   {
                     _bolsa:
                     set #SYSMSGCOL 88
-                    event sysmessage SELECCIONA EL COFRE CON LAS MENAS
+                    event sysmessage CLICK EN EL COFRE DE MENAS
                     wait 20
                     set #TARGCURS 1
                     target
@@ -195,8 +196,8 @@ display yesno ************** ¿BANK? **************$$
 return
 
 sub setupBolsa
-set #SYSMSGCOL 73
-event sysmessage SELECIONA LA BOLSA PARA GUARDAR LINGOTES
+set #SYSMSGCOL 53
+event sysmessage CLICK EN LA BOLSA DE LINGOTES
 wait 20
 set #TARGCURS 1
 target
@@ -206,6 +207,22 @@ while #TARGCURS = 1
       }
 set %BolsaLingotes #LTARGETID
 gosub abrirContenedor %BolsaLingotes
+return
+
+sub setupBackpack
+set #SYSMSGCOL 18
+event sysmessage TOCA TU MOCHILA
+wait 20
+repeat
+     {
+       wait 1
+     }
+     until #CONTID = #BACKPACKID
+set %backpack_X #CONTPOSX
+set %backpack_Y #CONTPOSY
+set #SYSMSGCOL 73
+event sysmessage Posicion: %backpack_X %backpack_Y
+wait 20
 return
 
 sub setupForja
