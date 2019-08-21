@@ -5,7 +5,7 @@
 ;  ||   ||   ||    ||     ||   || || ||  .|''||    //     \\    ||   ||  .|''||   ||  ||   //  .|''||
 ;  `|...|'  .||.   `|..' .||. .||    ||. `|..||. .//       \\. .||. .||. `|..||. .||  ||. /... `|..||.
 ; =====================================================================================================
-; Script Name: Cocina [ Panadero ]
+; Script Name: Cocinar [ Panadero ]
 ;                            _          _
 ;                           (c)___c____(c)
 ;                            \ ........../
@@ -47,7 +47,7 @@ set %version v1.0
 ; Version: 2.0
 ; Client Tested with: 2.0.3
 ; EUO version tested with: 1.5 Version 142
-; Shard: Ultima Alianza (°Hasta la muerte!)
+; Shard: Ultima Alianza (¬°Hasta la muerte!)
 ; Fecha: 08/12/2018
 ; Purpose: Fabrica pan usando harina y jarras de agua.
 ; Instrucciones; Necesitas el libro de cocina "Simple", ramas para el fuego, harina, y agua.
@@ -57,7 +57,7 @@ set %bolsa_harina JWAWKOD
 set %bolsa_ramas JWAWKOD
 set %bolsa_pan_fabricado UCLAEPD
 set %bolsa_jarras CCWXZOD
-set %tiempo_alimentacion 360 ; Cada cu·ntos segundos va a comprobar si tiene hambre.
+set %tiempo_alimentacion 360 ; Cada cu√°ntos segundos va a comprobar si tiene hambre.
 ;-------------------------------------------
 set %harina PGG
 set %pan RGG
@@ -240,14 +240,14 @@ return
 sub comprobar_comida
 {
   hambriento:
-  set %jrnl #jindex ; Marcamos un Ìndice de las lÌneas del diario.
+  set %jrnl #jindex ; Marcamos un √≠ndice de las l√≠neas del diario.
   event macro 4 0 .hungry
   wait 20
   while #true
      {
-       if #jindex > %jrnl ; Si aparece una nueva lÌnea.
+       if #jindex > %jrnl ; Si aparece una nueva l√≠nea.
           {
-            set %jrnl %jrnl + 1 ; Seleccionamos ese numero de lÌnea.
+            set %jrnl %jrnl + 1 ; Seleccionamos ese numero de l√≠nea.
             scanjournal %jrnl   ; La leemos...
             if Estas_no_le_afecta_el_hambre in #journal || Estas_tan_lleno_que_no_puedes in #journal || Estas_totalmente_saciado in #journal
                {
@@ -273,7 +273,7 @@ sub comprobar_comida
                                  set %proxima_vez %tiempo_actual + %tiempo_alimentacion
                                }
                        }
-                       else ; Mensaje extraÒo, repetimos...
+                       else ; Mensaje extra√±o, repetimos...
                           {
                             goto hambriento
                           }
@@ -353,7 +353,7 @@ goto _lets_wait_for_a_message
 ;======================================================================
 sub wait_for_GUMP ; version 1.4 ~Locke
 ;=================================================================
-; AÒadido #CONTID ^^
+; A√±adido #CONTID ^^
 if !_A0 < 3
 {
 display ok You haven't specified enough vars.$
