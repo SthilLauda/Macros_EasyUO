@@ -9,10 +9,10 @@
 ; Version: 1.0
 ; Client Tested with: 2.0.3
 ; EUO version tested with: EasyUO 1.5 Version 243
-; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Shard: Ultima Alianza (Â¡Hasta la muerte!)
 ; Public Release: 21/08/2019
 ; Revised On: 21/08/2019
-; Propósito: Entrena la habilidad de catar (Taste ID).
+; PropÃ³sito: Entrena la habilidad de catar (Taste ID).
 ; Instrucciones: Click en el alimento a catar.
 ;---------------------------
 SET %tiempo_alimentacion 360
@@ -39,7 +39,7 @@ IF %proxima_vez <= %tiempo_actual
      gosub comprobar_comida
    }
 set %jstart #jindex
-EVENT MACRO 13 36 ; Use Skill Taste Identification
+EVENT MACRO 13 36 ; Use skill Taste Identification
 TARGET
 SET #LTARGETID %COMIDA
 EVENT MACRO 22
@@ -65,14 +65,14 @@ RETURN
 sub comprobar_comida
 {
   hambriento:
-  set %jrnl #jindex ; Marcamos un índice de las líneas del diario.
+  set %jrnl #jindex ; Marcamos un Ã­ndice de las lÃ­neas del diario.
   event macro 4 0 .hungry
   wait 20
   while #true
      {
-       if #jindex > %jrnl ; Si aparece una nueva línea.
+       if #jindex > %jrnl ; Si aparece una nueva lÃ­nea.
           {
-            set %jrnl %jrnl + 1 ; Seleccionamos ese numero de línea.
+            set %jrnl %jrnl + 1 ; Seleccionamos ese numero de lÃ­nea.
             scanjournal %jrnl   ; La leemos...
             if Estas_no_le_afecta_el_hambre in #journal || Estas_tan_lleno_que_no_puedes in #journal || Estas_totalmente_saciado in #journal
                {
@@ -98,7 +98,7 @@ sub comprobar_comida
                                  set %proxima_vez %tiempo_actual + %tiempo_alimentacion
                                }
                        }
-                       else ; Mensaje extraño, repetimos...
+                       else ; Mensaje extraÃ±o, repetimos...
                           {
                             goto hambriento
                           }
