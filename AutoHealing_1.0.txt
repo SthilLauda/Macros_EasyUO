@@ -32,12 +32,26 @@
 ; Release: 26/07/2019
 ; Purpose: Aplica vendas.
 ;==================================
-
-set %version 1.0
+set %version 1.1
+;________________________________
+;
+; ///////////////////////////////
+; ******** CONFIGURACIÓN ********
+; ///////////////////////////////
+;________________________________
+;
+set %delay_venda 180
+;________________________________
+;
+; ///////////////////////////////
+; ****** FIN CONFIGURACIÓN ******
+; ///////////////////////////////
+;________________________________
+;
 set %vendas_sucias AMF
 set %vendas_limpias ZLF
 set %max_vendas_sucias 10
-set %venta_timer #SCNT
+set %venda_timer #SCNT
 
 set #SYSMSGCOL 88
 event sysmessage ==================
@@ -50,14 +64,10 @@ wait 20
 gosub setupPilon
 
 loop:
-if ( C in %CHAR_STATUS || GC in #CHARSTATUS ) && ( CA notin %CHAR_STATUS ) && ( CBA notin %CHAR_STATUS ) && ( GCA notin %CHAR_STATUS )
+gosub checkPoison
+if ( #HITS < #MAXHITS && ! %posioned ) ; Nos falta vida y no estamos envenenados...
      {
-       wait 1
-       goto loop
-     }
-if ( #HITS < #MAXHITS && C Notin #CHARSTATUS ) ; Nos falta vida y no estamos envenenados...
-     {
-       if #SCNT2 > %venta_timer
+       if #SCNT2 > %venda_timer
           {
             event macro 4 0 .vendas
             target
@@ -68,7 +78,7 @@ if ( #HITS < #MAXHITS && C Notin #CHARSTATUS ) ; Nos falta vida y no estamos env
                  {
                    if ( Pones_el_vendas in #RESULT )
                         {
-                          set %venta_timer #SCNT2 + 180
+                          set %venda_timer #SCNT2 + %delay_venda
                           gosub limpiarVendas
                           goto loop
                         }
@@ -80,11 +90,9 @@ if ( #HITS < #MAXHITS && C Notin #CHARSTATUS ) ; Nos falta vida y no estamos env
                    if ( pero_fallas in #RESULT )
                         {
                           set %fail_timer #SCNT2 + 30 ; 3 segundos
-                          _WaitToFail:
-                          if #SCNT2 < %fail_timer
+                          while #SCNT2 < %fail_timer
                              {
                                wait 1
-                               goto _WaitToFail
                              }
                           goto loop
                         }
@@ -92,6 +100,17 @@ if ( #HITS < #MAXHITS && C Notin #CHARSTATUS ) ; Nos falta vida y no estamos env
           }
      }
 goto loop
+
+sub checkPoison
+if ( C in %CHAR_STATUS || GC in #CHARSTATUS ) && ( CA notin %CHAR_STATUS ) && ( CBA notin %CHAR_STATUS ) && ( GCA notin %CHAR_STATUS )
+     {
+       set %posioned #TRUE
+     }
+     else
+        {
+          set %posioned #FALSE
+        }
+return
 
 ;======================================================
 
