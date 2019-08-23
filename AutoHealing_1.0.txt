@@ -50,6 +50,11 @@ wait 20
 gosub setupPilon
 
 loop:
+if ( C in %CHAR_STATUS || GC in #CHARSTATUS ) && ( CA notin %CHAR_STATUS ) && ( CBA notin %CHAR_STATUS ) && ( GCA notin %CHAR_STATUS )
+     {
+       wait 1
+       goto loop
+     }
 if ( #HITS < #MAXHITS && C Notin #CHARSTATUS ) ; Nos falta vida y no estamos envenenados...
      {
        if #SCNT2 > %venta_timer
