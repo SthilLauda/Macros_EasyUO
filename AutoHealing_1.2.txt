@@ -40,7 +40,7 @@ set %version 1.1
 ; ///////////////////////////////
 ;________________________________
 ;
-set %delay_venda 180
+set %delay_venda 190
 ;________________________________
 ;
 ; ///////////////////////////////
@@ -65,6 +65,7 @@ gosub setupPilon
 
 loop:
 gosub checkPoison
+gosub checkDex
 if ( #HITS < #MAXHITS && ! %posioned ) ; Nos falta vida y no estamos envenenados...
      {
        if #SCNT2 > %venda_timer
@@ -100,6 +101,17 @@ if ( #HITS < #MAXHITS && ! %posioned ) ; Nos falta vida y no estamos envenenados
           }
      }
 goto loop
+
+sub checkDex
+if #DEX < 100
+   {
+     set %delay_venda 210
+   }
+   else
+      {
+        set %delay_venda 190
+      }
+return
 
 sub checkPoison
 if ( C in %CHAR_STATUS || GC in #CHARSTATUS ) && ( CA notin %CHAR_STATUS ) && ( CBA notin %CHAR_STATUS ) && ( GCA notin %CHAR_STATUS )
