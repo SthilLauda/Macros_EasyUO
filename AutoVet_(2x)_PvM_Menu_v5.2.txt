@@ -1,0 +1,2302 @@
+; ======================================================================================================
+;  '||   ||` '||`   ||                                 /.\      '||`
+;   ||   ||   ||    ||     ''                         // \\      ||   ''
+;   ||   ||   ||  ''||''   ||  '||),,(|,   '''|.     //...\\     ||   ||   '''|.  `||''|,  '''/  '''|.
+;   ||   ||   ||    ||     ||   || || ||  .|''||    //     \\    ||   ||  .|''||   ||  ||   //  .|''||
+;   `|...|'  .||.   `|..' .||. .||    ||. `|..||. .//       \\. .||. .||. `|..||. .||  ||. /... `|..||.
+; ======================================================================================================
+;
+; Script Name: AutoVet DUAL [ PvM ]                       ,/
+;                                                        //
+;                                                      ,//
+;                                          ___   /|   |//
+;                                      `__/\_ --(/|___/-/
+;                                   \|\_-\___ __-_`- /-/ \.
+;                                  |\_-___,-\_____--/_)' ) \
+;                                   \ -_ /     __ \( `( __`\|
+;                                   `\__|      |\)\ ) /(/|
+;           ,._____.,            ',--//-|      \  |  '   /
+;          /     __. \,          / /,---|       \       /
+;         / /    _. \  \        `/`_/ _,'        |     |
+;        |  | ( (  \   |      ,/\'__/'/          |     |
+;        |  \  \`--, `_/_------______/           \(   )/
+;        | | \  \_. \,                            \___/\
+;        | |  \_   \  \                                 \
+;        \ \    \_ \   \   /                              \
+;         \ \  \._  \__ \_|       |                  ___    \
+;          \ \___  \      \       |               __/  /__   \
+;           \__ \__ \  \_ |       \             /__   __ /   |
+;           |  \_____ \  ____      |              /__/       |
+;           | \  \__ ---' .__\     |        |               |
+;           \  \__ ---   /   )     |        \              /
+;            \   \____/ / ()(      \          `---_       /|
+;             \__________/(,--__    \_________.    |    ./ |
+;               |     \ \  `---_\--,           \   \_,./   |
+;               |      \  \_ ` \    /`---_______-\   \\    /
+;                \      \.___,`|   /              \   \\   \
+;                 \     |  \_ \|   \              (   |:    |
+;                  \    \      \    |             /  / |    ;
+;                   \    \      \    \          ( `_'   \  |
+;                    \.   \      \.   \          `__/   |  |
+;                      \   \       \.  \                |  |
+;                       \   \        \  \               (  )
+;                        \   |        \  |              |  |
+;                         |  \         \ \              I  `
+;                         ( __;        ( _;            ('-_';
+;                         |___\        \___:            \___:
+;
+; Author: Sthil Lauda
+; Testeada por: Bishop
+; Version: 5.2 (Experimental) xDDD
+; Client Tested with: 2.0.3
+; EUO version tested with: EasyUO 1.5 Version 243
+; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Public Release: 25/08/2019
+; Revision Date: 25/08/2019
+; Global Variables Used: none
+; Purpose:
+;          - Aplica vendas en base a la posición que hayas fijado apuntando con el mouse en la barra de salud de tu montura.
+;          - Aplica pociones de curación animal.
+;          - Neutraliza el veneno con Magia (An Nox) en base al color lima del poison en la barra de salud de tu mascota.
+;          - Curación con Magia (In Vas Mani) ****AVISO**** ¡Esta opción consume toneladas de maná y regs!;
+;          - Canción Himno de Batalla y Frenesí sobre el familiar, montura y golem.
+;          - Resucita al familiar y a la montura automáticamente.
+;          - Oculta a la montura con el hechizo "An Lor Xen".
+;          - Equipa arco y armadura de golem, y lo desarma y quita la armadura para encogerlo.
+;          - Recalea a 1 una runa de tu elección en el libro que hayas configurado (casa, establos, banco, etc).
+;          - Tecla para auto-domar una montura hasta que te acepte como dueño.
+;          - Canciones élficas y del libro de música.
+;
+set %version v5.2
+;==============================================================================================================
+; *** INSTRUCCIONES ***
+;======================
+; La macro funciona con una 1 montura + 1 familiar + 1 Golem.
+; La barra de salud de la montura debe estar al frente, en el foco.
+; IMPORTANTE -> Intentar NO cerrar la barra de salud, taparla, o moverla mientras la macro funciona (aunque volverá a su sitio).
+;________________________________
+;
+; ///////////////////////////////
+; ******** CONFIGURACIÓN ********
+; ///////////////////////////////
+;==============================================================================================================
+; Para encontrar estos valores X e Y, tienes que mover con la mano la barra de salud de tu montura hasta el sitio
+; donde quieres que se quede fija, y sin soltar la barra de salud, mirar en el EasyUO y apuntar lo que pone en
+; el apartado "Container Info" -> #CONTPOSX y #CONTPOSY. Reduce la ventana del UO a la mitad para que puedas tener
+; el EasyUO abierto al lado de la ventana del UO y poder mirar el EasyUO al mismo tiempo que mueves la barra de salud.
+;--------
+; MONTURA
+set %PosicionBarraSaludMontura1_X 346 ; La coordenada X de la pantalla donde situar la barrra de salud de la primera montura
+set %PosicionBarraSaludMontura1_Y 708 ; La coordenada Y de la pantalla donde situar la barrra de salud de la primera montura
+; FAMILIAR
+set %PosicionBarraSaludFamiliar_X 192 ; La coordenada X de la pantalla donde situar la barrra de salud de la segunda montura
+set %PosicionBarraSaludFamiliar_Y 708 ; La coordenada Y de la pantalla donde situar la barrra de salud de la segunda montura
+;==============================================================================================================
+; Libro de Runas y posición de la runa a la que quieres viajar... Un establo, el banco, tu casa, etc.
+set %nombre_libro TAMER ; Escribe el nombre de tu libro de runas donde tienes la runa a los establos.
+                        ; Si tu libro no tiene nombre, pónselo abriéndolo y usando la opción "Renombrar Libro".
+set %numero_runa 1      ; Escribe la posición de la runa (1-16) a donde recaleará usando el libro (establo, casa, banco, etc).
+;==============================================================================================================
+; Tiempo en aplicarse la venda. Si falla el vendazo por lag, etc, incrementar en 1 segundo y volver a probar.
+; Puede ser por mala conexión a la red, latencias, etc... añadir tiempo (+1 segundo) hasta que funcione.
+set %tiempo_vendazo 7
+; El máximo de vendas sucias en la mochila antes de limpiarlas.
+set %max_vendas_sucias 50
+;========================================================
+; Quitar el veneno a tu mascota usando magia ( An Nox ). Si no te interesa ponlo a "#FALSE".
+set %neutralizar_veneno_con_magia #TRUE
+;========================================================
+; Curar puntos de vida a tu mascota usando magia ( In Vas Mani ). Si quieres activarlo ponlo a "#TRUE".
+; *** ¡¡AVISO!! *** Necesita toneleadas de regs, maná y toda la magia que puedas ponerte encima ( Recomendado 120 con capa y joyas ).
+set %curar_con_magia #TRUE
+set %porciento_curar_con_magia 30 ; Número del {5..al..93} significa el % del TOTAL de los PUNTOS DE VIDA DE TU MASCOTA.
+                                  ; 60 -> Empezar a curar con magia cuando la vida baje del 60% de salud.
+set %distancia_hechizos 7 ; La distancia máxima en TILES con tu MASCOTA en la que casteará hechizos de curación/sanar ( In Vas Mani / An Nox ).
+                          ; Algo así como el "PERÍMETRO" para poder lanzar MAGIAS.
+;========================================================
+set %ALIMENTAR #FALSE         ; Si quieres alimentarlo ponlo a "#TRUE" (ES LO IDEAL PARA MACREAR FAMILIARES).
+set %tipo_alimentacion FRUTA  ; La otra opción es "CARNE".
+set %tiempo_alimentacion_mascota 1800 ; No sé muy bien qué poner... de momento unos 1800 ( 30min ) :D
+;==============================================================================================================
+; Macro del UO "bow" ( Viene incluida de serie ). Es para cambiar el foco a la pantalla del UO.
+set %tecla_saludo_1 b
+set %tecla_saludo_2 ctrl
+;================================================
+; //////////////////////////////////////////////
+; ************* FIN CONFIGURACIÓN *************
+; //////////////////////////////////////////////
+;________________________________________________
+;
+set %libro_runas MPF
+set %vendas_limpias ZLF
+set %vendas_sucias AMF
+set %golems_encogidos ZIM
+set %golems_abiertos YAB
+set %pilones TEE_QEE_WEE_VEE
+set %armaduras_golem NYAB
+set %arcos_golem GYAB
+set %espadas_golem UPO
+set %fruta QQD_PQD_YSD
+set %carne FUD_YLI_VRD_HQD_YRD_AQD
+set %PosicionLibroRunasX 0
+set %PosicionLibroRunasY 0
+set %libro_runas_GUMP generic_gump
+set %dimensiones_GUMP 452_236
+set %nombre_salud_GUMP status_gump
+set %barra_salud_GUMP 432_184
+set %cronometro_alimentacion1 N/A
+set %cronometro_alimentacion2 N/A
+set %cronometro_vendazo #SCNT
+set %pixel_poison 2716457 ; Color del poison en Ultima Alianza. "Lima limón" :D
+set %intentos_seguir 0
+set %start_libro 0
+set %max_porciento_curar_con_magia %porciento_curar_con_magia - 1
+set #lpc 400
+;
+; Tipo de alimentación para la mascota
+;
+if ( %ALIMENTAR ) ; Seleccionar la comida para las mascotas :D
+     {
+       if %tipo_alimentacion = CARNE
+          {
+            set %comida %carne
+          }
+       if %tipo_alimentacion = FRUTA
+          {
+            set %comida %fruta
+          }
+     }
+;
+; MENSAJE
+;
+set #SYSMSGCOL 88
+event sysmessage ======================
+set #SYSMSGCOL 53
+event sysmessage AutoVet DUAL %version
+set #SYSMSGCOL 88
+event sysmessage ======================
+wait 20
+
+gosub InitMenu
+wait 40
+
+;========================================================
+configurar:
+finditem %vendas_limpias C_ , #BACKPACKID
+if #FINDKIND = -1
+{
+ display ok No tienes ninguna venda en la mochila.$$Deteniendo... :-(
+ halt
+}
+finditem %pilones C_ , #BACKPACKID
+if #FINDKIND = -1
+{
+ display ok No tienes pilón de agua en la mochila.$$Deteniendo... :-(
+ halt
+}
+else
+{
+set %pilon #FINDID
+set #SYSMSGCOL 73
+event sysmessage OK: pilon de agua...
+wait 1s
+}
+finditem %golems_encogidos C_ , #BACKPACKID
+if #FINDCNT > 0
+   {
+     set %golem_id #FINDID
+     set %golem #TRUE
+     gosub GetName %golem_id nombre_golem
+     event exmsg %golem_id 3 90 GOLEM: %nombre_golem
+     wait 40
+   }
+   else ; Si no hay Golem en la mochila, buscamos en las cercanías a ver...
+      {
+        finditem %golems_abiertos G
+        if #FINDCNT > 0
+           {
+             display yesno ************** [CONFIGURAR GOLEM] ***************$$
+                         + ¿Quieres configurar un golem que ya está abierto?$$
+                         + ******************************************************$
+             if ( #dispres = yes )
+                  {
+                    _ClickGolem:
+                    display OK Targetea a tu GOLEM...
+                    set #TARGCURS 1
+                    target
+                    while #TARGCURS = 1
+                          {
+                            wait 1
+                          }
+                    set %golem_id #LTARGETID
+                    finditem %golem_id ; Comprobar si es un Golem o es otra cosa... XD
+                    if #FINDCNT > 0
+                       {
+                         if %golems_abiertos NotIn #FINDTYPE
+                            {
+                              set #SYSMSGCOL 39
+                              event sysmessage ESTO NO PARECE SER UN GOLEM!
+                              wait 20
+                              goto _ClickGolem
+                            }
+                            else
+                               {
+                                 set %golem #TRUE
+                                 gosub GetName %golem_id nombre_golem
+                                 event exmsg %golem_id 3 90 GOLEM: %nombre_golem
+                                 wait 40
+                               }
+                       }
+                  }
+                  else ; Han respondido que no hay golem...
+                     {
+                       set #SYSMSGCOL 38
+                       event sysmessage Desactivando Golems...
+                       wait 40
+                       set %golem #FALSE
+                     }
+           }
+           else ; No vemos ningún Golem...
+              {
+                set #SYSMSGCOL 38
+                event sysmessage Desactivando Golems...
+                wait 40
+                set %golem #FALSE
+              }
+      }
+set #LOBJECTID #CHARID ; Nos bajamos de la montura por si a caso...
+event Macro 17
+wait 40
+display OK Targetea a tu MONTURA...
+set #targCurs 1
+target
+while #targCurs = 1
+   {
+    wait 1
+	 }
+set %montura #LTARGETID
+gosub GetName %montura nombre_montura
+event exmsg %montura 3 90 MONTURA: %nombre_montura
+wait 20
+gosub ConstantVetPet1 %montura
+wait 20
+display OK Targetea a tu FAMILIAR...
+set #targCurs 1
+target
+while #targCurs = 1
+   {
+     wait 1
+	 }
+set %familiar #LTARGETID
+gosub GetName %familiar nombre_familiar
+event exmsg %familiar 3 90 FAMILIAR: %nombre_familiar
+wait 20
+gosub ConstantVetPet2 %familiar
+wait 20
+display TODO LISTO!! :-)
+goto main
+
+;========================================================
+;
+; ******************* LOOP PRINCIPAL ********************
+;
+;========================================================
+main:
+gosub buttonloop ; Comprobamos también si han pulsado algun botón del menú...
+gosub posicionar ; Nos aseguramos de que las barras de salud de las monturas siguen en su sitio...
+if ( %ALIMENTAR )
+     {
+       gosub alimentar_mascotas
+     }
+gosub getHealthPercentage %PosicionBarraSaludMontura1_X %PosicionBarraSaludMontura1_Y
+set %vida_montura1 #RESULT
+wait 10
+gosub getHealthPercentage %PosicionBarraSaludFamiliar_X %PosicionBarraSaludFamiliar_Y
+set %vida_familiar #RESULT
+wait 10
+gosub checkDeadPets
+if ( %vida_montura1 < !healatpercent_mount1 && %vida_montura1 >= 1 ) || ( %vida_familiar < !healatpercent_familiar && %vida_familiar >= 1 ) || ( %montura_muerta || %familiar_muerto )
+     {
+       gosub comprobar_vendazo
+     }
+menu get AutoAnNoxChk
+set %neutralizar_veneno_con_magia #menures
+if ( %neutralizar_veneno_con_magia )
+     {
+       gosub getHealthPercentage %PosicionBarraSaludMontura1_X %PosicionBarraSaludMontura1_Y
+       set %poison_montura1 %ghp_isPoisoned
+       set %vida_montura1 #RESULT
+       wait 10
+       gosub getHealthPercentage %PosicionBarraSaludFamiliar_X %PosicionBarraSaludFamiliar_Y
+       set %poison_familiar %ghp_isPoisoned
+       set %vida_familiar #RESULT
+       wait 10
+       if ( %poison_montura1 = -1 && %vida_montura1 >= 1 ) || ( %poison_familiar = -1 && %vida_familiar >= 1 ) && ( #MANA >= 6 )
+            {
+              gosub comprobar_veneno
+            }
+     }
+menu get AutoInVasManiChk
+set %curar_con_magia #menures
+if ( %curar_con_magia )
+     {
+       gosub getHealthPercentage %PosicionBarraSaludMontura1_X %PosicionBarraSaludMontura1_Y
+       set %vida_montura1 #RESULT
+       wait 10
+       gosub getHealthPercentage %PosicionBarraSaludFamiliar_X %PosicionBarraSaludFamiliar_Y
+       set %vida_familiar #RESULT
+       wait 10
+       menu GetNum PorcientoCurarMagia %porciento_curar_con_magia
+       set %porciento_curar_con_magia #menures
+       gosub checkDeadPets
+       if ( %vida_montura1 < %porciento_curar_con_magia && %vida_montura1 >= 1 && ! %montura_muerta ) || ( %vida_familiar < %porciento_curar_con_magia && %vida_familiar >= 1 && ! %familiar_muerto ) && ( #MANA >= 11 )
+            {
+              gosub comprobar_curar_magia
+            }
+     }
+goto main
+;========================================================
+;
+; ***************** FIN LOOP PRINCIPAL *****************
+;
+;========================================================
+;
+;-@ ============================== @-;
+;-@ ############################## @-;
+;-@ ############ SUBS ############ @-;
+;-@ ############################## @-;
+;-@ ============================== @-;
+;
+;========================================================
+sub InitMenu
+  menu Clear
+	menu Window Title Auto Vet [ PVM ] v5.2 [ 2x + Golem ]
+	menu Window Color Black
+	menu Window Size 482 184
+	menu Font Transparent #true
+	menu Font Align Right
+	menu Font Name MS Sans Serif
+	menu Font Size 8
+	menu Font Style b
+	menu Font Color Yellow
+	menu Font Transparent #false
+	menu Font Align Left
+	menu Font BGColor Black
+	menu Text EUOLabel1 212 2 FAMILIAR
+	menu Font Size 10
+	menu Text EUOLabel2 340 80 %
+	menu Shape EUOShape1 0 101 361 3 3 7 5 Lime 7 White
+	menu Shape EUOShape2 109 -4 3 109 3 7 5 Lime 7 White
+	menu Shape EUOShape3 197 -4 3 109 3 7 5 Lime 7 White
+	menu Font Size 8
+	menu Font Color Aqua
+	menu Text EUOLabel3 400 0 GOLEM
+	menu Shape EUOShape6 460 44 1 9 3 7 1 Black 7 White
+	menu Shape EUOShape5 357 -2 3 187 3 7 5 Lime 7 White
+	menu Shape EUOShape4 173 100 3 85 3 7 5 Lime 7 White
+	menu Font Color Yellow
+	menu Text EUOLabel4 286 2 MONTURA
+	menu Font Color Yellow
+	menu Font BGColor Green
+	menu Button reparar 364 40 56 21 Reparar
+	menu Font Color Blue
+	menu Font BGColor Silver
+	menu Button conocimiento_animal 4 108 81 33 Cono Animal
+	menu Button recall_libro 88 108 81 33 Ir a Establos
+	menu Button domar 4 144 165 37 Domar
+	menu Font Color Lime
+	menu Font BGColor Black
+	menu Button oscuridad 116 4 77 21 Oscuridad
+	menu Font Color Yellow
+	menu Font BGColor $00FF0080
+	menu Button tranquilidad 116 28 77 21 Tranquilidad
+	menu Font Color $000080FF
+	menu Font BGColor Blue
+	menu Button himno_batalla 116 52 77 21 Himno Bat.
+	menu Font Color Lime
+	menu Font BGColor Black
+	menu Button ocultacion 116 76 77 21 Ocultación
+	menu Font Color Aqua
+	menu Font BGColor Blue
+	menu Button healing_con_magia_fami 203 16 54 21 Heal
+	menu Button healing_con_magia_montu 282 16 53 21 Heal
+	menu Font Name Small Fonts
+	menu Font Size 7
+	menu Font Color Lime
+	menu Font BGColor Black
+	menu Check AutoAnNoxChk 204 60 105 25 %neutralizar_veneno_con_magia Auto - An Nox
+	menu Font Color Fuchsia
+	menu Check AutoInVasManiChk 204 80 109 17 %curar_con_magia Auto - InVasMani
+	menu Font Name MS Sans Serif
+	menu Font Size 8
+	menu Font Color $000080FF
+	menu Font BGColor Blue
+	menu Button luz_elfica 268 108 85 21 Luz Elfi.
+	menu Font BGColor $00800040
+	menu Button campamento 180 108 85 21 Campamento
+	menu Font Color Yellow
+	menu Font BGColor Red
+	menu Button vida 180 156 53 25 Vida
+	menu Font Color Lime
+	menu Font BGColor Blue
+	menu Button mana 236 156 61 25 Mana
+	menu Font Color Blue
+	menu Font BGColor Yellow
+	menu Button frenesi 300 156 53 25 Frenesí
+	menu Font Color Red
+	menu Font BGColor Black
+	menu Button curandero 180 132 85 21 Curandero
+	menu Font Color $000080FF
+	menu Button voz_elfica 268 132 85 21 Voz Elfica
+	menu Font Color Red
+	menu Font BGColor Silver
+	menu Edit PorcientoCurarMagia 316 72 21 %porciento_curar_con_magia
+	menu Font BGColor Lime
+	menu Button sanar_golem 423 16 56 21 Sanar
+	menu Font Color Yellow
+	menu Font BGColor Red
+	menu Button guardar_golem 364 16 56 21 Guardar
+	menu Font Color Lime
+	menu Font BGColor Black
+	menu Button ocultar_montura 335 40 19 21 O
+	menu Font BGColor Purple
+	menu Button infogolem 364 160 115 21 .Infogolem
+	menu Font Color Blue
+	menu Font BGColor Silver
+	menu Button flechas 364 136 55 21 Flechas
+	menu Button manillas 424 136 55 21 Manillas
+	menu Button arco 364 112 55 21 Arco
+	menu Button armor 424 112 55 21 Armor
+	menu Font Color Red
+	menu Font BGColor Lime
+	menu Button sanar_familiar 257 16 19 21 S
+	menu Button sanar_montura 335 16 19 21 S
+	menu Font Color Lime
+	menu Font BGColor Blue
+	menu Button familiar 4 4 101 21 .Familiar
+	menu Font Color $000080FF
+	menu Button llamada_familiar 4 27 101 21 Familiar Elfico
+	menu Font Color Yellow
+	menu Button elfos 4 50 49 27 Elfos
+	menu Font Color $008000FF
+	menu Button capitan_noldor 56 50 49 27 Noldor
+	menu Font Color Red
+	menu Font BGColor Black
+	menu Button dormir_enemigo 4 79 101 20 Dormir Enemigo
+	menu Font Color Blue
+	menu Font BGColor Yellow
+	menu Button frenesi_golem 364 88 115 21 Frenesí
+	menu Font Color Aqua
+	menu Font BGColor Blue
+	menu Button healGolem 423 40 56 21 Heal
+	menu Font Color Blue
+	menu Font BGColor Yellow
+	menu Button frenesi_familiar 230 40 26 21 F
+	menu Font Color $000080FF
+	menu Font BGColor Blue
+	menu Button himno_batalla_montura 282 40 26 21 H
+	menu Font Color Blue
+	menu Font BGColor Yellow
+	menu Button frenesi_montura 309 40 26 21 F
+	menu Font Color $000080FF
+	menu Font BGColor Blue
+	menu Button himno_batalla_familiar 203 40 26 21 H
+	menu Button himno_batalla_golem 364 64 115 21 Himno de Batalla
+	menu Font Color Yellow
+	menu Font BGColor Red
+	menu Button pocion_veterinaria 257 40 19 21 P
+	menu Show 421 270
+return
+
+;========================================================
+
+sub pocion_veterinaria
+finditem WUF C_ , #BACKPACKID
+if #FINDCNT > 0
+   {
+     for #FINDINDEX 1 #FINDCNT
+         {
+           if #FINDCOL = 2975 ; Curación animal
+              {
+                set #LOBJECTID #FINDID
+                event macro 17
+                target
+                set #LTARGETID %familiar
+                set #LTARGETKIND 1
+                event macro 22
+              }
+         }
+   }
+return
+
+sub buttonloop
+if ( #menubutton <> n/a ) && ( #menubutton <> CLOSED )
+     {
+       key %tecla_saludo_1 %tecla_saludo_2 ; Cambiar el foco a la ventana del juego... ^^
+       gosub #menubutton ; Aquí ejecutamos el sub del botón correspondiente
+       set #menubutton n/a ; Reseteamos el botón del menú.
+     }
+return
+
+sub checkDeadPets
+finditem %montura
+if #FINDCNT > 0
+   {
+     if #FINDCOL = 961 ; Muerta
+        {
+          set %montura_muerta #TRUE
+        }
+        else
+           {
+             set %montura_muerta #FALSE
+           }
+   }
+finditem %familiar
+if #FINDCNT > 0
+   {
+     if #FINDCOL = 1154 ; Muerto
+        {
+          set %familiar_muerto #TRUE
+        }
+        else
+           {
+             set %familiar_muerto #FALSE
+           }
+   }
+return
+
+sub recall_libro
+finditem %libro_runas C_ , #BACKPACKID
+if ( #FINDKIND <> -1 ) ; Si hay libros en la mochila.
+     {
+       set %num_libros #FINDCNT
+       set %start_libro 1
+       for %n 1 %num_libros ; Bucamos el que nos han dicho entre todos ellos.
+           {
+             finditem %libro_runas C_ , #BACKPACKID
+             set %libro #FINDID
+             set #LOBJECTID %libro
+             event property %libro
+             str pos #Property $
+             str left #Property #StrRes
+             if ( %nombre_libro in #Property ) ; Si lo encontramos, entonces.
+                  {
+                    set #LOBJECTID %libro     ; Fijamos el libro.
+                    set %posruna %numero_runa ; Fijamos la posición de la runa.
+                    gosub librecall           ; Buscamos sus coordenadas.
+                    event macro 17            ; Abrimos el libro de runas.
+                    gosub wait_for GUMP %dimensiones_GUMP 3 ; Esperamos a que aparezca el libro. Tiempo de espera en segundos (3).
+                    if ( #result )
+                         {
+                           gosub situar_librorunas  ; Nos aseguramos de que el libro esté en su sitio.
+                           click %runex %runey x 5  ; Toque mágico (x 5) para poder correr al mismo tiempo que se abre el libro ^^
+                           gosub wait_for RECALL 15
+                           event macro 3 0 .resend
+                           return
+                         }
+                  } ; Si no este el libro que buscamos, lo descartamos
+                  else
+                     {
+                       ignoreitem #FINDID BAD_BOOKS ; Descartamos el resto de los libros.
+                     }
+           }
+     }
+     else ; No hay libros de runas en la mochila...
+        {
+          if ( %start_libro = 0 ) ; Si acabamos de iniciar la macro
+               {
+                 set %start_libro 1
+                 sound
+                 display NO HAY LIBROS DE RUNAS! ¬¬
+               }
+               else ; Si seguimos con la macro en marcha
+                  {
+                    event exmsg #charid 0 39 NO HAY LIBROS!! ¬¬
+                  }
+        }
+return
+
+sub TargetOn
+set %tiempo_espera_TO #scnt + 10
+repeat
+     {
+       _TargetOn:
+       if #TARGCURS = 1 ; Limpiamos el target
+          {
+            key esc
+            wait 5
+          }
+       set #TARGCURS 1 ; Nuevo target
+       target 1s
+       while #TARGCURS = 1 ; Esperamos al click...
+             {
+               wait 1
+             }
+       set %objetivo #LTARGETID
+       finditem %objetivo
+       if ( %objetivo = N/A )
+            {
+              goto _TargetOn
+            }
+     }
+     until ( %objetivo <> N/A || #scnt < %tiempo_espera_TO )
+return
+
+sub conocimiento_animal
+gosub TargetOn
+if %objetivo = N/A
+   {
+     return
+   }
+event macro 13 2
+target 2s
+set #LTARGETID %objetivo
+set #LTARGETKIND 1
+event macro 22
+gosub wait_for GUMP 414_405 3
+return
+
+sub domar
+if ( #CHARGHOST <> yes )
+     {
+       gosub TargetOn
+       tame:
+       set %jstart #jindex
+       event macro 13 35
+       target 3s
+       set #ltargetkind 1
+       set #ltargetid %objetivo
+       event macro 22
+       wait 20
+       set %tametimer #scnt + 15 ; Tiempo que le puede costar 1 intento de doma.
+       set %followtimer #scnt + 3
+       follow:
+       gosub wait_for MSG ESTAS_DEMASIADO_LEJOS YA_ESTA TE_ACEPTA NO_PUEDES_VER NO_PUEDES_DOMAR_ESO NO_CONSIGUES TU_HABILIDAD GET_THERE NO_PUEDE_SER SEE_THE_TARGET 10
+       if #true in #result
+           {
+             if ( YA_ESTA in #result || TE_ACEPTA in #result )
+                  {
+                    event exmsg #charid 3 88 COMPLETADO! :-)
+                    wait 10
+                    return
+                  }
+             if ( NO_CONSIGUES in #result )
+                  {
+                    goto busca
+                  }
+             if ( NO_PUEDES_VER in #result || GET_THERE in #result || SEE_THE_TARGET in #result ) ; En esta fase, lo que molesta suelen ser árboles, o animales en medio, o que te apartes corriendo mientras estabas domando....
+                  {
+                    set %intentos_seguir %intentos_seguir + 1
+                    if %intentos_seguir >= 6
+                       {
+                         set %intentos_seguir 0
+                         return
+                       }
+                    goto busca
+                  }
+             if ( ESTAS_DEMASIADO_LEJOS in #result )
+                  {
+                    goto busca
+                  }
+             if ( TU_HABILIDAD in #result || NO_PUEDE_SER in #result || NO_PUEDES_DOMAR_ESO in #result )
+                  {
+                    return
+                  }
+           }
+        busca:
+        finditem %objetivo
+        if ( #FINDCNT > 0 )
+             {
+               if ( #scnt > %followtimer )
+                    {
+                      set %pj_posx #CHARPOSX
+                      set %pj_posy #CHARPOSY
+                      if ( #FINDDIST > 2 ) ; Dos pasos de la montura que queremos domar, si es más nos movemos...
+                           {
+                             gosub pathFind #FINDX #FINDY #FINDZ 1 3 ; Tolerancia 1
+                             set %followtimer #scnt + 3
+                             wait 30
+                           }
+                    }
+               if ( #scnt < %tametimer )
+                    {
+                      goto follow
+                    }
+                    else
+                       {
+                         if ( %pj_posx <> #CHARPOSX ) || ( %pj_posy <> #CHARPOSY ) ; Nos hemos movido...
+                              {
+                                set %intentos_seguir 0 ; Seguimos intentando...
+                              }
+                         goto tame ; Estamos lo suficientemente cerca del animal...
+                       }
+             }
+             else ; Ya no vemos al animal que estábamos domando...
+                {
+                  event exmsg #charid 3 88 LOL ???
+                  wait 20
+                  return
+                }
+     }
+return
+
+sub familiar
+; Invoca a tu familiar al lado si su vida es mayor al 25% (=1 vial de sangre de dragón)
+if ( #CHARGHOST <> yes )
+     {
+       event macro 1 0 .familiar
+       wait 20
+     }
+return
+
+sub elfos
+; Canción Amigo de los Elfos: En función de la reputación elfica que tenga el bardo (hasta un máximo de 50000 puntos),
+; un grupo de Elfos acudirá en su ayuda. Una vez utilizada esta canción, el bardo debera esperar 3 minutos para
+; volver a utilizar cualquier otra canción.
+if ( #CHARGHOST <> yes )
+     {
+       event macro 1 0 .cancion26
+       wait 20
+     }
+return
+
+sub capitan_noldor
+if ( #MANA >= 50 )
+     {
+       gosub TargetOn
+       if %objetivo = N/A
+          {
+            return
+          }
+       event macro 3 0 .cancion28 ; Capitan Noldor: Un valiente Capitán de los elfos Noldor ayudara al bardo en la batalla, propinando un certero flechazo al enemigo del bardo. Si el objetivo del Capitan es un NPC, el daño será mayor.
+       target 10s
+       set #LTARGETID %objetivo
+       set #LTARGETKIND 1
+       event macro 22
+       wait 20
+     }
+     else
+        {
+          set #SYSMSGCOL 38
+          event sysmessage MANA INSUFICIENTE! :-(
+        }
+return
+
+sub dormir_enemigo
+gosub TargetOn
+if %objetivo = N/A
+   {
+     return
+   }
+event macro 3 0 .cancion9 ; Cuna: Duerme al objetivo el tiempo suficiente para poder huir. Mientras el objetivo está dormido no podrá moverse y apenas tendrá visibilidad. El más mínimo daño despertará al durmiente.
+target 8s
+set #LTARGETID %objetivo
+set #LTARGETKIND 1
+event macro 22
+wait 20
+return
+
+sub rudeza
+; Canción de Rudeza: El Bardo y su grupo en un radio de 5 casillas alrededor reciben una bonificación a su Fuerza.
+if ( #CHARGHOST <> yes )
+     {
+       event macro 1 0 .cancion5
+       wait 20
+     }
+return
+
+sub presteza
+; Canción de Presteza: El Bardo y su grupo en un radio de 5 casillas alrededor reciben una bonificación a su Destreza.
+if ( #CHARGHOST <> yes )
+     {
+       event macro 1 0 .cancion6
+       wait 20
+     }
+return
+
+sub luz_elfica
+; Canción Luz Elfica: El aura de luz que rodea al bardo hace que los enemigos de los elfos se debiliten y queden mas
+; expuestos al daño fisico. Los enemigos afectados son... Orcos, elfos oscuros, demonios, no muertos...
+if ( #CHARGHOST <> yes )
+     {
+       if ( #MANA >= 50 )
+            {
+              event macro 1 0 .cancion29
+              wait 20
+            }
+            else
+               {
+                 set #SYSMSGCOL 38
+                 event sysmessage MANA INSUFICIENTE! :-(
+               }
+     }
+return
+
+sub voz_elfica
+; Canción Voz Elfica: La voz del bardo será mucho mas poderosa y sus canciones de área cubrirán el doble de terreno
+; (válido para todas las canciones de área excepto: Tranquilidad, Ocultación y Viaje Elfico)
+if ( #CHARGHOST <> yes )
+     {
+       event macro 1 0 .cancion21
+       wait 20
+     }
+return
+
+sub campamento
+; Canción de Campamento: El bardo crea una acogedora area a su alrededor en la que sus compañeros podrán recuperar su vida,
+; mana y estamina a un ritmo de 8 puntos cada segundo. Para poder beneficiarse de estos efectos, no pueden entablar combate
+; o recibir ataques.
+if ( #CHARGHOST <> yes )
+     {
+       event macro 1 0 .cancion30
+       wait 20
+     }
+return
+
+sub curandero
+; Canción Curandero Elfico: Al cantar esta canción, una curandera elfica acudirá en ayuda del bardo. Permanecerá en la zona
+; durante 30 minutos antes de partir. Una vez utilizada esta canción, el bardo debe esperar 24 horas para que otra curandera
+; pueda acudir en su ayuda.
+if ( #CHARGHOST <> yes )
+     {
+       event macro 1 0 .cancion27
+       wait 20
+     }
+return
+
+sub llamada_familiar
+; Canción Llamada al Familiar: Tras entonar esta canción, el familiar aparece junto a ti (aunque este muerto o mal herido)
+; sin necesidad de ingredientes para ello.
+if ( #CHARGHOST <> yes )
+     {
+       event macro 1 0 .cancion22
+       wait 20
+     }
+return
+
+sub tranquilidad
+; Canción de Tranquilidad: Cuando el bardo, toca esta melodía ningún NPC o jugador en la zona de influencia puede
+; atacar física o mágicamente . La zona de influencia es de 5 casillas de radio si el bardo tiene menos de 80% de
+; la habilidad pacificar. En caso de tener mas de 80%, el radio será de 10 casillas. Los NPCs o Jugadores que se
+; encuentren fuera del área de influencia si podrán atacar a los que se encuentren dentro.
+if ( #CHARGHOST <> yes )
+     {
+       event macro 1 0 .cancion18
+       wait 20
+     }
+return
+
+sub frenesi
+; Con este encantamiento el objetivo de la canción es motivado positivamente sacando fuerzas de donde no quedan y
+; es capaz de llevar más peso de lo normal sin cansarse. Además recupera estamina más rápidamente.
+if ( #CHARGHOST <> yes )
+     {
+       event macro 1 0 .cancion8
+       target 5s
+       event macro 23
+       wait 20
+     }
+return
+
+sub vida
+; Canción de Recuperación: El Bardo, sin poderse mover, y su grupo en un radio de 5 casillas alrededor recuperan
+; 4 puntos de vida por segundo hasta que alguien interrumpa esta canción o llegue a su máximo permitido.
+if ( #CHARGHOST <> yes )
+     {
+       event macro 1 0 .cancion2
+       wait 20
+     }
+return
+
+sub mana
+; Canción del Concentración: El Bardo, sin poderse mover, y su grupo en un radio de 5 casillas alrededor recuperan
+; 4 puntos de mana por segundo hasta que alguien interrumpa esta canción o llegue a su máximo permitido.
+if ( #CHARGHOST <> yes )
+     {
+       event macro 1 0 .cancion3
+       wait 20
+     }
+return
+
+sub oscuridad
+; Canción de oscuridad: Da un 30% al bardo en su habilidad de ocultarse y de caminar oculto.
+if ( #CHARGHOST <> yes )
+     {
+       event macro 1 0 .cancion14
+       wait 20
+     }
+return
+
+sub ocultacion
+; Canción de Ocultación: Todos los personajes en un radio de 6 casillas alrededor del bardo, incluido este se harán
+; invisibles.
+if ( #CHARGHOST <> yes )
+     {
+       event macro 1 0 .cancion20
+       wait 20
+     }
+return
+
+sub himno_batalla
+; Himno de Batalla: Aumenta la probabilidad de Acierto, de Defensa y el daño producido al objetivo elegido.
+if ( #CHARGHOST <> yes )
+     {
+       event macro 1 0 .cancion12
+       target 5s
+     }
+return
+
+;
+; **** GOLEM ****
+;
+sub guardar_golem
+if ( %golem )
+     {
+       finditem %golem_id G
+       if #FINDCNT > 0
+          {
+            event macro 4 0 %nombre_golem Soltar armadura
+            wait 10
+            event macro 4 0 %nombre_golem Desarmar
+            wait 10
+            event macro 4 0 %nombre_golem Reducir
+            wait 10
+          }
+          else
+             {
+               set #SYSMSGCOL 38
+               event sysmessage NO HAY GOLEM! :-(
+               wait 20
+             }
+     }
+return
+
+sub infogolem
+if ( %golem )
+     {
+       finditem %golem_id G
+       if #FINDCNT > 0
+          {
+            event macro 4 0 .infogolem
+            target 3s
+            set #LTARGETID %golem_id
+            set #LTARGETKIND 1
+            event macro 22
+            gosub wait_for GUMP 280_470 3
+          }
+          else
+             {
+               set #SYSMSGCOL 38
+               event sysmessage NO HAY GOLEM! :-(
+               wait 20
+             }
+     }
+return
+
+sub armor
+if ( %golem )
+     {
+       finditem %golem_id G
+       if #FINDCNT > 0
+          {
+            finditem %armaduras_golem C_ , #BACKPACKID
+            if #FINDCNT > 0
+               {
+                 set #LOBJECTID #FINDID
+                 event macro 17
+                 target 3s
+                 set #LTARGETID %golem_id
+                 set #LTARGETKIND 1
+                 event macro 22
+                 wait 20
+              }
+              else
+                 {
+                   event macro 4 0 %nombre_golem Soltar armadura
+                 }
+          }
+          else
+             {
+               set #SYSMSGCOL 38
+               event sysmessage NO HAY GOLEM! :-(
+               wait 20
+             }
+     }
+return
+
+sub reparar
+if ( %golem )
+     {
+       event macro 4 0 %nombre_golem Repararse
+     }
+return
+
+sub manillas
+if ( %golem )
+     {
+       event macro 4 0 %nombre_golem Manillas
+     }
+return
+
+sub flechas
+if ( %golem )
+     {
+       event macro 4 0 %nombre_golem Flechas
+     }
+return
+
+sub arco
+if ( %golem )
+     {
+       finditem %golem_id G
+       if #FINDCNT > 0
+          {
+            if #FINDDIST <= 3
+               {
+                 finditem %arcos_golem C_ , #BACKPACKID
+                 if #FINDCNT > 0
+                    {
+                      exevent drag #FINDID
+                      exevent dropc %golem_id
+                      wait 30
+                    }
+                    else
+                       {
+                         event macro 4 0 %nombre_golem Desarmar
+                       }
+               }
+               else
+                  {
+                    event sysmessage DEMASIADO LEJOS!!
+                    wait 10
+                  }
+          }
+          else
+             {
+               set #SYSMSGCOL 38
+               event sysmessage NO HAY GOLEM! :-(
+               wait 20
+             }
+     }
+return
+
+sub himno_batalla_golem
+if ( #CHARGHOST <> yes )
+     {
+       finditem %golem_id G
+       if #FINDCNT > 0
+          {
+            event macro 1 0 .cancion12 ; Himno de Batalla: Aumenta la probabilidad de Acierto, de Defensa y el daño producido al objetivo elegido.
+            target 5s
+            set #LTARGETID %golem_id
+            set #LTARGETKIND 1
+            event macro 22
+            wait 20
+          }
+          else
+             {
+               set #SYSMSGCOL 38
+               event sysmessage NO HAY GOLEM! :-(
+               wait 20
+             }
+     }
+return
+
+sub frenesi_golem
+if ( #CHARGHOST <> yes )
+     {
+       finditem %golem_id G
+       if #FINDCNT > 0
+          {
+            event macro 1 0 .cancion8 ; Frenesí: Con este encantamiento el objetivo de la canción es motivado positivamente sacando fuerzas de donde no quedan y es capaz de llevar más peso de lo normal sin cansarse.
+            target 5s
+            set #LTARGETID %golem_id
+            set #LTARGETKIND 1
+            event macro 22
+            wait 20
+          }
+          else
+             {
+               set #SYSMSGCOL 38
+               event sysmessage NO HAY GOLEM! :-(
+               wait 20
+             }
+     }
+return
+
+sub cureGolem
+finditem %golem_id G
+if #FINDCNT > 0
+   {
+     if #FINDDIST <= %distancia_hechizos
+        {
+          gosub sanar_golem
+        }
+        else
+           {
+             event sysmessage DEMASIADO LEJOS!!
+             wait 10
+	         }
+   }
+   else
+      {
+        set #SYSMSGCOL 38
+        event sysmessage NO HAY GOLEM! :-(
+        wait 20
+      }
+return
+
+sub healGolem
+finditem %golem_id G
+if #FINDCNT > 0
+   {
+     if #FINDDIST <= %distancia_hechizos
+        {
+          gosub curar_golem
+        }
+        else
+           {
+             event sysmessage DEMASIADO LEJOS!!
+             wait 10
+	         }
+   }
+   else
+      {
+        set #SYSMSGCOL 38
+        event sysmessage NO HAY GOLEM! :-(
+        wait 20
+      }
+return
+
+sub curar_golem
+finditem %golem_id G
+if #FINDCNT > 0
+   {
+     if #TARGCURS = 1
+        {
+          key ESC ; Quitar cursor (por si acaso).
+          wait 10
+        }
+     event macro 15 28 ; Mayor Curación (In Vas Mani).
+     target 2s
+     set #LTARGETID %golem_id
+     set #LTARGETKIND 1
+     event macro 22
+     wait 3s
+     return
+   }
+   else
+      {
+        set #SYSMSGCOL 38
+        event sysmessage NO HAY GOLEM! :-(
+        wait 20
+      }
+return
+
+sub sanar_golem
+finditem %golem_id G
+if #FINDCNT > 0
+   {
+     if #TARGCURS = 1
+        {
+          key ESC ; Quitar cursor (por si acaso).
+          wait 10
+        }
+     event macro 15 10  ; Sanar (An Nox).
+     target 2s
+     set #LTARGETID %golem_id
+     set #LTARGETKIND 1
+     event macro 22
+     wait 2s
+   }
+   else
+      {
+        set #SYSMSGCOL 38
+        event sysmessage NO HAY GOLEM! :-(
+        wait 20
+      }
+return
+
+;
+; **** MONTURA ****
+;
+sub healing_con_magia_montu
+gosub healing_magia %montura
+return
+
+sub sanar_montura
+gosub neutralizar_veneno %montura
+return
+
+sub ocultar_montura
+gosub hide_pet %montura %nombre_montura
+return
+
+sub himno_batalla_montura
+gosub himno_pet %montura
+return
+
+sub frenesi_montura
+gosub frenesi_pet %montura
+return
+
+;
+; **** FAMILIAR ****
+;
+sub healing_con_magia_fami
+gosub healing_magia %familiar
+return
+
+sub ocultar_familiar
+gosub hide_pet %familiar %nombre_familiar
+return
+
+sub sanar_familiar
+gosub neutralizar_veneno %familiar
+return
+
+sub frenesi_familiar
+gosub frenesi_pet %familiar
+return
+
+sub himno_batalla_familiar
+gosub himno_pet %familiar
+return
+
+;
+; **** COMUNES ****
+;
+sub himno_pet
+set %pet_id %1
+if ( #CHARGHOST <> yes )
+     {
+       finditem %pet_id G
+       if #FINDCNT > 0
+          {
+            event macro 1 0 .cancion12 ; Himno de Batalla: Aumenta la probabilidad de Acierto, de Defensa y el daño producido al objetivo elegido.
+            target 5s
+            set #LTARGETID %pet_id
+            set #LTARGETKIND 1
+            event macro 22
+            wait 20
+          }
+          else
+             {
+               set #SYSMSGCOL 38
+               event sysmessage NO HAY ANIMAL! :-(
+               wait 20
+             }
+     }
+return
+
+sub frenesi_pet
+set %pet_id %1
+if ( #CHARGHOST <> yes )
+     {
+       finditem %pet_id G
+       if #FINDCNT > 0
+          {
+            event macro 1 0 .cancion8 ; Frenesí: Con este encantamiento el objetivo de la canción es motivado positivamente sacando fuerzas de donde no quedan y es capaz de llevar más peso de lo normal sin cansarse.
+            target 5s
+            set #LTARGETID %pet_id
+            set #LTARGETKIND 1
+            event macro 22
+            wait 20
+          }
+          else
+             {
+               set #SYSMSGCOL 38
+               event sysmessage NO HAY ANIMAL! :-(
+               wait 20
+             }
+     }
+return
+
+sub hide_pet
+set %pet_id %1
+set %pet_name %2
+finditem %pet_id G
+if #FINDDIST = N/A
+   {
+     return
+   }
+   else
+      {
+        if #FINDDIST <= %distancia_hechizos
+           {
+             event macro 4 0 %pet_name stop
+             wait 5
+             event macro 15 43
+             event macro 4 0 %pet_name follow me
+             wait 3s
+             event macro 4 0 %pet_name stay
+             target 5s
+             set #LTARGETID %pet_id
+             set #LTARGETKIND 1
+             event macro 22
+           }
+	         else
+	            {
+	              event sysmessage DEMASIADO LEJOS!!
+	              wait 10
+	            }
+	      }
+return
+
+; Colocar el Libro de runas en su sitio
+;========================================================
+sub situar_librorunas
+if ( %libro_runas_GUMP = #CONTNAME )
+     {
+       if ( #CONTSIZE = %dimensiones_GUMP )
+            {
+              if ( #CONTID = N/A )
+                   {
+                     set #contPosX %PosicionLibroRunasX
+                     set #contPosY %PosicionLibroRunasY
+                     contpos
+                   }
+            }
+     }
+return
+
+sub librecall
+{
+  if %posruna < 9
+     {
+       set %runex 130
+       if %posruna = 1
+          {
+            set %y 0
+          }
+          else
+             {
+               set %runea %posruna - 1
+               set %y 15 * %runea
+             }
+       set %runey 70 + %y
+     }
+  if %posruna > 8
+     {
+       set %runex 290
+       if %posruna = 9
+          {
+            set %y 0
+          }
+          else
+             {
+               set %runea %posruna - 9
+               set %y 15 * %runea
+             }
+       set %runey 70 + %y
+     }
+return
+}
+
+;========================================================
+sub posicionar
+{
+     if %nombre_salud_GUMP = #ContName
+        {
+            if #contSize = %barra_salud_GUMP
+               {
+                   if #CONTID = %montura
+                      {
+                          set #contPosX %PosicionBarraSaludMontura1_X
+                          set #contPosY %PosicionBarraSaludMontura1_Y
+                          contpos
+                      }
+                    if #CONTID = %familiar
+                      {
+                          set #contPosX %PosicionBarraSaludFamiliar_X
+                          set #contPosY %PosicionBarraSaludFamiliar_Y
+                          contpos
+                      }
+               }
+        }
+return
+}
+
+;========================================================
+sub comprobar_vendazo
+{
+  if ( #SCNT - %cronometro_vendazo ) > %tiempo_vendazo ; Podemos aplicar una venda...
+       {
+         if ( %vida_montura1 > %vida_familiar ) || ( %familiar_muerto ) ; Si la montura tiene más vida que el familiar...
+            {
+              finditem %familiar G ; Buscamos el familiar...
+              if ABS ( #CHARPOSX - #FINDX ) < 2 && ABS ( #CHARPOSY - #FINDY ) < 2 && ( #FINDDIST <> N/A ) ; Si estamos lo suficientemente cerca...
+                 {
+                   if ( %vida_familiar < !healatpercent_familiar && %vida_familiar >= 1 ) || ( %familiar_muerto ) ; Y le hace falta curarse...
+                        {
+                          gosub vendazo %familiar ; Vendazo al familiar.
+                        }
+                 }
+                 else ; El familiar está demasiado lejos...
+                    {
+                      finditem %montura G ; Buscamos la montura...
+                      if ABS ( #CHARPOSX - #FINDX ) < 2 && ABS ( #CHARPOSY - #FINDY ) < 2 && ( #FINDDIST <> N/A ) ; Si estamos lo suficientemente cerca...
+                         {
+                           if ( %vida_montura1 < !healatpercent_mount1 && %vida_montura1 >= 1 ) || ( %montura_muerta ) ; Y le hace falta curarse...
+                                {
+                                  gosub vendazo %montura ; Vendazo la montura.
+                                }
+                         }
+                    }
+            }
+            else ; El familiar tiene más vida que la montura...
+               {
+                 if ( %vida_familiar > %vida_montura1 ) || ( %montura_muerta ) ; Si el familiar tiene más vida que la montura...
+                    {
+                      finditem %montura G ; Buscamos la montura...
+                      if ABS ( #CHARPOSX - #FINDX ) < 2 && ABS ( #CHARPOSY - #FINDY ) < 2 && ( #FINDDIST <> N/A ) ; Si estamos lo suficientemente cerca...
+                         {
+                           if ( %vida_montura1 < !healatpercent_mount1 && %vida_montura1 >= 1 ) || ( %montura_muerta ) ; Y le hace falta curarse...
+                                {
+                                  gosub vendazo %montura ; Vendazo la montura.
+                                }
+                         }
+                         else ; La montura está demasiado lejos...
+                            {
+                              finditem %familiar G ; Buscamos el familiar...
+                              if ABS ( #CHARPOSX - #FINDX ) < 2 && ABS ( #CHARPOSY - #FINDY ) < 2 && ( #FINDDIST <> N/A ) ; Si estamos lo suficientemente cerca...
+                                 {
+                                   if ( %vida_familiar < !healatpercent_familiar && %vida_familiar >= 1 ) || ( %familiar_muerto ) ; Y le hace falta curarse...
+                                        {
+                                          gosub vendazo %familiar ; Vendazo al familiar.
+                                        }
+                                 }
+                            }
+                    }
+               }
+       }
+return
+}
+
+;========================================================
+sub vendazo
+{
+  set %pet_id %1
+  _reVenda:
+  if #TARGCURS = 1
+     {
+       set #TARGCURS 0  ; Quitar cursor (por si acaso).
+     }
+  finditem %vendas_limpias C_ , #BACKPACKID
+  if #FINDCNT > 0
+     {
+       set #LOBJECTID #FindID
+       event Macro 17 0 ; Vendazo
+       target 2s
+       set #LTARGETID %pet_id
+       set #LTARGETKIND 1
+       set %jstart #jindex
+       event macro 22 0
+       gosub wait_for MSG aplicas_las pones_el_vendas curas_a pero_fallas no_necesita_curarse estas_demasiado you_can 15
+       if ( #true in #result )
+            {
+              if ( pero_fallas in #result )
+                   {
+                     gosub limpiar_vendas
+                     gosub agrupar_vendas
+                     goto _reVenda
+                   }
+              if ( aplicas_las in #result || pones_el_vendas in #result )
+                   {
+                     if ( %montura_muerta || %familiar_muerto )
+                          {
+                            gosub wait_for GUMP 438_188 10
+                            if ( #RESULT )
+                                 {
+                                   contpos 25 25
+                                   click 243 177 f dmc
+                                   return
+                                 }
+                          }
+                          else
+                             {
+                               set %cronometro_vendazo #SCNT
+                               gosub limpiar_vendas
+                               gosub agrupar_vendas
+                             }
+                   }
+              if ( curas_a in #result )
+                   {
+                     return
+                   }
+              if ( no_necesita_curarse in #result || estas_demasiado in #result || you_can in #result )
+                   {
+                     return
+                   }
+            }
+     }
+return
+}
+
+;========================================================
+sub comprobar_veneno
+{
+  if %poison_montura1 = -1
+     {
+         finditem %montura G
+         if ABS ( #CHARPOSX - #FINDX ) < %distancia_hechizos && ABS ( #CHARPOSY - #FINDY ) < %distancia_hechizos && ( #FINDDIST <> N/A )
+             gosub neutralizar_veneno %montura
+     }
+  if %poison_familiar = -1
+     {
+         finditem %familiar G
+         if ABS ( #CHARPOSX - #FINDX ) < %distancia_hechizos && ABS ( #CHARPOSY - #FINDY ) < %distancia_hechizos && ( #FINDDIST <> N/A )
+             gosub neutralizar_veneno %familiar
+     }
+return
+}
+
+;========================================================
+sub neutralizar_veneno
+set %pet_id %1
+if ( #CHARGHOST <> yes )
+     {
+       finditem %pet_id G
+       if #FINDCNT > 0
+          {
+            event Macro 15 10 ; Cure - Sanar (An Nox): Elimina el veneno.
+            target 2s
+            set #LTARGETID %pet_id
+            set #LTargetKind 1
+            event macro 22
+            wait 2s
+          }
+          else
+             {
+               set #SYSMSGCOL 38
+               event sysmessage NO HAY ANIMAL! :-(
+               wait 20
+             }
+     }
+return
+
+;========================================================
+sub comprobar_curar_magia
+{
+  if %vida_montura1 > %vida_familiar
+      finditem %familiar G
+  else
+      finditem %montura G
+  if ABS ( #CHARPOSX - #FINDX ) < %distancia_hechizos && ABS ( #CHARPOSY - #FINDY ) < %distancia_hechizos && ( #FINDDIST <> N/A )
+      {
+        if %vida_montura1 > %vida_familiar
+              gosub healing_magia %familiar
+        else
+              gosub healing_magia %montura
+      }
+  else
+      {
+        if  %vida_montura1 > %vida_familiar
+              finditem %montura G
+        else
+              finditem %familiar G
+        if ABS ( #CHARPOSX - #FINDX ) < %distancia_hechizos && ABS ( #CHARPOSY - #FINDY ) < %distancia_hechizos && ( #FINDDIST <> N/A )
+           {
+             if %vida_montura1 > %vida_familiar
+                  gosub healing_magia %montura
+             else
+                  gosub healing_magia %familiar
+           }
+      }
+return
+}
+
+;========================================================
+sub healing_magia
+set %pet_id %1
+if ( #CHARGHOST <> yes )
+     {
+       finditem %pet_id G
+       if #FINDCNT > 0
+          {
+            event Macro 15 28 ; Greater Heal - Gran Curacion (In Vas Mani): El hermano mayor del hechizo Heal. Recupera una gran parte de puntos de salud, cuanto más poderoso sea el lanzador.
+            target 2s
+            set #LTARGETID %pet_id
+            set #LTargetKind 1
+            event macro 22
+            wait 3s
+          }
+          else
+             {
+               set #SYSMSGCOL 38
+               event sysmessage NO HAY ANIMAL! :-(
+               wait 20
+             }
+     }
+return
+
+;========================================================
+sub alimentar_mascotas
+{
+   if ( %cronometro_alimentacion1 = N/A ) || ( ( #SCNT - %cronometro_alimentacion1 ) > %tiempo_alimentacion_mascota )
+      {
+          finditem %montura G
+          if #FINDID =  %montura
+             {
+                 if ABS ( #CHARPOSX - #FINDX ) < 2 && ABS ( #CHARPOSY - #FINDY ) < 2 && ( #FINDDIST <> N/A )
+                 gosub alimentar %montura
+             }
+      }
+   if ( %cronometro_alimentacion2 = N/A ) || ( ( #SCNT - %cronometro_alimentacion2 ) > %tiempo_alimentacion_mascota )
+      {
+          finditem %familiar G
+          if #FINDID =  %familiar
+             {
+                 if ABS ( #CHARPOSX - #FINDX ) < 2 && ABS ( #CHARPOSY - #FINDY ) < 2 && ( #FINDDIST <> N/A )
+                 gosub alimentar %familiar
+             }
+      }
+return
+}
+
+;========================================================
+; Da de comer a la mascota indicada en el parámetro
+sub alimentar
+{
+  set %montura %1
+  finditem %comida C_ , #BACKPACKID
+  if #FINDCNT > 0
+     {
+         Exevent Drag #FINDID 1
+         Exevent Dropc %montura
+         wait 30
+     }
+  if %montura = %montura
+     {
+       set %cronometro_alimentacion1 #SCNT
+     }
+     else
+        {
+          if %montura = %familiar
+             {
+               set %cronometro_alimentacion2 #SCNT
+             }
+        }
+return
+}
+
+sub limpiar_vendas ; <==============================>
+finditem %vendas_sucias C_ , #BACKPACKID
+ if #FINDSTACK >= %max_vendas_sucias
+  {
+    set #LOBJECTID #FINDID
+    event macro 17 0
+    target 1s
+    set #LTARGETID %pilon
+    set #LTARGETKIND 1
+    event macro 22 0
+    wait 10
+  }
+return
+
+sub agrupar_vendas ; <==============================>
+_agruparVendas:
+finditem %vendas_limpias C_ , #BACKPACKID
+if #FINDCNT > 1 ; Si hay más de 1 montón de vendas...
+   {
+     for #FINDINDEX 1 #FINDCNT
+         {
+           exevent drag #FINDID #FINDSTACK
+           exevent dropc #BACKPACKID
+           wait 20
+           goto _agruparVendas
+         }
+   }
+return
+
+;-@ ============================== @-;
+;-@ ############################## @-;
+;-@ SUBS públicos del Foro EasyUO  @-;
+;-@ ############################## @-;
+;-@ ============================== @-;
+;
+
+;**
+;* @name GetName
+;* @author Roadkill
+;* @ver 1.0 24Jan04
+;* @purpose get the name of a creature/vendor
+;* @params %1= the id of the thing whose name you want, required
+;*	@%2= variable name to return the ID in, required
+;* @returns @%2 and #result
+;* @changes #property, #strres, @%2, !strlength
+;* @example call rksubs.txt GetName %beetle beetlename
+;* @status: tested
+sub GetName
+	finditem %1
+	if #findkind = -1
+		return error-cant_find
+	event property #findid
+	str pos #property $
+	set !strlength #strres - 2
+	str left #property !strlength
+	set %string #strres
+	str Del %string 1 1
+	set % . %2 #strres
+return % . %2
+
+; 1- getHealthPercentage
+;==================================
+; Script Name: getHealthPercentage
+; Author: Patrik Akerstrand
+; Version: 1.1
+; Client Tested with: 6.0.4.0
+; EUO version tested with: 1.5 V128
+; Shard OSI / FS: Alexandria
+; Revision Date: 2007-12-02
+; Public Release: 2007-12-02
+; Global Variables Used: NONE
+; Purpose: Get's the health percentage
+; of a visible non-obscured healthbar
+; and if the target is poisoned
+;==================================
+; ---------------------------
+; getHealthPercentage
+; @Author: Machine
+; @Usage: Can be called with
+; or without parameters. If
+; no parameters are passed,
+; it is assumed that the container
+; currently in focus is a healthbar
+; @Param: %1 - The x-position of the
+; healthbar to check
+; @param: %2 - The y-position of the
+; healthbar to check
+; @Returns: A value from
+; 0-255 where 255 = max color
+; 0 = no color
+; Also sets %ghp_isPoisoned to
+; #true if the target is poisoned,
+; #false otherwise
+; ---------------------------
+sub getHealthPercentage
+{
+  namespace Push
+  namespace Local healthStatus , #random
+  set !ghp_oldLpc #lpc
+  set #lpc 500
+  set !threshHold 60
+  if %0 = 0
+  {
+     set !ghp_barXStart #contPosX + 37
+     set !ghp_barY #contPosY + 43
+  }
+  else
+  {
+     set !ghp_barXStart %1 + 37
+     set !ghp_barY %2 + 43
+  }
+
+  savePix !ghp_barXStart !ghp_barY 1 ; Check poison at the lower part of the health bar
+  ; Añadido para arreglar el poison
+  set %tmp_pixel_poison #pixCol
+  if %tmp_pixel_poison = %pixel_poison
+  {
+    set %ghp_isPoisoned #true
+  }
+  else
+  {
+    set %ghp_isPoisoned #false
+  }
+  ; Fin
+  set !ghp_health 0
+  set !ghp_crt 50
+  set !ghp_lowLim 0
+  set !ghp_highLim 100
+  while #true
+  {
+    set !ghp_currentPixel !ghp_crt + !ghp_barXStart
+    savePix !ghp_currentPixel !ghp_barY 1
+    if #pixCol % 256 > !threshHold
+    {
+       if !ghp_crt < !ghp_highLim
+          set !ghp_highLim !ghp_crt
+       else
+          break
+       set !ghp_crt !ghp_crt - ( !ghp_HighLim - !ghp_lowLim ) / 2 - ( ( !ghp_HighLim - !ghp_lowLim ) % 2 )
+    }
+    else
+    {
+       set !ghp_health !ghp_crt
+       if !ghp_crt > !ghp_lowLim
+          set !ghp_lowLim !ghp_crt
+       else
+          break
+       set !ghp_crt ( !ghp_crt + ( !ghp_HighLim - !ghp_lowLim ) / 2 ) + ( ( !ghp_HighLim - !ghp_lowLim ) % 2 )
+    }
+  }
+  set #result !ghp_health
+  set #lpc !ghp_oldLpc
+  namespace Clear
+  namespace Pop
+}
+return #result
+
+;===========================================================
+; Name: pathFind
+; Author: ScriptFellow (the.WZA)
+; Parameters: %1 = X
+;             %2 = Y
+;             %3 = Z
+;             %4 = tolerance
+;             %5 = timeout (in seconds)
+; Purpose: Pathfind to the given coordinates
+; Return: %return (#true or #false )
+;-----------------------------------------------------------
+sub pathFind
+set %_x %1
+set %_y %2
+if %0 <= 2 || %2 = N/A
+   set %_z -1
+else
+   set %_z %3
+if %0 <= 3 || %3 = N/A
+   set %_tolerance 0
+else
+   set %_tolerance %4
+if %0 <= 4
+   set %_endTime #sCnt + 15
+else
+   set %_endTime #sCnt + %5
+set %return #false
+deleteJournal
+scanJournal 2
+event PathFind %_x %_y %_z
+_pathFindScanAgain:
+scanJournal 1
+if pathfinding in #journal
+   goto _pathFindOkay
+if can't_get_there in #journal || #sCnt > %_endTime
+   return
+goto _pathFindScanAgain
+_pathFindOkay:
+gosub _pathFindDist %_x %_y %_z #charPosX #charPosY #charPosZ
+set %return %return <= %_tolerance
+if %return
+{
+   if %_tolerance > 0
+   {
+      set %1 #cliLeft + #cliXRes / 2
+      set %2 #cliTop + #cliYRes / 2
+      if #charDir < 3
+          set %1 %1 + 1
+      else
+      {
+         if #charDir > 3 && #charDir < 7
+            set %1 %1 - 1
+      }
+      if #charDir = 0 || #charDir = 6
+         set %2 %2 - 1
+      else
+      {
+         if #charDir > 1 && #charDir < 5
+            set %2 %2 + 1
+      }
+      click %1 %2 R
+   }
+   return
+}
+if #sCnt > %_endTime
+   return
+goto _pathFindOkay
+
+sub _pathFindDist
+set %1 %1 - %4 abs
+set %2 %2 - %5 abs
+set %3 %3 - %6 abs
+gosub max %1 %2 %3
+return
+
+; to be defined
+sub max
+set %return %1
+for %_idx 2 %0
+{
+   if % . %_idx > %return
+   set %return % . %_idx
+}
+return
+
+;===================
+; 1- ConstantVetPet1
+;===================
+;
+;%1 is the petid
+;pets healthbar must have focus
+sub ConstantVetPet1
+_rkcvp1:
+	if %rkcvpinit1 = #true
+		goto _cvpcheck1
+	menu set status setting up Auto-vetting
+  display OK ********************************* [ AutoVet ] *********************************$$
+           + Por favor saca la barra de salud de tu MONTURA, o haz
+           + click en ella si ya está abierta... $$
+           + NOTA: ( Tienes 5 segundos... ).$$
+           + ******************************************************************************$
+  gosub wait_for GUMP %montura 5
+  if ( ! #result )
+       {
+         display Parece que ha habido algún problema con la barra de salud. Reiniciando macro...
+         goto _rkcvp1
+       }
+  set #SYSMSGCOL 18
+ 	event sysmessage OK, ajustando barra de salud a la posición fijada...
+ 	wait 20
+	gosub posicionar
+	wait 20
+  display OK ************************************ [ AutoVet ] ************************************$$
+         + Ahora pon el cursor con cuidado encima de la barra de salud al nivel que quieras
+     	   + curar a tu MONTURA, y presiona la tecla ESCAPE.$$
+         + [ Ejemplo ]: Situar el cursor 2 milímetros antes del final de la barra azul,
+         + y pulsar la tecla ESCAPE.$$
+	       + ************************************************************************************$
+  _LimiteMontura1:
+  onhotkey ESC
+           {
+             goto _comprobarLimite1
+           }
+           wait 1
+           goto _LimiteMontura1
+  _comprobarLimite1:
+	set %heal_montu1_thoffsetx #cursorx - #contposx
+	set %heal_montu1_thoffsety #cursory - #contposy
+	if %heal_montu1_thoffsetx < 38 || %heal_montu1_thoffsetx > 138 || %heal_montu1_thoffsety < 40 || %heal_montu1_thoffsety > 45
+   	 {
+   		 display El cursor no está dentro de la barra de salud ¬¬
+       + inténtalo otra vez.
+   		 goto _rkcvp1
+   	 }
+	set %rkcvpinit1 #true
+	set !healatpercent_mount1 %heal_montu1_thoffsetx - 38
+  if !healatpercent_mount1 >= 93 ; Apaño por si nos pasamos del límite
+	   {
+       set !healatpercent_mount1 93
+       set %limite_heal_mount1 100 ; (100% de vida)
+	   }
+	   else
+	       {
+	         set %limite_heal_mount1 !healatpercent_mount1
+	       }
+  display OK ************************** [ AutoVet ] **************************$$
+           + Auto-Vetting ajustado al %limite_heal_mount1 porciento de salud.$$
+           + ****************************************************************$
+	set #SYSMSGCOL 73
+	event sysmessage MONTURA ajustada al %limite_heal_mount1 porciento de salud.
+	sound
+	wait 20
+_cvpcheck1:
+	set !pethealth_mount1_checkx #contposx + %heal_montu1_thoffsetx
+	set !pethealth_mount1_checky #contposy + %heal_montu1_thoffsety
+return
+
+;===================
+; 2- ConstantVetPet2
+;===================
+;
+;%1 is the petid
+;pets healthbar must have focus
+sub ConstantVetPet2
+_rkcvp2:
+	if %rkcvpinit2 = #true
+		goto _cvpcheck2
+	menu set status setting up Auto-vetting
+  display OK ********************************* [ AutoVet ] *********************************$$
+           + Por favor saca la barra de salud de tu FAMILIAR, o haz
+           + click en ella si ya está abierta... $$
+           + NOTA: ( Tienes 5 segundos... ).$$
+           + ******************************************************************************$
+  gosub wait_for GUMP %familiar 5
+  if ( ! #result )
+       {
+         display Parece que ha habido algún problema con la barra de salud. Reiniciando macro...
+         goto _rkcvp2
+       }
+  set #SYSMSGCOL 18
+ 	event sysmessage OK, ajustando barra de salud a la posición fijada...
+ 	wait 20
+	gosub posicionar
+	wait 20
+  display OK ************************************ [ AutoVet ] ************************************$$
+         + Ahora pon el cursor con cuidado encima de la barra de salud al nivel que quieras
+     	   + curar a tu FAMILIAR, y presiona la tecla ESCAPE.$$
+         + [ Ejemplo ]: Situar el cursor 2 milímetros antes del final de la barra azul,
+         + y pulsar la tecla ESCAPE.$$
+	       + ************************************************************************************$
+  _LimiteFamiliar:
+  onhotkey ESC
+           {
+             goto _comprobarLimite2
+           }
+           wait 1
+           goto _LimiteFamiliar
+  _comprobarLimite2:
+	set %heal_familiar_thoffsetx #cursorx - #contposx
+	set %heal_familiar_thoffsety #cursory - #contposy
+	if %heal_familiar_thoffsetx < 38 || %heal_familiar_thoffsetx > 138 || %heal_familiar_thoffsety < 40 || %heal_familiar_thoffsety > 45
+	   {
+   	   display El cursor no está dentro de la barra de salud ¬¬
+       + inténtalo otra vez.
+		   goto _rkcvp2
+   	 }
+	set %rkcvpinit2 #true
+	set !healatpercent_familiar %heal_familiar_thoffsetx - 38
+ if !healatpercent_familiar >= 93 ; Apaño por si nos pasamos del límite
+	   {
+       set !healatpercent_familiar 93
+       set %limite_heal_familiar 100 ; (100% de vida)
+	   }
+	   else
+	       {
+	         set %limite_heal_familiar !healatpercent_familiar
+	       }
+  display OK ************************** [ AutoVet ] **************************$$
+           + Auto-Vetting ajustado al %limite_heal_familiar porciento de salud.$$
+           + ****************************************************************$
+	set #SYSMSGCOL 73
+	event sysmessage FAMILIAR ajustado al %limite_heal_familiar porciento de salud.
+	sound
+	wait 20
+_cvpcheck2:
+	set !pethealth_familiar_checkx #contposx + %heal_familiar_thoffsetx
+	set !pethealth_familiar_checky #contposy + %heal_familiar_thoffsety
+return
+;============
+
+;=================================================================
+sub wait_for
+;=================================================================
+; This "wait_for" sub package was created by Locke. If you use these subs please keep this header intact.
+; // end header
+; Documentation: the sub package grew to large with all the comments. To load them call the sub like this:
+; gosub wait_for docs    | or you can use doc, documention, what, or my personal favorite, kickass.
+; Thanks to ~BookWibble~ for helping with all the debugging and spotting a bug or three.
+; "wait_for core dispatcher" version 1.3 by Locke
+if %1 = doc || if %1 = docs || if %1 = documentation || if %1 = what || if %1 = kickass
+{
+Display ok Please click ok and wait for your browser to start.
+execute http://www.easyuo.com/forum/viewtopic.php?t=24716
+halt
+}
+nameSpace Push
+namespace local LLNS
+set #result N/A ; if #result isn't set by one of my wait_for subs it'll throw an error.
+set !LPC #lpc
+set #lpc 200
+for %i 0 %0
+set !_A . %i % . %i
+gosub wait_for_ , !_A1
+ignoreitem reset LLWAITFOR
+set #lpc !lpc
+namespace clear LLNS
+namespace pop
+if #result <> N/A
+return #result
+else
+display ok You specified an unknown wait_for command. Script returned #result and is halting.
+halt
+
+;======================================================================
+sub wait_for_MSG ; version 1.4 ~Locke
+;=================================================================
+if !_A0 < 3
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for MSG %message % , time_out_in_seconds$
++Script is halting
+halt
+}
+set !_timeout ( #scnt + !_A . !_A0 )
+_lets_wait_for_a_message:
+for %i %jstart #jindex
+{
+ scanjournal %i
+  for %ii 2 !_A0
+  {
+    if !_A . %ii in #journal && %jstart <> %i
+    set #result #true , #spc , !_A . %ii
+  }
+}
+
+if #true notin #result
+{
+set #result #false
+ if !_timeout =< #scnt
+ return #result
+wait 1
+goto _lets_wait_for_a_message
+}
+else
+return #result
+
+wait 1
+goto _lets_wait_for_a_message
+
+
+;======================================================================
+sub wait_for_GUMP ; version 1.4 ~Locke
+;=================================================================
+if !_A0 < 3
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for GUMP XXX_YYY % , time_out_in_seconds$
++Script is halting
+halt
+}
+if !_A3 <> CLOSE
+set !_timeout #scnt + !_A3
+else
+set !_timeout 0 ; no gump wait if %3 = CLOSE since we already believe it to be open.
+
+_lets_wait_for_a_gump:
+if #CONTID = !_A2 || #CONTSIZE = !_A2 || #CONTKIND = !_A2 || #CONTNAME = !_A2 || #CONTTYPE = !_A2
+{
+  if !_A5 <> N/A && !_A6 <> N/A
+  {
+  set !clickx !_A5 + #contposx
+  set !clicky !_A6 + #contposy
+  click !clickx !clicky
+  }
+  if !_A3 = CLOSE || if !_A4 = CLOSE || !_A5 = CLOSE || !_A6 = CLOSE
+  {
+  set !string #contsize
+  str pos !string _
+  set !pos #strres
+  str del !string #strres #strres
+  set !clickX #contposx + ( #strres / 2 )
+  str del !string 1 !pos
+  set !clickY #contposy + ( #strres / 2 )
+  click !clickx !clicky R
+  }
+return #true
+}
+
+if !_timeout =< #scnt && !_A4 = N/A
+return #false
+
+if !_A4 <> N/A && !_timeout =< #scnt
+{
+finditem !_A4
+ if #findkind <> -1
+ {
+  for #findindex 1 #findcnt
+  {
+   if #finddist > 2
+   ignoreitem #findid LLWAITFOR
+   else
+   break
+  }
+  set #lobjectid #findid
+  event macro 17 0
+  set !_timeout #scnt + !_A3
+ }
+ else
+ return #false
+}
+wait 1
+goto _lets_wait_for_a_gump
+
+;======================================================================
+sub wait_for_HOTKEY ; Version 0.8 ~Locke
+;=================================================================
+if !_A0 < 4
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for HOTKEY KEY ACTION % , time_out_in_seconds$
++Script is halting
+halt
+}
+set #lpc 300
+set %key_pressed N/A
+set !_Timeout !_A . !_A0 + #scnt
+repeat
+{
+ for %i 2 !_A0
+ {
+ set !_key !_A . %i
+ onhotkey !_key
+ set %key_pressed !_Key
+ }
+}
+until !_timeout =< #scnt || %key_pressed <> N/A
+if %key_pressed <> N/A
+{
+for !i 2 !_A0
+{
+set !key_pos !_A . !i
+if %key_pressed in !key_pos
+break
+}
+set !i !i + 1
+set !next_var !_A . !i
+}
+if set in !next_var && %key_pressed <> N/A
+{
+set !string !next_var
+str pos !string _
+str del !string 1 #strres
+set !string #strres
+str pos !string _
+set !pos #strres - 1
+set !realpos #strres
+str left !string !pos
+set !var #strres
+str del !string 1 !realpos
+set % . !var #strres
+return % . !var
+}
+if %key_pressed <> N/A
+return !next_var
+
+return #false
+
+;======================================================================
+sub wait_for_ITEM ; Version 0.1 ~Locke
+;=================================================================
+; %A2 = #findid ; %A3 = C_ , %mod || G_ , %mod ; %A4 = wait_time in seconds
+if !_A0 < 4
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for ITEM # , findid C_ , % , mod % , timeout
++Script is halting
+halt
+}
+set !_timeout !_A4 + #scnt
+repeat
+{
+finditem !_A2 !_A3
+if #findkind <> -1
+return #true
+wait 1
+}
+until #scnt => !_timeout
+return #false
+
+
+;======================================================================
+sub wait_for_RECALL ; Version 0.1 ~Locke
+;=================================================================
+; %A2 = wait_time in seconds
+if !_A0 < 2
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for RECALL % , timeout
++Script is halting
+halt
+}
+set !_timeout !_A2 + #scnt
+set !old_POS_X #charposx
+set !old_POS_Y #charposy
+set !old_pos_Z #charposz
+repeat
+{
+if #CHARPOSX <> !old_POS_X || #CHARPOSY <> !old_POS_Y || #CHARPOSZ <> !old_POS_Z
+return #true
+wait 1
+}
+until #scnt => !_timeout
+return #false
