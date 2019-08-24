@@ -1,0 +1,475 @@
+; ======================================================================================================
+;  '||   ||` '||`   ||                                 /.\      '||`
+;   ||   ||   ||    ||     ''                         // \\      ||   ''
+;   ||   ||   ||  ''||''   ||  '||),,(|,   '''|.     //...\\     ||   ||   '''|.  `||''|,  '''/  '''|.
+;   ||   ||   ||    ||     ||   || || ||  .|''||    //     \\    ||   ||  .|''||   ||  ||   //  .|''||
+;   `|...|'  .||.   `|..' .||. .||    ||. `|..||. .//       \\. .||. .||. `|..||. .||  ||. /... `|..||.
+; =====================================================================================================
+;
+; Script Name: Carpintería
+;                                            __
+;                                _____....--' .'
+;                      ___...---'._ o      -`(
+;            ___...---'            \   .--.  `\
+;  ___...---'                      |   \   \ `|
+; |                                |o o |  |  |
+; |                                 \___'.-`.  '.
+; |                                      |   `---'
+; '^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^' LGB
+;
+; Author: Sthil Lauda
+; Version: 1.10
+; Client Tested with: 2.0.3
+; EUO version tested with: EasyUO 1.5 Version 243
+; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Public Release: 02/11/18
+; Revised On: 02/11/18
+; Purpose: Fabrica lotes de mapas o pergaminos para subir la habilidad de carpintería.
+; Instrucciones: Configurar un cofre con madera, bolsa con serruchos, y bolsa para dejar los mapas fabricados.
+set %version v1.10
+;________________________________
+;
+; ///////////////////////////////
+; ******** CONFIGURACIÓN ********
+; ///////////////////////////////
+;________________________________
+;
+; Si tienes menos de 40 de habilidad pon un "1" para hacer mapas en blanco.
+set %TipodeLotes 1 ; 1 = Lote de Mapas en Blanco y 2 = Lote de Pergaminos en Blanco.
+;-----------------
+set %bolsaMateriales ZPFXMND ; Bolsa donde se encuentra la madera
+set %bolsaMapas LWHDKOD      ; Bolsa para dejar los mapas fabricados.
+set %bolsaSerruchos HHSQEPD  ; Bolsa donde se encuentran los Serruchos
+set %tiempo_alimentacion 360 ; Cada cuántos segundos va a comprobar si tiene hambre (6 minutos).
+;________________________________________________
+;
+; //////////////////////////////////////////////
+; ************* FIN CONFIGURACIÓN *************
+; //////////////////////////////////////////////
+;________________________________________________
+;
+set %madera ZLK
+set %sierra AGG_EGG
+set %lote MMF
+set %start 0
+set %tiempo_actual #SCNT ; Reloj
+set %proxima_vez %tiempo_actual ; Trigger
+set %comida RGG_NRD_QSD_ZBG_WLI_QRD_END_FUD_YLI_WLI_HGI
+     +_KGI_EGI_QLI_KLI_MLI_KRD_HQD_AQD_MQE_VQE_TQE_JQE_IQE
+     +_GQE_SPE_ZPE_OQE_BDF_KPE_RQE_YSD_SQD_YWI_AXI_PQD_QQD
+
+set #SYSMSGCOL 88
+event sysmessage ==================
+set #SYSMSGCOL 53
+event sysmessage  Carpinteria %version
+set #SYSMSGCOL 88
+event sysmessage ==================
+wait 40
+
+Inicio:
+chooseskill carp real
+if #SKILL >= 1000
+   {
+     display ¡Somos GM Carpinteria! :-) ; Somos GM Carpentry
+     halt
+   }
+set %tiempo_actual #SCNT
+if %proxima_vez <= %tiempo_actual ; Comer cada cierto tiempo si hay hambre
+   {
+     gosub comprobar_comida
+   }
+gosub Madera
+gosub Herramientas
+gosub Fabricar
+goto Inicio
+
+;<=======================>
+sub Madera
+finditem %madera C_ , #BACKPACKID
+if #FINDSTACK < 6
+   {
+     finditem %madera C_ , %bolsaMateriales
+     if #FINDSTACK >= 50
+        {
+          set %peso #WEIGHT
+          exevent drag #FINDID 50
+          gosub waitForSysVar Weight <> %peso 50 ; Esperamos a que cambie el peso del PJ
+          exevent dropC #BACKPACKID
+          gosub waitforitem #FINDID 50 #BACKPACKID ; Esperamos a que caiga el objeto en la mochila
+        }
+        else
+           {
+             event sysmessage NO QUEDA MADERA! :-(
+             halt
+           }
+   }
+return
+
+;<=======================>
+sub Herramientas
+finditem %sierra C_ , #backpackid
+if #findcnt <= 1
+   {
+     finditem %sierra C_ , %bolsaSerruchos
+     if #findcnt >= 3
+        {
+          _repite_sierra:
+          finditem %sierra C_ , #backpackid
+          if #findcnt < 3
+             {
+               set %peso #WEIGHT
+               finditem %sierra C_ , %bolsaSerruchos
+               exevent drag #FINDID
+               gosub waitForSysVar Weight <> %peso 50 ; Esperamos a que cambie el peso del PJ
+               exevent dropC #BACKPACKID
+               gosub waitforitem #FINDID 50 #BACKPACKID ; Esperamos a que caiga el objeto en la mochila
+               goto _repite_sierra
+             }
+        }
+        else
+           {
+             event sysmessage NO QUEDAN SERRUCHOS! :-(
+             halt
+           }
+   }
+return
+
+;<=======================>
+
+sub Fabricar
+if ( #CONTNAME <> generic_gump ) && ( #CONTSIZE <> 530_480 )
+     {
+       set %start 0
+     }
+finditem %sierra C_ , #backpackid
+if #findcnt > 0
+   {
+     if %start = 0
+        {
+          set #LOBJECTID #FINDID
+          event macro 17
+          gosub wait_for GUMP 530_480 50
+          click 67 251 ; Categoria Otros
+          gosub wait_for GUMP 530_480 50
+          set %start 1
+        }
+     if %TipodeLotes = 1
+        {
+          click 274 188 ; Mapas en Blanco
+          gosub wait_for GUMP 530_480 150
+        }
+        else
+           {
+             if %TipodeLotes = 2
+                {
+                  Click 274 172 ; Lote de pergaminos
+                  gosub wait_for GUMP 530_480 150
+                }
+           }
+   }
+guardar:
+if ( #WEIGHT >= #MAXWEIGHT - 30 )
+     {
+       finditem %Lote C_ , #backpackid
+       if #FindCnt > 0
+          {
+            exevent Drag #FINDID #FINDSTACK
+            exevent Dropc %bolsaMapas
+            wait 30
+            goto guardar
+          }
+     }
+return
+
+;=====================================================
+; Rutina para, en caso de hambre, comer hasta saciarse
+;=====================================================
+; v2.2
+sub comprobar_comida
+{
+  hambriento:
+  set %jrnl #jindex ; Marcamos un índice de las líneas del diario.
+  event macro 4 0 .hungry
+  wait 20
+  while #true
+     {
+       if #jindex > %jrnl ; Si aparece una nueva línea.
+          {
+            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de línea.
+            scanjournal %jrnl   ; La leemos...
+            if Dentro_de_1_minuto in #journal
+               {
+                 wait 120s ; Save del server...
+               }
+            if Estas_no_le_afecta_el_hambre in #journal || Estas_tan_lleno_que_no_puedes in #journal || Estas_totalmente_saciado in #journal
+               {
+                 set %proxima_vez %tiempo_actual + %tiempo_alimentacion
+                 return
+               }
+               else
+                  {
+                    if Estas_lleno in #journal || Estas_contento in #journal || Estas_en_inanicion in #journal || Estas_hambriento in #journal || Sientes_mucho in #journal || Estas_con_hambre in #journal || Estas_parcialmente in #journal || Estas_bien_lleno in #journal || Te_sientes_casi_lleno in #journal
+                       {
+                         finditem %comida C_ , #backpackid
+                         if #findcnt > 0
+                            {
+                              set #lobjectid #findid
+                              event macro 17
+                              wait 20
+                              goto hambriento
+                            }
+                            else
+                               {
+                                 event exmsg #charid 3 48 COMPRA COMIDA!!
+                                 wait 40
+                                 set %proxima_vez %tiempo_actual + %tiempo_alimentacion
+                               }
+                       }
+                       else ; Mensaje extraño, repetimos...
+                          {
+                            goto hambriento
+                          }
+                  }
+          }
+       return
+     } ; FIN While
+}
+return
+
+sub waitforitem
+{
+   set %time #SCNT2 + %2 ; Segundos
+   dropwait:
+   finditem %1 C_ , %3
+   if ( #FINDKIND = -1 ) ; Not Found
+   {
+       wait 1
+       if ( #SCNT2 >= %time )
+       {
+         return
+       }
+       goto dropwait
+   }
+   return
+}
+
+;-@ ============================== @-;
+;-@ ############################## @-;
+;-@ SUBS públicos del Foro EasyUO  @-;
+;-@ ############################## @-;
+;-@ ============================== @-;
+
+;**
+;* Splits a string by a divider into an array and
+;* copies the result into the desired namespace
+;* @param %1 The string to split
+;* @param %2 Divider
+;* @param %3 Array name
+;* @param %4 {optional} Result namespace. If no
+;*           namespace is given it will create the
+;*           array using the %-notation
+;* @sideEffects Creates a number of variables
+;*              with name as given in %3 followed by
+;*              a digit
+;* @returns The length of the array
+sub split
+  namespace Push
+  namespace Local split , #systime
+  set !lpc #lpc
+  if #lpc < 500
+     set #lpc 500
+
+  set !string %1
+  set !divider %2
+  set !arrayName %3
+  if %0 > 3
+     set !namespace %4
+  else
+     set !namespace #false
+
+  set !length 0
+  repeat
+  {
+     set !length !length + 1
+     str Pos !string !divider 1
+     if #strRes = 0
+     {
+        set !done #true
+        set ! . !arrayName , !length !string
+     }
+     else
+     {
+        set !pos #strRes
+        set !len !pos - 1
+        str Left !string !len
+        set ! . !arrayName , !length #strRes
+        str Del !string 1 !pos
+        set !string #strRes
+     }
+  }
+  until ( !done = #true )
+  set #result !length
+
+  if !namespace <> #false
+  {
+     namespace Copy !arrayName , * To Local !namespace
+  }
+  else
+  {
+    for !i 1 #result
+    {
+       set !value !arrayName , !i
+       set % . !arrayName , !i ! . !value
+    }
+  }
+  set #lpc !lpc
+  namespace Clear
+  namespace Pop
+return #result
+
+;=================================================================
+sub wait_for
+;=================================================================
+; This "wait_for" sub package was created by Locke. If you use these subs please keep this header intact.
+; Documentation: the sub package grew to large with all the comments. To load them call the sub like this:
+; gosub wait_for docs    | or you can use doc, documention, what, or my personal favorite, kickass.
+
+; "wait_for core dispatcher" version 1.2 by Locke
+if %1 = doc || if %1 = docs || if %1 = documentation || if %1 = what || if %1 = kickass
+{
+Display ok Please click ok and wait for your browser to start.
+execute http://www.easyuo.com/forum/viewtopic.php?t=24716
+halt
+}
+nameSpace Push
+namespace local LLNS
+set #result N/A ; if #result isn't set by one of my wait_for subs it'll throw an error.
+set !LPC #lpc
+set #lpc 200
+for %i 0 %0
+set !_A . %i % . %i
+gosub wait_for_ , !_A1
+set #lpc !lpc
+namespace clear LLNS
+namespace pop
+if #result <> N/A
+return #result
+else
+display ok You specified an unknown wait_for command. Script returned #result and is halting.
+halt
+;=================================================================
+sub wait_for_MSG ; version 1.4 ~Locke
+;=================================================================
+if !_A0 < 3
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for MSG %message time_out_in_seconds$
++Script is halting
+halt
+}
+set !_timeout ( #scnt + !_A . !_A0 )
+_lets_wait_for_a_message:
+for %i %jstart #jindex
+{
+ scanjournal %i
+  for %ii 2 !_A0
+  {
+    if !_A . %ii in #journal && %jstart <> %i
+    set #result #true , #spc , !_A . %ii
+  }
+}
+
+if #true notin #result
+{
+set #result #false
+ if !_timeout =< #scnt
+ return #result
+wait 1
+goto _lets_wait_for_a_message
+}
+else
+return #result
+
+wait 1
+goto _lets_wait_for_a_message
+
+;======================================================================
+sub wait_for_GUMP ; version 1.4 ~Locke
+;=================================================================
+; Añadido #CONTID ^^
+if !_A0 < 3
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for GUMP XXX_YYY time_out_in_seconds$
++Script is halting
+halt
+}
+if !_A3 <> CLOSE
+set !_timeout #scnt2 + !_A3
+else
+set !_timeout 0 ; no gump wait if %3 = CLOSE since we already believe it to be open.
+
+_lets_wait_for_a_gump:
+if #CONTSIZE = !_A2 || #CONTKIND = !_A2 || #CONTNAME = !_A2 || #CONTTYPE = !_A2 || #CONTID = !_A2
+{
+ if !_A5 <> N/A && !_A6 <> N/A
+ {
+ set !clickx !_A5 + #contposx
+ set !clicky !_A6 + #contposy
+ click !clickx !clicky
+ }
+ if !_A3 = CLOSE || if !_A4 = CLOSE || !_A5 = CLOSE || !_A6 = CLOSE
+ {
+ set !string #contsize
+ str pos !string _
+ set !pos #strres
+ str del !string #strres #strres
+ set !clickX #contposx + ( #strres / 2 )
+ str del !string 1 !pos
+ set !clickY #contposy + ( #strres / 2 )
+ click !clickx !clicky R
+ }
+return #true
+}
+
+if ( !_timeout =< #scnt2 ) && ( !_A4 = N/A )
+   {
+     return #false
+   }
+
+if !_A4 <> N/A && !_timeout =< #scnt2
+{
+finditem !_A4
+if #findkind <> -1
+{
+ for #findindex 1 #findcnt
+ {
+  if #finddist > 2
+  ignoreitem #findid LLWAITFOR
+  else
+  break
+ }
+ set #lobjectid #findid
+ event macro 17 0
+ set !_timeout #scnt2 + !_A3
+}
+else
+return #false
+}
+wait 1
+goto _lets_wait_for_a_gump
+
+sub waitForSysVar
+if %0 < 4 || %4 = N/A
+set %4 %_defaultWaitForTimeout
+if %0 < 5
+set %5 return
+set %4 #sCnt2 + %4
+_waitForSysVar:
+set % . %5 # . %1 %2 %3
+if ! % . %5 && #sCnt2 < %4
+{
+Wait 1
+goto _waitForSysVar
+}
+return
