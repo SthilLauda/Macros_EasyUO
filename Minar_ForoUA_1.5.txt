@@ -1,7 +1,7 @@
 ; ------------------------------------------------------
 ; Macro de Minar para UA-Sphere (Sphere 0.56b-Nightly)
-; Creado por: Alex
-; Ultima edición: 24/08/2019 por Sthil Lauda
+; Creado por: Alex [ MOD+ Sthil ]
+; Ultima ediciÃ³n: 24/08/2019 por Sthil Lauda
 ; Modificaciones de: DaviD JoneS, darksplit, Sthil Lauda.
 ; ------------------------------------------------------
 set %version v1.5
@@ -9,87 +9,87 @@ set %version v1.5
 ; - Cuando enciendas la macro, debes estar exactamente en el lugar donde te deja la runa que te lleva a casa.
 ; - Las runas de las minas deben estar marcadas DENTRO de ellas.
 ; - No se funde el material, macro de separar/fundir disponible en el foro: https://ultima-alianza.com/foro/threads/61838-Repositorio-con-mis-macros
-; - Sólo se podrá utilizar la macro en las minas preestablecidas, mostradas más abajo.
-; - No es necesario tener regs de recall encima al iniciar la Macro, lo comprueba y coge automáticamente.
-; - Regs, mineral y comida deberán estar en el MISMO CONTENEDOR.
-; - Esta macro mina únicamente en una mina de tu elección.
+; - SÃ³lo se podrÃ¡ utilizar la macro en las minas preestablecidas, mostradas mÃ¡s abajo.
+; - No es necesario tener regs de recall encima al iniciar la Macro, lo comprueba y coge automÃ¡ticamente.
+; - Regs, mineral y comida deberÃ¡n estar en el MISMO CONTENEDOR.
+; - Esta macro mina Ãºnicamente en una mina de tu elecciÃ³n.
 ; - Skill de Magia a 30 para poder recalear.
 ;
 ; Modificaciones:
 ;
 ; 24/08/2019:
-; Correcciones de código: - Añadido "sub refreshBackpack" para refrescar la mochila al llegar a casa (Evita mineral "fantasma" que no existe).
-;                         - Añadido nuevo "sub" para meditar con fundamento.
+; Correcciones de cÃ³digo: - AÃ±adido "sub refreshBackpack" para refrescar la mochila al llegar a casa (Evita mineral "fantasma" que no existe).
+;                         - AÃ±adido nuevo "sub" para meditar con fundamento.
 ;                         - Nuevo sub para dejar los minerales.
 ;                         - Mejorado el sub de recall a casa y recall a la mina.
 ;
 ; 12/08/2019:
-; Correcciones de código: - Añadida función para comer desde el cofre.
-;                         - Añadida función para detectar los save's del server.
-;                         - Sustituído "msg .resend $" por "event macro 3 0 .resend" (Más estable).
+; Correcciones de cÃ³digo: - AÃ±adida funciÃ³n para comer desde el cofre.
+;                         - AÃ±adida funciÃ³n para detectar los save's del server.
+;                         - SustituÃ­do "msg .resend $" por "event macro 3 0 .resend" (MÃ¡s estable).
 ;
 ; 08/08/2019:
-; Correcciones de código: - Eliminados mensajes que hacían petar el client después de abrir el cofre.
+; Correcciones de cÃ³digo: - Eliminados mensajes que hacÃ­an petar el client despuÃ©s de abrir el cofre.
 ;
 ; 27/07/2019
-; Correcciones de código: - Añadido "#LTARGETKIND 3" para no fallar el target a la hora de usar el pico en el suelo.
+; Correcciones de cÃ³digo: - AÃ±adido "#LTARGETKIND 3" para no fallar el target a la hora de usar el pico en el suelo.
 ;                         - Sustituido el antiguo "event drag" y "click", por el nuevo "exevent drag" y "exevent dropc".
 ;                         - Sustituido "wait 10" por "target" al usar el pico.
 ;                         - Sustituido "wait 20" por "wait_for GUMP 452_236" para esperar a que se abra el libro de runas.
 ;                         - Sustituido "wait 20" por "wait_for GUMP %idcaja" para esperar a que se abra el cofre de casa.
-;                         - Añadido "contpos 0 0" para no fallar al hacer click en el cartel del libro de runas, si este se ha movido de sitio.
-;                         - Sustituido "wait 10s" "wait_for RECALL" para añadir robustez en el recaleo.
+;                         - AÃ±adido "contpos 0 0" para no fallar al hacer click en el cartel del libro de runas, si este se ha movido de sitio.
+;                         - Sustituido "wait 10s" "wait_for RECALL" para aÃ±adir robustez en el recaleo.
 ;
 ; 23/05/2010
-; Corrección de código: cambiado el sub del peso, para que recalee en función del #maxweight de cada pj
-; según su fuerza.
+; CorrecciÃ³n de cÃ³digo: cambiado el sub del peso, para que recalee en funciÃ³n del #maxweight de cada pj
+; segÃºn su fuerza.
 ;
 ; 08/04/2010
-; Corrección de bugs: variables mal escritas, añadido código de Journal para que no se quede parado.
-; Añadidos: Comprobar y coger Regs automáticamente al llegar a casa para tener siempre 5 de cada,
-; simplificación de algunos nuevos comandos para evitar bugs (exevent Dropc, exevent Drag),
-; se ha implementado un código para desarmar la mano derecha al empezar para poder encontrar el pico.
-; Creada descripción de la Macro y mejora de la explicación de su funcionamiento.
+; CorrecciÃ³n de bugs: variables mal escritas, aÃ±adido cÃ³digo de Journal para que no se quede parado.
+; AÃ±adidos: Comprobar y coger Regs automÃ¡ticamente al llegar a casa para tener siempre 5 de cada,
+; simplificaciÃ³n de algunos nuevos comandos para evitar bugs (exevent Dropc, exevent Drag),
+; se ha implementado un cÃ³digo para desarmar la mano derecha al empezar para poder encontrar el pico.
+; Creada descripciÃ³n de la Macro y mejora de la explicaciÃ³n de su funcionamiento.
 ; Comentarios explicativos y mejora visual de los Sysmessage.
-; Próximamente se añadirá la posibilidad de recalear al Bank en vez de a Casa.
+; PrÃ³ximamente se aÃ±adirÃ¡ la posibilidad de recalear al Bank en vez de a Casa.
 ;
-; Explicación:
+; ExplicaciÃ³n:
 ; Esta macro ha sido creada para Minar dejando el mineral en casa con la ayuda de Runas.
-; Al comienzo y cada vez que vuelva a casa, se comprobará el número de regs del personaje,
-; y se cogerán los necesarios para volver a tener 5 de cada para evitar pérdidas en el caso de una
+; Al comienzo y cada vez que vuelva a casa, se comprobarÃ¡ el nÃºmero de regs del personaje,
+; y se cogerÃ¡n los necesarios para volver a tener 5 de cada para evitar pÃ©rdidas en el caso de una
 ; matanza de un PK en la mina.
-; Se meditará antes y después de recalear para subir el maná para acelerar el proceso,
-; aún así, no es realmente necesaria la skill de Meditar.
-; Minará por toda la mina, de manera aleatoria, pero evitando volver a minar allí dónde ya lo hiciste.
+; Se meditarÃ¡ antes y despuÃ©s de recalear para subir el manÃ¡ para acelerar el proceso,
+; aÃºn asÃ­, no es realmente necesaria la skill de Meditar.
+; MinarÃ¡ por toda la mina, de manera aleatoria, pero evitando volver a minar allÃ­ dÃ³nde ya lo hiciste.
 ;
 ;________________________________
 ;
 ; ///////////////////////////////
-; ******** CONFIGURACIÓN ********
+; ******** CONFIGURACIÃ“N ********
 ; ///////////////////////////////
 ;________________________________
 ;
-; - Hueco donde tengas la runa que te llevará al cofre para guardar los minerales (1-16)
+; - Hueco donde tengas la runa que te llevarÃ¡ al cofre para guardar los minerales (1-16)
 ;--------------------
 set %runacasa 1
 ;--------------------
-; - Hueco donde tengas la runa que te llevará DENTRO de la mina (1-16)
+; - Hueco donde tengas la runa que te llevarÃ¡ DENTRO de la mina (1-16)
 ;--------------------
 set %runamina 9
 ;--------------------
-; - Elige una mina de la lista a continuación y escribe su número en la variante siguiente:
+; - Elige una mina de la lista a continuaciÃ³n y escribe su nÃºmero en la variante siguiente:
 ; -------------------
-set %lugar 0 ; Mina en la que actuará la macro
+set %lugar 0 ; Mina en la que actuarÃ¡ la macro
 ;________________________________________________
 ;
 ; //////////////////////////////////////////////
-; ************* FIN CONFIGURACIÓN *************
+; ************* FIN CONFIGURACIÃ“N *************
 ; //////////////////////////////////////////////
 ;________________________________________________
 ;
 ; Las Minas actuales son:
 ;
-; 0- Ninguna (Mina solo igual, pero si se sale de dentro de la mina no se volverá a meter, deberás moverlo tu)
+; 0- Ninguna (Mina solo igual, pero si se sale de dentro de la mina no se volverÃ¡ a meter, deberÃ¡s moverlo tu)
 ; 1- Shame (Norte de la entrada Shame (Trabajos Forzados))
 ; 2- Covetous 1 (Primera Mina a la derecha de la Dungeon Covetous)
 ; 3- Covetous 2 (Segunda Mina a la derecha de la Dungeon Covetous)
@@ -103,15 +103,15 @@ set %lugar 0 ; Mina en la que actuará la macro
 ; 11- Destard 1 (Un poco a la izquierda de La Dungeon Destard)
 ; 12- Destard 2 (Desde la entrada de Destard Dungeon bajando bordeando, la primera mina que encuentras)
 ; 13- Destard 3 (Desde la entrada de Destard Dungeon bajando bordeando, la segunda mina que encuentras)
-; 14- Destard 4 (Desde la entrada de Destard Dungeon bajando bordeando, la terera mina que encuentras, en la de la parte derecha de la montaña)
+; 14- Destard 4 (Desde la entrada de Destard Dungeon bajando bordeando, la terera mina que encuentras, en la de la parte derecha de la montaÃ±a)
 ; 15- Wrong 1 (Junto a la entrada de la Dungeon de Wrong)
-; 16- Wrong 2 (Bordendo la montaña desde la entrada de Wrong hacia la izquierda, la primera que encuentras)
-; 17- Wrong 3 (Bordendo la montaña desde la entrada de Wrong hacia la izquierda, la segunda que encuentras)
-; 18- Hythloth 1 (Bordeando la montaña, hacia arriba desde Hythloth, la primera que encuentras)
-; 19- Hythloth 2 (Bordeando la montaña, hacia abajo derecha de Hythloth, la primera Mina que encuentras)
-; 20- Hythloth 3 (Bordeando la montaña, hacia abajo derecha de Hythloth, la segunda Mina que encuentras)
-; 22- Avatar Norte 1 (De la montaña del Norte de Avatar, la primera que encuentas)
-; 23- Avatar Norte 2 (De la montaña del Norte de Avatar, desde la primera, a la derecha bordeando, la primera que encuentras)
+; 16- Wrong 2 (Bordendo la montaÃ±a desde la entrada de Wrong hacia la izquierda, la primera que encuentras)
+; 17- Wrong 3 (Bordendo la montaÃ±a desde la entrada de Wrong hacia la izquierda, la segunda que encuentras)
+; 18- Hythloth 1 (Bordeando la montaÃ±a, hacia arriba desde Hythloth, la primera que encuentras)
+; 19- Hythloth 2 (Bordeando la montaÃ±a, hacia abajo derecha de Hythloth, la primera Mina que encuentras)
+; 20- Hythloth 3 (Bordeando la montaÃ±a, hacia abajo derecha de Hythloth, la segunda Mina que encuentras)
+; 22- Avatar Norte 1 (De la montaÃ±a del Norte de Avatar, la primera que encuentas)
+; 23- Avatar Norte 2 (De la montaÃ±a del Norte de Avatar, desde la primera, a la derecha bordeando, la primera que encuentras)
 ; 24- Desierto (En el cruce de caminos)
 ; 25- Shame Sur
 ; ==================================
@@ -383,7 +383,7 @@ if #FINDCNT > 0 ; Hay minerales...
      wait 30
      goto _dejar
    }
-   else ; No queda más mineral en la mochila
+   else ; No queda mÃ¡s mineral en la mochila
       {
         goto recallmina
       }
@@ -476,7 +476,7 @@ if ( #TRUE in #result )
      {
        if pierdes in #result
           {
-            goto _reMedit ; Meditamos hasta que no perdamos la concentración
+            goto _reMedit ; Meditamos hasta que no perdamos la concentraciÃ³n
           }
        if trance in #result
           {
@@ -486,7 +486,7 @@ if ( #TRUE in #result )
                  {
                    goto _reMedit
                  }
-                 else ; Meditamos hasta llenar la barra al máximo...
+                 else ; Meditamos hasta llenar la barra al mÃ¡ximo...
                     {
                       repeat
                            {
@@ -496,7 +496,7 @@ if ( #TRUE in #result )
                            until #MANA = #MAXMANA
                     }
           }
-       if en_paz in #result ; OK, estamos bien de maná.
+       if en_paz in #result ; OK, estamos bien de manÃ¡.
           {
             return
           }
@@ -515,14 +515,14 @@ sub comprobar_comida
 {
   hambriento:
   gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
-  set %jrnl #jindex ; Marcamos un índice de las líneas del diario.
+  set %jrnl #jindex ; Marcamos un Ã­ndice de las lÃ­neas del diario.
   event macro 4 0 .hungry
   wait 20
   while #true
      {
-       if #jindex > %jrnl ; Si aparece una nueva línea.
+       if #jindex > %jrnl ; Si aparece una nueva lÃ­nea.
           {
-            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de línea.
+            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de lÃ­nea.
             scanjournal %jrnl   ; La leemos...
             if Dentro_de_1_minuto in #journal
                {
@@ -565,7 +565,7 @@ sub comprobar_comida
                                        }
                                }
                        }
-                       else ; Mensaje extraño, repetimos...
+                       else ; Mensaje extraÃ±o, repetimos...
                           {
                             goto hambriento
                           }
@@ -763,7 +763,7 @@ return
 
 ;-@ ============================== @-;
 ;-@ ############################## @-;
-;-@ SUBS públicos del Foro EasyUO  @-;
+;-@ SUBS pÃºblicos del Foro EasyUO  @-;
 ;-@ ############################## @-;
 ;-@ ============================== @-;
 
@@ -940,7 +940,7 @@ goto _lets_wait_for_a_message
 ;======================================================================
 sub wait_for_GUMP ; version 1.4 ~Locke
 ;=================================================================
-; Añadido #CONTID ^^
+; AÃ±adido #CONTID ^^
 if !_A0 < 3
 {
 display ok You haven't specified enough vars.$
