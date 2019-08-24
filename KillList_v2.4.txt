@@ -1,0 +1,395 @@
+;        |                                 /   \                   |       .
+;  _    -O-       .                )      ((   ))     (           -O-
+; (@)    |     +                  /|\      ))_((     /|\           |            .
+; |-|                            / | \    (/\|/\)   / | \                            (@)
+; | | --------------------------/--|-voV---\`|'/--Vov-|--\---------------------------|-|         .
+; |-|                                '^`   (o o)  '^`                                | |
+; | |                                      `\Y/'                                     |-|
+; |-|   _______ __ __   __                  _______ __ __                            | |
+; | |  |   |   |  |  |_|__|.--------.---.-.|   _   |  |__|.---.-.-----.-----.---.-.  |-|    .     o
+; |-|  |   |   |  |   _|  ||        |  _  ||       |  |  ||  _  |     |-- __|  _  |  | |
+; | |  |_______|__|____|__||__|__|__|___._||___|___|__|__||___._|__|__|_____|___._|  |-|
+; |_|________________________________________________________________________________| |
+; (@)                     l   /\ /         ( (          \ /\   l                   `\|-|             .
+;           o             l /   V           \ \          V   \ l       +             (@)
+;                         l/                _) )_             \I                                 +
+;      +                                    `\ /'
+;
+; Script Name: Kill List
+;
+; #############################################
+; ############__---~~~~~|~~~~~--__#############
+; ########.-~~          |          ~~-.########
+; #####.-~     .-~~~~-. |              ~-.#####
+; ####/       {  o     }|                 \####
+; ###/        /       / |                  \###
+; ##|        `--r'   {  | ,___.-',          |##
+; ##|          /      ~-|         ',        |##
+; ##|---------{---------|----------'--------|##
+; ##|          \        |         /         |##
+; ##|           \       |        /          |##
+; ###\         ~ ~~~~~~~|~~~~~~~~~ ~       /###
+; ####\       ~ ~ ~ ~ ~ | ~ ~ ~ ~ ~ ~     /####
+; #####`-_     ~ ~ ~ ~ ~|~ ~ ~ ~ ~ ~    _-'####
+; ########`-__    ~ ~ ~ | ~ ~ ~ ~   __-'#######
+; ############~~---_____|_____---~~############
+; #############################################
+;
+; Author: iwantmypot [ MOD+ Sthil ]
+; Version: 2.4
+; Client Tested with: 2.0.3
+; EUO version tested with: 1.5v69
+; Shard OSI / FS: OSI
+; Revision Date: 18/08/2019
+; Public Release: 24/03/2006
+; Global Variables Used: none
+set %version 2.4
+; Purpose: Crea una lista de todos los players o monstruos cerca tuya, para atacarlos con un botón.
+; Thanks to: a_goat for the idea/inspiration to create this script.
+;==============================================
+;________________________________
+;
+; ///////////////////////////////
+; ******** CONFIGURACIÓN ********
+; ///////////////////////////////
+;________________________________
+;
+set %radio_de_accion 25
+set %guildtag [****] , #spc , $  ; -> Aquí va la etiqueta del clan, para ignorar a sus PJ's.
+; Macro del UO "bow" ( Viene incluida de serie )
+set %tecla_saludo_1 b
+set %tecla_saludo_2 ctrl
+; Tamaño de los botones
+set %buttonheight 20
+set %buttondistance 2
+;________________________________________________
+;
+; //////////////////////////////////////////////
+; ************* FIN CONFIGURACIÓN *************
+; //////////////////////////////////////////////
+;________________________________________________
+;
+set %uosteam_friends 2 ; #FINDREP -> Friend (Green)
+set %creatures _
+set %ignored _
+set #menubutton none
+set %buttons 0
+set #lpc 1000
+_restartMacro:
+set #SYSMSGCOL 88
+event sysmessage ==============
+set #SYSMSGCOL 53
+event sysmessage Kill List %version
+set #SYSMSGCOL 88
+event sysmessage ==============
+wait 20
+set %PJ_actual #CHARID
+gosub selectMode  ; Modo PVP / PVM
+gosub checkSkills ; Modo "Tamer"/"Warrior"/"Mago".
+gosub menu
+
+begin:
+gosub checkPJ
+gosub search
+wait 1
+finditem * G_ . %radio_de_accion
+if #findcnt = 0 && #menubutton = none
+  goto begin
+if #findcnt = 0 && #menubutton <> none
+  goto thebuttons
+for #findindex 1 #findcnt
+  {
+  wait 1
+  if ( #findrep = 3 || #findrep = 0 )
+       {
+         if #findtype NotIn %creatures
+            {
+              set %creatures %creatures , #findtype , _
+              continue
+            }
+       }
+  event property #findid
+  if #findrep in %enemies && #findrep Notin %uosteam_friends && %guildtag notin #property && (bonded) notin #property && (tame) notin #property && #findid <> #charid
+     {
+       gosub addbutton #findid #property #findrep #findtype
+       continue
+     }
+  if #findrep notin %enemies && #findrep <> 7
+     {
+       if #findtype NotIn %creatures
+          {
+            set %creatures %creatures , #findtype , _
+          }
+     }
+  else
+     {
+       set %ignored %ignored , #findid , _
+     }
+    wait 1
+  }
+wait 1
+if #menubutton = none
+  goto begin
+thebuttons:
+if target in #menubutton
+  {
+    key %tecla_saludo_1 %tecla_saludo_2 ; Cambiar el foco a la ventana del juego... ^^
+    str del #menubutton 1 6
+    gosub target #strres
+  }
+if friend in #menubutton
+  {
+    key %tecla_saludo_1 %tecla_saludo_2 ; Cambiar el foco a la ventana del juego... ^^
+    str del #menubutton 1 6
+    set %ignored %ignored , %tid . #strres , _
+  }
+if remove in #menubutton
+  {
+    key %tecla_saludo_1 %tecla_saludo_2 ; Cambiar el foco a la ventana del juego... ^^
+    str del #menubutton 1 6
+    set %creatures %creatures , %type . #strres , _
+  }
+if #menubutton = reset
+  {
+    set %creatures _
+    set %ignored _
+  }
+if #menubutton = CLOSED
+   halt
+set #menubutton none
+goto begin
+
+;------------SUBS--------------------------------
+
+sub checkPJ
+if ( #CHARID <> %PJ_actual ) ; Hemos cambiado de personaje...
+     {
+       set #SYSMSGCOL 38
+       event sysmessage REINICIANDO MACRO...
+       goto _restartMacro
+     }
+return
+
+sub selectMode
+display yesno ******************** ¡MODO PVP! **********************$$
+            + ¿Quieres activar el modo PVP/PK? (Incluir PJ's azules) $$
+            + ********************************************************$$
+if #dispres = yes ; PVP
+   {
+     set #SYSMSGCOL 43
+     event sysmessage OK: MODO PK >:-]
+     wait 20
+     set %enemies 1_4_5_6 ; 1 Innocent (Azules), 4 Criminales (Gris), 5 Enemigos (Naranja), 6 Asesino (Rojo).
+   }
+   else ; -----------> PVM
+      {
+        set #SYSMSGCOL 88
+        event sysmessage OK: MODO ALIANZA :-)
+        wait 20
+        set %enemies 4_5_6 ; 4 Criminales (Gris), 5 Enemigos (Naranja), 6 Asesinos (Rojo).
+      }
+return
+
+sub checkSkills
+chooseskill Anil real ; Animal Lore
+set %conocimiento_animal #SKILL
+chooseskill Anim real ; Animal Taming
+set %domar #SKILL
+chooseskill Chiv real ; Caballería
+set %caballeria #SKILL
+chooseskill Arch real ; Archery
+set %archery #SKILL
+chooseskill Fenc real ; Fencing
+set %fencing #SKILL
+chooseskill Mace real ; Mace Fighting
+set %mace #SKILL
+chooseskill Swor real ; Swordsmanship
+set %sword #SKILL
+chooseskill Tact real ; Tactics
+set %tactics #SKILL
+chooseskill Eval real ; Evaluating
+set %eval #SKILL
+chooseskill Medi real ; Meditation
+set %medit #SKILL
+if ( %conocimiento_animal >= 850 ) && ( %domar >= 850 ) ; Mínimo de skill para que te hagan caso las monturas, etc.
+     {
+       set #SYSMSGCOL 73
+       event sysmessage MODO TAMER ACTIVADO!
+       wait 20
+       set %modo_tamer #TRUE ; Modo "All Kill"
+       set %modo_warrior #FALSE
+       set %modo_mago #FALSE
+     }
+     else
+        {
+          if ( %caballeria >= 300 || %archery >= 300 || %fencing >= 300 || %mace >= 300 || %sword >= 300 ) && ( %tactics >= 300 )
+               {
+                 set #SYSMSGCOL 73
+                 event sysmessage MODO WARRIOR ACTIVADO!
+                 wait 20
+                 set %modo_tamer #FALSE
+                 set %modo_mago #FALSE
+                 set %modo_warrior #TRUE ; Modo "Attack Last"
+               }
+               else
+                  {
+                    if ( %eval >= 300 && %medit >= 300 )
+                         {
+                           set #SYSMSGCOL 73
+                           event sysmessage MODO MAGO ACTIVADO!
+                           wait 20
+                           set %modo_tamer #FALSE
+                           set %modo_warrior #FALSE
+                           set %modo_mago #TRUE ; In Por Ylem
+                         }
+                  }
+        }
+return
+
+sub target
+  {
+    menu get melee
+    if ( %modo_tamer )
+         {
+           set #LTARGETID %tid . %1 ; Establecer el Target al ID asignado
+           event macro 3 0 All Kill
+           target
+           set #LTARGETKIND 1
+           event macro 22 0 ; Last Target
+         }
+         else ; Modo Warrior / Mago
+            {
+              if ( #menures || %modo_warrior ) ; Auto-Attack = ON ( Con la casilla de Auto-Attack marcada o siendo Warrior )
+                   {
+                     set #LTARGETID %tid . %1 ; Establecer el Target al ID asignado
+                     event macro 27 0 ; Attack Last
+                   }
+                   else ; Auto-Atacck = OFF ( Pillamos el target a pelo, )
+                      {
+                        if ( %modo_mago )
+                             {
+                               event macro 15 4 ; Cast Spell Magic Arrow
+                               target
+                               set #LTARGETID %tid . %1 ; Establecer el Target al ID asignado
+                               set #LTARGETKIND 1
+                               event macro 22 0 ; Last Target
+                             }
+                      }
+            }
+    return
+  }
+
+sub addbutton
+  {
+  set %tid . %buttons %1
+  str pos %2 $
+  set %left #strres - 1
+  str left %2 %left
+  set %name . %buttons #strres
+  set %rep . %buttons %3
+  set %type . %buttons %4
+  set %down ( %buttonheight + %buttondistance ) * %buttons
+  if #findrep = 1
+    menu Font BGColor Aqua
+  if #findrep = 4
+    menu Font BGColor Gray
+  if #findrep = 5
+    menu Font BGColor $000080FF
+  if #findrep = 6
+    menu Font BGColor $003838DE
+  menu Button target , %buttons 0 %down 130 %buttonheight %name . %buttons
+  menu Font BGColor BtnFace
+  menu Button friend , %buttons 135 %down 25 %buttonheight F
+  menu Button remove , %buttons 160 %down 25 %buttonheight X
+  set %buttons %buttons + 1
+  ignoreitem %1
+  return
+  }
+
+sub remove
+  {
+  set %buttons %buttons - 1
+  set %2 %buttons - 1
+  for %mover %1 %2
+    {
+    if %1 > %2
+       break
+    set %temp %mover + 1
+    set %tid . %mover %tid . %temp
+    set %name . %mover %name . %temp
+    set %rep . %mover %rep . %temp
+    set %type . %mover %type . %temp
+    if %rep . %mover = 1
+      menu Font BGColor Aqua
+    if %rep . %mover = 4
+      menu Font BGColor Gray
+    if %rep . %mover = 5
+      menu Font BGColor $000080FF
+    if %rep . %mover = 6
+      menu Font BGColor $003838DE
+    menu delete target , %mover
+    set %down ( %buttonheight + %buttondistance ) * %mover
+    menu Button target , %mover 0 %down 130 %buttonheight %name . %mover
+    menu Font BGColor BtnFace
+    }
+  menu delete target , %buttons
+  menu delete friend , %buttons
+  menu delete remove , %buttons
+  return
+  }
+
+sub search
+  {
+  if %buttons = 0
+     return
+  ignoreitem reset
+  ignoreitem %ignored , %creatures
+  set %limit %buttons - 1
+  for %sfm %limit 0
+    {
+    wait 1
+    finditem %tid . %sfm G_ . %radio_de_accion
+    if #findcnt = 0
+      {
+      gosub remove %sfm
+      continue
+      }
+    event property #findid
+    str pos #property $
+    set %left #strres - 1
+    str left #property %left
+    if %name . %sfm <> #strres || #findrep <> %rep . %sfm
+      gosub remove %sfm
+    else
+      ignoreitem %tid . %sfm
+    }
+  return
+  }
+
+;------------MENU--------------------------------
+
+Sub Menu
+  {
+  menu Clear
+  menu Window Title Kill List
+  menu Window Color Black
+  menu Window Size 185 #CLIYRES ; <-- TAMAÑO DE LA VENTANA
+  menu Font Transparent #true
+  menu Font Align Right
+  menu Font Name Arial
+  menu Font Size 8
+  menu Font Style
+  menu Font Color WindowText
+  set %down #cliyres - 25
+  menu Font Color Silver
+  menu Font Align Left
+  menu Font BGColor Black
+  menu Check melee 5 %down 150 25 #false Auto-Atacck
+  menu Font Color WindowText
+  menu Font BGColor BtnFace
+  menu Button reset 160 %down 25 25 R
+  menu Show #CLIXRES -3
+  menu Show #CLIXRES -3
+  menu HideEUO
+  return
+  }
