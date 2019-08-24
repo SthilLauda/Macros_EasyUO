@@ -73,7 +73,7 @@ set %version v5.2
 ;======================
 ; La macro funciona con una 1 montura + 1 familiar + 1 Golem.
 ; La barra de salud de la montura debe estar al frente, en el foco.
-; IMPORTANTE -> Intentar NO cerrar la barra de salud, taparla, o moverla mientras la macro funciona (aunque volverá a su sitio).
+; IMPORTANTE -> Intentar NO cerrar las barras de salud, taparlas, o moverlas mientras la macro funciona (aunque volverán a su sitio).
 ;________________________________
 ;
 ; ///////////////////////////////
