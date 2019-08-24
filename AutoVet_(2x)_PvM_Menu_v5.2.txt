@@ -86,11 +86,11 @@ set %version v5.2
 ; el EasyUO abierto al lado de la ventana del UO y poder mirar el EasyUO al mismo tiempo que mueves la barra de salud.
 ;--------
 ; MONTURA
-set %PosicionBarraSaludMontura1_X 346 ; La coordenada X de la pantalla donde situar la barrra de salud de la primera montura
-set %PosicionBarraSaludMontura1_Y 708 ; La coordenada Y de la pantalla donde situar la barrra de salud de la primera montura
+set %PosicionBarraSaludMontura1_X 346 ; La coordenada X de la pantalla donde situar la barrra de salud de tu MONTURA.
+set %PosicionBarraSaludMontura1_Y 708 ; La coordenada Y de la pantalla donde situar la barrra de salud de tu MONTURA.
 ; FAMILIAR
-set %PosicionBarraSaludFamiliar_X 192 ; La coordenada X de la pantalla donde situar la barrra de salud de la segunda montura
-set %PosicionBarraSaludFamiliar_Y 708 ; La coordenada Y de la pantalla donde situar la barrra de salud de la segunda montura
+set %PosicionBarraSaludFamiliar_X 192 ; La coordenada X de la pantalla donde situar la barrra de salud de tu FAMILIAR.
+set %PosicionBarraSaludFamiliar_Y 708 ; La coordenada Y de la pantalla donde situar la barrra de salud de tu FAMILIAR.
 ;==============================================================================================================
 ; Libro de Runas y posición de la runa a la que quieres viajar... Un establo, el banco, tu casa, etc.
 set %nombre_libro TAMER ; Escribe el nombre de tu libro de runas donde tienes la runa a los establos.
