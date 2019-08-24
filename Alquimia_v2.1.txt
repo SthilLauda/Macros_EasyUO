@@ -218,9 +218,11 @@ if ( %start )
             set #LOBJECTID #FINDID
             event macro 17 0
             gosub wait_for GUMP 530_480 30
-            click 64 210  f
+            contpos 40 40
+            click 64 210 f dmc
             gosub wait_for GUMP 530_480 30
-            click 269 109 f
+            contpos 40 40
+            click 269 109 f dmc
             gosub wait_for GUMP 530_480 50
           }
      }
@@ -230,7 +232,8 @@ if ( %start )
                {
                  goto _craft_menu
                }
-          click 326 495 f
+          contpos 40 40     
+          click 326 495 f dmc
           gosub wait_for GUMP 530_480 50
         }
 finditem %botellas C_ , #BACKPACKID
