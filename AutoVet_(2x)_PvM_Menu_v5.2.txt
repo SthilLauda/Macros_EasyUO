@@ -116,7 +116,7 @@ set %distancia_hechizos 7 ; La distancia máxima en TILES con tu MASCOTA en la q
 ;========================================================
 set %ALIMENTAR #FALSE         ; Si quieres alimentarlo ponlo a "#TRUE" (ES LO IDEAL PARA MACREAR FAMILIARES).
 set %tipo_alimentacion FRUTA  ; La otra opción es "CARNE".
-set %tiempo_alimentacion_mascota 1800 ; No sé muy bien qué poner... de momento unos 1800 ( 30min ) :D
+set %tiempo_alimentacion_mascota 1800 ; No sé muy bien qué poner... de momento unos 1800 segundos ( 30min ) :D
 ;==============================================================================================================
 ; Macro del UO "bow" ( Viene incluida de serie ). Es para cambiar el foco a la pantalla del UO.
 set %tecla_saludo_1 b
