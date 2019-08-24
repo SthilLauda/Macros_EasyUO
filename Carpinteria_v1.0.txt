@@ -6,7 +6,7 @@
 ;   `|...|'  .||.   `|..' .||. .||    ||. `|..||. .//       \\. .||. .||. `|..||. .||  ||. /... `|..||.
 ; =====================================================================================================
 ;
-; Script Name: Carpintería
+; Script Name: CarpinterÃ­a
 ;                                            __
 ;                                _____....--' .'
 ;                      ___...---'._ o      -`(
@@ -21,16 +21,16 @@
 ; Version: 1.10
 ; Client Tested with: 2.0.3
 ; EUO version tested with: EasyUO 1.5 Version 243
-; Shard: Ultima Alianza (¡Hasta la muerte!)
-; Public Release: 02/11/18
-; Revised On: 02/11/18
-; Purpose: Fabrica lotes de mapas o pergaminos para subir la habilidad de carpintería.
+; Shard: Ultima Alianza (Â¡Hasta la muerte!)
+; Public Release: 24/08/2019
+; Revised On: 24/08/2019
+; Purpose: Fabrica lotes de mapas o pergaminos para subir la habilidad de carpinterÃ­a.
 ; Instrucciones: Configurar un cofre con madera, bolsa con serruchos, y bolsa para dejar los mapas fabricados.
 set %version v1.10
 ;________________________________
 ;
 ; ///////////////////////////////
-; ******** CONFIGURACIÓN ********
+; ******** CONFIGURACIÃ“N ********
 ; ///////////////////////////////
 ;________________________________
 ;
@@ -40,11 +40,11 @@ set %TipodeLotes 1 ; 1 = Lote de Mapas en Blanco y 2 = Lote de Pergaminos en Bla
 set %bolsaMateriales ZPFXMND ; Bolsa donde se encuentra la madera
 set %bolsaMapas LWHDKOD      ; Bolsa para dejar los mapas fabricados.
 set %bolsaSerruchos HHSQEPD  ; Bolsa donde se encuentran los Serruchos
-set %tiempo_alimentacion 360 ; Cada cuántos segundos va a comprobar si tiene hambre (6 minutos).
+set %tiempo_alimentacion 360 ; Cada cuÃ¡ntos segundos va a comprobar si tiene hambre (6 minutos).
 ;________________________________________________
 ;
 ; //////////////////////////////////////////////
-; ************* FIN CONFIGURACIÓN *************
+; ************* FIN CONFIGURACIÃ“N *************
 ; //////////////////////////////////////////////
 ;________________________________________________
 ;
@@ -70,7 +70,7 @@ Inicio:
 chooseskill carp real
 if #SKILL >= 1000
    {
-     display ¡Somos GM Carpinteria! :-) ; Somos GM Carpentry
+     display Â¡Somos GM Carpinteria! :-) ; Somos GM Carpentry
      halt
    }
 set %tiempo_actual #SCNT
@@ -188,14 +188,14 @@ return
 sub comprobar_comida
 {
   hambriento:
-  set %jrnl #jindex ; Marcamos un índice de las líneas del diario.
+  set %jrnl #jindex ; Marcamos un Ã­ndice de las lÃ­neas del diario.
   event macro 4 0 .hungry
   wait 20
   while #true
      {
-       if #jindex > %jrnl ; Si aparece una nueva línea.
+       if #jindex > %jrnl ; Si aparece una nueva lÃ­nea.
           {
-            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de línea.
+            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de lÃ­nea.
             scanjournal %jrnl   ; La leemos...
             if Dentro_de_1_minuto in #journal
                {
@@ -225,7 +225,7 @@ sub comprobar_comida
                                  set %proxima_vez %tiempo_actual + %tiempo_alimentacion
                                }
                        }
-                       else ; Mensaje extraño, repetimos...
+                       else ; Mensaje extraÃ±o, repetimos...
                           {
                             goto hambriento
                           }
@@ -255,7 +255,7 @@ sub waitforitem
 
 ;-@ ============================== @-;
 ;-@ ############################## @-;
-;-@ SUBS públicos del Foro EasyUO  @-;
+;-@ SUBS pÃºblicos del Foro EasyUO  @-;
 ;-@ ############################## @-;
 ;-@ ============================== @-;
 
@@ -396,7 +396,7 @@ goto _lets_wait_for_a_message
 ;======================================================================
 sub wait_for_GUMP ; version 1.4 ~Locke
 ;=================================================================
-; Añadido #CONTID ^^
+; AÃ±adido #CONTID ^^
 if !_A0 < 3
 {
 display ok You haven't specified enough vars.$
