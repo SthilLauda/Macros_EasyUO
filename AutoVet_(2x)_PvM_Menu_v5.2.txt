@@ -511,6 +511,7 @@ return
 ;========================================================
 
 sub pocion_veterinaria
+set %CurebyPots #FALSE
 finditem WUF C_ , #BACKPACKID
 if #FINDCNT > 0
    {
@@ -518,6 +519,7 @@ if #FINDCNT > 0
          {
            if #FINDCOL = 2975 ; Curación animal
               {
+                set %CurebyPots #TRUE
                 set #LOBJECTID #FINDID
                 event macro 17
                 target
@@ -526,7 +528,17 @@ if #FINDCNT > 0
                 event macro 22
               }
          }
+     if ( ! %CurebyPots )
+          {
+            set #SYSMSGCOL 38
+            event sysmessage NO HAY POCIONES!
+          }
    }
+   else
+      {
+        set #SYSMSGCOL 38
+        event sysmessage NO HAY POCIONES!
+      }
 return
 
 sub buttonloop
