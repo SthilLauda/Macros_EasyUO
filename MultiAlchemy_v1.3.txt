@@ -362,6 +362,7 @@ if ( %start1 )
                {
                  goto _craft_menu
                }
+          contpos 40 40     
           click 326 495 f dmc
           gosub wait_for GUMP 530_480 50
           gosub checkllenar
@@ -547,104 +548,130 @@ return
 sub clickPoti
 if %veneno_menor ; Venenos
    {
+     contpos 40 40
      click 64 210 f
      gosub wait_for GUMP 530_480 30
+     contpos 40 40
      click 269 109 f
      gosub wait_for GUMP 530_480 50
      return
    }
 if %invis ; Mixturas
    {
+     contpos 40 40
      click 67 270 f
      gosub wait_for GUMP 530_480 30
+     contpos 40 40
      click 275 250 f
      gosub wait_for GUMP 530_480 50
      return
    }
 if %curacion ; Curación
    {
+     contpos 40 40
      click 67 190 f
      gosub wait_for GUMP 530_480 30
+     contpos 40 40
      click 273 149 f
      gosub wait_for GUMP 530_480 50
      return
    }
 if %fuerza ; Atributos
    {
+     contpos 40 40
      click 67 130 f
      gosub wait_for GUMP 530_480 30
+     contpos 40 40
      click 274 170 f
      gosub wait_for GUMP 530_480 50
      return
    }
 if %agilidad ; Atributos
    {
+     contpos 40 40
      click 67 130 f
      gosub wait_for GUMP 530_480 30
+     contpos 40 40
      click 274 130 f
      gosub wait_for GUMP 530_480 50
      return
    }
 if %antidoto ; Antídoto
    {
+     contpos 40 40
      click 67 230 f
      gosub wait_for GUMP 530_480 30
+     contpos 40 40
      click 274 150 f
      gosub wait_for GUMP 530_480 50
      return
    }
 if %resistencia ; Resistencia
    {
+     contpos 40 40
      click 67 150 f
      gosub wait_for GUMP 530_480 30
+     contpos 40 40
      click 274 130 f
      gosub wait_for GUMP 530_480 50
      return
    }
 if %inteligencia ; Atributos
    {
+     contpos 40 40
      click 67 130 f
      gosub wait_for GUMP 530_480 30
+     contpos 40 40
      click 274 210 f
      gosub wait_for GUMP 530_480 50
      return
    }
 if %bendecir ; Atributos
    {
+     contpos 40 40
      click 67 130 f
      gosub wait_for GUMP 530_480 30
+     contpos 40 40
      click 274 230 f
      gosub wait_for GUMP 530_480 50
      return
    }
 if %encojer ; Mixturas
    {
+     contpos 40 40
      click 67 270 f
      gosub wait_for GUMP 530_480 30
+     contpos 40 40
      click 274 169 f
      gosub wait_for GUMP 530_480 50
      return
    }
 if %piel_piedra ; Mixturas
    {
+     contpos 40 40
      click 67 270 f
      gosub wait_for GUMP 530_480 30
+     contpos 40 40
      click 274 230 f
      gosub wait_for GUMP 530_480 50
      return
    }
 if %explosion ; Explosión
    {
+     contpos 40 40
      click 67 250 f
      gosub wait_for GUMP 530_480 30
+     contpos 40 40
      click 274 150 f
      gosub wait_for GUMP 530_480 50
      return
    }
 if %mana ; Maná
    {
+     contpos 40 40
      click 67 170 f
      gosub wait_for GUMP 530_480 30
+     contpos 40 40
      click 274 130 f
      gosub wait_for GUMP 530_480 50
      return
