@@ -44,28 +44,28 @@
 ; Public Release: 24/03/2006
 ; Global Variables Used: none
 set %version 2.4
-; Purpose: Crea una lista de todos los players o monstruos cerca tuya, para atacarlos con un botón.
+; Purpose: Crea una lista de todos los players o monstruos cerca tuya, para atacarlos con un botÃ³n.
 ; Thanks to: a_goat for the idea/inspiration to create this script.
 ;==============================================
 ;________________________________
 ;
 ; ///////////////////////////////
-; ******** CONFIGURACIÓN ********
+; ******** CONFIGURACIÃ“N ********
 ; ///////////////////////////////
 ;________________________________
 ;
 set %radio_de_accion 25
-set %guildtag [****] , #spc , $  ; -> Aquí va la etiqueta del clan, para ignorar a sus PJ's.
-; Macro del UO "bow" ( Viene incluida de serie )
+set %guildtag [****] , #spc , $  ; -> AquÃ­ va la etiqueta del clan, para ignorar a sus PJ's.
+; Macro del UO "bow" ( Viene incluida de serie ).
 set %tecla_saludo_1 b
 set %tecla_saludo_2 ctrl
-; Tamaño de los botones
+; TamaÃ±o de los botones
 set %buttonheight 20
 set %buttondistance 2
 ;________________________________________________
 ;
 ; //////////////////////////////////////////////
-; ************* FIN CONFIGURACIÓN *************
+; ************* FIN CONFIGURACIÃ“N *************
 ; //////////////////////////////////////////////
 ;________________________________________________
 ;
@@ -171,8 +171,8 @@ if ( #CHARID <> %PJ_actual ) ; Hemos cambiado de personaje...
 return
 
 sub selectMode
-display yesno ******************** ¡MODO PVP! **********************$$
-            + ¿Quieres activar el modo PVP/PK? (Incluir PJ's azules) $$
+display yesno ******************** Â¡MODO PVP! **********************$$
+            + Â¿Quieres activar el modo PVP/PK? (Incluir PJ's azules) $$
             + ********************************************************$$
 if #dispres = yes ; PVP
    {
@@ -195,7 +195,7 @@ chooseskill Anil real ; Animal Lore
 set %conocimiento_animal #SKILL
 chooseskill Anim real ; Animal Taming
 set %domar #SKILL
-chooseskill Chiv real ; Caballería
+chooseskill Chiv real ; CaballerÃ­a
 set %caballeria #SKILL
 chooseskill Arch real ; Archery
 set %archery #SKILL
@@ -211,7 +211,7 @@ chooseskill Eval real ; Evaluating
 set %eval #SKILL
 chooseskill Medi real ; Meditation
 set %medit #SKILL
-if ( %conocimiento_animal >= 850 ) && ( %domar >= 850 ) ; Mínimo de skill para que te hagan caso las monturas, etc.
+if ( %conocimiento_animal >= 850 ) && ( %domar >= 850 ) ; MÃ­nimo de skill para que te hagan caso las monturas, etc.
      {
        set #SYSMSGCOL 73
        event sysmessage MODO TAMER ACTIVADO!
@@ -373,7 +373,7 @@ Sub Menu
   menu Clear
   menu Window Title Kill List
   menu Window Color Black
-  menu Window Size 185 #CLIYRES ; <-- TAMAÑO DE LA VENTANA
+  menu Window Size 185 #CLIYRES ; <-- TAMAÃ‘O DE LA VENTANA
   menu Font Transparent #true
   menu Font Align Right
   menu Font Name Arial
