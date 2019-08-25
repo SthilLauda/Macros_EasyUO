@@ -7,6 +7,20 @@
 ; ======================================================================================================
 ;
 ; Script Name: Petrificar
+;             .--,
+;           ( (`  ,--.
+;      ,--.  ) )\  `) ).--,
+;       `) )/ /) ) ( (( (`
+;       / /( (.  "-.) )) )
+;   ,-.( ( /          / /,--,
+;    `) \ ` ==.    .==  ( (`
+;    ( (_) ~6~      ~6~ _) )
+;     \_ (      )(      )_/
+;    ,-,\ \     ^^     /\ ,-.
+;   ( (_/ /\    __,   /\ \_) )
+;    '._.' _\  /__/  /_ '._.'
+;      .--`  \ `    /  `--.
+;             '----'  
 ; Author: Sthil Lauda
 ; Version: 1.2
 ; Client Tested with: 2.0.3
@@ -15,6 +29,7 @@
 ; Public Release: 13/01/2019
 ; Global Variables Used: none
 ; Purpose: Elige un objetivo y lo petrifica. Mide la distancia hasta el objetivo y soporta el modo "oculto/hiding" :-)
+;
 set %version v1.2
 ;________________________________
 ;
