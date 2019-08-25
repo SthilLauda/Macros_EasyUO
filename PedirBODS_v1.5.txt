@@ -50,6 +50,8 @@ if ( #SCNT > %bod_timer )
             {
               event macro 1 0 bod
               set %bod_timer #SCNT + %bod_time ; Fijar el tiempo del siguiente BOD.
+              wait 20
+              event macro 1 0 Gracias, mi lord
             }
             else
                {
@@ -73,6 +75,7 @@ if ( #SCNT > %bod_timer )
                         gosub wait_for MSG Pones_el_Orden_de_pedido Tengo_un_trabajo_para_ti 40 ; Hemos pedido un BOD :-)
                       }
                       until #TRUE in #RESULT
+                      event macro 1 0 Gracias, mi lord
                       set %bod_timer #SCNT + %bod_time ; Fijar el tiempo del siguiente BOD.
                }
      }
