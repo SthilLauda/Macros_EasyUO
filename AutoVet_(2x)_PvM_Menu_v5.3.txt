@@ -1677,21 +1677,21 @@ return
 ; Da de comer a la mascota indicada en el parámetro
 sub alimentar
 {
-  set %montura %1
+  set %pet_id %1
   finditem %comida C_ , #BACKPACKID
   if #FINDCNT > 0
      {
          Exevent Drag #FINDID 1
-         Exevent Dropc %montura
+         Exevent Dropc %pet_id
          wait 30
      }
-  if %montura = %montura
+  if %pet_id = %montura
      {
        set %cronometro_alimentacion1 #SCNT
      }
      else
         {
-          if %montura = %familiar
+          if %pet_id = %familiar
              {
                set %cronometro_alimentacion2 #SCNT
              }
