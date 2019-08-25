@@ -8,33 +8,33 @@
 ;
 ; Script Name: Petrificar
 ; Author: Sthil Lauda
-; Version: 1.1
+; Version: 1.2
 ; Client Tested with: 2.0.3
 ; EUO version tested with: EasyUO 1.5 Version 243
-; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Shard: Ultima Alianza (Â¡Hasta la muerte!)
 ; Public Release: 13/01/2019
 ; Global Variables Used: none
 ; Purpose:
-set %version v1.1
+set %version v1.2
 ;________________________________
 ;
 ; ///////////////////////////////
-; ******** CONFIGURACIÓN ********
+; ******** CONFIGURACIÃ“N ********
 ; ///////////////////////////////
 ;________________________________
 ;
 ; Aqui ponemo la tecla que queramos usar para activar el Orbe petrificador.
-; También se puede hacer con ; A-Z, 0-9, F1-F12, ESC, BACK, TAB, ENTER, PAUSE, CAPSLOCK, SPACE, PGDN, PGUP,
+; TambiÃ©n se puede hacer con ; A-Z, 0-9, F1-F12, ESC, BACK, TAB, ENTER, PAUSE, CAPSLOCK, SPACE, PGDN, PGUP,
 ; END, HOME, LEFT, RIGHT, UP, DOWN, PRNSCR, INSERT, DELETE, NUMLOCK, SCROLLLOCK.
 set %tecla INSERT
-; Mínimo de cargas en el Orbe para empezar a avisar
+; MÃ­nimo de cargas en el Orbe para empezar a avisar
 set %min_cargas 2
 ; Tiempo de recarga del Orbe (No hace falta modificarlo a no ser que el server cambie)
 set %tiempo_recarga 800
 ;________________________________
 ;
 ; ///////////////////////////////
-; ****** FIN CONFIGURACIÓN ******
+; ****** FIN CONFIGURACIÃ“N ******
 ; ///////////////////////////////
 ;________________________________
 ;
@@ -86,7 +86,7 @@ onhotkey %tecla
                                 if ( #FINDDIST > 3 )
                                      {
                                        set #SYSMSGCOL 48 ; Naranja
-                                       repeat ; Esperar a que el target esté lo suficientemente cerca
+                                       repeat ; Esperar a que el target estÃ© lo suficientemente cerca
                                             {
                                               finditem %objetivo
                                               if #FINDDIST <> N/A
@@ -158,7 +158,7 @@ gosub wait_for MSG Ya_puedes_usar_el_orbe 3
 if ( #TRUE in #RESULT ) || ( #SCNT > %tiempo_orbe )
      {
        set %cargado #TRUE ; Avisamos en color.
-       set %tiempo_orbe #SCNT ; Reseteamos el cronómetro.
+       set %tiempo_orbe #SCNT ; Reseteamos el cronÃ³metro.
        goto loop ; Volvemos al principio.
      }
 goto _recarga
@@ -205,7 +205,7 @@ if #FINDCNT > 0
                           set %start_orbe #FALSE
                           set %cargas 0
                           sound
-                          display EL ORBE ESTA GASTADO! ¬¬ $$
+                          display EL ORBE ESTA GASTADO! Â¬Â¬ $$
                           return
                         }
                         else
@@ -235,13 +235,13 @@ if #FINDCNT > 0
              {
                set %start_orbe #FALSE
                sound
-               display NO HAY ORBE EN LA MOCHILA ¬¬ $$
+               display NO HAY ORBE EN LA MOCHILA Â¬Â¬ $$
                return
              }
              else
                 {
                   set #SYSMSGCOL 38
-                  event sysmessage NO HAY NINGUN ORBE ¬¬!!
+                  event sysmessage NO HAY NINGUN ORBE Â¬Â¬!!
                 }
       }
 return
@@ -284,7 +284,7 @@ return
 
 ;-@ ============================== @-;
 ;-@ ############################## @-;
-;-@ SUBS públicos del Foro EasyUO  @-;
+;-@ SUBS pÃºblicos del Foro EasyUO  @-;
 ;-@ ############################## @-;
 ;-@ ============================== @-;
 ;
