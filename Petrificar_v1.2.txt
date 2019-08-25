@@ -1,0 +1,591 @@
+; ======================================================================================================
+;  '||   ||` '||`   ||                                 /.\      '||`
+;   ||   ||   ||    ||     ''                         // \\      ||   ''
+;   ||   ||   ||  ''||''   ||  '||),,(|,   '''|.     //...\\     ||   ||   '''|.  `||''|,  '''/  '''|.
+;   ||   ||   ||    ||     ||   || || ||  .|''||    //     \\    ||   ||  .|''||   ||  ||   //  .|''||
+;   `|...|'  .||.   `|..' .||. .||    ||. `|..||. .//       \\. .||. .||. `|..||. .||  ||. /... `|..||.
+; ======================================================================================================
+;
+; Script Name: Petrificar
+; Author: Sthil Lauda
+; Version: 1.1
+; Client Tested with: 2.0.3
+; EUO version tested with: EasyUO 1.5 Version 243
+; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Public Release: 13/01/2019
+; Global Variables Used: none
+; Purpose:
+set %version v1.1
+;________________________________
+;
+; ///////////////////////////////
+; ******** CONFIGURACIÓN ********
+; ///////////////////////////////
+;________________________________
+;
+; Aqui ponemo la tecla que queramos usar para activar el Orbe petrificador.
+; También se puede hacer con ; A-Z, 0-9, F1-F12, ESC, BACK, TAB, ENTER, PAUSE, CAPSLOCK, SPACE, PGDN, PGUP,
+; END, HOME, LEFT, RIGHT, UP, DOWN, PRNSCR, INSERT, DELETE, NUMLOCK, SCROLLLOCK.
+set %tecla INSERT
+; Mínimo de cargas en el Orbe para empezar a avisar
+set %min_cargas 2
+; Tiempo de recarga del Orbe (No hace falta modificarlo a no ser que el server cambie)
+set %tiempo_recarga 800
+;________________________________
+;
+; ///////////////////////////////
+; ****** FIN CONFIGURACIÓN ******
+; ///////////////////////////////
+;________________________________
+;
+
+set %start_orbe #TRUE
+set %orbes WBBB ; Orbes petrificadores
+set %tiempo_orbe #SCNT
+set %start #TRUE
+set %aviso #FALSE
+set %cargado #FALSE
+
+set #SYSMSGCOL 88
+event sysmessage ===============
+set #SYSMSGCOL 53
+event sysmessage Petrificar %version
+set #SYSMSGCOL 88
+event sysmessage ===============
+wait 20
+
+gosub check_cargas ; Comprobamos las cargas antes de nada
+
+;========================================================
+;
+; ******************* LOOP PRINCIPAL ********************
+;
+;========================================================
+loop:
+if ( #SCNT > %tiempo_orbe && %aviso ) || ( %cargado )
+     {
+       set #SYSMSGCOL 1372 ; Verde
+       event sysmessage ORBE RECARGADO!
+       wait 10
+       set %cargado #FALSE
+       set %aviso #FALSE
+     }
+onhotkey %tecla
+         {
+           set %pre_petri #TRUE
+           gosub check_cargas ; Comprobamos las cargas antes de nada
+           if ( #SCNT > %tiempo_orbe )
+                {
+                  if ( %cargas > 0 )
+                       {
+                         gosub TargetOn ; Pillamos el Target
+                         _rePetri:
+                         finditem %objetivo
+                         if ( #FINDCNT > 0 && #FINDDIST <> N/A ) ; Si el objetivo sigue estando
+                              {
+                                if ( #FINDDIST > 3 )
+                                     {
+                                       set #SYSMSGCOL 48 ; Naranja
+                                       repeat ; Esperar a que el target esté lo suficientemente cerca
+                                            {
+                                              finditem %objetivo
+                                              if #FINDDIST <> N/A
+                                                 {
+                                                   event sysmessage DISTANCIA: #FINDDIST casillas...
+                                                   wait 20
+                                                 }
+                                            }
+                                       until ( #FINDDIST <= 3 || #FINDDIST = N/A || #FINDCNT = 0 ) && ( H Notin #CHARSTATUS ) ; <- Hiding ^^
+                                       if ( #FINDDIST = N/A || #FINDCNT = 0 ) ; El objectivo ha desaparecido
+                                            {
+                                              goto loop ; Volvemos al principio...
+                                            }
+                                     }
+                                gosub petrificar ; Petrificar con el Orbe
+                              }
+                         gosub wait_for MSG Logras_petrificar_a El_orbe_se_esta_recargando No_consigues No_tienes_linea_de_vision 3
+                         if ( #TRUE in #RESULT ) ; En caso de fallo, estar lejos, etc...
+                              {
+                                if ( No_consigues in #RESULT || No_tienes_linea_de_vision in #RESULT )
+                                     {
+                                       goto _rePetri ; Repetimos con el mismo objetivo
+                                     }
+                                if ( El_orbe_se_esta_recargando in #RESULT )
+                                     {
+                                       set %tiempo_orbe #SCNT + %tiempo_recarga
+                                       set %aviso #TRUE
+                                       goto loop_recarga ; Nos vamos a esperar a la recarga...
+                                     }
+                                if ( Logras_petrificar_a in #RESULT )
+                                     {
+                                       set %tiempo_orbe #SCNT + %tiempo_recarga
+                                       set %aviso #TRUE
+                                       set %pre_petri #FALSE
+                                       gosub check_cargas ; Comprobamos las cargas antes de nada
+                                       goto loop ; Volvemos al principio...
+                                     }
+                              }
+                       }
+                       else
+                          {
+                            set #SYSMSGCOL 38
+                            event sysmessage NO QUEDAN CARGAS!!
+                            wait 10
+                          }
+                }
+                else
+                   {
+                     set #SYSMSGCOL 18
+                     set %restante %tiempo_orbe - #SCNT
+                     event sysmessage ORBE SIN RECARGAR!! [ %restante Secs ]
+                     wait 10
+                   }
+         }
+goto loop
+;========================================================
+;
+; ***************** FIN LOOP PRINCIPAL *****************
+;
+;========================================================
+
+loop_recarga:
+set #SYSMSGCOL 23
+event sysmessage ESPERANDO RECARGA...
+wait 20
+_recarga:
+set %jstart #jindex
+gosub wait_for MSG Ya_puedes_usar_el_orbe 3
+if ( #TRUE in #RESULT ) || ( #SCNT > %tiempo_orbe )
+     {
+       set %cargado #TRUE ; Avisamos en color.
+       set %tiempo_orbe #SCNT ; Reseteamos el cronómetro.
+       goto loop ; Volvemos al principio.
+     }
+goto _recarga
+
+;==========================
+; Pretifica a un objectivo
+;==========================
+sub petrificar
+set %jstart #jindex
+set #LOBJECTID %orbe
+event macro 17
+target
+set #LTARGETID %objetivo
+set #LTARGETKIND 1
+event macro 22
+wait 40
+return
+;==============================
+; Controla las cargas del Orbe
+;==============================
+sub check_cargas
+finditem %orbes C_ , #BACKPACKID
+if #FINDCNT > 0
+   {
+     set %orbe #FINDID
+     event property %orbe
+     set %string #property
+     gosub split %string $ Propiedades
+     set %cargas %PROPIEDADES2
+     str Pos %cargas :
+     str Del %cargas 1 8
+     set %cargas #strres
+     str Len %cargas
+     set %len #strres
+     str Pos %cargas /
+     str Del %cargas #strres %len
+     set %cargas #strres
+     if ( %cargas <= %min_cargas ) && ( ! %pre_petri || %start )
+          {
+            if ( %cargas = 0 )
+                 {
+                   if ( %start_orbe ) ; Si acabamos de encender la macro...
+                        {
+                          set %start_orbe #FALSE
+                          set %cargas 0
+                          sound
+                          display EL ORBE ESTA GASTADO! ¬¬ $$
+                          return
+                        }
+                        else
+                           {
+                             set #SYSMSGCOL 38
+                             event sysmessage EL ORBE SE HA GASTADO!!
+                           }
+                 }
+            set #SYSMSGCOL 48
+            event sysmessage CUIDADO!! QUEDAN %cargas CARGAS!!
+            wait 10
+          }
+          else
+             {
+               if ( %cargas > %min_cargas ) && ( ! %pre_petri || %start )
+                    {
+                      set #SYSMSGCOL 72
+                      event sysmessage ORBE OK: %cargas CARGAS
+                      wait 10
+                    }
+             }
+     set %start #FALSE
+   }
+   else
+      {
+        if ( %start_orbe ) ; Si acabamos de encender la macro
+             {
+               set %start_orbe #FALSE
+               sound
+               display NO HAY ORBE EN LA MOCHILA ¬¬ $$
+               return
+             }
+             else
+                {
+                  set #SYSMSGCOL 38
+                  event sysmessage NO HAY NINGUN ORBE ¬¬!!
+                }
+      }
+return
+
+;=================================
+; Adquirir un target para el Orbe
+;=================================
+sub TargetOn
+set %objetivo N/A
+set #LTARGETID N/A
+set %tiempo_click #scnt + 5 ; Tiempo de espera en segundos para hacer click
+repeat
+     {
+       _TargetOn:
+       if #TARGCURS = 1 ; Limpiamos el target
+          {
+            key esc
+            wait 5
+          }
+       set #TARGCURS 1 ; Nuevo target
+       target
+       while ( #TARGCURS = 1 ) ; Esperamos al click...
+               {
+                 wait 1
+               }
+       if ( #LTARGETID <> YC )
+            {
+              set %objetivo #LTARGETID
+            }
+            else
+               {
+                 set #SYSMSGCOL 1360
+                 event sysmessage CANCELADO!
+                 wait 20
+                 goto loop
+               }
+     }
+     until ( %objetivo <> N/A || #scnt < %tiempo_click )
+return
+
+;-@ ============================== @-;
+;-@ ############################## @-;
+;-@ SUBS públicos del Foro EasyUO  @-;
+;-@ ############################## @-;
+;-@ ============================== @-;
+;
+;**
+;* Splits a string by a divider into an array and
+;* copies the result into the desired namespace
+;* @param %1 The string to split
+;* @param %2 Divider
+;* @param %3 Array name
+;* @param %4 {optional} Result namespace. If no
+;*           namespace is given it will create the
+;*           array using the %-notation
+;* @sideEffects Creates a number of variables
+;*              with name as given in %3 followed by
+;*              a digit
+;* @returns The length of the array
+sub split
+  namespace Push
+  namespace Local split , #systime
+  set !lpc #lpc
+  if #lpc < 500
+     set #lpc 500
+
+  set !string %1
+  set !divider %2
+  set !arrayName %3
+  if %0 > 3
+     set !namespace %4
+  else
+     set !namespace #false
+
+  set !length 0
+  repeat
+  {
+     set !length !length + 1
+     str Pos !string !divider 1
+     if #strRes = 0
+     {
+        set !done #true
+        set ! . !arrayName , !length !string
+     }
+     else
+     {
+        set !pos #strRes
+        set !len !pos - 1
+        str Left !string !len
+        set ! . !arrayName , !length #strRes
+        str Del !string 1 !pos
+        set !string #strRes
+     }
+  }
+  until ( !done = #true )
+  set #result !length
+
+  if !namespace <> #false
+  {
+     namespace Copy !arrayName , * To Local !namespace
+  }
+  else
+  {
+    for !i 1 #result
+    {
+       set !value !arrayName , !i
+       set % . !arrayName , !i ! . !value
+    }
+  }
+  set #lpc !lpc
+  namespace Clear
+  namespace Pop
+return #result
+
+;=================================================================
+sub wait_for
+;=================================================================
+; This "wait_for" sub package was created by Locke. If you use these subs please keep this header intact.
+; // end header
+; Documentation: the sub package grew to large with all the comments. To load them call the sub like this:
+; gosub wait_for docs    | or you can use doc, documention, what, or my personal favorite, kickass.
+; Thanks to ~BookWibble~ for helping with all the debugging and spotting a bug or three.
+; "wait_for core dispatcher" version 1.3 by Locke
+if %1 = doc || if %1 = docs || if %1 = documentation || if %1 = what || if %1 = kickass
+{
+Display ok Please click ok and wait for your browser to start.
+execute http://www.easyuo.com/forum/viewtopic.php?t=24716
+halt
+}
+nameSpace Push
+namespace local LLNS
+set #result N/A ; if #result isn't set by one of my wait_for subs it'll throw an error.
+set !LPC #lpc
+set #lpc 200
+for %i 0 %0
+set !_A . %i % . %i
+gosub wait_for_ , !_A1
+ignoreitem reset LLWAITFOR
+set #lpc !lpc
+namespace clear LLNS
+namespace pop
+if #result <> N/A
+return #result
+else
+display ok You specified an unknown wait_for command. Script returned #result and is halting.
+halt
+
+;======================================================================
+sub wait_for_MSG ; version 1.4 ~Locke
+;=================================================================
+if !_A0 < 3
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for MSG %message % , time_out_in_seconds$
++Script is halting
+halt
+}
+set !_timeout ( #scnt + !_A . !_A0 )
+_lets_wait_for_a_message:
+for %i %jstart #jindex
+{
+ scanjournal %i
+  for %ii 2 !_A0
+  {
+    if !_A . %ii in #journal && %jstart <> %i
+    set #result #true , #spc , !_A . %ii
+  }
+}
+
+if #true notin #result
+{
+set #result #false
+ if !_timeout =< #scnt
+ return #result
+wait 1
+goto _lets_wait_for_a_message
+}
+else
+return #result
+
+wait 1
+goto _lets_wait_for_a_message
+
+
+;======================================================================
+sub wait_for_GUMP ; version 1.4 ~Locke
+;=================================================================
+if !_A0 < 3
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for GUMP XXX_YYY % , time_out_in_seconds$
++Script is halting
+halt
+}
+if !_A3 <> CLOSE
+set !_timeout #scnt + !_A3
+else
+set !_timeout 0 ; no gump wait if %3 = CLOSE since we already believe it to be open.
+
+_lets_wait_for_a_gump:
+if #CONTSIZE = !_A2 || #CONTKIND = !_A2 || #CONTNAME = !_A2 || #CONTTYPE = !_A2
+{
+  if !_A5 <> N/A && !_A6 <> N/A
+  {
+  set !clickx !_A5 + #contposx
+  set !clicky !_A6 + #contposy
+  click !clickx !clicky
+  }
+  if !_A3 = CLOSE || if !_A4 = CLOSE || !_A5 = CLOSE || !_A6 = CLOSE
+  {
+  set !string #contsize
+  str pos !string _
+  set !pos #strres
+  str del !string #strres #strres
+  set !clickX #contposx + ( #strres / 2 )
+  str del !string 1 !pos
+  set !clickY #contposy + ( #strres / 2 )
+  click !clickx !clicky R
+  }
+return #true
+}
+
+if !_timeout =< #scnt && !_A4 = N/A
+return #false
+
+if !_A4 <> N/A && !_timeout =< #scnt
+{
+finditem !_A4
+ if #findkind <> -1
+ {
+  for #findindex 1 #findcnt
+  {
+   if #finddist > 2
+   ignoreitem #findid LLWAITFOR
+   else
+   break
+  }
+  set #lobjectid #findid
+  event macro 17 0
+  set !_timeout #scnt + !_A3
+ }
+ else
+ return #false
+}
+wait 1
+goto _lets_wait_for_a_gump
+
+;======================================================================
+sub wait_for_HOTKEY ; Version 0.8 ~Locke
+;=================================================================
+if !_A0 < 4
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for HOTKEY KEY ACTION % , time_out_in_seconds$
++Script is halting
+halt
+}
+set #lpc 300
+set %key_pressed N/A
+set !_Timeout !_A . !_A0 + #scnt
+repeat
+{
+ for %i 2 !_A0
+ {
+ set !_key !_A . %i
+ onhotkey !_key
+ set %key_pressed !_Key
+ }
+}
+until !_timeout =< #scnt || %key_pressed <> N/A
+if %key_pressed <> N/A
+{
+for !i 2 !_A0
+{
+set !key_pos !_A . !i
+if %key_pressed in !key_pos
+break
+}
+set !i !i + 1
+set !next_var !_A . !i
+}
+if set in !next_var && %key_pressed <> N/A
+{
+set !string !next_var
+str pos !string _
+str del !string 1 #strres
+set !string #strres
+str pos !string _
+set !pos #strres - 1
+set !realpos #strres
+str left !string !pos
+set !var #strres
+str del !string 1 !realpos
+set % . !var #strres
+return % . !var
+}
+if %key_pressed <> N/A
+return !next_var
+
+return #false
+
+;======================================================================
+sub wait_for_ITEM ; Version 0.1 ~Locke
+;=================================================================
+; %A2 = #findid ; %A3 = C_ , %mod || G_ , %mod ; %A4 = wait_time in seconds
+if !_A0 < 4
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for ITEM # , findid C_ , % , mod % , timeout
++Script is halting
+halt
+}
+set !_timeout !_A4 + #scnt
+repeat
+{
+finditem !_A2 !_A3
+if #findkind <> -1
+return #true
+wait 1
+}
+until #scnt => !_timeout
+return #false
+
+
+;======================================================================
+sub wait_for_RECALL ; Version 0.1 ~Locke
+;=================================================================
+; %A2 = wait_time in seconds
+if !_A0 < 2
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for RECALL % , timeout
++Script is halting
+halt
+}
+set !_timeout !_A2 + #scnt
+set !old_POS_X #charposx
+set !old_POS_Y #charposy
+set !old_pos_Z #charposz
+repeat
+{
+if #CHARPOSX <> !old_POS_X || #CHARPOSY <> !old_POS_Y || #CHARPOSZ <> !old_POS_Z
+return #true
+wait 1
+}
+until #scnt => !_timeout
+return #false
