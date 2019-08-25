@@ -679,6 +679,10 @@ sub domar
 if ( #CHARGHOST <> yes )
      {
        gosub TargetOn
+       if %objetivo = N/A
+          {
+            return
+          }
        tame:
        set %jstart #jindex
        event macro 13 35
