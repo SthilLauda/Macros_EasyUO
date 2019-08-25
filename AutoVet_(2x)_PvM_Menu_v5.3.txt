@@ -54,20 +54,20 @@
 ; Public Release: 25/08/2019
 ; Revision Date: 25/08/2019
 ; Global Variables Used: none.
+set %version v5.3
 ; Purpose:
 ;          - Aplica vendas en base a la posición que hayas fijado apuntando con el mouse en la barra de salud de tu montura.
 ;          - Aplica pociones de curación animal (Solo al familiar).
-;          - Neutraliza el veneno con Magia (An Nox) en base al color lima del poison en la barra de salud de tu mascota.
-;          - Curación con Magia (In Vas Mani) ****AVISO**** ¡Esta opción consume toneladas de maná y regs!;
+;          - Neutraliza el veneno con Magia (An Nox) en base al color verde del poison en la barra de salud de tu montura o familiar.
+;          - Curación con Magia (In Vas Mani) **** ¡ AVISO ! **** ¡Esta opción consume mucho maná y toneladas de regs! XD
 ;          - Canción Himno de Batalla y Frenesí sobre el familiar, montura y golem.
 ;          - Resucita al familiar y a la montura automáticamente.
 ;          - Oculta a la montura con el hechizo "An Lor Xen".
-;          - Equipa arco y armadura de golem, y lo desarma y quita la armadura para encogerlo.
+;          - Equipa arco y armadura al golem, lo desarma y quita la armadura para encogerlo.
 ;          - Recalea a 1 una runa de tu elección en el libro que hayas configurado (casa, establos, banco, etc).
 ;          - Tecla para auto-domar una montura hasta que te acepte como dueño.
 ;          - Canciones élficas y del libro de música.
 ;
-set %version v5.3
 ;==============================================================================================================
 ; *** INSTRUCCIONES ***
 ;======================
@@ -82,18 +82,19 @@ set %version v5.3
 ;==============================================================================================================
 ; Para encontrar estos valores X e Y, tienes que mover con la mano la barra de salud de tu montura hasta el sitio
 ; donde quieres que se quede fija, y sin soltar la barra de salud, mirar en el EasyUO y apuntar lo que pone en
-; el apartado "Container Info" -> #CONTPOSX y #CONTPOSY. Reduce la ventana del UO a la mitad para que puedas tener
-; el EasyUO abierto al lado de la ventana del UO y poder mirar el EasyUO al mismo tiempo que mueves la barra de salud.
+; el apartado "Container Info" -> #CONTPOSX y #CONTPOSY. Para ello, redimensiona la ventana del UO a la mitad para que puedas poner
+; la ventana del EasyUO al lado de la ventana del UO y poder mirar el EasyUO al mismo tiempo que mueves la barra de salud.
 ;--------
 ; MONTURA
 set %PosicionBarraSaludMontura1_X 346 ; La coordenada X de la pantalla donde situar la barrra de salud de tu MONTURA.
 set %PosicionBarraSaludMontura1_Y 708 ; La coordenada Y de la pantalla donde situar la barrra de salud de tu MONTURA.
+;---------
 ; FAMILIAR
 set %PosicionBarraSaludFamiliar_X 192 ; La coordenada X de la pantalla donde situar la barrra de salud de tu FAMILIAR.
 set %PosicionBarraSaludFamiliar_Y 708 ; La coordenada Y de la pantalla donde situar la barrra de salud de tu FAMILIAR.
 ;==============================================================================================================
-; Libro de Runas y posición de la runa a la que quieres viajar... Un establo, el banco, tu casa, etc.
-set %nombre_libro TAMER ; Escribe el nombre de tu libro de runas donde tienes la runa a los establos.
+; Nombre del libro de Runas y posición de la runa a la que quieres viajar... Un establo, el banco, tu casa, etc.
+set %nombre_libro TAMER ; Escribe el nombre de tu libro de runas donde tienes la runa que quieres usar.
                         ; Si tu libro no tiene nombre, pónselo abriéndolo y usando la opción "Renombrar Libro".
 set %numero_runa 1      ; Escribe la posición de la runa (1-16) a donde recaleará usando el libro (establo, casa, banco, etc).
 ;==============================================================================================================
@@ -103,22 +104,22 @@ set %tiempo_vendazo 7
 ; El máximo de vendas sucias en la mochila antes de limpiarlas.
 set %max_vendas_sucias 50
 ;========================================================
-; Quitar el veneno a tu mascota usando magia ( An Nox ). Si no te interesa ponlo a "#FALSE".
+; Quitar el veneno a tu mascota usando magia. Si no te interesa ponlo a "#FALSE". Se puede activar/desactivar con la macro encencida desmarcando o marcando la casilla "Auto - An Nox".
 set %neutralizar_veneno_con_magia #TRUE
 ;========================================================
-; Curar puntos de vida a tu mascota usando magia ( In Vas Mani ). Si quieres activarlo ponlo a "#TRUE".
-; *** ¡¡AVISO!! *** Necesita toneleadas de regs, maná y toda la magia que puedas ponerte encima ( Recomendado 120 con capa y joyas ).
+; Curar puntos de vida a tu mascota usando magia ( In Vas Mani ). Si quieres activarlo ponlo a "#TRUE". Se puede activar/desactivar con la macro encencida desmarcando o marcando la casilla "Auto - InVasMani".
+; *** ¡¡AVISO!! *** Necesita toneleadas de regs y maná, y toda la magia que puedas ponerte encima ( Recomendado 120 con capa y joyas ).
 set %curar_con_magia #TRUE
 set %porciento_curar_con_magia 30 ; Número del {5..al..93} significa el % del TOTAL de los PUNTOS DE VIDA DE TU MASCOTA.
                                   ; 30 -> Empezar a curar con magia cuando la vida esté por debajo del 30% de salud.
 set %distancia_hechizos 7 ; La distancia máxima en TILES con tu MASCOTA en la que casteará hechizos de curación/sanar ( In Vas Mani / An Nox ).
-                          ; Algo así como el "PERÍMETRO" en el que lanzará MAGIAS.
+                          ; Algo así como el "PERÍMETRO" en el que tu personaje podrá lanzar MAGIAS.
 ;========================================================
 set %ALIMENTAR #FALSE         ; Si quieres alimentarlo ponlo a "#TRUE" (ES LO IDEAL PARA MACREAR FAMILIARES).
 set %tipo_alimentacion FRUTA  ; La otra opción es "CARNE".
 set %tiempo_alimentacion_mascota 1800 ; No sé muy bien qué poner... de momento unos 1800 segundos ( 30min ) :D
 ;==============================================================================================================
-; Macro del UO "bow" ( Viene incluida de serie ). Es para cambiar el foco a la pantalla del UO.
+; Macro del UO "bow" ( Viene incluida de serie ). ( Es para cambiar el foco a la pantalla del UO. )
 set %tecla_saludo_1 b
 set %tecla_saludo_2 ctrl
 ;================================================
