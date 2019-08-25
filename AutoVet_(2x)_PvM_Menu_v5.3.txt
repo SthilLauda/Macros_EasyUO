@@ -960,8 +960,19 @@ sub himno_batalla
 ; Himno de Batalla: Aumenta la probabilidad de Acierto, de Defensa y el daño producido al objetivo elegido.
 if ( #CHARGHOST <> yes )
      {
-       event macro 1 0 .cancion12
-       target 5s
+       gosub TargetOn
+       if %objetivo = N/A
+          {
+            return
+          }
+          else
+             {
+               event macro 1 0 .cancion12
+               target 5s
+               set #LTARGETID %objetivo
+               set #LTARGETKIND 1
+               event macro 22
+             }
      }
 return
 
