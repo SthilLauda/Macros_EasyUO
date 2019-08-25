@@ -14,7 +14,7 @@
 ; Shard: Ultima Alianza (¡Hasta la muerte!)
 ; Public Release: 13/01/2019
 ; Global Variables Used: none
-; Purpose:
+; Purpose: Elige un objetivo y lo petrifica. Mide la distancia hasta el objetivo y soporta el modo "oculto/hiding" :-)
 set %version v1.2
 ;________________________________
 ;
