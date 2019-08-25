@@ -110,9 +110,9 @@ set %neutralizar_veneno_con_magia #TRUE
 ; *** ¡¡AVISO!! *** Necesita toneleadas de regs, maná y toda la magia que puedas ponerte encima ( Recomendado 120 con capa y joyas ).
 set %curar_con_magia #TRUE
 set %porciento_curar_con_magia 30 ; Número del {5..al..93} significa el % del TOTAL de los PUNTOS DE VIDA DE TU MASCOTA.
-                                  ; 60 -> Empezar a curar con magia cuando la vida baje del 60% de salud.
+                                  ; 30 -> Empezar a curar con magia cuando la vida esté por debajo del 30% de salud.
 set %distancia_hechizos 7 ; La distancia máxima en TILES con tu MASCOTA en la que casteará hechizos de curación/sanar ( In Vas Mani / An Nox ).
-                          ; Algo así como el "PERÍMETRO" para poder lanzar MAGIAS.
+                          ; Algo así como el "PERÍMETRO" en el que lanzará MAGIAS.
 ;========================================================
 set %ALIMENTAR #FALSE         ; Si quieres alimentarlo ponlo a "#TRUE" (ES LO IDEAL PARA MACREAR FAMILIARES).
 set %tipo_alimentacion FRUTA  ; La otra opción es "CARNE".
