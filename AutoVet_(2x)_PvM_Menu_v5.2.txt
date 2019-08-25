@@ -629,6 +629,7 @@ if ( #FINDKIND <> -1 ) ; Si hay libros en la mochila.
 return
 
 sub TargetOn
+set #LTARGETID N/A
 set %tiempo_espera_TO #scnt + 10
 repeat
      {
@@ -639,17 +640,23 @@ repeat
             wait 5
           }
        set #TARGCURS 1 ; Nuevo target
-       target 1s
+       target
        while #TARGCURS = 1 ; Esperamos al click...
              {
                wait 1
              }
-       set %objetivo #LTARGETID
-       finditem %objetivo
-       if ( %objetivo = N/A )
+       if ( #LTARGETID <> YC )
             {
-              goto _TargetOn
+              set %objetivo #LTARGETID
             }
+            else ; Hemos cancelado el target con la tecla ESCAPE
+               {
+                 set #SYSMSGCOL 1360
+                 event sysmessage CANCELADO!
+                 wait 20
+                 set %objetivo N/A
+                 return
+               }
      }
      until ( %objetivo <> N/A || #scnt < %tiempo_espera_TO )
 return
