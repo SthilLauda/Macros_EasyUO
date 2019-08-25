@@ -370,7 +370,7 @@ goto main
 ;========================================================
 sub InitMenu
   menu Clear
-	menu Window Title Auto Vet [ PVM ] v5.2 [ 2x + Golem ]
+	menu Window Title Auto Vet [ PVM ] v5.3 [ 2x + Golem ]
 	menu Window Color Black
 	menu Window Size 482 184
 	menu Font Transparent #true
