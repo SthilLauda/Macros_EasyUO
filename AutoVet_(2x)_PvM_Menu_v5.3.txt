@@ -56,7 +56,7 @@
 ; Global Variables Used: none.
 ; Purpose:
 ;          - Aplica vendas en base a la posición que hayas fijado apuntando con el mouse en la barra de salud de tu montura.
-;          - Aplica pociones de curación animal.
+;          - Aplica pociones de curación animal (Solo al familiar).
 ;          - Neutraliza el veneno con Magia (An Nox) en base al color lima del poison en la barra de salud de tu mascota.
 ;          - Curación con Magia (In Vas Mani) ****AVISO**** ¡Esta opción consume toneladas de maná y regs!;
 ;          - Canción Himno de Batalla y Frenesí sobre el familiar, montura y golem.
