@@ -1,0 +1,1854 @@
+    ; ======================================================================================================
+    ; '||   ||` '||`   ||                                 /.\      '||`
+    ;  ||   ||   ||    ||     ''                         // \\      ||   ''
+    ;  ||   ||   ||  ''||''   ||  '||),,(|,   '''|.     //...\\     ||   ||   '''|.  `||''|,  '''/  '''|.
+    ;  ||   ||   ||    ||     ||   || || ||  .|''||    //     \\    ||   ||  .|''||   ||  ||   //  .|''||
+    ;  `|...|'  .||.   `|..' .||. .||    ||. `|..||. .//       \\. .||. .||. `|..||. .||  ||. /... `|..||.
+    ; ======================================================================================================
+    ; Script Name: Reg Monitor PRO
+    ;                     ________                        ________________
+    ;                  .##@@&&&@@##.                     |.--------------.|
+    ;               ,##@&::%&&%%::&@##.                  ||    AJ: 80    ||
+    ;              #@&:%%000000000%%:&@#                 ||    SA: 63    ||
+    ;             #@&:%00'        '00%:&@#               ||    CS: 45    ||
+    ;            #@&:%0'            '0%:&@#              ||    MS: 73    ||
+    ;           #@&:%0                0%:&@#             ||    PN: 70    ||
+    ;          #@&:%0                  0%:&@#            ||    RM: 72    ||
+    ;          #@&:%0                  0%:&@#            ||    GS: 82    ||
+    ;         "" ' "                   " ' ""            ||    BE: 26    ||
+    ;        _oOoOoOo_                  .-.-.            ||   ---------- ||
+    ;       (oOoOoOoOo)                (  :  )           || VENDAS:  78  ||
+    ;        )`"""""`(               .-.`. .'.-.         || DIEZMOS: 255 ||
+    ;       /         \             (_  '.Y.'  _)        ||______________||
+    ;      |           |            (   .'|'.   )        |[##] oooo O [##]|
+    ;      \           /             '-'  |  '-'         |==sharp=========|
+    ;  jgs `=========`                                   """""""""""""""""" hjw
+    ;   __________________________________________________________________________
+    ; Record Players
+    ;   __________________________________________________________________________
+    ;
+    ; Author: Sthil Lauda
+    ; Version: 2.0
+    ; Client Tested with: 2.0.3
+    ; EUO version tested with: EasyUO 1.5 Version 243
+    ; Shard: Ultima Alianza (¡Hasta la muerte!)
+    ; Public Release: 18/5/2018
+    ; Purpose: - Contabiliza los regs de magia y nigromancia (si se activa la opción "nigro") y avisa si la cantidad de alguno
+    ;            de ellos desciende por debajo del umbral establecido. Tambien establece una barra de título con los contadores.
+    ;          - Primero buscará bolsas que tenga el nombre "Bolsa de Reactivos". Si sólo hay una, elige dicha bolsa.
+    ;            Si hay más de una bolsa que tenga el nombre "Bolsa de Reactivos", entonces elegirá la que más peso tenga.
+    ;            Si no hay ninguna bolsa, entonces te preguntará qué bolsa quieres usar para controlar los regs.
+    ;          - Las vendas se activan si tienes Healing o Veterinaria, Diezmos para Caballeria, y Flechas si tienes skill de Archery.
+    ;
+    set %version 3.0
+    inicio:
+    ;________________________________
+    ;
+    ; ///////////////////////////////
+    ; ******** CONFIGURACIÓN ********
+    ; ///////////////////////////////
+    ;________________________________
+    ;
+    ; FUNCIONES
+    set %tiempo_aviso 60 ; Cada cuántos segundos va a avisar una vez que falta alguno de los regs configurados.
+    set %tiempo_loot 300 ; Tiempo en iniciar la macro después de muerto o si la macro encuentra la bolsa de regs antes de este tiempo).
+    set %sonido #false   ; Si quieres un pitido por cada reg que falte.
+    set %menu #true      ; Si quieres un menú gráfico en color con los contadores de los regs.
+    set %UOtitle #false  ; Si quieres ver los regs en la barra superior del UO.
+    ; Para encontrar estos dos valores tienes que mover con la mano la bolsa de regs hasta donde quieras tenerla puesta,
+    ; y apuntar lo que pone en el Easy en el apartado "Container Info" -> CONTPOSX y CONTPOSY.
+    set %PosicionBolsaRegsX 1097
+    set %PosicionBolsaRegsY 21
+    ; LIMITES (Alertar) REGS MAGERY
+    set %min_regs_AJ 50 ;-> Ajo                ( Magic Trap )
+    set %min_regs_SA 50 ;-> Seda de Aracnido   ( Magic Trap )
+    set %min_regs_CS 50 ;-> Ceniza Sulfurosa   ( Magic Trap )
+    set %min_regs_MS 25 ;-> Musgo de Sangre    ( Recall )
+    set %min_regs_PN 25 ;-> Perla Negra        ( Recall )
+    set %min_regs_RM 25 ;-> Raiz de Mandragora ( Recall )
+    set %min_regs_GS 0  ;-> Ginseng
+    set %min_regs_BE 0  ;-> Belladona
+    ; LIMITES (Alertar) REGS NIGRO
+    set %min_regs_AZ 0 ;-> Azufre
+    set %min_regs_SS 0 ;-> Semilla de Sangre
+    set %min_regs_AR 0 ;-> Arrabio
+    set %min_regs_CV 0 ;-> Ceniza Volcanica
+    set %min_regs_PP 0 ;-> Piedra Pomez
+    set %min_regs_OB 0 ;-> Obsidiana
+    set %min_regs_TF 0 ;-> Tierra Fertil
+    set %min_regs_SV 0 ;-> Seta del Verdugo
+    ; LIMITES (ALERTAR) POCIONES
+    set %min_pots_curacion 10
+    set %min_pots_antidoto 5
+    set %min_pots_resist 3
+    set %min_pots_agilidad 0
+    set %min_pots_fuerza 3
+    set %min_pots_invis 1
+    set %min_pots_encoger 0
+    set %min_pots_piedra 0
+    ; Caballeria
+    set %min_diezmos 50  ; El numero de diezmos en la mochila antes de empezar a alertar de que se acaban.
+    ; Healing / Vet
+    set %min_vendas 55   ; El numero de vendas en la mochila antes de empezar a alertar de que se acaban.
+    ; Archery
+    set %min_flechas 25  ; El numero de flechas en la mochila antes de empezar a alertar de que se acaban.
+    set %min_virotes 25  ; El numero de virotes en la mochila antes de empezar a alertar de que se acaban.
+    ;________________________________________________
+    ;
+    ; //////////////////////////////////////////////
+    ; ************* FIN CONFIGURACIÓN *************
+    ; //////////////////////////////////////////////
+    ;________________________________________________
+    ;
+    ; BOLSAS DE REGS
+    ;
+    set %bolsitas CKF ; Bolsitas de las redondas, por favor. (Para pequeñas usar IUD_LKF)
+    set %num_bolsitas_regs 0
+    set %mas_pesada 0 ; Bolsa de Regs más pesada
+    set %mas_pesado 0 ; Montón de Diezmos más pesado
+    set %contenedor_regs_GUMP container_gump
+    set %dimensiones_GUMP 176_194
+    set %bolsa_abierta 0
+    ;============================================
+    ;
+    ; INICIAR LOS CRONOMETROS Y ESTADO DE ALERTAS
+    ;
+    set %cronometro_aviso_regs 0
+    set %cronometro_aviso_diezmos 0
+    set %cronometro_aviso_vendas 0
+    set %cronometro_aviso_pociones 0
+    set %cronometro_aviso_flechas 0
+    set %alert_regs 0
+    set %alert_diezmos 0
+    set %alert_vendas 0
+    set %alert_pots 0
+    set %alert_flechas 0
+    set %alert_virotes 0
+    ;=========
+    ;
+    ; SKILLS
+    ;
+    set %caballeria #false
+    set %curar #false
+    set %curacion #false
+    set %vet #false
+    set %necroregs #false
+    set %anatomia #false
+    set %arco #false
+    ;======================================================
+    ;
+    ; INDICA SI HEMOS MUERTO (para volver a abrir la bolsa)
+    ;
+    set %muerto 0
+    set %tiempo_res #SCNT
+    ;===============
+    ;
+    ; BOTÖN DEL MENÚ
+    ;
+    set #menubutton N/A
+    ;==========
+    ;
+    ; PERSONAJE
+    ;
+    set %charid #charid
+    ;========
+    ;
+    ; DIEZMOS
+    ;
+    set %total_diezmos 0
+    set %CNT_diezmos 0
+    set %ok_diezmos #false
+    ;=======
+    ;
+    ; VENDAS
+    ;
+    set %total_vendas 0
+    set %CNT_vendas 0
+    set %ok_vendas #false
+    set %pilones_agua TEE_QEE_WEE_VEE
+    ;========
+    ;
+    ; FLECHAS
+    ;
+    set %total_flechas 0
+    set %CNT_flechas 0
+    set %ok_flechas #false
+    set %flechas RWF
+    
+    ;========
+    ;
+    ; VIROTES
+    ;
+    set %total_virotes 0
+    set %CNT_virotes 0
+    set %ok_virotes #false
+    set %virotes LNK
+    ;========
+    ;
+    ; COLORES
+    ;
+    set #SYSMSGCOL 89
+    ;========
+    ;
+    ; MENSAJE
+    ;
+    event sysmessage Reg Monitor %version
+    wait 40
+    event Macro 8 2
+    ;============
+    ;
+    ; REGS MAGERY
+    ;
+    set %tipoID1 JUF
+    set %diminutivo1 MS
+    set %nombre1 Musgo , #spc , de , #spc , Sangre
+    set %tipoID2 KZF
+    set %diminutivo2 AJ
+    set %nombre2 Ajo
+    set %tipoID3 RZF
+    set %diminutivo3 SA
+    set %nombre3 Seda , #spc , de , #spc , Aracnido
+    set %tipoID4 JZF
+    set %diminutivo4 GS
+    set %nombre4 Ginseng
+    set %tipoID5 WZF
+    set %diminutivo5 BE
+    set %nombre5 Belladona
+    set %tipoID6 SZF
+    set %diminutivo6 CS
+    set %nombre6 Ceniza , #spc , Sulfurosa
+    set %tipoID7 KUF
+    set %diminutivo7 PN
+    set %nombre7 Perla , #spc , Negra
+    set %tipoID8 MZF
+    set %diminutivo8 RM
+    set %nombre8 Raiz , #spc , de , #spc , Mandragora
+    ; REGS NIGRO
+    set %tipoID9 FUF
+    set %diminutivo9 AZ
+    set %nombre9 Azufre
+    set %tipoID10 EUF
+    set %diminutivo10 SS
+    set %nombre10 Semilla , #spc , De , #spc , Sangre
+    set %tipoID11 YZF
+    set %diminutivo11 AR
+    set %nombre11 Arrabio
+    set %tipoID12 TZF
+    set %diminutivo12 CV
+    set %nombre12 Ceniza , #spc , Volcanica
+    set %tipoID13 XZF
+    set %diminutivo13 PP
+    set %nombre13 Piedra , #spc , Pomez
+    set %tipoID14 VZF
+    set %diminutivo14 OB
+    set %nombre14 Obsidiana
+    set %tipoID15 NZF
+    set %diminutivo15 TF
+    set %nombre15 Tierra , #spc , Fertil
+    set %tipoID16 PZF
+    set %diminutivo16 SV
+    set %nombre16 Seta , #spc , Del , #spc , Verdugo
+    ;=================
+    ;
+    ; REGS EN LA BOLSA
+    ;
+    set %NUM_REGS_MS 0
+    set %NUM_REGS_AJ 0
+    set %NUM_REGS_SA 0
+    set %NUM_REGS_GS 0
+    set %NUM_REGS_BE 0
+    set %NUM_REGS_CS 0
+    set %NUM_REGS_PN 0
+    set %NUM_REGS_RM 0
+    set %NUM_REGS_AZ 0
+    set %NUM_REGS_SS 0
+    set %NUM_REGS_AR 0
+    set %NUM_REGS_CV 0
+    set %NUM_REGS_PP 0
+    set %NUM_REGS_OB 0
+    set %NUM_REGS_TF 0
+    set %NUM_REGS_SV 0
+    ;=========
+    ;
+    ; POCIONES
+    ;
+ 	  set %POTS_CURACION 0
+	  set %POTS_ANTIDOTO 0
+	  set %POTS_RESIST 0
+	  set %POTS_AGILIDAD 0
+	  set %POTS_FUERZA 0
+	  set %POTS_INVIS 0
+	  set %POTS_ENCOGER 0
+    set %POTS_PIEDRA 0
+    set %TOTAL_POCIONES 0
+    set %LABEL1 CURACION
+    set %LABEL2 ANTIDOTO
+    set %LABEL3 RESIST
+    set %LABEL4 AGILIDAD
+    set %LABEL5 FUERZA
+    set %LABEL6 INVIS
+    set %LABEL7 ENCOGER
+    set %LABEL8 PIEDRA
+    set %ok_pot #false
+    
+    ;==========================
+    ;
+    ; Interruptor de CABALLERIA
+    ;
+    chooseskill chiv real
+    set %chivalry #skill
+    if %chivalry > 500
+     {
+       set %caballeria #true ; Controlamos los diezmos o no...
+     }
+     ;=====================
+     ;
+     ; Interruptor de NIGRO
+     ;
+     chooseskill necr real
+     set %nigromancia #skill
+     if %nigromancia > 500
+        {
+          set %necroregs #true
+        }
+     ; Habilita regs de Magia o si tienes Nigro, entonces se activan los dos.
+     set %j 8
+     if %necroregs
+        {
+          set %j 16
+        }
+    ;=======================
+    ;
+    ; Interruptor de FLECHAS
+    ;
+    chooseskill arch real
+    set %archery #skill
+    if %archery > 500
+     {
+       set %arco #true ; Controlamos las flechas o no...
+     }
+    ;======================
+    ;
+    ; Interruptor de VENDAS
+    ;
+    chooseskill vete real ; Veterinaria
+    set %vet #skill
+    if %vet >= 400
+       {
+         set %vet #true
+       }
+    chooseskill heal real ; Curación
+    set %healing #skill
+    if %healing > 599
+       {
+         set %curar #true
+         chooseskill anat real ; Anatomy
+         set %anatomy #skill
+         if %anatomy > 499
+	          { ; Anatomy
+	            set %anatomia #true
+            }
+	     }
+    ; Si tenemos healing o veterinaria, activamos el check de vendas
+	  if ( %curar || %vet )
+        {
+          set %curacion #true
+         ;=================================================================
+         ;El pilón de agua para limpiar vendas sucias
+         ;
+         finditem %pilones_agua C_ , #BACKPACKID
+         if #FINDKIND = -1 ; Si no hay ninguno, avisamos.
+            {
+              event exmsg #CHARID 0 89 CONSIGUE UN PILON DE AGUA!!
+              wait 1s
+            }
+            else
+               {
+                 set %pilon #FINDID
+                 set #SYSMSGCOL 53
+                 event sysmessage OK: pilon de agua...
+                 wait 1s
+               }
+        }
+    
+    ;
+    ; CONFIGURAMOS LA BOLSITA DE REGS AUTOMÁTICAMENTE
+    ;
+    gosub setup_bolsa
+    
+    ;========================================================
+    ;
+    ; ******************* LOOP PRINCIPAL ********************
+    ;
+    ;========================================================
+    mainloop:
+    set %CHAR_STATUS #CHARGHOST ; Actualizar el estado del personaje
+    if %CHAR_STATUS <> yes
+    {
+     ; Si nos hemos salido del juego (para cambiar de personaje)
+     gosub check_logout
+     if ( %muerto = 1 ) && ( #SCNT > %tiempo_res ) ; Se supone que hemos resucitado...
+        {
+          set %muerto 0
+          set #SYSMSGCOL 89
+          event sysmessage Reg Monitor %version
+          wait 40
+          gosub setup_bolsa
+        }
+        else ; Si hemos resucitado y encontrado la bolsa o supeerado el tiempo límite de lotearte
+           {
+             if ( %muerto = 0 ) && ( #SCNT > %tiempo_res || %bolsa_encontrada = 1 )
+                  {
+                    gosub contarRegs
+                    gosub checkPotis
+                    if ( %caballeria )
+                         {
+                           gosub CheckDiezmos
+                         }
+                    if ( %curacion )
+                         {
+                           gosub CheckVendas
+                         }
+                    if ( %arco )
+                         {
+                           gosub checkFlechas
+                           gosub checkVirotes
+                         }
+                    if %UOtitle
+                       {
+                         gosub StatusBarUp
+                         SetUOTitle Str: #STR Dex: #DEX Int: #INT Peso: #Weight , / , #MaxWeight %tb
+                         wait 2s
+                       }
+                  }
+                  else ; Si hemos resucitado, pero no ha pasado el tiempo de loteo, buscamos la bolsita de regs
+                     {
+                       if ( %muerto = 0 ) && ( #SCNT < %tiempo_res || %bolsa_encontrada = 0 )
+                            {
+                              finditem %id_final_bolsa C_ , #BACKPACKID
+                              if #FINDKIND <> -1 ; ¡Hemos encontrado la bolsita! ^^
+                                 {
+                                   set %bolsa_encontrada 1
+                                   set %tiempo_res #SCNT ; Desactivamos la espera y volvemos a iniciar la macro...
+                                   wait 1
+                                 } ; Aqui podemos meter un else y jugar con esperar un tiempo a encontrar nuevas volsas
+                            }
+                       goto mainloop
+                     }
+           }
+     gosub bloop ; Miramos si hay que ejecutar algun sub de los botones "Upd" del menú...
+    }
+    else ; En caso de muerte...
+       {
+         wait 1
+         set %tiempo_res #SCNT + %tiempo_loot
+         if %muerto = 0
+            {
+              gosub borra_contadores
+              set %muerto 1
+            }
+         goto mainloop
+       }
+    goto mainloop
+    ;========================================================
+    ;
+    ; ***************** FIN LOOP PRINCIPAL ******************
+    ;
+    ;========================================================
+
+    sub contarRegs
+    ignoreitem reset
+    set %tb
+    set %tbv2
+    for %i 1 %j
+    {
+    set %CHAR_STATUS #CHARGHOST
+    if ( %CHAR_STATUS <> yes ) && ( #SCNT > %tiempo_res || %bolsa_encontrada = 1 ) && ( %muerto = 0 )
+       {
+        set %count 0
+        cr1:
+                finditem %tipoID . %i C_ , %id_final_bolsa ; Buscamos sólo en la bolsa que hemos elegido.
+                if #findkind <> -1
+                   {
+                      set %count %count + #findstack
+                      ignoreitem #findid
+                      goto cr1
+                   }
+                if %i = 1 ; Eliminamos el primer espacio " " del primer REG.
+                   {
+                      set %tb %tb , %diminutivo . %i , : , %count
+                      set %tbv2 %tbv2 , %nombre . %i , : , %count
+                   }
+                   else ; Añadimos un espacio para la barra de título y una separador ($) para el sub split.
+                      {
+                        set %tb %tb , #spc , %diminutivo . %i , : , %count
+                        set %tbv2 %tbv2 , $ , %nombre . %i , : , %count
+                      }
+       }
+       else ; Si hemos muerto, entonces salimos
+          {
+            set %tiempo_res #SCNT + %tiempo_loot
+            if %muerto = 0
+               {
+                 gosub borra_contadores
+                 set %muerto 1
+               }
+            return
+          }
+    }
+    gosub split %tbv2 $ REG
+    for %i 1 %j
+    {
+      set %CHAR_STATUS #CHARGHOST
+      gosub check_logout
+      if ( %CHAR_STATUS <> yes ) && ( #SCNT > %tiempo_res || %bolsa_encontrada = 1 ) && ( %muerto = 0 )
+         {
+           set %nombre_reg %NOMBRE . %i
+           set %diminutivo_reg %diminutivo . %i
+           set %reg_string %REG . %i
+           set %min_regs_actual %min_regs_ . %diminutivo_reg
+           str pos %reg_string :
+           set %string_pos #strres
+           str del %reg_string 1 %string_pos
+           set %cantidad_reg #strres
+           set %NUM_REGS_ . %diminutivo_reg %cantidad_reg
+           if ( %NUM_REGS_ . %diminutivo_reg <> %CNT_ . %diminutivo_reg )
+                {
+                  set %CNT_ . %diminutivo_reg %cantidad_reg
+                  ; Actualizar contadores de REGS
+                  gosub actualiza_contadores_regs
+                }
+           if ( %cantidad_reg >= %min_regs_actual ) && ( ! %ok_reg . %i )
+                {
+                  set %ok_reg . %i #true
+                  set #SYSMSGCOL 88
+                  event sysmessage OK: %nombre_reg : %cantidad_reg
+                  wait 20
+                }
+           if ( %cantidad_reg < %min_regs_actual ) && ( #SCNT > %cronometro_aviso_regs || %alert_regs = 1 )
+                {
+                  set #SYSMSGCOL 68
+                  event sysmessage %nombre_reg : %cantidad_reg
+                  if %sonido
+                     {
+                       sound
+                     }
+                  wait 20
+                  set %alert_regs 1
+                  set %ok_reg . %i #false
+                }
+         }
+         else ; Si hemos muerto, entonces salimos
+            {
+              set %tiempo_res #SCNT + %tiempo_loot
+              if %muerto = 0
+                 {
+                   gosub borra_contadores
+                   set %muerto 1
+                 }
+              return
+            }
+    }
+    if %alert_regs = 1
+       {
+         set %cronometro_aviso_regs #SCNT + %tiempo_aviso
+         set %alert_regs 0
+       }
+    return
+
+sub StatusBarUp
+if #charname = N/A
+   {
+     Event Macro 8 2
+     wait 5
+   }
+return
+
+;===========================
+;Configurar la bolsa de REGS
+;===========================
+sub setup_bolsa
+ignoreitem reset
+finditem %bolsitas C_ , #BACKPACKID
+set %num_bolsitas #FINDCNT
+if %num_bolsitas > 1
+   {
+     for %i 1 %num_bolsitas ; Buscamos varias bolsas distintas de reactivos.
+         {
+           gosub check_logout
+           finditem %bolsitas C_ , #BACKPACKID
+           event property #FINDID
+           if Bolsa , #spc , De , #spc , Reactivos in #property
+              {
+                set %num_bolsitas_regs %num_bolsitas_regs + 1
+                set %bolsa_regs . %i #FINDID
+                set %id_final_bolsa %bolsa_regs . %i
+                event property %bolsa_regs . %i
+                set %string_bolsa . %i #property
+                gosub split %string_bolsa . %i $ BOLSA_REACTIVOS
+                set %string_peso . %i %BOLSA_REACTIVOS2
+                str pos %string_peso . %i :
+                str del %string_peso . %i 1 #strres
+                set %string_peso . %i #strres
+                str pos %string_peso . %i Piedras
+                set %pos_tmp #strres - 1
+                str left %string_peso . %i %pos_tmp
+                set %peso_bolsa . %i #strres
+                str len %peso_bolsa . %i
+                set %len . %i #strres - 3
+                str left %peso_bolsa . %i %len . %i
+                set %peso_bolsa . %i #strres
+              }
+           ignoreitem #FINDID
+         }
+         
+     if %num_bolsitas_regs >= 1 ; Si hay una o más de una bolsita de reactivos
+     {
+        for %i 1 %num_bolsitas ; Elegimos la que más pesa.
+            {
+              set %ahora_pesada %peso_bolsa . %i
+              set %ahora_nombre %BOLSA_REACTIVOS . %i
+              if %ahora_pesada > %mas_pesada
+                 {
+                   set %mas_pesada %ahora_pesada
+                 }
+            }
+        set #SYSMSGCOL 68
+        event sysmessage OK: Bolsa Reactivos
+        set %bolsa_encontrada 1
+        wait 1s
+        set #SYSMSGCOL 53
+        event sysmessage ID: %id_final_bolsa
+        wait 1s
+        event sysmessage PESO: %mas_pesada
+        wait 1s
+        event sysmessage Abriendo bolsa de regs...
+        wait 2s
+        gosub abrir_bolsa
+        if %bolsa_abierta = 1
+           {
+             gosub situar_bolsa
+           }
+        if %menu
+           {
+             set #SYSMSGCOL 68
+             event sysmessage Mostrando menu grafico...
+             wait 40
+             gosub showEUOMenu
+           }
+     }
+   }
+   else  ; Si sólo hay una bolsita.
+      {
+        if %num_bolsitas = 1
+           {
+             set #SYSMSGCOL 21
+             set %id_final_bolsa #FINDID
+             event sysmessage OK: Bolsa Reactivos %id_final_bolsa
+             set %bolsa_encontrada 1
+             wait 1s
+             set #SYSMSGCOL 53
+             event sysmessage Abriendo bolsa de regs...
+             wait 2s
+             gosub abrir_bolsa
+             if %bolsa_abierta = 1
+                {
+                  gosub situar_bolsa
+                }
+             if %menu
+                {
+                  gosub showEUOMenu
+                }
+           }
+      }
+      else  ; Si no hay ninguna bolsita.
+         {
+           if ( %num_bolsitas = 0 || %num_bolsitas = N/A )
+                {
+                  set #SYSMSGCOL 38
+                  event sysmessage FALLO: No hay bolsas!
+                }
+         }
+return
+
+;====================================================
+; Abrir la bolsa y esperar a que aparezca en pantalla
+; ===================================================
+sub abrir_bolsa
+set #LOBJECTID %id_final_bolsa
+event macro 17 0
+gosub esperar_gump 145 ContSize %dimensiones_GUMP ; 145 segundos de Time-Out (Un "Save" del server)
+return
+
+;==============================================
+; Espera a que aparezca una ventana en pantalla
+;==============================================
+; Gosub esperar_gump 3 ContSize 530_507
+sub esperar_gump
+set !tiempo_limite #scnt + %1
+while !contenedor <> %3 && !tiempo_limite > #scnt
+      {
+        set !contenedor # . %2  ; Le ponemos un nombre al contenedor
+        wait 5
+      }
+      if !tiempo_limite <= #scnt
+         {
+           set %bolsa_abierta 0
+         }
+      set %bolsa_abierta 1
+return
+
+;=====================================
+; Colocar la bolsa de regs en su sitio
+;=====================================
+sub situar_bolsa
+if ( %contenedor_regs_GUMP = #CONTNAME )
+     {
+       if ( #CONTSIZE = %dimensiones_GUMP )
+            {
+              if ( #CONTID = %id_final_bolsa )
+                   {
+                     set #contPosX %PosicionBolsaRegsX
+                     set #contPosY %PosicionBolsaRegsY
+                     contpos
+                   }
+            }
+     }
+return
+
+;============================
+; COMPROBAR NÚMERO DE DIEZMOS
+;============================
+sub CheckDiezmos
+ignoreitem reset
+; Empezamos sin recordar los diezmos que había (Los volvemos a contar)
+set %num_montones_diezmos 0
+set %actual_pesado 0
+set %total_diezmos 0
+set %ahora_pesado_mochila 0
+set %ahora_pesado_bolsa 0
+set %monton_mas_pesado_mochila 0
+set %monton_mas_pesado_bolsa 0
+for %i 1 10 ; Borramos incluso hasta 10 montones de diezmos
+    {
+      deletevar stack_diezmos_mochila . %i
+      deletevar stack_diezmos_mochila_ID . %i
+      deletevar stack_diezmos_bolsa . %i
+      deletevar stack_diezmos_bolsa_ID . %i
+    }
+finditem POF C_ , %id_final_bolsa
+if #FINDKIND <> -1
+   {
+     for %i 1 #FINDCNT ; Aquí pueden existir montones de oro, etc... cosas que no son diezmos.
+         {
+           analizar_bolsa:
+           finditem POF C_ , %id_final_bolsa
+           if ( #FINDCOL = 1953 ) && ( #FINDKIND <> -1 ) ; Si tiene el color de los Diezmos
+                {
+                  set %num_montones_diezmos %num_montones_diezmos + 1
+                  set %stack_diezmos_bolsa . %i #FINDSTACK
+                  set %stack_diezmos_bolsa_ID . %i #FINDID
+                  ignoreitem #FINDID ; Descartamos el montón de diezmos que acabamos de inspecionar
+                }
+                else ; Descartamos otro tipo de monedas
+                   {
+                     if ( #FINDKIND <> -1 ) ; En caso de que realmente existan
+                          {
+                            ignoreitem #FINDID
+                            goto analizar_bolsa
+                          }
+                   }
+         } ; FOR
+   }
+; Si no hay diezmos en la bolsa de regs
+ignoreitem reset
+finditem POF C_ , #BACKPACKID ; Buscamos en la mochila
+if #FINDKIND <> -1
+   {
+     for %i 1 #FINDCNT ; Aquí pueden existir montones de oro, etc... cosas que no son diezmos.
+         {
+           analizar_mochila:
+           finditem POF C_ , #BACKPACKID
+           if ( #FINDCOL = 1953 ) && ( #FINDKIND <> -1 ) ; Si tiene el color de los Diezmos
+                {
+                  set %num_montones_diezmos %num_montones_diezmos + 1
+                  set %stack_diezmos_mochila . %i #FINDSTACK
+                  set %stack_diezmos_mochila_ID . %i #FINDID
+                  ignoreitem #FINDID ; Descartamos el montón de diezmos que acabamos de inspecionar
+                }
+                else ; Descartamos otro tipo de monedas
+                   {
+                     if ( #FINDKIND <> -1 ) ; En caso de que realmente existan
+                          {
+                            ignoreitem #FINDID
+                            goto analizar_mochila
+                          }
+                   }
+         }
+   }
+
+if %num_montones_diezmos >= 1 ; Si hay uno o más montones de diezmos
+   {
+     for %i 1 %num_montones_diezmos ; Los sumamos todos para tener el total de diezmos
+         {
+           set %ahora_pesado_bolsa %stack_diezmos_bolsa . %i
+           set %total_diezmos %total_diezmos + %stack_diezmos_bolsa . %i
+           if ( %ahora_pesado_mochila > %mas_pesado )
+                {
+                  set %monton_mas_pesado_bolsa %ahora_pesado_mochila
+                }
+           set %ahora_pesado_mochila %stack_diezmos_mochila . %i
+           set %total_diezmos %total_diezmos + %stack_diezmos_mochila . %i
+           if ( %ahora_pesado_mochila > %mas_pesado )
+                {
+                  set %monton_mas_pesado_mochila %ahora_pesado_mochila
+                }
+         }
+   }
+   else ; Si no hay ningún stack de diezmos en ningún sitio
+      {
+        if ( ! %ok_diezmos ) && ( #SCNT > %cronometro_aviso_diezmos )
+               {
+                 event exmsg #charid 0 140 SIN DIEZMOS!! [ %total_diezmos ]
+                 if %sonido
+                    {
+                      sound
+                    }
+                 wait 20
+                 set %cronometro_aviso_diezmos #SCNT + %tiempo_aviso
+               }
+      }
+     ; Llevar la cuenta si cambia el número de diezmos
+     if ( %total_diezmos <> %CNT_diezmos )
+          {
+            set %CNT_diezmos %total_diezmos
+            gosub actualiza_contadores_diezmos
+          }
+     ; Alertamos o informamos si se soluciona el problema.
+     if ( %total_diezmos > %min_diezmos ) && ( ! %ok_diezmos )
+          {
+            event exmsg #charid 0 68 OK: DIEZMOS [ %total_diezmos ]
+            wait 20
+            set %ok_diezmos #true
+            set %cronometro_aviso_diezmos #SCNT
+            return
+          }
+          else ; Si hay pocos diezmos
+             {
+               if ( %total_diezmos < %min_diezmos ) && ( #SCNT > %cronometro_aviso_diezmos || %total_diezmos <> %CNT_diezmos )
+                    {
+                      event exmsg #charid 0 140 DIEZMOS!! [ %total_diezmos ]
+                      wait 20
+                      set %ok_diezmos #false
+                      set %cronometro_aviso_diezmos #SCNT + %tiempo_aviso
+                      return
+                    }
+             }
+return
+
+;===========================
+; COMPROBAR NÚMERO DE VENDAS
+;===========================
+sub CheckVendas
+ignoreitem reset
+set %num_montones_vendas 0
+set %ahora_pesado_mochila 0
+set %ahora_pesado_bolsa 0
+set %monton_mas_pesado_mochila 0
+set %monton_mas_pesado_bolsa 0
+set %total_vendas 0
+set %actual_pesado 0
+if ( %curacion )
+     {
+       for %i 1 10 ; Borramos incluso hasta 10 montones de vendas
+           {
+             deletevar stack_vendas_mochila . %i
+             deletevar stack_vendas_mochila_ID . %i
+             deletevar stack_vendas_bolsa . %i
+             deletevar stack_vendas_bolsa_ID . %i
+           }
+       finditem ZLF C_ , #BACKPACKID
+       if ( #FINDKIND <> -1 )
+            {
+             for %i 1 #FINDCNT
+                 {
+                   finditem ZLF C_ , #BACKPACKID
+                   set %stack_vendas_mochila . %i #FINDSTACK
+                   set %stack_vendas_mochila_ID . %i #FINDID
+                   set %num_montones_vendas %num_montones_vendas + 1
+                   ignoreitem #FINDID
+                 }
+                 goto bolsa
+            }
+            else ; No hay vendas en la mochila, buscamos en la bolsita de regs...
+               {
+                 ignoreitem reset
+                 bolsa:
+                 finditem ZLF C_ , %id_final_bolsa
+                 if ( #FINDKIND <> -1 )
+                      {
+                        for %i 1 #FINDCNT
+                            {
+                              finditem ZLF C_ , %id_final_bolsa
+                              set %stack_vendas_bolsa . %i #FINDSTACK
+                              set %stack_vendas_bolsa_ID  #FINDID
+                              set %num_montones_vendas %num_montones_vendas + 1
+                              ignoreitem #FINDID
+                            }
+                      }
+               }
+       ; "Pesar" los montones y monitorizar el que más tenga...
+       if %num_montones_vendas >= 1 ; Si hay uno o más montones de diezmos
+          {
+            for %i 1 %num_montones_vendas ; Los sumamos todos para tener el total de diezmos
+                {
+                  ; Contar en la mochila
+                  set %ahora_pesado_mochila %stack_vendas_mochila . %i
+                  set %total_vendas %total_vendas + %stack_vendas_mochila . %i
+                  if ( %actual_pesado > %monton_mas_pesado_mochila )
+                       {
+                         set %monton_mas_pesado_mochila %actual_pesado
+                       }
+                  ; Contar dentro de la bolsita
+                  set %ahora_pesado_bolsa %stack_vendas_bolsa . %i
+                  set %total_vendas %total_vendas + %stack_vendas_bolsa . %i
+                  if ( %actual_pesado > %monton_mas_pesado_bolsa )
+                       {
+                         set %monton_mas_pesado_bolsa %actual_pesado
+                       }
+
+                }
+          }
+       if ( %total_vendas <> %CNT_vendas )
+                {
+                  set %CNT_vendas %total_vendas
+                  gosub actualiza_contadores_vendas
+                }
+       if ( %total_vendas > %min_vendas ) && ( ! %ok_vendas )
+            {
+              event exmsg #charid 0 68 OK: VENDAS [ %total_vendas ]
+              wait 20
+              set %ok_vendas #true
+              set %cronometro_aviso_vendas #SCNT
+            }
+            else
+               {
+                 if ( %total_vendas < %min_vendas ) && ( #SCNT > %cronometro_aviso_vendas )
+                      {
+                        event exmsg #charid 0 38 ALERTA VENDAS [ %total_vendas ]
+                        wait 20
+                        set %ok_vendas #false
+                        set %cronometro_aviso_vendas #SCNT + %tiempo_aviso
+                      }
+               }
+     }
+return
+
+;============================
+; Contar pociones por colores
+;
+sub checkPotis
+set %TOTAL_POCIONES 0
+ignoreitem reset
+for %i 1 8 ; Borramos todos los montones de pociones
+    {
+      set %LABEL_ACTUAl %LABEL . %i
+      set %POTS_ . %LABEL_ACTUAl 0
+    }
+finditem WUF C_ , #BACKPACKID
+if #FINDKIND <> -1
+   {
+     for %i 1 #FINDCNT
+         {
+           finditem WUF C_ , #BACKPACKID
+           if #FINDCOL = 254 ; Pota Curación
+              {
+                set %POTS_CURACION #FINDSTACK
+	            }
+	         if #FINDCOL = 40 ; Pota Antidoto
+              {
+                set %POTS_ANTIDOTO #FINDSTACK
+    	        }
+    	     if #FINDCOL = 37 ; Pota Resistencia
+	            {
+                set %POTS_RESIST #FINDSTACK
+	            }
+	         if #FINDCOL = 99 ; Pota Agilidad
+              {
+                set %POTS_AGILIDAD #FINDSTACK
+	            }
+	         if #FINDCOL = 696 ; Pota Fuerza
+              {
+                set %POTS_FUERZA #FINDSTACK
+	            }
+           if #FINDCOL = 703 ; Pota Invis
+	            {
+                set %POTS_INVIS #FINDSTACK
+	            }
+	         if #FINDCOL = 1082 ; Pota Encoger
+	            {
+                set %POTS_ENCOGER #FINDSTACK
+	            }
+	         if #FINDCOL = 1870 ; Pota Piel de Piedra
+	            {
+                set %POTS_PIEDRA #FINDSTACK
+	            }
+	         ignoreitem #FINDID
+	       }
+   }
+; Sumar pociones
+for %i 1 8
+     {
+       set %LABEL_ACTUAl %LABEL . %i
+       set %STACK_POCION_ACTUAl %POTS_ . %LABEL_ACTUAl
+       set %MIN_POCION_ACTUAL %MIN_POTS_ . %LABEL_ACTUAl
+       set %TOTAL_POCIONES %TOTAL_POCIONES + %STACK_POCION_ACTUAl
+       if ( %POTS_ . %LABEL_ACTUAl <> %CNT_POT_ . %LABEL_ACTUAl )
+            {
+              set %CNT_POT_ . %LABEL_ACTUAl %STACK_POCION_ACTUAl
+              ; Actualizar contadores de POCIONES
+              gosub actualizar_contadores_pociones
+            }
+       ; Evitamos sacar info de un tipo de poción que no usamos ni controlamos...
+       if ( %STACK_POCION_ACTUAl >= %MIN_POCION_ACTUAL ) && ( ! %ok_pot . %i )
+            {
+              set %ok_pot . %i #true
+              set %cronometro_aviso_pociones #SCNT
+              set #SYSMSGCOL 83
+              event sysmessage OK: %LABEL_ACTUAl : %CNT_POT_ . %LABEL_ACTUAl
+              wait 20
+            }
+       if ( %STACK_POCION_ACTUAl < %MIN_POCION_ACTUAL ) && ( #SCNT > %cronometro_aviso_pociones || %alert_pots = 1 )
+            {
+              set #SYSMSGCOL 38
+              event sysmessage %LABEL_ACTUAl : %CNT_POT_ . %LABEL_ACTUAl
+              if %sonido
+                 {
+                   sound
+                 }
+              wait 20
+              set %alert_pots 1
+              set %ok_pot . %i #false
+            }
+     }
+; Ponemos el contador despues de alertar y reseteamos la alerta
+if %alert_pots = 1
+       {
+         set %cronometro_aviso_pociones #SCNT + %tiempo_aviso
+         set %alert_pots 0
+       }
+return
+
+;============================
+; COMPROBAR NÚMERO DE FLECHAS
+;============================
+sub checkFlechas
+ignoreitem reset
+set %num_montones_flechas 0
+set %ahora_pesado_mochila 0
+set %ahora_pesado_bolsa 0
+set %monton_mas_pesado_mochila 0
+set %monton_mas_pesado_bolsa 0
+set %total_flechas 0
+set %actual_pesado 0
+if ( %arco )
+     {
+       for %i 1 10 ; Borramos incluso hasta 10 montones de flechas
+           {
+             deletevar stack_flechas_mochila . %i
+             deletevar stack_flechas_mochila_ID . %i
+             deletevar stack_flechas_bolsa . %i
+             deletevar stack_flechas_bolsa_ID . %i
+           }
+       finditem %flechas C_ , #BACKPACKID
+       if ( #FINDKIND <> -1 )
+            {
+             for %i 1 #FINDCNT
+                 {
+                   finditem %flechas C_ , #BACKPACKID
+                   set %stack_flechas_mochila . %i #FINDSTACK
+                   set %stack_flechas_mochila_ID . %i #FINDID
+                   set %num_montones_flechas %num_montones_flechas + 1
+                   ignoreitem #FINDID
+                 }
+                 goto paso_a_bolsa1
+            }
+            else ; No hay flechas en la mochila, buscamos en la bolsita de regs...
+               {
+                 ignoreitem reset
+                 paso_a_bolsa1:
+                 finditem %flechas C_ , %id_final_bolsa
+                 if ( #FINDKIND <> -1 )
+                      {
+                        for %i 1 #FINDCNT
+                            {
+                              finditem %flechas C_ , %id_final_bolsa
+                              set %stack_flechas_bolsa . %i #FINDSTACK
+                              set %stack_flechas_bolsa_ID  #FINDID
+                              set %num_montones_flechas %num_montones_flechas + 1
+                              ignoreitem #FINDID
+                            }
+                      }
+               }
+       ; "Pesar" los montones y monitorizar el que más tenga...
+       if %num_montones_flechas >= 1 ; Si hay uno o más montones de diezmos
+          {
+            for %i 1 %num_montones_flechas ; Los sumamos todos para tener el total de diezmos
+                {
+                  ; Contar en la mochila
+                  set %ahora_pesado_mochila %stack_flechas_mochila . %i
+                  set %total_flechas %total_flechas + %stack_flechas_mochila . %i
+                  if ( %actual_pesado > %monton_mas_pesado_mochila )
+                       {
+                         set %monton_mas_pesado_mochila %actual_pesado
+                       }
+                  ; Contar dentro de la bolsita
+                  set %ahora_pesado_bolsa %stack_flechas_bolsa . %i
+                  set %total_flechas %total_flechas + %stack_flechas_bolsa . %i
+                  if ( %actual_pesado > %monton_mas_pesado_bolsa )
+                       {
+                         set %monton_mas_pesado_bolsa %actual_pesado
+                       }
+
+                }
+          }
+       if ( %total_flechas <> %CNT_flechas )
+                {
+                  set %CNT_flechas %total_flechas
+                  gosub actualizar_contadores_flechas
+                }
+       if ( %total_flechas > %min_flechas ) && ( ! %ok_flechas )
+            {
+              event exmsg #charid 0 68 OK: FLECHAS [ %total_flechas ]
+              wait 20
+              set %ok_flechas #true
+              set %cronometro_aviso_flechas #SCNT
+            }
+            else
+               {
+                 if ( %total_flechas < %min_flechas ) && ( #SCNT > %cronometro_aviso_flechas || %alert_flechas = 1 )
+                      {
+                        event exmsg #charid 0 38 ALERTA FLECHAS [ %total_flechas ]
+                        if %sonido
+                           {
+                             sound
+                           }
+                        wait 20
+                        set %ok_flechas #false
+                        set %cronometro_aviso_flechas #SCNT + %tiempo_aviso
+                      }
+               }
+     }
+return
+
+;============================
+; COMPROBAR NÚMERO DE VIROTES
+;============================
+sub checkVirotes
+ignoreitem reset
+set %num_montones_virotes 0
+set %ahora_pesado_mochila 0
+set %ahora_pesado_bolsa 0
+set %monton_mas_pesado_mochila 0
+set %monton_mas_pesado_bolsa 0
+set %total_virotes 0
+set %actual_pesado 0
+if ( %arco )
+     {
+       for %i 1 10 ; Borramos incluso hasta 10 montones de virotes
+           {
+             deletevar stack_virotes_mochila . %i
+             deletevar stack_virotes_mochila_ID . %i
+             deletevar stack_virotes_bolsa . %i
+             deletevar stack_virotes_bolsa_ID . %i
+           }
+       finditem %virotes C_ , #BACKPACKID
+       if ( #FINDKIND <> -1 )
+            {
+             for %i 1 #FINDCNT
+                 {
+                   finditem %virotes C_ , #BACKPACKID
+                   set %stack_virotes_mochila . %i #FINDSTACK
+                   set %stack_virotes_mochila_ID . %i #FINDID
+                   set %num_montones_virotes %num_montones_virotes + 1
+                   ignoreitem #FINDID
+                 }
+                 goto paso_a_bolsa2
+            }
+            else ; No hay virotes en la mochila, buscamos en la bolsita de regs...
+               {
+                 ignoreitem reset
+                 paso_a_bolsa2:
+                 finditem %virotes C_ , %id_final_bolsa
+                 if ( #FINDKIND <> -1 )
+                      {
+                        for %i 1 #FINDCNT
+                            {
+                              finditem %virotes C_ , %id_final_bolsa
+                              set %stack_virotes_bolsa . %i #FINDSTACK
+                              set %stack_virotes_bolsa_ID  #FINDID
+                              set %num_montones_virotes %num_montones_virotes + 1
+                              ignoreitem #FINDID
+                            }
+                      }
+               }
+       ; "Pesar" los montones y monitorizar el que más tenga...
+       if %num_montones_virotes >= 1 ; Si hay uno o más montones de diezmos
+          {
+            for %i 1 %num_montones_virotes ; Los sumamos todos para tener el total de diezmos
+                {
+                  ; Contar en la mochila
+                  set %ahora_pesado_mochila %stack_virotes_mochila . %i
+                  set %total_virotes %total_virotes + %stack_virotes_mochila . %i
+                  if ( %actual_pesado > %monton_mas_pesado_mochila )
+                       {
+                         set %monton_mas_pesado_mochila %actual_pesado
+                       }
+                  ; Contar dentro de la bolsita
+                  set %ahora_pesado_bolsa %stack_virotes_bolsa . %i
+                  set %total_virotes %total_virotes + %stack_virotes_bolsa . %i
+                  if ( %actual_pesado > %monton_mas_pesado_bolsa )
+                       {
+                         set %monton_mas_pesado_bolsa %actual_pesado
+                       }
+
+                }
+          }
+       if ( %total_virotes <> %CNT_virotes )
+                {
+                  set %CNT_virotes %total_virotes
+                  gosub actualizar_contadores_virotes
+                }
+       if ( %total_virotes > %min_virotes ) && ( ! %ok_virotes )
+            {
+              event exmsg #charid 0 68 OK: VIROTES [ %total_virotes ]
+              wait 20
+              set %ok_virotes #true
+              set %cronometro_aviso_virotes #SCNT
+            }
+            else
+               {
+                 if ( %total_virotes < %min_virotes ) && ( #SCNT > %cronometro_aviso_virotes || %alert_virotes = 1 )
+                      {
+                        event exmsg #charid 0 38 ALERTA VIROTES [ %total_virotes ]
+                        if %sonido
+                           {
+                             sound
+                           }
+                        wait 20
+                        set %ok_virotes #false
+                        set %cronometro_aviso_virotes #SCNT + %tiempo_aviso
+                      }
+               }
+     }
+return
+
+;===================================
+; Detecta si hemos salido o vuelto a
+; entrar en el juego
+;
+sub check_logout
+if #charname = N/A
+        {
+          Event Macro 8 2 ; Abrir la barra de stats
+        	wait 1s
+	        if #charname = N/A
+             {
+      		     gosub PausadoFueraJuego
+      		     if ( %charid <> #charid ) && ( #charname <> N/A )
+                    {
+                      set #SYSMSGCOL 20
+                      event sysmessage Reiniciando macro...
+                      wait 2s
+                      goto inicio
+                    }
+                    else
+                       {
+                         if ( %charid = #charid ) && ( #charname <> N/A )
+                              {
+                                set #SYSMSGCOL 20
+                                event sysmessage Continuando macro...
+                                wait 1s
+                                goto mainloop
+                              }
+                       }
+             }
+        }
+return
+
+;=================
+; DETECTA EL LOGIN
+;=================
+sub PausadoFueraJuego
+juegoPausado:
+wait 10
+if ( #contname = MainMenu_gump ) || ( #contname = normal_gump ) ||
+ + ( #contname = Login_gump ) || ( #contname = waiting_gump )
+     {
+       set %pausado #true
+       goto juegoPausado
+     }
+if %pausado
+   {
+     set %pausado #false
+     wait 15s ; Esperamos a que se abran todos los carteles del UO; mochila, etc...
+   }
+return
+
+;==========================
+; Un bonito menú gráfico ^^
+;==========================
+;--------- EasyUO Menu Designer Code Begin ---------
+sub showEUOMenu
+  menu Clear
+	menu Window Title Monitor 4.0
+	menu Window Color Black
+	menu Window Size 429 236
+	menu Font Transparent #true
+	menu Font Align Right
+	menu Shape EUOShape7 320 176 101 53 4 7 1 Lime 7 Black
+	menu Shape EUOShape3 320 120 101 53 4 7 1 Lime 7 Black
+	menu Shape EUOShape4 320 64 101 53 4 7 1 Lime 7 Black
+	menu Shape EUOShape6 320 8 101 53 4 7 1 Lime 7 Black
+	menu Shape EUOShape2 112 8 101 221 4 7 1 Lime 7 Black
+	menu Shape EUOShape1 8 8 101 221 4 7 1 Lime 7 Black
+	menu Font Name MS Sans Serif
+	menu Font Size 8
+	menu Font Style
+	menu Font Color Lime
+	menu Font Align Left
+	menu Font BGColor Black
+	menu Text EUOLabel1 20 40 %DIMINUTIVO1
+	menu Text EUOLabel2 20 60 %DIMINUTIVO2
+	menu Text EUOLabel3 20 80 %DIMINUTIVO3
+	menu Text EUOLabel4 20 100 %DIMINUTIVO4
+	menu Text EUOLabel5 20 120 %DIMINUTIVO5
+	menu Text EUOLabel6 20 140 %DIMINUTIVO6
+	menu Text EUOLabel7 20 160 %DIMINUTIVO7
+	menu Text EUOLabel8 20 180 %DIMINUTIVO8
+	menu Text EUOLabel9 124 40 %DIMINUTIVO9
+	menu Text EUOLabel10 124 60 %DIMINUTIVO10
+	menu Text EUOLabel11 124 80 %DIMINUTIVO11
+	menu Text EUOLabel12 124 100 %DIMINUTIVO12
+	menu Text EUOLabel13 124 120 %DIMINUTIVO13
+	menu Text EUOLabel14 124 140 %DIMINUTIVO14
+	menu Text EUOLabel15 124 160 %DIMINUTIVO15
+	menu Text EUOLabel16 124 180 %DIMINUTIVO16
+	menu Font Color Fuchsia
+	menu Text EUOLabel17 40 40 %NUM_REGS_MS
+	menu Text EUOLabel18 40 60 %NUM_REGS_AJ
+	menu Text EUOLabel19 40 80 %NUM_REGS_SA
+	menu Text EUOLabel20 40 100 %NUM_REGS_GS
+	menu Text EUOLabel21 40 120 %NUM_REGS_BE
+	menu Text EUOLabel22 40 140 %NUM_REGS_CS
+	menu Text EUOLabel23 40 160 %NUM_REGS_PN
+	menu Text EUOLabel24 40 180 %NUM_REGS_RM
+	menu Text EUOLabel25 144 40 %NUM_REGS_AZ
+	menu Text EUOLabel26 144 60 %NUM_REGS_SS
+	menu Text EUOLabel27 144 80 %NUM_REGS_AR
+	menu Text EUOLabel28 144 100 %NUM_REGS_CV
+	menu Text EUOLabel29 144 120 %NUM_REGS_PP
+	menu Text EUOLabel30 144 140 %NUM_REGS_OB
+	menu Text EUOLabel31 144 160 %NUM_REGS_TF
+	menu Text EUOLabel32 144 180 %NUM_REGS_SV
+	menu Font Style b
+	menu Font Color Aqua
+	menu Text EUOLabel33 40 16 MAGIA
+	menu Font Color Red
+	menu Text EUOLabel34 144 16 NIGRO
+	menu Font Color White
+	menu Text EUOLabel35 342 14 DIEZMOS
+	menu Font Color $00C08000
+	menu Text EUOLabel36 344 70 VENDAS
+	menu Font Style
+	menu Font Color Fuchsia
+	menu Text EUOLabel37 324 36 %TOTAL_DIEZMOS
+	menu Text EUOLabel38 324 92 %TOTAL_VENDAS
+	menu Shape EUOShape5 216 8 101 221 4 7 1 Lime 7 Black
+	menu Font Style b
+	menu Font Color $000080FF
+	menu Text EUOLabel39 236 16 POCIONES
+	menu Font Style
+	menu Font Color Fuchsia
+	menu Text EUOLabel40 252 40 %POTS_CURACION
+	menu Text EUOLabel41 252 60 %POTS_ANTIDOTO
+	menu Text EUOLabel42 252 80 %POTS_RESIST
+	menu Text EUOLabel43 252 100 %POTS_AGILIDAD
+	menu Text EUOLabel44 252 120 %POTS_FUERZA
+	menu Text EUOLabel45 252 140 %POTS_INVIS
+	menu Text EUOLabel46 252 160 %POTS_ENCOGER
+	menu Text EUOLabel47 252 180 %POTS_PIEDRA
+	menu Font Style b
+	menu Font Color $0000FF80
+	menu Text EUOLabel48 344 126 FLECHAS
+	menu Font Style
+	menu Font Color Fuchsia
+  menu Text EUOLabel49 324 148 %TOTAL_FLECHAS
+	menu Font Color Lime
+	menu Text EUOLabel50 228 40 CU
+	menu Text EUOLabel51 228 60 AN
+	menu Text EUOLabel52 228 80 RE
+	menu Text EUOLabel53 228 100 AG
+	menu Text EUOLabel54 228 120 FU
+	menu Text EUOLabel55 228 140 IN
+	menu Text EUOLabel56 228 160 EN
+	menu Text EUOLabel57 228 180 PP
+	menu Font Style b
+	menu Font Color $00FF8080
+	menu Text EUOLabel58 344 182 VIROTES
+	menu Font Style
+	menu Font Color Fuchsia
+	menu Text EUOLabel59 324 200 %TOTAL_VIROTES
+	menu Font Color Yellow
+	menu Font BGColor 3DDkShadow
+	menu Edit reg1 68 36 29 %MIN_REGS_MS
+	menu Edit reg2 68 56 29 %MIN_REGS_AJ
+	menu Edit reg3 68 76 29 %MIN_REGS_SA
+	menu Edit reg4 68 96 29 %MIN_REGS_GS
+	menu Edit reg5 68 116 29 %MIN_REGS_BE
+	menu Edit reg6 68 136 29 %MIN_REGS_CS
+	menu Edit reg7 68 156 29 %MIN_REGS_PN
+	menu Edit reg8 68 176 29 %MIN_REGS_RM
+	menu Edit reg9 172 36 29 %MIN_REGS_AZ
+	menu Edit reg10 172 56 29 %MIN_REGS_SS
+	menu Edit reg11 172 76 29 %MIN_REGS_AR
+	menu Edit reg12 172 96 29 %MIN_REGS_CV
+	menu Edit reg13 172 116 29 %MIN_REGS_PP
+	menu Edit reg14 172 136 29 %MIN_REGS_OB
+	menu Edit reg15 172 156 29 %MIN_REGS_TF
+	menu Edit reg16 172 176 29 %MIN_REGS_SV
+	menu Font BGColor Black
+	menu Button actualizar_magery 68 200 29 21 Upd
+	menu Button actualizar_nigro 172 200 29 21 Upd
+	menu Button actualizar_diezmos 386 32 29 21 Upd
+	menu Button actualizar_vendas 386 88 29 21 Upd
+	menu Font BGColor 3DDkShadow
+	menu Edit diezmos 352 32 29 %MIN_DIEZMOS
+	menu Edit vendas 352 88 29 %MIN_VENDAS
+	menu Edit curacion 276 36 29 %MIN_POTS_CURACION
+	menu Edit antidoto 276 56 29 %MIN_POTS_ANTIDOTO
+	menu Edit resistencia 276 76 29 %MIN_POTS_RESIST
+	menu Edit agilidad 276 96 29 %MIN_POTS_AGILIDAD
+	menu Edit fuerza 276 116 29 %MIN_POTS_FUERZA
+	menu Font BGColor Black
+	menu Button actualizar_pociones 276 200 29 21 Upd
+	menu Font BGColor 3DDkShadow
+	menu Edit invis 276 136 29 %MIN_POTS_INVIS
+	menu Edit encoger 276 156 29 %MIN_POTS_ENCOGER
+	menu Edit piel_piedra 276 176 29 %MIN_POTS_PIEDRA
+	menu Edit flechas 352 144 29 %MIN_FLECHAS
+	menu Font BGColor Black
+	menu Button actualizar_flechas 386 144 29 21 Upd
+	menu Font BGColor 3DDkShadow
+	menu Edit virotes 352 200 29 %MIN_VIROTES
+	menu Font BGColor Black
+	menu Button actualizar_virotes 386 200 29 21 Upd
+	menu Show 0 735
+;--------- EasyUO Menu Designer Code End ---------
+
+;======================
+; ACTUALIZA %min_vendas
+;======================
+sub actualizar_vendas
+if ( ! %curacion )
+     {
+       set #SYSMSGCOL 53
+       event sysmessage No pareces usar vendas!
+       wait 20
+       return
+     }
+  menu getnum vendas
+  set %MIN_VENDAS #MenuRes
+	; Si hemos actualizado los límites, entonces activamos la alerta de inmediato...
+	set %alert_vendas 1
+return
+
+;=======================
+; ACTUALIZA %min_diezmos
+;=======================
+sub actualizar_diezmos
+if ( ! %caballeria ) || ( ! %curacion ) || ( ! %anatomia )
+     {
+       set #SYSMSGCOL 53
+       event sysmessage No pareces un caballero!
+       wait 20
+       return
+     }
+  menu getnum diezmos
+  set %MIN_DIEZMOS #MenuRes
+  ; Si hemos actualizado los límites, entonces activamos la alerta de inmediato...
+  set %alert_diezmos 1
+return
+
+sub actualizar_magery
+  menu getnum reg1
+  set %MIN_REGS_MS #MenuRes
+  menu getnum reg2
+  set %MIN_REGS_AJ #MenuRes
+	menu getnum reg3
+	set %MIN_REGS_SA #MenuRes
+	menu getnum reg4
+	set %MIN_REGS_GS #MenuRes
+	menu getnum reg5
+	set %MIN_REGS_BE #MenuRes
+	menu getnum reg6
+	set %MIN_REGS_CS #MenuRes
+	menu getnum reg7
+	set %MIN_REGS_PN #MenuRes
+	menu getnum reg8
+	set %MIN_REGS_RM #MenuRes
+	; Si hemos actualizado los límites, entonces activamos la alerta de inmediato...
+	set %alert_regs 1
+return
+
+sub actualizar_nigro
+  if ( ! %necroregs )
+     {
+       set #SYSMSGCOL 53
+       event sysmessage No pareces un Nigromante!
+       wait 20
+       return
+     }
+  menu getnum reg9
+  set %MIN_REGS_AZ #MenuRes
+  menu getnum reg10
+  set %MIN_REGS_SS #MenuRes
+	menu getnum reg11
+	set %MIN_REGS_AR #MenuRes
+	menu getnum reg12
+	set %MIN_REGS_CV #MenuRes
+	menu getnum reg13
+	set %MIN_REGS_PP #MenuRes
+	menu getnum reg14
+	set %MIN_REGS_OB #MenuRes
+	menu getnum reg15
+	set %MIN_REGS_TF #MenuRes
+	menu getnum reg16
+	set %MIN_REGS_SV #MenuRes
+	; Si hemos actualizado los límites, entonces activamos la alerta de inmediato...
+	set %alert_regs 1
+return
+
+sub actualizar_pociones
+  menu getnum curacion
+  set %MIN_POTS_CURACION #MenuRes
+  menu getnum antidoto
+  set %MIN_POTS_ANTIDOTO #MenuRes
+	menu getnum resistencia
+	set %MIN_POTS_RESIST #MenuRes
+	menu getnum agilidad
+	set %MIN_POTS_AGILIDAD #MenuRes
+	menu getnum fuerza
+	set %MIN_POTS_FUERZA #MenuRes
+	menu getnum invis
+	set %MIN_POTS_INVIS #MenuRes
+	menu getnum encoger
+	set %MIN_POTS_ENCOGER #MenuRes
+	menu getnum piel_piedra
+	set %MIN_POTS_PIEDRA #MenuRes
+	; Si hemos actualizado los límites, entonces activamos la alerta de inmediato...
+	set %alert_pots 1
+return
+
+;=======================
+; ACTUALIZA %min_flechas
+;=======================
+sub actualizar_flechas
+if ( ! %arco )
+     {
+       set #SYSMSGCOL 53
+       event sysmessage No pareces un arquero!
+       wait 20
+       return
+     }
+  menu getnum flechas
+  set %MIN_FLECHAS #MenuRes
+  ; Si hemos actualizado los límites, entonces activamos la alerta de inmediato...
+  set %alert_flechas 1
+return
+
+;=======================
+; ACTUALIZA %min_virotes
+;=======================
+sub actualizar_virotes
+if ( ! %arco )
+     {
+       set #SYSMSGCOL 53
+       event sysmessage No pareces un arquero!
+       wait 20
+       return
+     }
+  menu getnum virotes
+  set %MIN_VIROTES #MenuRes
+  ; Si hemos actualizado los límites, entonces activamos la alerta de inmediato...
+  set %alert_virotes 1
+return
+
+sub borra_contadores
+  menu Font Color Fuchsia
+  set %TOTAL_DIEZMOS 0
+  set %TOTAL_VENDAS 0
+  set %TOTAL_FLECHAS 0
+  set %NUM_REGS_MS 0
+  set %NUM_REGS_AJ 0
+  set %NUM_REGS_SA 0
+  set %NUM_REGS_GS 0
+  set %NUM_REGS_BE 0
+  set %NUM_REGS_CS 0
+  set %NUM_REGS_PN 0
+  set %NUM_REGS_RM 0
+  set %NUM_REGS_AZ 0
+  set %NUM_REGS_SS 0
+  set %NUM_REGS_AR 0
+  set %NUM_REGS_CV 0
+  set %NUM_REGS_PP 0
+  set %NUM_REGS_OB 0
+  set %NUM_REGS_TF 0
+  set %NUM_REGS_SV 0
+  set %CNT_AJ 0
+  set %CNT_AR 0
+  set %CNT_AZ 0
+  set %CNT_BE 0
+  set %CNT_CS 0
+  set %CNT_CV 0
+  set %CNT_GS 0
+  set %CNT_MS 0
+  set %CNT_OB 0
+  set %CNT_PN 0
+  set %CNT_PP 0
+  set %CNT_RM 0
+  set %CNT_SA 0
+  set %CNT_SS 0
+  set %CNT_SV 0
+  set %CNT_TF 0
+  set %POTS_CURACION 0
+	set %POTS_ANTIDOTO 0
+	set %POTS_RESIST 0
+	set %POTS_AGILIDAD 0
+	set %POTS_FUERZA 0
+	set %POTS_INVIS 0
+	set %POTS_ENCOGER 0
+  set %POTS_PIEDRA 0
+  menu delete EUOLabel17
+  menu Text EUOLabel17 40 40 %NUM_REGS_MS
+  menu delete EUOLabel18
+  menu Text EUOLabel18 40 60 %NUM_REGS_AJ
+  menu delete EUOLabel19
+  menu Text EUOLabel19 40 80 %NUM_REGS_SA
+  menu delete EUOLabel20
+  menu Text EUOLabel20 40 100 %NUM_REGS_GS
+  menu delete EUOLabel21
+  menu Text EUOLabel21 40 120 %NUM_REGS_BE
+  menu delete EUOLabel22
+  menu Text EUOLabel22 40 140 %NUM_REGS_CS
+  menu delete EUOLabel23
+  menu Text EUOLabel23 40 160 %NUM_REGS_PN
+  menu delete EUOLabel24
+  menu Text EUOLabel24 40 180 %NUM_REGS_RM
+  menu delete EUOLabel25
+  menu Text EUOLabel25 144 40 %NUM_REGS_AZ
+  menu delete EUOLabel26
+  menu Text EUOLabel26 144 60 %NUM_REGS_SS
+  menu delete EUOLabel27
+  menu Text EUOLabel27 144 80 %NUM_REGS_AR
+  menu delete EUOLabel28
+  menu Text EUOLabel28 144 100 %NUM_REGS_CV
+  menu delete EUOLabel29
+  menu Text EUOLabel29 144 120 %NUM_REGS_PP
+  menu delete EUOLabel30
+  menu Text EUOLabel30 144 140 %NUM_REGS_OB
+  menu delete EUOLabel31
+  menu Text EUOLabel31 144 160 %NUM_REGS_TF
+  menu delete EUOLabel32
+  menu Text EUOLabel32 144 180 %NUM_REGS_SV
+  menu delete EUOLabel37
+  menu Text EUOLabel37 324 36 %TOTAL_DIEZMOS
+  menu delete EUOLabel38
+  menu Text EUOLabel38 324 92 %TOTAL_VENDAS
+	menu delete EUOLabel40
+	menu Text EUOLabel40 252 40 %POTS_CURACION
+	menu delete EUOLabel41
+	menu Text EUOLabel41 252 60 %POTS_ANTIDOTO
+	menu delete EUOLabel42
+	menu Text EUOLabel42 252 80 %POTS_RESIST
+	menu delete EUOLabel43
+	menu Text EUOLabel43 252 100 %POTS_AGILIDAD
+	menu delete EUOLabel44
+	menu Text EUOLabel44 252 120 %POTS_FUERZA
+	menu delete EUOLabel45
+	menu Text EUOLabel45 252 140 %POTS_INVIS
+	menu delete EUOLabel46
+	menu Text EUOLabel46 252 160 %POTS_ENCOGER
+	menu delete EUOLabel47
+	menu Text EUOLabel47 252 180 %POTS_PIEDRA
+	menu delete EUOLabel49
+  menu Text EUOLabel49 324 148 %TOTAL_FLECHAS
+  menu delete EUOLabel59
+  menu Text EUOLabel59 324 200 %TOTAL_VIROTES
+return
+
+
+sub actualiza_contadores_regs
+  menu Font Color Fuchsia
+  menu delete EUOLabel17
+  menu Text EUOLabel17 40 40 %NUM_REGS_MS
+  menu delete EUOLabel18
+  menu Text EUOLabel18 40 60 %NUM_REGS_AJ
+  menu delete EUOLabel19
+  menu Text EUOLabel19 40 80 %NUM_REGS_SA
+  menu delete EUOLabel20
+  menu Text EUOLabel20 40 100 %NUM_REGS_GS
+  menu delete EUOLabel21
+  menu Text EUOLabel21 40 120 %NUM_REGS_BE
+  menu delete EUOLabel22
+  menu Text EUOLabel22 40 140 %NUM_REGS_CS
+  menu delete EUOLabel23
+  menu Text EUOLabel23 40 160 %NUM_REGS_PN
+  menu delete EUOLabel24
+  menu Text EUOLabel24 40 180 %NUM_REGS_RM
+  menu delete EUOLabel25
+  menu Text EUOLabel25 144 40 %NUM_REGS_AZ
+  menu delete EUOLabel26
+  menu Text EUOLabel26 144 60 %NUM_REGS_SS
+  menu delete EUOLabel27
+  menu Text EUOLabel27 144 80 %NUM_REGS_AR
+  menu delete EUOLabel28
+  menu Text EUOLabel28 144 100 %NUM_REGS_CV
+  menu delete EUOLabel29
+  menu Text EUOLabel29 144 120 %NUM_REGS_PP
+  menu delete EUOLabel30
+  menu Text EUOLabel30 144 140 %NUM_REGS_OB
+  menu delete EUOLabel31
+  menu Text EUOLabel31 144 160 %NUM_REGS_TF
+  menu delete EUOLabel32
+  menu Text EUOLabel32 144 180 %NUM_REGS_SV
+return
+
+sub actualiza_contadores_diezmos
+  menu Font Color Fuchsia
+  menu delete EUOLabel37
+  menu Text EUOLabel37 324 36 %TOTAL_DIEZMOS
+return
+
+sub actualiza_contadores_vendas
+  menu Font Color Fuchsia
+  menu delete EUOLabel38
+  menu Text EUOLabel38 324 92 %TOTAL_VENDAS
+return
+
+sub actualizar_contadores_flechas
+  menu delete EUOLabel49
+  menu Text EUOLabel49 324 148 %TOTAL_FLECHAS
+return
+
+sub actualizar_contadores_virotes
+  menu delete EUOLabel59
+  menu Text EUOLabel59 324 200 %TOTAL_VIROTES
+return
+
+sub actualizar_contadores_pociones
+  menu delete EUOLabel40
+	menu Text EUOLabel40 252 40 %POTS_CURACION
+	menu delete EUOLabel41
+	menu Text EUOLabel41 252 60 %POTS_ANTIDOTO
+	menu delete EUOLabel42
+	menu Text EUOLabel42 252 80 %POTS_RESIST
+	menu delete EUOLabel43
+	menu Text EUOLabel43 252 100 %POTS_AGILIDAD
+	menu delete EUOLabel44
+	menu Text EUOLabel44 252 120 %POTS_FUERZA
+	menu delete EUOLabel45
+	menu Text EUOLabel45 252 140 %POTS_INVIS
+	menu delete EUOLabel46
+	menu Text EUOLabel46 252 160 %POTS_ENCOGER
+	menu delete EUOLabel47
+	menu Text EUOLabel47 252 180 %POTS_PIEDRA
+return
+
+;=========================================
+; Ejecuta el SUB del botón correspondiente
+;=========================================
+sub bloop
+bloop:
+if #menubutton <> n/a
+{
+gosub #menubutton
+set #menubutton n/a
+return
+}
+else
+return
+
+;-@ ============================== @-;
+;-@ ############################## @-;
+;-@ SUBS públicos del Foro EasyUO  @-;
+;-@ ############################## @-;
+;-@ ============================== @-;
+;
+;**
+;* Splits a string by a divider into an array and
+;* copies the result into the desired namespace
+;* @param %1 The string to split
+;* @param %2 Divider
+;* @param %3 Array name
+;* @param %4 {optional} Result namespace. If no
+;*           namespace is given it will create the
+;*           array using the %-notation
+;* @sideEffects Creates a number of variables
+;*              with name as given in %3 followed by
+;*              a digit
+;* @returns The length of the array
+sub split
+  namespace Push
+  namespace Local split , #systime
+  set !lpc #lpc
+  if #lpc < 500
+     set #lpc 500
+
+  set !string %1
+  set !divider %2
+  set !arrayName %3
+  if %0 > 3
+     set !namespace %4
+  else
+     set !namespace #false
+
+  set !length 0
+  repeat
+  {
+     set !length !length + 1
+     str Pos !string !divider 1
+     if #strRes = 0
+     {
+        set !done #true
+        set ! . !arrayName , !length !string
+     }
+     else
+     {
+        set !pos #strRes
+        set !len !pos - 1
+        str Left !string !len
+        set ! . !arrayName , !length #strRes
+        str Del !string 1 !pos
+        set !string #strRes
+     }
+  }
+  until ( !done = #true )
+  set #result !length
+
+  if !namespace <> #false
+  {
+     namespace Copy !arrayName , * To Local !namespace
+  }
+  else
+  {
+    for !i 1 #result
+    {
+       set !value !arrayName , !i
+       set % . !arrayName , !i ! . !value
+    }
+  }
+  set #lpc !lpc
+  namespace Clear
+  namespace Pop
+return #result
