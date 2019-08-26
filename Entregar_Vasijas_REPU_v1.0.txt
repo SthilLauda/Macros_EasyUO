@@ -6,7 +6,7 @@
 ;   `|...|'  .||.   `|..' .||. .||    ||. `|..||. .//       \\. .||. .||. `|..||. .||  ||. /... `|..||.
 ; ======================================================================================================
 ;
-; Nombre Script: Entregar Vasijas [ Repu Élfica ]
+; Nombre Script: Entregar Vasijas [ Repu Ã‰lfica ]
 ;
 ; Author: Sthil Lauda
 ; Version: 1.0
@@ -15,8 +15,8 @@
 ; Shard OSI / FS: (Ultima Alianza)
 ; Public Release: 16/03/18
 ; Revised On: 16/03/18
-; Propósito: Entregar Vasijas a un NPC, controlando la distancia.
-; Configuración: Ninguna, hay que ir a donde está el NPC Elfo sabio del Valle de las Canciones, en el Mirador. (5149,2886,73)
+; PropÃ³sito: Entregar Vasijas a un NPC, controlando la distancia.
+; ConfiguraciÃ³n: Ninguna, hay que ir a donde estÃ¡ el NPC Elfo sabio del Valle de las Canciones, en el Mirador. (5149,2886,73).
 
 initevents
 set %vasija SEE
@@ -59,10 +59,10 @@ onHotKey ESC
 goto TESC
 
 meter:
-finditem %vasija ; Buscamos en todas las bolsas que están abiertas...
+finditem %vasija ; Buscamos en todas las bolsas que estÃ¡n abiertas...
 if #FINDCNT > 0
    {
-     if #FINDCOL = 858 ; Vasija Élfica En Muy Mal Estado.
+     if #FINDCOL = 858 ; Vasija Ã‰lfica En Muy Mal Estado.
         {
           if ( H Notin #CHARSTATUS ) && ( #SCNT > %HID_TIMER )
                {
@@ -82,7 +82,7 @@ if #FINDCNT > 0
                            set %pos_elfo_z #FINDZ
                            event pathfind %pos_elfo_x %pos_elfo_y %pos_elfo_z
                            wait 40
-                           finditem %elfo G_15 ; Actualizar la distancia después de andar...
+                           finditem %elfo G_15 ; Actualizar la distancia despuÃ©s de andar...
                          }
                          until #FINDDIST < 3
                   }
