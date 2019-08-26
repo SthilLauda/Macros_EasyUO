@@ -31,13 +31,13 @@
     ; Version: 2.0
     ; Client Tested with: 2.0.3
     ; EUO version tested with: EasyUO 1.5 Version 243
-    ; Shard: Ultima Alianza (¡Hasta la muerte!)
+    ; Shard: Ultima Alianza (Â¡Hasta la muerte!)
     ; Public Release: 18/5/2018
-    ; Purpose: - Contabiliza los regs de magia y nigromancia (si se activa la opción "nigro") y avisa si la cantidad de alguno
-    ;            de ellos desciende por debajo del umbral establecido. Tambien establece una barra de título con los contadores.
-    ;          - Primero buscará bolsas que tenga el nombre "Bolsa de Reactivos". Si sólo hay una, elige dicha bolsa.
-    ;            Si hay más de una bolsa que tenga el nombre "Bolsa de Reactivos", entonces elegirá la que más peso tenga.
-    ;            Si no hay ninguna bolsa, entonces te preguntará qué bolsa quieres usar para controlar los regs.
+    ; Purpose: - Contabiliza los regs de magia y nigromancia (si se activa la opciÃ³n "nigro") y avisa si la cantidad de alguno
+    ;            de ellos desciende por debajo del umbral establecido. Tambien establece una barra de tÃ­tulo con los contadores.
+    ;          - Primero buscarÃ¡ bolsas que tenga el nombre "Bolsa de Reactivos". Si sÃ³lo hay una, elige dicha bolsa.
+    ;            Si hay mÃ¡s de una bolsa que tenga el nombre "Bolsa de Reactivos", entonces elegirÃ¡ la que mÃ¡s peso tenga.
+    ;            Si no hay ninguna bolsa, entonces te preguntarÃ¡ quÃ© bolsa quieres usar para controlar los regs.
     ;          - Las vendas se activan si tienes Healing o Veterinaria, Diezmos para Caballeria, y Flechas si tienes skill de Archery.
     ;
     set %version 3.0
@@ -45,15 +45,15 @@
     ;________________________________
     ;
     ; ///////////////////////////////
-    ; ******** CONFIGURACIÓN ********
+    ; ******** CONFIGURACIÃ“N ********
     ; ///////////////////////////////
     ;________________________________
     ;
     ; FUNCIONES
-    set %tiempo_aviso 60 ; Cada cuántos segundos va a avisar una vez que falta alguno de los regs configurados.
-    set %tiempo_loot 300 ; Tiempo en iniciar la macro después de muerto o si la macro encuentra la bolsa de regs antes de este tiempo).
+    set %tiempo_aviso 60 ; Cada cuÃ¡ntos segundos va a avisar una vez que falta alguno de los regs configurados.
+    set %tiempo_loot 300 ; Tiempo en iniciar la macro despuÃ©s de muerto o si la macro encuentra la bolsa de regs antes de este tiempo).
     set %sonido #false   ; Si quieres un pitido por cada reg que falte.
-    set %menu #true      ; Si quieres un menú gráfico en color con los contadores de los regs.
+    set %menu #true      ; Si quieres un menÃº grÃ¡fico en color con los contadores de los regs.
     set %UOtitle #false  ; Si quieres ver los regs en la barra superior del UO.
     ; Para encontrar estos dos valores tienes que mover con la mano la bolsa de regs hasta donde quieras tenerla puesta,
     ; y apuntar lo que pone en el Easy en el apartado "Container Info" -> CONTPOSX y CONTPOSY.
@@ -88,24 +88,24 @@
     set %min_pots_piedra 0
     ; Caballeria
     set %min_diezmos 50  ; El numero de diezmos en la mochila antes de empezar a alertar de que se acaban.
-    ; Healing / Vet
+    ; Healing / Vet.
     set %min_vendas 55   ; El numero de vendas en la mochila antes de empezar a alertar de que se acaban.
-    ; Archery
+    ; Archery.
     set %min_flechas 25  ; El numero de flechas en la mochila antes de empezar a alertar de que se acaban.
     set %min_virotes 25  ; El numero de virotes en la mochila antes de empezar a alertar de que se acaban.
     ;________________________________________________
     ;
     ; //////////////////////////////////////////////
-    ; ************* FIN CONFIGURACIÓN *************
+    ; ************* FIN CONFIGURACIÃ“N *************
     ; //////////////////////////////////////////////
     ;________________________________________________
     ;
     ; BOLSAS DE REGS
     ;
-    set %bolsitas CKF ; Bolsitas de las redondas, por favor. (Para pequeñas usar IUD_LKF)
+    set %bolsitas CKF ; Bolsitas de las redondas, por favor. (Para pequeÃ±as usar IUD_LKF)
     set %num_bolsitas_regs 0
-    set %mas_pesada 0 ; Bolsa de Regs más pesada
-    set %mas_pesado 0 ; Montón de Diezmos más pesado
+    set %mas_pesada 0 ; Bolsa de Regs mÃ¡s pesada
+    set %mas_pesado 0 ; MontÃ³n de Diezmos mÃ¡s pesado
     set %contenedor_regs_GUMP container_gump
     set %dimensiones_GUMP 176_194
     set %bolsa_abierta 0
@@ -143,7 +143,7 @@
     set %tiempo_res #SCNT
     ;===============
     ;
-    ; BOTÖN DEL MENÚ
+    ; BOTÃ–N DEL MENÃš
     ;
     set #menubutton N/A
     ;==========
@@ -337,7 +337,7 @@
        {
          set %vet #true
        }
-    chooseskill heal real ; Curación
+    chooseskill heal real ; CuraciÃ³n
     set %healing #skill
     if %healing > 599
        {
@@ -354,7 +354,7 @@
         {
           set %curacion #true
          ;=================================================================
-         ;El pilón de agua para limpiar vendas sucias
+         ;El pilÃ³n de agua para limpiar vendas sucias
          ;
          finditem %pilones_agua C_ , #BACKPACKID
          if #FINDKIND = -1 ; Si no hay ninguno, avisamos.
@@ -372,7 +372,7 @@
         }
     
     ;
-    ; CONFIGURAMOS LA BOLSITA DE REGS AUTOMÁTICAMENTE
+    ; CONFIGURAMOS LA BOLSITA DE REGS AUTOMÃTICAMENTE
     ;
     gosub setup_bolsa
     
@@ -395,7 +395,7 @@
           wait 40
           gosub setup_bolsa
         }
-        else ; Si hemos resucitado y encontrado la bolsa o supeerado el tiempo límite de lotearte
+        else ; Si hemos resucitado y encontrado la bolsa o supeerado el tiempo lÃ­mite de lotearte
            {
              if ( %muerto = 0 ) && ( #SCNT > %tiempo_res || %bolsa_encontrada = 1 )
                   {
@@ -426,7 +426,7 @@
                        if ( %muerto = 0 ) && ( #SCNT < %tiempo_res || %bolsa_encontrada = 0 )
                             {
                               finditem %id_final_bolsa C_ , #BACKPACKID
-                              if #FINDKIND <> -1 ; ¡Hemos encontrado la bolsita! ^^
+                              if #FINDKIND <> -1 ; Â¡Hemos encontrado la bolsita! ^^
                                  {
                                    set %bolsa_encontrada 1
                                    set %tiempo_res #SCNT ; Desactivamos la espera y volvemos a iniciar la macro...
@@ -436,7 +436,7 @@
                        goto mainloop
                      }
            }
-     gosub bloop ; Miramos si hay que ejecutar algun sub de los botones "Upd" del menú...
+     gosub bloop ; Miramos si hay que ejecutar algun sub de los botones "Upd" del menÃº...
     }
     else ; En caso de muerte...
        {
@@ -467,7 +467,7 @@
        {
         set %count 0
         cr1:
-                finditem %tipoID . %i C_ , %id_final_bolsa ; Buscamos sólo en la bolsa que hemos elegido.
+                finditem %tipoID . %i C_ , %id_final_bolsa ; Buscamos sÃ³lo en la bolsa que hemos elegido.
                 if #findkind <> -1
                    {
                       set %count %count + #findstack
@@ -479,7 +479,7 @@
                       set %tb %tb , %diminutivo . %i , : , %count
                       set %tbv2 %tbv2 , %nombre . %i , : , %count
                    }
-                   else ; Añadimos un espacio para la barra de título y una separador ($) para el sub split.
+                   else ; AÃ±adimos un espacio para la barra de tÃ­tulo y una separador ($) para el sub split.
                       {
                         set %tb %tb , #spc , %diminutivo . %i , : , %count
                         set %tbv2 %tbv2 , $ , %nombre . %i , : , %count
@@ -602,9 +602,9 @@ if %num_bolsitas > 1
            ignoreitem #FINDID
          }
          
-     if %num_bolsitas_regs >= 1 ; Si hay una o más de una bolsita de reactivos
+     if %num_bolsitas_regs >= 1 ; Si hay una o mÃ¡s de una bolsita de reactivos
      {
-        for %i 1 %num_bolsitas ; Elegimos la que más pesa.
+        for %i 1 %num_bolsitas ; Elegimos la que mÃ¡s pesa.
             {
               set %ahora_pesada %peso_bolsa . %i
               set %ahora_nombre %BOLSA_REACTIVOS . %i
@@ -638,7 +638,7 @@ if %num_bolsitas > 1
            }
      }
    }
-   else  ; Si sólo hay una bolsita.
+   else  ; Si sÃ³lo hay una bolsita.
       {
         if %num_bolsitas = 1
            {
@@ -717,11 +717,11 @@ if ( %contenedor_regs_GUMP = #CONTNAME )
 return
 
 ;============================
-; COMPROBAR NÚMERO DE DIEZMOS
+; COMPROBAR NÃšMERO DE DIEZMOS
 ;============================
 sub CheckDiezmos
 ignoreitem reset
-; Empezamos sin recordar los diezmos que había (Los volvemos a contar)
+; Empezamos sin recordar los diezmos que habÃ­a (Los volvemos a contar)
 set %num_montones_diezmos 0
 set %actual_pesado 0
 set %total_diezmos 0
@@ -739,7 +739,7 @@ for %i 1 10 ; Borramos incluso hasta 10 montones de diezmos
 finditem POF C_ , %id_final_bolsa
 if #FINDKIND <> -1
    {
-     for %i 1 #FINDCNT ; Aquí pueden existir montones de oro, etc... cosas que no son diezmos.
+     for %i 1 #FINDCNT ; AquÃ­ pueden existir montones de oro, etc... cosas que no son diezmos.
          {
            analizar_bolsa:
            finditem POF C_ , %id_final_bolsa
@@ -748,7 +748,7 @@ if #FINDKIND <> -1
                   set %num_montones_diezmos %num_montones_diezmos + 1
                   set %stack_diezmos_bolsa . %i #FINDSTACK
                   set %stack_diezmos_bolsa_ID . %i #FINDID
-                  ignoreitem #FINDID ; Descartamos el montón de diezmos que acabamos de inspecionar
+                  ignoreitem #FINDID ; Descartamos el montÃ³n de diezmos que acabamos de inspecionar
                 }
                 else ; Descartamos otro tipo de monedas
                    {
@@ -765,7 +765,7 @@ ignoreitem reset
 finditem POF C_ , #BACKPACKID ; Buscamos en la mochila
 if #FINDKIND <> -1
    {
-     for %i 1 #FINDCNT ; Aquí pueden existir montones de oro, etc... cosas que no son diezmos.
+     for %i 1 #FINDCNT ; AquÃ­ pueden existir montones de oro, etc... cosas que no son diezmos.
          {
            analizar_mochila:
            finditem POF C_ , #BACKPACKID
@@ -774,7 +774,7 @@ if #FINDKIND <> -1
                   set %num_montones_diezmos %num_montones_diezmos + 1
                   set %stack_diezmos_mochila . %i #FINDSTACK
                   set %stack_diezmos_mochila_ID . %i #FINDID
-                  ignoreitem #FINDID ; Descartamos el montón de diezmos que acabamos de inspecionar
+                  ignoreitem #FINDID ; Descartamos el montÃ³n de diezmos que acabamos de inspecionar
                 }
                 else ; Descartamos otro tipo de monedas
                    {
@@ -787,7 +787,7 @@ if #FINDKIND <> -1
          }
    }
 
-if %num_montones_diezmos >= 1 ; Si hay uno o más montones de diezmos
+if %num_montones_diezmos >= 1 ; Si hay uno o mÃ¡s montones de diezmos
    {
      for %i 1 %num_montones_diezmos ; Los sumamos todos para tener el total de diezmos
          {
@@ -805,7 +805,7 @@ if %num_montones_diezmos >= 1 ; Si hay uno o más montones de diezmos
                 }
          }
    }
-   else ; Si no hay ningún stack de diezmos en ningún sitio
+   else ; Si no hay ningÃºn stack de diezmos en ningÃºn sitio
       {
         if ( ! %ok_diezmos ) && ( #SCNT > %cronometro_aviso_diezmos )
                {
@@ -818,7 +818,7 @@ if %num_montones_diezmos >= 1 ; Si hay uno o más montones de diezmos
                  set %cronometro_aviso_diezmos #SCNT + %tiempo_aviso
                }
       }
-     ; Llevar la cuenta si cambia el número de diezmos
+     ; Llevar la cuenta si cambia el nÃºmero de diezmos
      if ( %total_diezmos <> %CNT_diezmos )
           {
             set %CNT_diezmos %total_diezmos
@@ -847,7 +847,7 @@ if %num_montones_diezmos >= 1 ; Si hay uno o más montones de diezmos
 return
 
 ;===========================
-; COMPROBAR NÚMERO DE VENDAS
+; COMPROBAR NÃšMERO DE VENDAS
 ;===========================
 sub CheckVendas
 ignoreitem reset
@@ -897,8 +897,8 @@ if ( %curacion )
                             }
                       }
                }
-       ; "Pesar" los montones y monitorizar el que más tenga...
-       if %num_montones_vendas >= 1 ; Si hay uno o más montones de diezmos
+       ; "Pesar" los montones y monitorizar el que mÃ¡s tenga...
+       if %num_montones_vendas >= 1 ; Si hay uno o mÃ¡s montones de diezmos
           {
             for %i 1 %num_montones_vendas ; Los sumamos todos para tener el total de diezmos
                 {
@@ -961,7 +961,7 @@ if #FINDKIND <> -1
      for %i 1 #FINDCNT
          {
            finditem WUF C_ , #BACKPACKID
-           if #FINDCOL = 254 ; Pota Curación
+           if #FINDCOL = 254 ; Pota CuraciÃ³n
               {
                 set %POTS_CURACION #FINDSTACK
 	            }
@@ -1009,7 +1009,7 @@ for %i 1 8
               ; Actualizar contadores de POCIONES
               gosub actualizar_contadores_pociones
             }
-       ; Evitamos sacar info de un tipo de poción que no usamos ni controlamos...
+       ; Evitamos sacar info de un tipo de pociÃ³n que no usamos ni controlamos...
        if ( %STACK_POCION_ACTUAl >= %MIN_POCION_ACTUAL ) && ( ! %ok_pot . %i )
             {
               set %ok_pot . %i #true
@@ -1040,7 +1040,7 @@ if %alert_pots = 1
 return
 
 ;============================
-; COMPROBAR NÚMERO DE FLECHAS
+; COMPROBAR NÃšMERO DE FLECHAS
 ;============================
 sub checkFlechas
 ignoreitem reset
@@ -1090,8 +1090,8 @@ if ( %arco )
                             }
                       }
                }
-       ; "Pesar" los montones y monitorizar el que más tenga...
-       if %num_montones_flechas >= 1 ; Si hay uno o más montones de diezmos
+       ; "Pesar" los montones y monitorizar el que mÃ¡s tenga...
+       if %num_montones_flechas >= 1 ; Si hay uno o mÃ¡s montones de diezmos
           {
             for %i 1 %num_montones_flechas ; Los sumamos todos para tener el total de diezmos
                 {
@@ -1142,7 +1142,7 @@ if ( %arco )
 return
 
 ;============================
-; COMPROBAR NÚMERO DE VIROTES
+; COMPROBAR NÃšMERO DE VIROTES
 ;============================
 sub checkVirotes
 ignoreitem reset
@@ -1192,8 +1192,8 @@ if ( %arco )
                             }
                       }
                }
-       ; "Pesar" los montones y monitorizar el que más tenga...
-       if %num_montones_virotes >= 1 ; Si hay uno o más montones de diezmos
+       ; "Pesar" los montones y monitorizar el que mÃ¡s tenga...
+       if %num_montones_virotes >= 1 ; Si hay uno o mÃ¡s montones de diezmos
           {
             for %i 1 %num_montones_virotes ; Los sumamos todos para tener el total de diezmos
                 {
@@ -1296,7 +1296,7 @@ if %pausado
 return
 
 ;==========================
-; Un bonito menú gráfico ^^
+; Un bonito menÃº grÃ¡fico ^^
 ;==========================
 ;--------- EasyUO Menu Designer Code Begin ---------
 sub showEUOMenu
@@ -1459,7 +1459,7 @@ if ( ! %curacion )
      }
   menu getnum vendas
   set %MIN_VENDAS #MenuRes
-	; Si hemos actualizado los límites, entonces activamos la alerta de inmediato...
+	; Si hemos actualizado los lÃ­mites, entonces activamos la alerta de inmediato...
 	set %alert_vendas 1
 return
 
@@ -1476,7 +1476,7 @@ if ( ! %caballeria ) || ( ! %curacion ) || ( ! %anatomia )
      }
   menu getnum diezmos
   set %MIN_DIEZMOS #MenuRes
-  ; Si hemos actualizado los límites, entonces activamos la alerta de inmediato...
+  ; Si hemos actualizado los lÃ­mites, entonces activamos la alerta de inmediato...
   set %alert_diezmos 1
 return
 
@@ -1497,7 +1497,7 @@ sub actualizar_magery
 	set %MIN_REGS_PN #MenuRes
 	menu getnum reg8
 	set %MIN_REGS_RM #MenuRes
-	; Si hemos actualizado los límites, entonces activamos la alerta de inmediato...
+	; Si hemos actualizado los lÃ­mites, entonces activamos la alerta de inmediato...
 	set %alert_regs 1
 return
 
@@ -1525,7 +1525,7 @@ sub actualizar_nigro
 	set %MIN_REGS_TF #MenuRes
 	menu getnum reg16
 	set %MIN_REGS_SV #MenuRes
-	; Si hemos actualizado los límites, entonces activamos la alerta de inmediato...
+	; Si hemos actualizado los lÃ­mites, entonces activamos la alerta de inmediato...
 	set %alert_regs 1
 return
 
@@ -1546,7 +1546,7 @@ sub actualizar_pociones
 	set %MIN_POTS_ENCOGER #MenuRes
 	menu getnum piel_piedra
 	set %MIN_POTS_PIEDRA #MenuRes
-	; Si hemos actualizado los límites, entonces activamos la alerta de inmediato...
+	; Si hemos actualizado los lÃ­mites, entonces activamos la alerta de inmediato...
 	set %alert_pots 1
 return
 
@@ -1563,7 +1563,7 @@ if ( ! %arco )
      }
   menu getnum flechas
   set %MIN_FLECHAS #MenuRes
-  ; Si hemos actualizado los límites, entonces activamos la alerta de inmediato...
+  ; Si hemos actualizado los lÃ­mites, entonces activamos la alerta de inmediato...
   set %alert_flechas 1
 return
 
@@ -1580,7 +1580,7 @@ if ( ! %arco )
      }
   menu getnum virotes
   set %MIN_VIROTES #MenuRes
-  ; Si hemos actualizado los límites, entonces activamos la alerta de inmediato...
+  ; Si hemos actualizado los lÃ­mites, entonces activamos la alerta de inmediato...
   set %alert_virotes 1
 return
 
@@ -1766,7 +1766,7 @@ sub actualizar_contadores_pociones
 return
 
 ;=========================================
-; Ejecuta el SUB del botón correspondiente
+; Ejecuta el SUB del botÃ³n correspondiente
 ;=========================================
 sub bloop
 bloop:
@@ -1781,7 +1781,7 @@ return
 
 ;-@ ============================== @-;
 ;-@ ############################## @-;
-;-@ SUBS públicos del Foro EasyUO  @-;
+;-@ SUBS pÃºblicos del Foro EasyUO  @-;
 ;-@ ############################## @-;
 ;-@ ============================== @-;
 ;
