@@ -10,12 +10,12 @@
 ; Version: 1.1
 ; Client Tested with: 2.0.3
 ; EUO version tested with: EasyUO 1.5 Version 243
-; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Shard: Ultima Alianza (Â¡Hasta la muerte!)
 ; Public Release: 04/05/2019
 ; Revised On: 04/05/2019
-; Propósito: Completar escrituras de comodidad del item especificado.
-; Ejemplo: Hacer 25 deeds de 1000 flechas cada uno.
-; Instrucciones: Elegir bolsa de deeds y bolsa destino de los deeds (Puede ser la misma, Ejem: la mochila), y por último el tipo de objeto.
+; PropÃ³sito: Completar escrituras de comodidad del item especificado.
+; Ejemplo: Hacer 25 deeds de 1000 flechas cada uno, etc.
+; Instrucciones: Elegir bolsa de deeds y bolsa destino de los deeds (Puede ser la misma, Ejem: la mochila), y por Ãºltimo el tipo de objeto.
 
 set %numero_deeds 22
 set %tamano_deed 100
@@ -215,7 +215,7 @@ repeat
     
 sub setupBank ;<=========================>
 display yesno ******************** [ BANK Mode ] ******************** $$
-            + ¿Quieres hacer deeds en el bank de una ciudad?          $$
+            + Â¿Quieres hacer deeds en el bank de una ciudad?          $$
             + ******************************************************* $$
 if ( #dispres = yes )
      {
@@ -253,7 +253,7 @@ if #FINDSTACK >= %tamano_deed
                 }
                 else
                    {
-                     if #FINDCOL = 436 ; Deed vacío
+                     if #FINDCOL = 436 ; Deed vacÃ­o
                         {
                           break ; Hemos encontrado uno para usar...
                         }
@@ -263,7 +263,7 @@ if #FINDSTACK >= %tamano_deed
      else ; No hay deeds en la mochila
         {
           finditem TVH C_ , %contenedor_1
-          if #FINDCNT > 0 && #FINDCOL = 436 ; Deed vacío
+          if #FINDCNT > 0 && #FINDCOL = 436 ; Deed vacÃ­o
              {
                exevent drag #FINDID 1
                exevent dropc #BACKPACKID 80 80
@@ -273,7 +273,7 @@ if #FINDSTACK >= %tamano_deed
         }
   _makeDeed:
   finditem TVH C_ , #BACKPACKID
-  if #FINDCNT > 0 && #FINDCOL = 436 ; Deed vacío
+  if #FINDCNT > 0 && #FINDCOL = 436 ; Deed vacÃ­o
      {
        set #LOBJECTID #FINDID
        finditem %item_type C_ , %contenedor_3
@@ -338,7 +338,7 @@ halt
 ;======================================================================
 sub wait_for_GUMP ; version 1.4 ~Locke
 ;=================================================================
-; Añadido #CONTID ^^
+; AÃ±adido #CONTID ^^
 if !_A0 < 3
 {
 display ok You haven't specified enough vars.$
