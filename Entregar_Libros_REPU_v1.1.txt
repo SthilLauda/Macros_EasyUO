@@ -6,7 +6,7 @@
 ;   `|...|'  .||.   `|..' .||. .||    ||. `|..||. .//       \\. .||. .||. `|..||. .||  ||. /... `|..||.
 ; ======================================================================================================
 ;
-; Nombre Script: Entregar Libros [ Repu Élfica ]
+; Nombre Script: Entregar Libros [ Repu Ã‰lfica ]
 ;
 ; Author: Sthil Lauda
 ; Version: 1.1
@@ -15,8 +15,8 @@
 ; Shard OSI / FS: (Ultima Alianza)
 ; Public Release: 16/03/18
 ; Revised On: 16/03/18
-; Propósito: Entregar libros a un NPC, controlando la distancia.
-; Configuración: Ninguna, hay que ir a donde está el NPC Elfo sabio del asentamiento de la Capilla de Sacrificio. (3355,292,4)
+; PropÃ³sito: Entregar libros a un NPC, controlando la distancia.
+; ConfiguraciÃ³n: Ninguna, hay que ir a donde estÃ¡ el NPC Elfo sabio del asentamiento de la Capilla de Sacrificio. (3355,292,4).
 
 initevents
 set %libro XYF
@@ -59,7 +59,7 @@ onHotKey ESC
 goto TESC
 
 meter:
-finditem %libro ; Buscamos en todas las bolsas que están abiertas...
+finditem %libro ; Buscamos en todas las bolsas que estÃ¡n abiertas...
 if #FINDCNT > 0
    {
      if #FINDCOL = 668 ; Libro Verde Restaurado
@@ -82,7 +82,7 @@ if #FINDCNT > 0
                            set %pos_elfo_z #FINDZ
                            event pathfind %pos_elfo_x %pos_elfo_y %pos_elfo_z
                            wait 40
-                           finditem %elfo G_15 ; Actualizar la distancia después de andar...
+                           finditem %elfo G_15 ; Actualizar la distancia despuÃ©s de andar...
                          }
                          until #FINDDIST < 3
                   }
