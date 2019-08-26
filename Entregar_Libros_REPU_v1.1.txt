@@ -1,0 +1,116 @@
+; ======================================================================================================
+;  '||   ||` '||`   ||                                 /.\      '||`
+;   ||   ||   ||    ||     ''                         // \\      ||   ''
+;   ||   ||   ||  ''||''   ||  '||),,(|,   '''|.     //...\\     ||   ||   '''|.  `||''|,  '''/  '''|.
+;   ||   ||   ||    ||     ||   || || ||  .|''||    //     \\    ||   ||  .|''||   ||  ||   //  .|''||
+;   `|...|'  .||.   `|..' .||. .||    ||. `|..||. .//       \\. .||. .||. `|..||. .||  ||. /... `|..||.
+; ======================================================================================================
+;
+; Nombre Script: Entregar Libros [ Repu Élfica ]
+;
+; Author: Sthil Lauda
+; Version: 1.1
+; Client Tested with: 4.0.5b
+; EUO Version tested with: V1.42 (Build 009B)
+; Shard OSI / FS: (Ultima Alianza)
+; Public Release: 16/03/18
+; Revised On: 16/03/18
+; Propósito: Entregar libros a un NPC, controlando la distancia.
+; Configuración: Ninguna, hay que ir a donde está el NPC Elfo sabio del asentamiento de la Capilla de Sacrificio. (3355,292,4)
+
+initevents
+set %libro XYF
+set %confp 1
+set #sysmsgcol 53
+SET %HID_TIMER #SCNT
+
+event sysmessage Haz click en el NPC Elfo
+set #TARGCURS 1
+target
+_targLoop1:
+if #TARGCURS = 1
+   {
+     wait 1
+     goto _targLoop1
+   }
+set %elfo #LTARGETID
+
+configurar:
+if %confp = 1
+   {
+     set #sysmsgcol 53
+     event sysmessage Abre las bolsa donde estan los libros
+     event sysmessage Y presiona la tecla ESC
+     set %conf 1
+     goto TESC
+   }
+
+TESC:
+onHotKey ESC
+{
+  if %conf = 1
+     {
+       set #sysmsgcol 68
+       event sysmessage OK, descargando...
+       wait 40
+       goto meter
+     }
+}
+goto TESC
+
+meter:
+finditem %libro ; Buscamos en todas las bolsas que están abiertas...
+if #FINDCNT > 0
+   {
+     if #FINDCOL = 668 ; Libro Verde Restaurado
+        {
+          if ( H Notin #CHARSTATUS ) && ( #SCNT > %HID_TIMER )
+               {
+                 event macro 13 21 ; Use SKILL Hiding
+                 SET %HID_TIMER #SCNT + 5
+               }
+          set %tmp_libro #FINDID
+          finditem %elfo G_15
+          if #FINDCNT > 0
+             {
+               if #FINDDIST > 3
+                  {
+                    repeat
+                         {
+                           set %pos_elfo_x #FINDX - 1
+                           set %pos_elfo_y #FINDY - 1
+                           set %pos_elfo_z #FINDZ
+                           event pathfind %pos_elfo_x %pos_elfo_y %pos_elfo_z
+                           wait 40
+                           finditem %elfo G_15 ; Actualizar la distancia después de andar...
+                         }
+                         until #FINDDIST < 3
+                  }
+                  else ; Estamos lo suficientemente cerca del NPC
+                     {
+                       exevent drag %tmp_libro
+                       wait 7
+                       exevent dropC %elfo
+                     }
+             }
+             else
+                {
+                  set #sysmsgcol 38
+                  event sysmessage NO VEO AL ELFO! :-(
+                  halt
+                }
+        }
+        else
+           {
+             ignoreitem #FINDID Libros_Malos
+           }
+        
+   }
+   else
+      {
+        set #sysmsgcol 88
+        event sysmessage NO QUEDAN MAS libros! :-)
+        wait 20
+        goto configurar
+      }
+goto meter
