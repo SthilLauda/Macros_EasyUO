@@ -28,6 +28,8 @@
 ;    _   -    _   -  (_ __)     _    ~~;~~     -_
 ;       _- _-  _    < / < \  _-  _    -     _-   _
 ;
+set %version v1.7
+;
 ; *** NOTAS "MÁGICAS" ^^ *** :
 ; - Si la macro de domar se os para en un determinado sitio y el pj no se mueve, pausad la macro,
 ;   abrid una nueva pestaña en el EasyUO, y escribid lo siguiente: set *posicion 0
@@ -54,7 +56,7 @@ set %comida RGG_NRD_QSD_ZBG_WLI_QRD_END_FUD_YLI_WLI_HGI
 ;
 set #SYSMSGCOl 88
 event SysMessage TammingGenius by Nilaween
-event SysMessage [ MOD+ Sthil ]
+event SysMessage [ MOD+ Sthil %version ]
 set #SYSMSGCOl 43
 event SysMessage Intentando acudir a la ultima posicion. Por favor, ayudame a llegar.
 chooseskill Anim real
@@ -77,28 +79,29 @@ if %proxima_vez <= %tiempo_actual ; Comer cada cierto tiempo si hay hambre
 {
   gosub comprobar_comida
 }
-set #LTARGETID #CHARID
+set #LTARGETID N/A
 finditem * G_25
 for #FINDINDEX 1 #FINDCNT
 {
 if #FINDREP <> 3 2
-ignoreitem #FINDID
+ignoreitem #FINDID IGNORE_ANIMALS
 set *bloqueados *bloqueados , _ , #FINDID
 if #FINDREP = 3 && #FINDID notIn %recientameados && #FINDDIST < %distancia && #FINDX < 755 2
-set #LTARGETID #FINDID
+set %tmp_animal #FINDID
 set %distancia #FINDDIST
 }
-if #LTARGETID = #CHARID
+if %tmp_animal = #CHARID
 goto movimiento
-event PROPERTY #LTARGETID
+event PROPERTY %tmp_animal
 if ( OSO in #PROPERTY && #SKILL < 601 ) || SERPIENTE in #PROPERTY || HORRENDO in #PROPERTY 2
-set %recientameados %recientameados , _ , #LTARGETID
+set %recientameados %recientameados , _ , %tmp_animal
 goto nuevotarget
 gosub checkBugTarget
 repitiendotarget:
 set %jstart #jindex
 event macro 13 35
 target
+set #LTARGETID %tmp_animal
 set #LTARGETKIND 1
 event macro 22
 gosub wait_for MSG TE_ACEPTA TU_HABILIDAD YA_ESTA NO_PUEDE_SER NO_PUEDES_DOMAR GET_THERE NO_PUEDES_VER SEE_THE_TARGET UNEXPECTED_TARGET FUERA_DE_TU ESTAS_DEMASIADO_LEJOS NO_CONSIGUES 200
@@ -108,13 +111,13 @@ if ( #TRUE in #RESULT )
           {
             event macro 1 0 all release
             gosub hiding
-            set %recientameados %recientameados , _ , #LTARGETID
+            set %recientameados %recientameados , _ , %tmp_animal
             goto nuevotarget
           }
        if YA_ESTA in #RESULT || NO_PUEDE_SER in #RESULT || NO_PUEDES_DOMAR in #RESULT || GET_THERE in #RESULT || %intentos <= 0 3
           {
-            set *bloqueados *bloqueados , _ , #LTARGETID
-            ignoreitem #LTARGETID
+            set *bloqueados *bloqueados , _ , %tmp_animal
+            ignoreitem %tmp_animal IGNORE_ANIMALS
             gosub hiding
             goto nuevotarget
           }
@@ -224,7 +227,7 @@ if ( %hiding )
 return
 
 sub checkBugTarget ; <==============================>
-finditem #LTARGETID
+finditem %tmp_animal
 if #FINDX In %ignore_locs_X && #FINDY In %ignore_locs_Y && #FINDZ In %ignore_locs_Z ; El animal está en una parte del mapa (Yew) bugeado, y el PJ se queda atrapado.
    {
      set *bloqueados *bloqueados , _ , #FINDID
@@ -244,7 +247,7 @@ sub seguir ; <==============================>
 if %tiempopathfind > #SYSTIME && %tiempopathfind <> N/A
 return
 set %tiempopathfind #SYSTIME + 2000
-finditem #LTARGETID
+finditem %tmp_animal
 if #FINDKIND <> -1 && #FINDDIST > 4
 gosub pathFind #FINDX #FINDY #FINDZ 1 5
 return
