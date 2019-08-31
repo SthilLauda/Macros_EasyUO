@@ -283,7 +283,7 @@ if #dispres = no
              {               
                event sysmessage OK Bolsa: %bolsa_loot
                wait 10
-             ; gosub wait_for GUMP %bolsa_loot CLOSE ; Cerramos la bolsa del loot...
+               gosub wait_for GUMP %bolsa_loot CLOSE ; Cerramos la bolsa del loot...
              }     
    }
    else
