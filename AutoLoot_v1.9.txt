@@ -35,17 +35,17 @@
 ;                                 '==--=='
 ;
 ; Author: Sthil Lauda
-; Version: 1.8
+; Version: 1.9
 ; Client Tested with: 2.0.3
 ; EUO version tested with: EasyUO 1.5 Version 243
 ; Shard: Ultima Alianza (¡Hasta la muerte!)
-; Public Release: 25/08/2019
-; Revised On: 28/04/2019
+; Public Release: 24/08/2019
+; Revised On: 01/09/2019
 ; Purpose: Lotear y cortar el cadaver.
 ; Instrucciones: - Configurar las teclas rápidas (hotkeys).
 ;                - Si quieres que no lotee alguna cosa, desactiva la línea correspondiente añadiendo un ";" delante Ejem: " ;gosub moveItem %gemas %contenedor %bolsa_loot ".
 ;
-set %version v1.8
+set %version v1.9
 ;
 ;________________________________
 ;
@@ -151,8 +151,8 @@ set %PosicionBolsaLootY 131
 ;   del cadáver a la mochila (drop). De esta forma se evita esperar de sobra "a ciegas" para darle el suficiente
 ;   tiempo a moverse de un sitio a otro, dependiendo del lag, etc.
 ;
-set %actionwait 10  ; Tiempo de espera entre acciones.
-set %dragdropwait 1 ; Tiempo de espera para el drag & drop.
+set %actionwait 10  ; Tiempo de espera entre acciones
+set %dragdropwait 1 ; Tiempo de espera para el drag & drop
 ;
 ;-----------------------------------
 ; *** SONIDO AL COMPLETAR LOTEO ***
@@ -178,7 +178,7 @@ set %joyas IJG_SJG_UJG_HJG
 set %runas QWL_SWL_RWL_PWL
 set %pociones WUF
 set %flechas LNK_RWF
-set %custom_pvm LGG_XYF_SEE_UZF_EAG_GUF_QEJ_LWK ; Pólvoras, Libros, Vasijas, Escamas, Madera muerta, Huesos, Cristal de fundición, Corazón nórdico, etc...
+set %custom_pvm LGG_XYF_SEE_UZF_EAG_GUF_QEJ_LWK_WXD_EWS ; Pólvoras, Libros, Vasijas, Escamas, Madera muerta, Huesos, Cristal de fundición, Corazón nórdico, etc...
 set %golems YWL_RCG_QSL_LYAB
 set %gemas BVG_YVF_CVF_CWF_RVF_GVF_BWF_VVF_DWF_ZVF_OVF_TVF_FVF_HVF_QVF_QUF_GWF_
  +BVF_VUF_PVF_BUF_FVF_NVF_AWF_DVF_UVF_KVF_EVF_WVF_FWF_RVF_WUF_BVF_MWF_XVF_HEJ_MVF
@@ -283,7 +283,7 @@ if #dispres = no
              {               
                event sysmessage OK Bolsa: %bolsa_loot
                wait 10
-               gosub wait_for GUMP %bolsa_loot CLOSE ; Cerramos la bolsa del loot...
+               ;gosub wait_for GUMP %bolsa_loot CLOSE ; Cerramos la bolsa del loot...
              }     
    }
    else
@@ -793,7 +793,7 @@ SUB moveItem
                          }
                  IF %mode = 1
                     {
-                      SET %_newItemLocation %3
+                      SET %_newItemLocation %2
                     }
                     else
                        {
