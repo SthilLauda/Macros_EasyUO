@@ -47,7 +47,7 @@
 ;
 ; Author: Sthil Lauda
 ; Testeada por: Bishop
-; Version: 5.3 (Experimental) xDDD
+; Version: 5.4 (Experimental) xDDD
 ; Client Tested with: 2.0.3
 ; EUO version tested with: EasyUO 1.5 Version 243
 ; Shard: Ultima Alianza (¡Hasta la muerte!)
@@ -67,7 +67,7 @@
 ;          - Tecla para auto-domar una montura hasta que te acepte como dueño.
 ;          - Canciones élficas y del libro de música.
 ;
-set %version v5.3
+set %version v5.4
 ;==============================================================================================================
 ; *** INSTRUCCIONES ***
 ;======================
