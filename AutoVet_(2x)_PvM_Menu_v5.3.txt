@@ -52,22 +52,22 @@
 ; EUO version tested with: EasyUO 1.5 Version 243
 ; Shard: Ultima Alianza (¡Hasta la muerte!)
 ; Public Release: 25/08/2019
-; Revision Date: 25/08/2019
+; Revision Date: 01/09/2019
 ; Global Variables Used: none.
-set %version v5.3
 ; Purpose:
 ;          - Aplica vendas en base a la posición que hayas fijado apuntando con el mouse en la barra de salud de tu montura.
-;          - Aplica pociones de curación animal (Solo al familiar).
-;          - Neutraliza el veneno con Magia (An Nox) en base al color verde del poison en la barra de salud de tu montura o familiar.
-;          - Curación con Magia (In Vas Mani) **** ¡ AVISO ! **** ¡Esta opción consume mucho maná y toneladas de regs! XD
+;          - Aplica pociones de curación animal.
+;          - Neutraliza el veneno con Magia (An Nox) en base al color lima del poison en la barra de salud de tu mascota.
+;          - Curación con Magia (In Vas Mani) ****AVISO**** ¡Esta opción consume toneladas de maná y regs!;
 ;          - Canción Himno de Batalla y Frenesí sobre el familiar, montura y golem.
 ;          - Resucita al familiar y a la montura automáticamente.
 ;          - Oculta a la montura con el hechizo "An Lor Xen".
-;          - Equipa arco y armadura al golem, lo desarma y quita la armadura para encogerlo.
+;          - Equipa arco y armadura de golem, y lo desarma y quita la armadura para encogerlo.
 ;          - Recalea a 1 una runa de tu elección en el libro que hayas configurado (casa, establos, banco, etc).
 ;          - Tecla para auto-domar una montura hasta que te acepte como dueño.
 ;          - Canciones élficas y del libro de música.
 ;
+set %version v5.3
 ;==============================================================================================================
 ; *** INSTRUCCIONES ***
 ;======================
@@ -82,19 +82,18 @@ set %version v5.3
 ;==============================================================================================================
 ; Para encontrar estos valores X e Y, tienes que mover con la mano la barra de salud de tu montura hasta el sitio
 ; donde quieres que se quede fija, y sin soltar la barra de salud, mirar en el EasyUO y apuntar lo que pone en
-; el apartado "Container Info" -> #CONTPOSX y #CONTPOSY. Para ello, redimensiona la ventana del UO a la mitad para que puedas poner
-; la ventana del EasyUO al lado de la ventana del UO y poder mirar el EasyUO al mismo tiempo que mueves la barra de salud.
+; el apartado "Container Info" -> #CONTPOSX y #CONTPOSY. Reduce la ventana del UO a la mitad para que puedas tener
+; el EasyUO abierto al lado de la ventana del UO y poder mirar el EasyUO al mismo tiempo que mueves la barra de salud.
 ;--------
 ; MONTURA
 set %PosicionBarraSaludMontura1_X 346 ; La coordenada X de la pantalla donde situar la barrra de salud de tu MONTURA.
 set %PosicionBarraSaludMontura1_Y 708 ; La coordenada Y de la pantalla donde situar la barrra de salud de tu MONTURA.
-;---------
 ; FAMILIAR
 set %PosicionBarraSaludFamiliar_X 192 ; La coordenada X de la pantalla donde situar la barrra de salud de tu FAMILIAR.
 set %PosicionBarraSaludFamiliar_Y 708 ; La coordenada Y de la pantalla donde situar la barrra de salud de tu FAMILIAR.
 ;==============================================================================================================
-; Nombre del libro de Runas y posición de la runa a la que quieres viajar... Un establo, el banco, tu casa, etc.
-set %nombre_libro TAMER ; Escribe el nombre de tu libro de runas donde tienes la runa que quieres usar.
+; Libro de Runas y posición de la runa a la que quieres viajar... Un establo, el banco, tu casa, etc.
+set %nombre_libro TAMER ; Escribe el nombre de tu libro de runas donde tienes la runa a los establos.
                         ; Si tu libro no tiene nombre, pónselo abriéndolo y usando la opción "Renombrar Libro".
 set %numero_runa 1      ; Escribe la posición de la runa (1-16) a donde recaleará usando el libro (establo, casa, banco, etc).
 ;==============================================================================================================
@@ -102,24 +101,24 @@ set %numero_runa 1      ; Escribe la posición de la runa (1-16) a donde recalea
 ; Puede ser por mala conexión a la red, latencias, etc... añadir tiempo (+1 segundo) hasta que funcione.
 set %tiempo_vendazo 7
 ; El máximo de vendas sucias en la mochila antes de limpiarlas.
-set %max_vendas_sucias 50
+set %max_vendas_sucias 25
 ;========================================================
-; Quitar el veneno a tu mascota usando magia. Si no te interesa ponlo a "#FALSE". Se puede activar/desactivar con la macro encencida desmarcando o marcando la casilla "Auto - An Nox".
+; Quitar el veneno a tu mascota usando magia ( An Nox ). Si no te interesa ponlo a "#FALSE".
 set %neutralizar_veneno_con_magia #TRUE
 ;========================================================
-; Curar puntos de vida a tu mascota usando magia ( In Vas Mani ). Si quieres activarlo ponlo a "#TRUE". Se puede activar/desactivar con la macro encencida desmarcando o marcando la casilla "Auto - InVasMani".
-; *** ¡¡AVISO!! *** Necesita toneleadas de regs y maná, y toda la magia que puedas ponerte encima ( Recomendado 120 con capa y joyas ).
+; Curar puntos de vida a tu mascota usando magia ( In Vas Mani ). Si quieres activarlo ponlo a "#TRUE".
+; *** ¡¡AVISO!! *** Necesita toneleadas de regs, maná y toda la magia que puedas ponerte encima ( Recomendado 120 con capa y joyas ).
 set %curar_con_magia #TRUE
 set %porciento_curar_con_magia 30 ; Número del {5..al..93} significa el % del TOTAL de los PUNTOS DE VIDA DE TU MASCOTA.
-                                  ; 30 -> Empezar a curar con magia cuando la vida esté por debajo del 30% de salud.
-set %distancia_hechizos 7 ; La distancia máxima en TILES con tu MASCOTA en la que casteará hechizos de curación/sanar ( In Vas Mani / An Nox ).
-                          ; Algo así como el "PERÍMETRO" en el que tu personaje podrá lanzar MAGIAS.
+                                  ; 60 -> Empezar a curar con magia cuando la vida baje del 60% de salud.
+set %distancia_hechizos 20 ; La distancia máxima en TILES con tu MASCOTA en la que casteará hechizos de curación/sanar ( In Vas Mani / An Nox ).
+                          ; Algo así como el "PERÍMETRO" para poder lanzar MAGIAS.
 ;========================================================
 set %ALIMENTAR #FALSE         ; Si quieres alimentarlo ponlo a "#TRUE" (ES LO IDEAL PARA MACREAR FAMILIARES).
 set %tipo_alimentacion FRUTA  ; La otra opción es "CARNE".
 set %tiempo_alimentacion_mascota 1800 ; No sé muy bien qué poner... de momento unos 1800 segundos ( 30min ) :D
 ;==============================================================================================================
-; Macro del UO "bow" ( Viene incluida de serie ). ( Es para cambiar el foco a la pantalla del UO. )
+; Macro del UO "bow" ( Viene incluida de serie ). Es para cambiar el foco a la pantalla del UO.
 set %tecla_saludo_1 b
 set %tecla_saludo_2 ctrl
 ;================================================
@@ -310,28 +309,17 @@ if ( %ALIMENTAR )
        gosub alimentar_mascotas
      }
 gosub getHealthPercentage %PosicionBarraSaludMontura1_X %PosicionBarraSaludMontura1_Y
+set %poison_montura1 %ghp_isPoisoned
 set %vida_montura1 #RESULT
 wait 10
 gosub getHealthPercentage %PosicionBarraSaludFamiliar_X %PosicionBarraSaludFamiliar_Y
+set %poison_familiar %ghp_isPoisoned
 set %vida_familiar #RESULT
 wait 10
-gosub checkDeadPets
-if ( %vida_montura1 < !healatpercent_mount1 && %vida_montura1 >= 1 ) || ( %vida_familiar < !healatpercent_familiar && %vida_familiar >= 1 ) || ( %montura_muerta || %familiar_muerto )
-     {
-       gosub comprobar_vendazo
-     }
 menu get AutoAnNoxChk
 set %neutralizar_veneno_con_magia #menures
 if ( %neutralizar_veneno_con_magia )
      {
-       gosub getHealthPercentage %PosicionBarraSaludMontura1_X %PosicionBarraSaludMontura1_Y
-       set %poison_montura1 %ghp_isPoisoned
-       set %vida_montura1 #RESULT
-       wait 10
-       gosub getHealthPercentage %PosicionBarraSaludFamiliar_X %PosicionBarraSaludFamiliar_Y
-       set %poison_familiar %ghp_isPoisoned
-       set %vida_familiar #RESULT
-       wait 10
        if ( %poison_montura1 = -1 && %vida_montura1 >= 1 ) || ( %poison_familiar = -1 && %vida_familiar >= 1 ) && ( #MANA >= 6 )
             {
               gosub comprobar_veneno
@@ -341,12 +329,6 @@ menu get AutoInVasManiChk
 set %curar_con_magia #menures
 if ( %curar_con_magia )
      {
-       gosub getHealthPercentage %PosicionBarraSaludMontura1_X %PosicionBarraSaludMontura1_Y
-       set %vida_montura1 #RESULT
-       wait 10
-       gosub getHealthPercentage %PosicionBarraSaludFamiliar_X %PosicionBarraSaludFamiliar_Y
-       set %vida_familiar #RESULT
-       wait 10
        menu GetNum PorcientoCurarMagia %porciento_curar_con_magia
        set %porciento_curar_con_magia #menures
        gosub checkDeadPets
@@ -354,6 +336,11 @@ if ( %curar_con_magia )
             {
               gosub comprobar_curar_magia
             }
+     }
+gosub checkDeadPets
+if ( %vida_montura1 < !healatpercent_mount1 && %vida_montura1 >= 1 ) || ( %vida_familiar < !healatpercent_familiar && %vida_familiar >= 1 ) || ( %montura_muerta || %familiar_muerto )
+     {
+       gosub comprobar_vendazo
      }
 goto main
 ;========================================================
@@ -641,7 +628,7 @@ repeat
             wait 5
           }
        set #TARGCURS 1 ; Nuevo target
-       target
+       target 1s
        while #TARGCURS = 1 ; Esperamos al click...
              {
                wait 1
@@ -650,7 +637,7 @@ repeat
             {
               set %objetivo #LTARGETID
             }
-            else ; Hemos cancelado el target con la tecla ESCAPE
+            else
                {
                  set #SYSMSGCOL 1360
                  event sysmessage CANCELADO!
@@ -1527,46 +1514,61 @@ sub vendazo
        set #LTARGETKIND 1
        set %jstart #jindex
        event macro 22 0
-       gosub wait_for MSG aplicas_las pones_el_vendas curas_a pero_fallas no_necesita_curarse estas_demasiado you_can 15
-       if ( #true in #result )
+       if ( %montura_muerta || %familiar_muerto )
             {
-              if ( pero_fallas in #result )
-                   {
-                     gosub limpiar_vendas
-                     gosub agrupar_vendas
-                     goto _reVenda
-                   }
-              if ( aplicas_las in #result || pones_el_vendas in #result )
-                   {
-                     if ( %montura_muerta || %familiar_muerto )
-                          {
-                            gosub wait_for GUMP 438_188 10
-                            if ( #RESULT )
-                                 {
-                                   contpos 25 25
-                                   click 243 177 f dmc
-                                   return
-                                 }
-                          }
-                          else
-                             {
-                               set %cronometro_vendazo #SCNT
-                               gosub limpiar_vendas
-                               gosub agrupar_vendas
-                             }
-                   }
-              if ( curas_a in #result )
-                   {
-                     return
-                   }
-              if ( no_necesita_curarse in #result || estas_demasiado in #result || you_can in #result )
-                   {
-                     return
-                   }
+              gosub resPet
             }
+            else
+               {
+                 set %cronometro_vendazo #SCNT
+                 wait 20
+                 gosub limpiar_vendas
+                 gosub agrupar_vendas
+               }
      }
 return
 }
+
+sub resPet
+gosub wait_for MSG aplicas_las pones_el_vendas curas_a pero_fallas no_necesita_curarse estas_demasiado you_can 15
+if ( #true in #result )
+     {
+       if ( pero_fallas in #result )
+            {
+              gosub limpiar_vendas
+              gosub agrupar_vendas
+              goto _reVenda
+            }
+       if ( aplicas_las in #result || pones_el_vendas in #result )
+            {
+              if ( %montura_muerta || %familiar_muerto )
+                   {
+                     gosub wait_for GUMP 438_188 10
+                     if ( #RESULT )
+                          {
+                            contpos 25 25
+                            click 243 177 f dmc
+                            return
+                          }
+                   }
+                   else
+                      {
+                        set %cronometro_vendazo #SCNT
+			wait 20
+                        gosub limpiar_vendas
+                        gosub agrupar_vendas
+                      }
+            }
+       if ( curas_a in #result )
+            {
+              return
+            }
+       if ( no_necesita_curarse in #result || estas_demasiado in #result || you_can in #result )
+            {
+              return
+            }
+     }
+return
 
 ;========================================================
 sub comprobar_veneno
@@ -1717,16 +1719,16 @@ return
 
 sub limpiar_vendas ; <==============================>
 finditem %vendas_sucias C_ , #BACKPACKID
- if #FINDSTACK >= %max_vendas_sucias
-  {
-    set #LOBJECTID #FINDID
-    event macro 17 0
-    target 1s
-    set #LTARGETID %pilon
-    set #LTARGETKIND 1
-    event macro 22 0
-    wait 10
-  }
+if #FINDSTACK >= %max_vendas_sucias
+   {
+     set #LOBJECTID #FINDID
+     event macro 17
+     target
+     set #LTARGETID %pilon
+     set #LTARGETKIND 1
+     event macro 22
+     wait 10
+   }
 return
 
 sub agrupar_vendas ; <==============================>
