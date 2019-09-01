@@ -28,7 +28,7 @@
 ;    _   -    _   -  (_ __)     _    ~~;~~     -_
 ;       _- _-  _    < / < \  _-  _    -     _-   _
 ;
-set %version v1.8
+set %version v1.10
 ;
 ; *** NOTAS "MÁGICAS" ^^ *** :
 ; - Si la macro de domar se os para en un determinado sitio y el pj no se mueve, pausad la macro,
