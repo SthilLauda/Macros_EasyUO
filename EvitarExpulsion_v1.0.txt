@@ -82,7 +82,7 @@ for %s 1 53 ; Comprobar las 53 habilidades ^^
       set %skills_totales %skills_totales + #SKILL
       if ( #SKILL >= 648 ) && ( #skillLock <> locked )
            {
-             exevent skilllock %habilidad locked
+             exevent skilllock %habilidad_ . %s locked
              if #skillLock <> locked
                 {
                   set #SYSMSGCOL 38
