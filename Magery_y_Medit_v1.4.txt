@@ -180,7 +180,7 @@ chooseskill Mage real
 if #SKILL >= 1000
    {
      set #SYSMSGCOL 73
-     event sysmessage SOMOS GN MAGERY! :-)
+     event sysmessage SOMOS GM MAGERY! :-)
      halt
    }
 return
