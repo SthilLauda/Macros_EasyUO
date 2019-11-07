@@ -121,7 +121,7 @@ if %producto = 2
 return
 
 sub makeDeed ;<=========================>
-finditem %producto_guardar C_ , %bolsa
+finditem %producto_guardar C_ , %cofre
 if #FINDSTACK >= %tamano_deed
 {
   _cogeDeed:
@@ -142,7 +142,7 @@ if #FINDSTACK >= %tamano_deed
   if #FINDCNT > 0 && #FINDCOL = 436 ; Deed vacío
      {
        set #LOBJECTID #FINDID
-       finditem %producto_guardar C_ , %bolsa
+       finditem %producto_guardar C_ , %cofre
        if #FINDSTACK >= %tamano_deed
           {
             event macro 17
@@ -159,7 +159,7 @@ if #FINDSTACK >= %tamano_deed
   if #FINDCNT > 0 && #FINDCOL = 34 ; Deed completado
      {
        exevent drag #FINDID #FINDSTACK
-       exevent dropc %bolsa
+       exevent dropc %cofre
        wait 30
        goto _dropDeed
      }
@@ -181,7 +181,7 @@ finditem %producto_guardar C_ , #BACKPACKID
 if #FINDSTACK >= %limite_producto
    {
      exevent drag #FINDID #FINDSTACK
-     exevent dropc %bolsa
+     exevent dropc %cofre
      wait 30
      goto _dejar
    }
