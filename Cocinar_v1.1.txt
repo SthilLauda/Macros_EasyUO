@@ -72,7 +72,7 @@ set %tiempo_alimentacion 360     ; cada cuantos segundos comprobar el hambre.
 ;
 set %horno BPB                   ; Tipo de Horno.
 set %combustible ZLK_PEF         ; Troncos y ramas.
-set %alimentos_crudos IND        ; Filetes de pescado crudo (IND), Filetes de carne cruda (VRD).
+set %alimentos_crudos IND_VRD    ; Filetes de pescado crudo (IND), Filetes de carne cruda (VRD).
 set %alimentos_cocinados HND_YRD ; Filetes de pescado asado (HND), Filetes de carne asada (YRD).
 set %herramientas IRD_GRD_HRD_CRD_FRD_BRD  ; Herramientas de Cocina.
 set %comida RGG_NRD_QSD_ZBG_WLI_QRD_END_FUD_YLI_WLI_HGI
