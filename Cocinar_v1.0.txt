@@ -5,7 +5,7 @@
 ;  ||   ||   ||    ||     ||   || || ||  .|''||    //     \\    ||   ||  .|''||   ||  ||   //  .|''||
 ;  `|...|'  .||.   `|..' .||. .||    ||. `|..||. .//       \\. .||. .||. `|..||. .||  ||. /... `|..||.
 ; =====================================================================================================
-; Script Name: Cocinar [ Panadero ]
+; Script Name: Cocinar
 ;                            _          _
 ;                           (c)___c____(c)
 ;                            \ ........../
@@ -41,29 +41,44 @@
 ;               ~~~        ~~         ~~           ~~
 ; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~      `"""""""`
 ;
-set %version v1.0
+set %version v1.1
 ;
 ; Author: Sthil Lauda
-; Version: 2.0
+; Version: 1.1
 ; Client Tested with: 2.0.3
 ; EUO version tested with: 1.5 Version 142
 ; Shard: Ultima Alianza (¡Hasta la muerte!)
-; Fecha: 08/12/2018
-; Purpose: Fabrica pan usando harina y jarras de agua.
-; Instrucciones; Necesitas el libro de cocina "Simple", ramas para el fuego, harina, y agua.
+; Fecha: 07/12/2019
+; Purpose: Cocina pescado y carne para subir la skill de cocinar.
+; Instrucciones; Necesitas filetes de pescado o filetes de carne cruda,
+;                troncos o ramas para encender el horno, herramientas de cocinar, y el horno.
 ;------------------------------------------------------
-
-set %bolsa_harina JWAWKOD
-set %bolsa_ramas JWAWKOD
-set %bolsa_pan_fabricado UCLAEPD
-set %bolsa_jarras CCWXZOD
-set %tiempo_alimentacion 360 ; Cada cuántos segundos va a comprobar si tiene hambre.
-;-------------------------------------------
-set %harina PGG
-set %pan RGG
-set %jarras GZF
-set %ramas PEF
-set %comida RGG
+;________________________________
+;
+; ///////////////////////////////
+; ******** CONFIGURACIÓN ********
+; ///////////////////////////////
+;________________________________
+;
+set %stack_alimentos 50          ; Montón de alimentos a procesar en la mochila.
+set %stack_combustible 50        ; Montón de troncos o ramas en la mochilaa.
+set %tiempo_alimentacion 360     ; cada cuantos segundos comprobar el hambre.
+;________________________________________________
+;
+; //////////////////////////////////////////////
+; ************* FIN CONFIGURACIÓN *************
+; //////////////////////////////////////////////
+;________________________________________________
+;
+set %horno BPB                   ; Tipo de Horno.
+set %combustible ZLK_PEF         ; Troncos y ramas.
+set %alimentos_crudos IND        ; Filetes de pescado crudo (IND), Filetes de carne cruda (VRD).
+set %alimentos_cocinados HND_YRD ; Filetes de pescado asado (HND), Filetes de carne asada (YRD).
+set %herramientas IRD_GRD_HRD_CRD_FRD_BRD  ; Herramientas de Cocina.
+set %comida RGG_NRD_QSD_ZBG_WLI_QRD_END_FUD_YLI_WLI_HGI
+ +_KGI_EGI_QLI_KLI_MLI_KRD_HQD_AQD_MQE_VQE_TQE_JQE_IQE
+ +_GQE_SPE_ZPE_OQE_BDF_KPE_RQE_YSD_SQD_YWI_AXI_PQD_QQD
+ +_HND_YRD_
 set %tiempo_actual #SCNT
 set %proxima_vez #SCNT
 
@@ -75,41 +90,183 @@ set #SYSMSGCOL 88
 event sysmessage =============
 wait 20
 
-gosub setupCookBook
+gosub setupHorno
+gosub setupCofre
 
-loop_cocina:
+loop:
 gosub checkskill
-gosub harina
-gosub jarras
-gosub ramas
-gosub fabricar_pan
-gosub checkhungry
-gosub dejar_pan
-goto loop_cocina
-
-sub harina
-_harina:
-finditem %harina C_ , #BACKPACKID
-if #FINDCNT = 0
+gosub checkHungry
+finditem %ID_horno G_3
+if #FINDCNT > 0
    {
-     finditem %harina C_ , %bolsa_harina
-     if #FINDSTACK > 0
+     finditem %combustible C_ , #BACKPACKID
+     if #FINDCNT > 0
         {
-          exevent drag #FINDID 1
-          exevent dropc #BACKPACKID
-          wait 20
-          goto _harina
+          set %ID_combustible #FINDID
+          finditem %herramientas C_ , #BACKPACKID
+          if #FINDCNT > 0
+             {
+               set %ID_herramientas #FINDID
+               finditem %alimentos_crudos C_ , #BACKPACKID
+               if #FINDCNT > 0
+                  {
+                    set %ID_alimentos_crudos #FINDID
+                    ; Encender el Horno.
+                    set #LOBJECTID %ID_horno
+                    event macro 17
+                    target
+                    set #LTARGETID %ID_combustible
+                    set #LTARGETKIND 1
+                    event macro 22
+                    ; Seleccionar la Herramienta de Cocina.
+                    set #LOBJECTID %ID_horno
+                    event macro 17
+                    target
+                    set #LTARGETID %ID_herramientas
+                    set #LTARGETKIND 1
+                    event macro 22
+                    ; Usar el Horno con los alimentos.
+                    set #LOBJECTID %ID_horno
+                    event macro 17
+                    target
+                    set #LTARGETID %ID_alimentos_crudos
+                    set #LTARGETKIND 1
+                    event macro 22
+                    set %jstart #jindex ; Esperamos a que el horno esté disponible de nuevo.
+                    gosub wait_for MSG El_horno_se_apaga 400
+                    ; Descagar los alimentos cocinados si hay muchos o vamos pasados de peso...
+                    finditem %alimentos_cocinados C_ , #BACKPACKID
+                    if #FINDSTACK > 50 || #WEIGHT >= #MAXWEIGHT - 50
+                       {
+                         if #FINDCNT > 0
+                            {
+                              exevent drag #FINDID #FINDSTACK
+                              exevent dropC %ID_cofre
+                              wait 30
+                            }
+                       }
+                  }
+                  else ; Reponemos alimentos...
+                     {
+                       finditem %alimentos_crudos C_ , %ID_cofre
+                       if #FINDCNT > 0
+                          {
+                            if #FINDSTACK >= %stack_alimentos
+                               {
+                                 exevent drag #FINDID %stack_alimentos
+                                 exevent dropC #BACKPACKID
+                                 wait 30
+                               }
+                               else ; Cojemos los que quedan...
+                                  {
+                                    exevent drag #FINDID #FINDSTACK
+                                    exevent dropC #BACKPACKID
+                                    wait 30
+                                  }
+                          }
+                          else
+                             {
+                               set #SYSMSGCOL 38
+                               event sysmessage NO HAY ALIMENTOS! :-(
+                               halt
+                             }
+                     }
+             }
+             else ; Reponemos herramientas...
+                {
+                  finditem %herramientas C_ , %ID_cofre
+                  if #FINDCNT > 0
+                     {
+                       exevent drag #FINDID
+                       exevent dropC #BACKPACKID
+                       wait 30
+                     }
+                     else
+                        {
+                          set #SYSMSGCOL 38
+                          event sysmessage NO HAY HERRAMIENTAS! :-(
+                          halt
+                        }
+                }
         }
-        else
+        else ; Reponemos combustible...
            {
-             set #SYSMSGCOL 38
-             event sysmessage NO QUEDA HARINA!
-             halt
+             finditem %combustible C_ , %ID_cofre
+             if #FINDCNT > 0
+                {
+                  if #FINDSTACK >= %stack_combustible
+                     {
+                       exevent drag #FINDID %stack_combustible
+                       exevent dropC #BACKPACKID
+                       wait 30
+                     }
+                     else ; Cojemos los que quedan...
+                        {
+                          exevent drag #FINDID #FINDSTACK
+                          exevent dropC #BACKPACKID
+                          wait 30
+                        }
+                }
+                else
+                   {
+                     set #SYSMSGCOL 38
+                     event sysmessage NO HAY COMBUSTIBLE! :-(
+                     halt
+                   }
            }
    }
+   else
+      {
+        set #SYSMSGCOL 43
+        event sysmessage ¡ESTAS LEJOS DEL HORNO!
+        wait 20
+      }
+goto loop
+
+sub setupHorno ;<====================>
+_setupHorno:
+set #TARGCURS 1
+set #SYSMSGCOL 73
+event sysmessage SELECCIONA EL HORNO!
+while #TARGCURS = 1
+      {
+        wait 1
+      }
+set %ID_horno #LTARGETID
+finditem %ID_horno
+if #FINDTYPE NotIn %horno
+   {
+     set #SYSMSGCOL 53
+     event sysmessage ESO NO PARECE UN HORNO! ¬¬
+     goto _setupHorno
+   }
+   else
+      {
+        set #SYSMSGCOL 88
+        event sysmessage [ OK ] ID HORNO: %ID_horno
+        wait 40
+      }
 return
 
-sub checkskill
+sub setupCofre ;<====================>
+_setupCofre:
+set #TARGCURS 1
+set #SYSMSGCOL 73
+event sysmessage SELECCIONA EL COFRE!
+while #TARGCURS = 1
+      {
+        wait 1
+      }
+set %ID_cofre #LTARGETID
+set #SYSMSGCOL 88
+event sysmessage [ OK ] ID COFRE: %ID_cofre
+wait 40
+set #LOBJECTID %ID_cofre
+event macro 17
+gosub wait_for GUMP %ID_cofre 40
+return
+
+sub checkskill ;<====================>
 chooseskill Cook real
 if #SKILL >= 1000
    {
@@ -119,7 +276,7 @@ if #SKILL >= 1000
    }
 return
 
-sub checkhungry
+sub checkHungry ;<====================>
 set %tiempo_actual #SCNT
 if %proxima_vez <= %tiempo_actual
    {
@@ -127,117 +284,11 @@ if %proxima_vez <= %tiempo_actual
    }
 return
 
-sub jarras
-_jarras:
-finditem %jarras C_ , #BACKPACKID
-if #FINDCNT < 2
-   {
-     set %repeticiones 2 - #FINDCNT
-     _searchBag:
-     finditem %jarras C_ , %bolsa_jarras
-     if #FINDCNT > 0
-        {
-          if #FINDBAGID in %bolsa_jarras
-             {
-               set %ID_bolsa_jarras #FINDBAGID
-               for %j 1 %repeticiones
-                   {
-                     finditem %jarras C_ , %ID_bolsa_jarras
-                     if #FINDCNT > 0
-                        {
-                          exevent drag #FINDID #FINDSTACK
-                          exevent dropc #BACKPACKID
-                          wait 20
-                        }
-                        else
-                           {
-                             set #SYSMSGCOL 38
-                             event sysmessage NO QUEDA AGUA!
-                             halt
-                           }
-                   }
-             }
-             else
-                {
-                  ignoreitem #FINDBAGID bad_jarras
-                  goto _searchBag
-                }
-         ignoreitem reset bad_jarras
-        }
-   }
-return
-
-sub ramas
-_ramas:
-finditem %ramas C_ , #BACKPACKID
-if #FINDCNT = 0
-   {
-     finditem %ramas C_ , %bolsa_ramas
-     if #FINDSTACK > 0
-        {
-          exevent drag #FINDID 1
-          exevent dropc #BACKPACKID
-          wait 20
-          goto _ramas
-        }
-        else
-           {
-             set #SYSMSGCOL 38
-             event sysmessage NO QUEDAN RAMAS!
-             halt
-           }
-   }
-return
-
-sub fabricar_pan
-finditem %libro_cocina C_ , #BACKPACKID
-if #FINDCNT > 0
-   {
-     set #LOBJECTID %libro_cocina
-     event macro 17
-     gosub wait_for GUMP 595_360 40
-     contpos 0 0
-     click 294 69 f dmc
-   }
-   else
-      {
-        set #SYSMSGCOL 38
-        event sysmessage NO HAY LIBRO DE COCINA :-(
-        halt
-      }
-return
-
-sub dejar_pan
-_dejarpan:
-finditem %pan C_ , #BACKPACKID
-if #FINDCNT > 0
-   {
-     exevent drag #FINDID #FINDSTACK
-     exevent dropc %bolsa_pan_fabricado
-     wait 20
-     goto _dejarpan
-   }
-return
-
-sub setupCookBook
-set #SYSMSGCOL 88
-event sysmessage CLICK EN TU LIBRO DE COCINA
-set #TARGCURS 1
-while #TARGCURS = 1
-      {
-        wait 1
-      }
-set %libro_cocina #LTARGETID
-set #SYSMSGCOL 73
-event sysmessage OK Libro: %libro_cocina
-wait 20
-return
-
 ;=====================================================
 ; Rutina para, en caso de hambre, comer hasta saciarse
 ;=====================================================
 ; v2.2
-sub comprobar_comida
+sub comprobar_comida ;<==============================>
 {
   hambriento:
   set %jrnl #jindex ; Marcamos un índice de las líneas del diario.
@@ -247,7 +298,7 @@ sub comprobar_comida
      {
        if #jindex > %jrnl ; Si aparece una nueva línea.
           {
-            set %jrnl %jrnl + 1 ; Seleccionamos ese numero de línea.
+            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de línea.
             scanjournal %jrnl   ; La leemos...
             if Estas_no_le_afecta_el_hambre in #journal || Estas_tan_lleno_que_no_puedes in #journal || Estas_totalmente_saciado in #journal
                {
@@ -258,17 +309,17 @@ sub comprobar_comida
                   {
                     if Estas_lleno in #journal || Estas_contento in #journal || Estas_en_inanicion in #journal || Estas_hambriento in #journal || Sientes_mucho in #journal || Estas_con_hambre in #journal || Estas_parcialmente in #journal || Estas_bien_lleno in #journal || Te_sientes_casi_lleno in #journal
                        {
-                         finditem %comida C_ , #BACKPACKID
+                         finditem %comida C_ , #backpackid
                          if #findcnt > 0
                             {
-                              set #LOBJECTID #FINDID
+                              set #lobjectid #findid
                               event macro 17
                               wait 20
                               goto hambriento
                             }
                             else
                                {
-                                 event exmsg #CHARID 3 48 COMPRA COMIDA!!
+                                 event exmsg #charid 3 48 COMPRA COMIDA!!
                                  wait 40
                                  set %proxima_vez %tiempo_actual + %tiempo_alimentacion
                                }
@@ -314,42 +365,6 @@ return #result
 else
 display ok You specified an unknown wait_for command. Script returned #result and is halting.
 halt
-;=================================================================
-sub wait_for_MSG ; version 1.4 ~Locke
-;=================================================================
-if !_A0 < 3
-{
-display ok You haven't specified enough vars.$
-+The basic format is: gosub wait_for MSG %message time_out_in_seconds$
-+Script is halting
-halt
-}
-set !_timeout ( #scnt2 + !_A . !_A0 )
-_lets_wait_for_a_message:
-for %i %jstart #jindex
-{
- scanjournal %i
-  for %ii 2 !_A0
-  {
-    if !_A . %ii in #journal && %jstart <> %i
-    set #result #true , #spc , !_A . %ii
-  }
-}
-
-if #true notin #result
-{
-set #result #false
- if !_timeout =< #scnt2
- return #result
-wait 1
-goto _lets_wait_for_a_message
-}
-else
-return #result
-
-wait 1
-goto _lets_wait_for_a_message
-
 ;======================================================================
 sub wait_for_GUMP ; version 1.4 ~Locke
 ;=================================================================
@@ -415,4 +430,38 @@ return #false
 }
 wait 1
 goto _lets_wait_for_a_gump
+;=================================================================
+sub wait_for_MSG ; version 1.4 ~Locke
+;=================================================================
+if !_A0 < 3
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for MSG %message time_out_in_seconds$
++Script is halting
+halt
+}
+set !_timeout ( #scnt2 + !_A . !_A0 )
+_lets_wait_for_a_message:
+for %i %jstart #jindex
+{
+ scanjournal %i
+  for %ii 2 !_A0
+  {
+    if !_A . %ii in #journal && %jstart <> %i
+    set #result #true , #spc , !_A . %ii
+  }
+}
 
+if #true notin #result
+{
+set #result #false
+ if !_timeout =< #scnt2
+ return #result
+wait 1
+goto _lets_wait_for_a_message
+}
+else
+return #result
+
+wait 1
+goto _lets_wait_for_a_message
