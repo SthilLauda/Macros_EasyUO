@@ -19,29 +19,29 @@
 ; Author: Sthil Lauda
 ; Version: 1.1 with: 2.0.3
 ; EUO version tested with: EasyUO 1.5 Version 243
-; Shard: Ultima Alianza (°Hasta la muerte!)
+; Shard: Ultima Alianza (¬°Hasta la muerte!)
 ; Revision Date: 20/08/2019
 ; Public Release: 20/08/2019
-; Purpose: Entrena la habilidad de cristalero fabricando vasos decorativos y haciendo tickets. TambiÈn puede hacer frascos de pociones si configuras la macro para ello.
+; Purpose: Entrena la habilidad de cristalero fabricando vasos decorativos y haciendo tickets. Tambi√©n puede hacer frascos de pociones si configuras la macro para ello.
 ;
 set %version v1.1
 ;________________________________
 ;
 ; ///////////////////////////////
-; ******** CONFIGURACI”N ********
+; ******** CONFIGURACI√ìN ********
 ; ///////////////////////////////
 ;________________________________
 ;
 set %bolsa_arena WTMMPQD
 set %bolsa_frascos WTMMPQD
 set %bolsa_sopladores WTMMPQD
-set %max_items 40              ; N˙mero de objetos fabricados en la mochila antes de vaciarla.
-set %monton_arena 50           ; N˙mero de lingotes de arena a reponer en la mochila.
+set %max_items 40              ; N√∫mero de objetos fabricados en la mochila antes de vaciarla.
+set %monton_arena 50           ; N√∫mero de lingotes de arena a reponer en la mochila.
 set %tiempo_alimentacion 360
 ;________________________________________________
 ;
 ; //////////////////////////////////////////////
-; ************* FIN CONFIGURACI”N *************
+; ************* FIN CONFIGURACI√ìN **************
 ; //////////////////////////////////////////////
 ;________________________________________________
 ;
@@ -82,7 +82,7 @@ goto inicio           ;|
 
 sub setupMacro
 _askConfig:
-display yesno øQuieres fabricar frascos para pociones?
+display yesno ¬øQuieres fabricar frascos para pociones?
 if ( #dispres = yes )
      {
        set %subir_skill_cristaleria #FALSE
@@ -90,7 +90,7 @@ if ( #dispres = yes )
      }
      else
         {
-          display yesno øQuieres entrenar la habilidad de cristalero?
+          display yesno ¬øQuieres entrenar la habilidad de cristalero?
           if ( #dispres = yes )
                {
                  set %subir_skill_cristaleria #TRUE
@@ -107,7 +107,7 @@ if ( #dispres = yes )
 return
 
 sub setupHid
-display yesno øQuieres OCULTAR al personaje mientras macreas?
+display yesno ¬øQuieres OCULTAR al personaje mientras macreas?
 if ( #dispres = yes )
      {
        set %hiding #TRUE
@@ -202,7 +202,7 @@ if #FINDCNT > 0
           {
             gosub menuCristalero
             set %jstart #jindex
-            click 60 60 d dmc ; Frasco vacÌo [ 2 x arena ]
+            click 60 60 d dmc ; Frasco vac√≠o [ 2 x arena ]
             gosub wait_for MSG Has_fallado Pones_el_frascos 50
             if ( #true in #result )
                  {
@@ -240,7 +240,7 @@ if #FINDCNT > 0
                                   }
                              if ( ahora_es_de_1000 in #result )
                                   {
-                                    display °Somos GM Cristalero! :-) ; Somos GM Tailor
+                                    display ¬°Somos GM Cristalero! :-) ; Somos GM Tailor
                                     halt
                                   }
                            }
@@ -273,14 +273,14 @@ sub make_tickets
           {
             set #LOBJECTID #FINDID
             event macro 17
-            gosub wait_for GUMP 585_401 50 ; Esperar a que se abra el men˙ de la la papelera
-            contpos %menu_reciclarx %menu_reciclary ; Situamos el men˙ de papelera en su sitio
+            gosub wait_for GUMP 585_401 50 ; Esperar a que se abra el men√∫ de la la papelera
+            contpos %menu_reciclarx %menu_reciclary ; Situamos el men√∫ de papelera en su sitio
             set %boton_eliminar_offsetx 89
             set %boton_eliminar_offsety 168
             set %clickx #contposx + %boton_eliminar_offsetx
             set %clicky #contposy + %boton_eliminar_offsety
             click %clickx %clicky f
-            gosub wait_for GUMP 585_401 50 ; Esperar a que vuelva el men˙ de la papelera
+            gosub wait_for GUMP 585_401 50 ; Esperar a que vuelva el men√∫ de la papelera
             set %boton_target_offsetx 307
             set %boton_target_offsety 334
             set %clickx #contposx + %boton_target_offsetx
@@ -302,7 +302,7 @@ sub make_tickets
           }
      }
 	key ESC
-	gosub wait_for GUMP 585_401 CLOSE ; Cerrar el men˙ de la papelera
+	gosub wait_for GUMP 585_401 CLOSE ; Cerrar el men√∫ de la papelera
 	return
 }
 
@@ -330,14 +330,14 @@ return
 sub comprobar_comida
 {
   hambriento:
-  set %jrnl #jindex ; Marcamos un Ìndice de las lÌneas del diario.
+  set %jrnl #jindex ; Marcamos un √≠ndice de las l√≠neas del diario.
   event macro 4 0 .hungry
   wait 20
   while #true
      {
-       if #jindex > %jrnl ; Si aparece una nueva lÌnea.
+       if #jindex > %jrnl ; Si aparece una nueva l√≠nea.
           {
-            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de lÌnea.
+            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de l√≠nea.
             scanjournal %jrnl   ; La leemos...
             if Dentro_de_1_minuto in #journal
                {
@@ -367,7 +367,7 @@ sub comprobar_comida
                                  set %proxima_vez %tiempo_actual + %tiempo_alimentacion
                                }
                        }
-                       else ; Mensaje extraÒo, repetimos...
+                       else ; Mensaje extra√±o, repetimos...
                           {
                             goto hambriento
                           }
