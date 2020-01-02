@@ -40,7 +40,7 @@
 ;                  '._____|'.\\......'''''''.:..'''
 ;                             \\
 ; Author: Sthil Lauda
-; Version: 1.3
+; Version: 1.5
 ; Client Tested with: 4.0.5b
 ; EUO Version tested with: V1.42 (Build 009B)
 ; Shard OSI / FS: (Ultima Alianza)
