@@ -47,7 +47,7 @@ set %version v1.2
 ; Version: 1.2
 ; Client Tested with: 2.0.3
 ; EUO version tested with: 1.5 Version 142
-; Shard: Ultima Alianza (°Hasta la muerte!)
+; Shard: Ultima Alianza (¬°Hasta la muerte!)
 ; Fecha: 07/12/2019
 ; Purpose: Cocina pescado y carne para subir la skill de cocinar.
 ; Instrucciones; Necesitas filetes de pescado o filetes de carne cruda,
@@ -56,16 +56,16 @@ set %version v1.2
 ;________________________________
 ;
 ; ///////////////////////////////
-; ******** CONFIGURACI”N ********
+; ******** CONFIGURACI√ìN ********
 ; ///////////////////////////////
 ;________________________________
 ;
-set %stack_materiales 50         ; MontÛn de alimentos y troncos a procesar en la mochila.
+set %stack_materiales 50         ; Mont√≥n de alimentos y troncos a procesar en la mochila.
 set %tiempo_alimentacion 360     ; cada cuantos segundos comprobar el hambre.
 ;________________________________________________
 ;
 ; //////////////////////////////////////////////
-; ************* FIN CONFIGURACI”N *************
+; ************* FIN CONFIGURACI√ìN *************
 ; //////////////////////////////////////////////
 ;________________________________________________
 ;
@@ -92,8 +92,8 @@ set #SYSMSGCOL 88
 event sysmessage =============
 wait 20
 
-gosub setupBank      ; ConfiguraciÛn de la posiciÛn del banco y el cofre.
-gosub setupHorno     ; ConfiguraciÛn del Horno.
+gosub setupBank      ; Configuraci√≥n de la posici√≥n del banco y el cofre.
+gosub setupHorno     ; Configuraci√≥n del Horno.
 
 loop:
 gosub checkskill
@@ -136,9 +136,9 @@ if #FINDCNT > 0
                     set #LTARGETID %ID_alimentos_crudos
                     set #LTARGETKIND 1
                     event macro 22
-                    set %jstart #jindex ; Esperamos a que el horno estÈ disponible de nuevo.
+                    set %jstart #jindex ; Esperamos a que el horno est√© disponible de nuevo.
                     gosub wait_for MSG El_horno_se_apaga 400
-                    ; Descagar los alimentos cocinados si hay muchos o vamos pasados de peso...
+                    ; Descargar los alimentos cocinados si hay muchos o vamos pasados de peso...
                     finditem %alimentos_cocinados C_ , #BACKPACKID
                     if #FINDSTACK > %stack_alimentos
                        {
@@ -186,7 +186,7 @@ sub dejarCocinadosBank ; <==============================>
 _abreBank0:
 if #SCNT >= %bank_timer
    {
-     if #CONTID <> %bank_ID ; El banco est· cerrado...
+     if #CONTID <> %bank_ID ; El banco est√° cerrado...
         {
           event macro 1 0 Bank
           wait 20
@@ -203,7 +203,7 @@ if #SCNT >= %bank_timer
                     goto _abreBank0
                   }
         }
-        else ; El banco ya est· abierto... :-)
+        else ; El banco ya est√° abierto... :-)
            {
              _dejarComida:
              finditem %alimentos_cocinados C_ , #BACKPACKID
@@ -226,7 +226,7 @@ set %item %1
 _abreBank1:
 if #SCNT >= %bank_timer
    {
-     if #CONTID <> %bank_ID ; El banco est· cerrado...
+     if #CONTID <> %bank_ID ; El banco est√° cerrado...
         {
           event macro 1 0 Bank
           wait 20
@@ -243,7 +243,7 @@ if #SCNT >= %bank_timer
                     goto _abreBank1
                   }
         }
-        else ; El banco ya est· abierto... :-)
+        else ; El banco ya est√° abierto... :-)
            {
              finditem %item C_ , %bank_ID
              if %item = %combustible || %item = %alimentos_crudos
@@ -288,7 +288,7 @@ return
 
 sub setupBank ; <==============================>
 display OK *********************** [ BANK ] ***********************$$
-         + AcÈrcate hasta el banco y pulsa la tecla ESCAPE. $$
+         + Ac√©rcate hasta el banco y pulsa la tecla ESCAPE. $$
          + ********************************************************
 _hotLoop:
 onhotkey ESC
@@ -492,14 +492,14 @@ return
 sub comprobar_comida ;<==============================>
 {
   hambriento:
-  set %jrnl #jindex ; Marcamos un Ìndice de las lÌneas del diario.
+  set %jrnl #jindex ; Marcamos un √≠ndice de las l√≠neas del diario.
   event macro 4 0 .hungry
   wait 20
   while #true
      {
-       if #jindex > %jrnl ; Si aparece una nueva lÌnea.
+       if #jindex > %jrnl ; Si aparece una nueva l√≠nea.
           {
-            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de lÌnea.
+            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de l√≠nea.
             scanjournal %jrnl   ; La leemos...
             if Estas_no_le_afecta_el_hambre in #journal || Estas_tan_lleno_que_no_puedes in #journal || Estas_totalmente_saciado in #journal
                {
@@ -525,7 +525,7 @@ sub comprobar_comida ;<==============================>
                                  set %proxima_vez %tiempo_actual + %tiempo_alimentacion
                                }
                        }
-                       else ; Mensaje extraÒo, repetimos...
+                       else ; Mensaje extra√±o, repetimos...
                           {
                             goto hambriento
                           }
@@ -710,7 +710,7 @@ halt
 ;======================================================================
 sub wait_for_GUMP ; version 1.4 ~Locke
 ;=================================================================
-; AÒadido #CONTID ^^
+; A√±adido #CONTID ^^
 if !_A0 < 3
 {
 display ok You haven't specified enough vars.$
