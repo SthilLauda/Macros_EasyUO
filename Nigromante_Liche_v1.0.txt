@@ -35,8 +35,8 @@
 ; Client Tested with: 2.0.3
 ; EUO version tested with: EasyUO 1.5 Version 243
 ; Shard: Ultima Alianza (¡Hasta la muerte!)
-; Revision Date: 30/12/2019
-; Public Release: 30/12/2019
+; Revision Date: 02/1/2020
+; Public Release: 02/1/2020
 ; Purpose: Entrena nigromancia en la ciudad de Wind, comprando regs a la pareja de Drakos del medio, o con los que andan sueltos por ahí.
 ; Requisitos:
 ;              - Para activar el modo "liche" hacen falta 40 puntos de Spirit Speak (ir al sabiondo de Wrong).
