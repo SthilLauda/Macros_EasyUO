@@ -34,30 +34,30 @@
 ; Version: 1.0
 ; Client Tested with: 2.0.3
 ; EUO version tested with: EasyUO 1.5 Version 243
-; Shard: Ultima Alianza (°Hasta la muerte!)
+; Shard: Ultima Alianza (¬°Hasta la muerte!)
 ; Revision Date: 30/12/2019
 ; Public Release: 30/12/2019
-; Purpose: Entrena nigromancia en la ciudad de Wind, comprando regs a la pareja de Drakos del medio, o con los que andan sueltos por ahÌ.
+; Purpose: Entrena nigromancia en la ciudad de Wind, comprando regs a la pareja de Drakos del medio, o con los que andan sueltos por ah√≠.
 ; Requisitos:
 ;              - Para activar el modo "liche" hacen falta 40 puntos de Spirit Speak (ir al sabiondo de Wrong).
-;              - Es recomendable un bastÛn de clÈrigo para acelerar el man·.
-;              - Es recomendable collar y anillo de inteligencia/medit para acelerar el man·.
-;              - Es recomendable tener a 100 la habilida de ConcentraciÛn/Focus, para acelerar el man· y la vida del liche.
+;              - Es recomendable un bast√≥n de cl√©rigo para acelerar el man√°.
+;              - Es recomendable collar y anillo de inteligencia/medit para acelerar el man√°.
+;              - Es recomendable tener a 100 la habilida de Concentraci√≥n/Focus, para acelerar el man√° y la vida del liche.
 ;              - No te olvides de tener comida en la mochila, y dinero en el banco... :D
 ;________________________________
 ;
 ; ///////////////////////////////
-; ******** CONFIGURACI”N ********
+; ******** CONFIGURACI√ìN ********
 ; ///////////////////////////////
 ;________________________________
 ;
 set %typearma TSF_WSF  ; Dagas.
-set %tiempo_comer 360  ; Cada cu·ntos segundos comprobar la comida.
+set %tiempo_comer 360  ; Cada cu√°ntos segundos comprobar la comida.
 set %tiempo_ronda 1060 ; Recarga de regs en los vendors.
 ;________________________________________________
 ;
 ; //////////////////////////////////////////////
-; ************* FIN CONFIGURACI”N *************
+; ************* FIN CONFIGURACI√ìN *************
 ; //////////////////////////////////////////////
 ;________________________________________________
 ;
@@ -104,8 +104,8 @@ if %skill_recro >= 1000
    }
 if %skill_spirit < 400
    {
-     display OK ° Te faltan 40 puntos de Spirit Speak ! $$
-              +° Son necesarios si quieres transformarte en Liche !
+     display OK ¬° Te faltan 40 puntos de Spirit Speak ! $$
+              +¬° Son necesarios si quieres transformarte en Liche !
      set #SYSMSGCOL 38
      event sysmessage [ OK ] Desactivando "Modo LICHE" :-(
      wait 20
@@ -116,14 +116,14 @@ if %skill_spirit < 400
         event sysmessage [ OK ] Activando "Modo LICHE" :D
         wait 1s
       }
-finditem %bastones C_ , #CHARID ; BastÛn de clÈrigo :D
+finditem %bastones C_ , #CHARID ; Bast√≥n de cl√©rigo :D
 if #FINDCNT = 0
    {
      finditem %bastones C_ , #BACKPACKID
      if #FINDCNT = 0
         {
-          display OK ° No tienes ning˙n bastÛn en la mochila ! $$
-                    +° Te conviene llevar uno de ClÈrigo / Medit !
+          display OK ¬° No tienes ning√∫n bast√≥n en la mochila ! $$
+                    +¬° Te conviene llevar uno de Cl√©rigo / Medit !
           set #SYSMSGCOL 43
           event sysmessage [ OK ] Sin ayuda de un BASTON :-(
           wait 20
@@ -141,7 +141,7 @@ if #FINDCNT = 0
         event sysmessage [ OK ] BASTON detectado... :D
         wait 1s
       }
-finditem %joya_collar C_ , #CHARID ; Buscamos el collar en el personaje,
+finditem %joya_collar C_ , #CHARID ; Buscamos el collar en el personaje.
 if #FINDCNT = 0 ; Si no lo llevamos puesto,
    {
      finditem %joya_collar C_ , #BACKPACKID
@@ -179,8 +179,8 @@ if #FINDCNT = 0 ; Si no lo llevamos puesto,
       }
 if %skill_focus < 1000
    {
-     display OK ° No tienes la habilidad "ConcentraciÛn/Focus" ! $$
-              +° Te conviene para regenerar el man· r·pidamente !
+     display OK ¬° No tienes la habilidad "Concentraci√≥n/Focus" ! $$
+              +¬° Te conviene para regenerar el man√° r√°pidamente !
      set #SYSMSGCOL 43
      event sysmessage [ OK ] Regenerando mana por otros medios... :-(
      wait 20
@@ -305,7 +305,7 @@ if ( %skill_recro >= 700 && %skill_spirit >= 400 ) ; Nos podemos transformar en 
                }
             _liche:
             set %jstart #jindex
-            event macro 1 0 .nigro 11 ; °Modo Liche!
+            event macro 1 0 .nigro 11 ; ¬°Modo Liche!
             gosub wait_for MSG El_hechizo_falla 50
             if ( #TRUE in #RESULT )
                  {
@@ -331,7 +331,7 @@ if ( %skill_recro >= 700 && %skill_spirit >= 400 ) ; Nos podemos transformar en 
                                  }
                             }
                     }
-            goto medit ; Llenamos a tope el man· del liche.
+            goto medit ; Llenamos a tope el man√° del liche.
           }
      }
      else
@@ -368,7 +368,7 @@ until #MANA < 7
 
 medit:
 _baston:
-finditem %bastones C_ , #BACKPACKID ; BastÛn de clÈrigo :D
+finditem %bastones C_ , #BACKPACKID ; Bast√≥n de cl√©rigo :D
 if #FINDCNT > 0
    {
      set #LOBJECTID #FINDID
@@ -416,7 +416,7 @@ if ( #TRUE in #result )
      {
        if pierdes in #result
           {
-            goto medit ; Meditamos hasta que no perdamos la concentraciÛn
+            goto medit ; Meditamos hasta que no perdamos la concentraci√≥n
           }
        if trance in #result
           {
@@ -433,7 +433,7 @@ if ( #TRUE in #result )
                         goto magia
                       }
                  }
-                 else ; Meditamos hasta llenar la barra al m·ximo...
+                 else ; Meditamos hasta llenar la barra al m√°ximo...
                     {
                       repeat
                            {
@@ -444,7 +444,7 @@ if ( #TRUE in #result )
                            goto magia
                     }
           }
-       if en_paz in #result ; OK, estamos bien de man·.
+       if en_paz in #result ; OK, estamos bien de man√°.
           {
             goto magia
           }
@@ -463,7 +463,7 @@ set %skill_spirit #SKILL
 finditem %VENDOR_DRAKE1
 if #FINDCNT > 0
    {
-     if ( %ultimo_vendor <> %VENDOR_DRAKE1 ) || ( #SCNT >= %ronda_timer_drako1 ) || ( %num_azufre = 0 && %skill_spirit >= 400 && %skill_recro >= 700 ) || ( %num_obsidiana = 0 && %skill_spirit >= 400 && %skill_recro >= 700 ) || ( %num_ceniza = 0 && %skill_spirit >= 400 && %skill_recro >= 700 ) || ( %VENDOR_DRAKE2 = N/A ) ; SÛlo hay un vendor en la zona...
+     if ( %ultimo_vendor <> %VENDOR_DRAKE1 ) || ( #SCNT >= %ronda_timer_drako1 ) || ( %num_azufre = 0 && %skill_spirit >= 400 && %skill_recro >= 700 ) || ( %num_obsidiana = 0 && %skill_spirit >= 400 && %skill_recro >= 700 ) || ( %num_ceniza = 0 && %skill_spirit >= 400 && %skill_recro >= 700 ) || ( %VENDOR_DRAKE2 = N/A ) ; S√≥lo hay un vendor en la zona...
           {
             if %num_arrabio = 0 ; Si compramos todo el arrabio, alternamos de vendor...
                {
@@ -559,15 +559,15 @@ if %skill_recro >= 700 && %skill_spirit >= 400 ; Regs para transformarnos en Lic
         }
      if %num_ceniza = 0
         {
-          gosub click 404 537 dmc ; Siguiente p·gina...
+          gosub click 404 537 dmc ; Siguiente p√°gina...
           gosub gump 3000 800_590 medit
-          gosub click 417 195 dmc ; 5 de Ceniza Volc·nica.
+          gosub click 417 195 dmc ; 5 de Ceniza Volc√°nica.
           gosub gump 3000 800_590 medit
         }
    }
 gosub click 600 535 dmc ; OKAY comprar.
 wait 10
-if %num_arrabio = 0 ; Necesit·bamos todo el arrabio del vendor...
+if %num_arrabio = 0 ; Necesit√°bamos todo el arrabio del vendor...
    {
      if %current_vendor = %VENDOR_DRAKE1
         {
@@ -577,7 +577,7 @@ if %num_arrabio = 0 ; Necesit·bamos todo el arrabio del vendor...
            {
              if %current_vendor = %VENDOR_DRAKE2
                 {
-                  set %ronda_timer_drako2 #SCNT + %tiempo_ronda ; Tiempo de recarga del 2∫ vendor
+                  set %ronda_timer_drako2 #SCNT + %tiempo_ronda ; Tiempo de recarga del 2¬∫ vendor
                 }
            }
    }
@@ -604,14 +604,14 @@ return
 sub comprobar_comida
 {
   hambriento:
-  set %jrnl #jindex ; Marcamos un Ìndice de las lÌneas del diario.
+  set %jrnl #jindex ; Marcamos un √≠ndice de las l√≠neas del diario.
   event macro 4 0 .hungry
   wait 20
   while #true
      {
-       if #jindex > %jrnl ; Si aparece una nueva lÌnea.
+       if #jindex > %jrnl ; Si aparece una nueva l√≠nea.
           {
-            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de lÌnea.
+            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de l√≠nea.
             scanjournal %jrnl   ; La leemos...
             if Estas_no_le_afecta_el_hambre in #journal || Estas_tan_lleno_que_no_puedes in #journal || Estas_totalmente_saciado in #journal
                {
@@ -637,7 +637,7 @@ sub comprobar_comida
                                  set %proxima_vez_comer %tiempo_actual + %tiempo_comer
                                }
                        }
-                       else ; Mensaje extraÒo, repetimos...
+                       else ; Mensaje extra√±o, repetimos...
                           {
                             goto hambriento
                           }
@@ -650,7 +650,7 @@ return
 
 ;-@ ============================== @-;
 ;-@ ############################## @-;
-;-@ SUBS p˙blicos del Foro EasyUO  @-;
+;-@ SUBS p√∫blicos del Foro EasyUO  @-;
 ;-@ ############################## @-;
 ;-@ ============================== @-;
 ;
