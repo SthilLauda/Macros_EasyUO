@@ -1,0 +1,239 @@
+; ======================================================================================================
+;  '||   ||` '||`   ||                                 /.\      '||`
+;   ||   ||   ||    ||     ''                         // \\      ||   ''
+;   ||   ||   ||  ''||''   ||  '||),,(|,   '''|.     //...\\     ||   ||   '''|.  `||''|,  '''/  '''|.
+;   ||   ||   ||    ||     ||   || || ||  .|''||    //     \\    ||   ||  .|''||   ||  ||   //  .|''||
+;   `|...|'  .||.   `|..' .||. .||    ||. `|..||. .//       \\. .||. .||. `|..||. .||  ||. /... `|..||.
+; ======================================================================================================
+;
+; Script Name: Recolectar Semillas [ FLORISTERIA ]
+;                    _
+;                  _(_)_                          wWWWw   _
+;      @@@@       (_)@(_)   vVVVv     _     @@@@  (___) _(_)_
+;     @@()@@ wWWWw  (_)\    (___)   _(_)_  @@()@@   Y  (_)@(_)
+;      @@@@  (___)     `|/    Y    (_)@(_)  @@@@   \|/   (_)\
+;       /      Y       \|    \|/    /(_)    \|      |/      |
+;    \ |     \ |/       | / \ | /  \|/       |/    \|      \|/
+;jgs \\|//   \\|///  \\\|//\\\|/// \|///  \\\|//  \\|//  \\\|//
+;^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+;
+; Author: Sthil Lauda
+; Version: 1.0
+; Client Tested with: 2.0.3
+; EUO version tested with: EasyUO 1.5 Version 243
+; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Revision Date: 30/12/2019
+; Public Release: 30/12/2019
+; Purpose: Recoge las semillas rápidamente de las plantas al pulsar una tecla.
+;________________________________
+;
+; ///////////////////////////////
+; ******** CONFIGURACIÓN ********
+; ///////////////////////////////
+;________________________________
+;
+set %tecla F11
+;________________________________________________
+;
+; //////////////////////////////////////////////
+; ************* FIN CONFIGURACIÓN *************
+; //////////////////////////////////////////////
+;________________________________________________
+;
+set %plantas TCF_YVE_NWE_IWE_ICF_VWE_MWE_NXE_JWE_UWE_BCF_BXE_CCF_BWE_UAF
+ignoreitem reset
+
+loop:
+onhotkey %tecla
+         {
+           finditem %plantas G_1
+           if #FINDCNT > 0
+              {
+                for #FINDINDEX 1 #FINDCNT
+                    {
+                      if #FINDZ = #CHARPOSZ
+                         {
+                           set #LOBJECTID #FINDID
+                           set %jstart #jindex
+                           event macro 17
+                           gosub wait_for MSG No_consigues Las_plantas_mutadas_no 1
+                           if ( #TRUE in #RESULT )
+                                {
+                                  ignoreitem #FINDID
+                                  continue
+                                }
+                                else ; La planta se puede procesar...
+                                   {
+                                     if #WEIGHT >= #MAXWEIGHT - 10 ; Si no tenemos sitio, paramos.
+                                        {
+                                          set #SYSMSGCOL 38
+                                          event sysmessage PESO MAXIMO ALCANZADO!
+                                          wait 20
+                                          goto loop
+                                        }
+                                     gosub wait_for GUMP 263_231 2
+                                     if #RESULT ; Si se ha abierto la ventana de la planta...
+                                        {
+                                          contpos 20 20
+                                          click 98 95 f dmc
+                                          gosub wait_for GUMP 255_231 2
+                                          for %e 1 8 ; Sacamos las ocho semillas.
+                                              {
+                                                contpos 20 20
+                                                click 241 193 f dmc
+                                                gosub wait_for GUMP 255_231 2
+                                              }
+                                          contpos 20 20
+                                          click 241 94 f dmc
+                                          gosub wait_for GUMP 271_231 2
+                                          contpos 20 20
+                                          click 200 169 f dmc
+                                          ignoreitem #FINDID ; Una vez procesada, no volvemos a mirar esta planta.
+                                        }
+                                        else
+                                           {
+                                             continue
+                                           }
+                                   }
+                         }
+                    }
+                    set #SYSMSGCOL 88
+                    event sysmessage PLANTAS TERMINADAS! :D
+                    wait 20
+              }
+         }
+wait 1
+goto loop
+   
+;=================================================================
+sub wait_for
+;=================================================================
+; This "wait_for" sub package was created by Locke. If you use these subs please keep this header intact.
+; // end header
+; Documentation: the sub package grew to large with all the comments. To load them call the sub like this:
+; gosub wait_for docs    | or you can use doc, documention, what, or my personal favorite, kickass.
+; Thanks to ~BookWibble~ for helping with all the debugging and spotting a bug or three.
+; "wait_for core dispatcher" version 1.3 by Locke
+if %1 = doc || if %1 = docs || if %1 = documentation || if %1 = what || if %1 = kickass
+{
+Display ok Please click ok and wait for your browser to start.
+execute http://www.easyuo.com/forum/viewtopic.php?t=24716
+halt
+}
+nameSpace Push
+namespace local LLNS
+set #result N/A ; if #result isn't set by one of my wait_for subs it'll throw an error.
+set !LPC #lpc
+set #lpc 200
+for %i 0 %0
+set !_A . %i % . %i
+gosub wait_for_ , !_A1
+ignoreitem reset LLWAITFOR
+set #lpc !lpc
+namespace clear LLNS
+namespace pop
+if #result <> N/A
+return #result
+else
+display ok You specified an unknown wait_for command. Script returned #result and is halting.
+halt
+
+;======================================================================
+sub wait_for_MSG ; version 1.4 ~Locke
+;=================================================================
+if !_A0 < 3
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for MSG %message % , time_out_in_seconds$
++Script is halting
+halt
+}
+set !_timeout ( #scnt + !_A . !_A0 )
+_lets_wait_for_a_message:
+for %i %jstart #jindex
+{
+ scanjournal %i
+  for %ii 2 !_A0
+  {
+    if !_A . %ii in #journal && %jstart <> %i
+    set #result #true , #spc , !_A . %ii
+  }
+}
+
+if #true notin #result
+{
+set #result #false
+ if !_timeout =< #scnt
+ return #result
+wait 1
+goto _lets_wait_for_a_message
+}
+else
+return #result
+
+wait 1
+goto _lets_wait_for_a_message
+
+
+;======================================================================
+sub wait_for_GUMP ; version 1.4 ~Locke
+;=================================================================
+if !_A0 < 3
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for GUMP XXX_YYY % , time_out_in_seconds$
++Script is halting
+halt
+}
+if !_A3 <> CLOSE
+set !_timeout #scnt + !_A3
+else
+set !_timeout 0 ; no gump wait if %3 = CLOSE since we already believe it to be open.
+
+_lets_wait_for_a_gump:
+if #CONTID = !_A2 || #CONTSIZE = !_A2 || #CONTKIND = !_A2 || #CONTNAME = !_A2 || #CONTTYPE = !_A2
+{
+  if !_A5 <> N/A && !_A6 <> N/A
+  {
+  set !clickx !_A5 + #contposx
+  set !clicky !_A6 + #contposy
+  click !clickx !clicky
+  }
+  if !_A3 = CLOSE || if !_A4 = CLOSE || !_A5 = CLOSE || !_A6 = CLOSE
+  {
+  set !string #contsize
+  str pos !string _
+  set !pos #strres
+  str del !string #strres #strres
+  set !clickX #contposx + ( #strres / 2 )
+  str del !string 1 !pos
+  set !clickY #contposy + ( #strres / 2 )
+  click !clickx !clicky R
+  }
+return #true
+}
+
+if !_timeout =< #scnt && !_A4 = N/A
+return #false
+
+if !_A4 <> N/A && !_timeout =< #scnt
+{
+finditem !_A4
+ if #findkind <> -1
+ {
+  for #findindex 1 #findcnt
+  {
+   if #finddist > 2
+   ignoreitem #findid LLWAITFOR
+   else
+   break
+  }
+  set #lobjectid #findid
+  event macro 17 0
+  set !_timeout #scnt + !_A3
+ }
+ else
+ return #false
+}
+wait 1
+goto _lets_wait_for_a_gump
