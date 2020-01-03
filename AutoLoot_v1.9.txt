@@ -84,7 +84,7 @@ set %lotear_bolsas #TRUE ; [ #TRUE = SÍ o #FALSE = NO ]
 ; **** Posición de la bolsa de Loot ****
 ;---------------------------------------
 ; Para encontrar estos valores X e Y, tienes que mover con la mano la bolsa del loot hasta el sitio donde quieres
-; que se quede fija, y sin soltar la barra de salud, mirar en el EasyUO y apuntar lo que pone en el apartado
+; que se quede fija, y sin soltar la bolsa, mirar en el EasyUO y apuntar lo que pone en el apartado
 ; "Container Info" -> #CONTPOSX y #CONTPOSY. Reduce la ventana del UO a la mitad para que puedas tener el EasyUO
 ; abierto al lado de la ventana del UO y poder mirar el EasyUO al mismo tiempo que mueves la bolsa del loot.
 ;--------
