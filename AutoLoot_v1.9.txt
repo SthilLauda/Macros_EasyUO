@@ -72,9 +72,9 @@ set %switch_loot_toggle_key_2 ctrl ; ¡Configura esto si vas a hacer PVP!
 ; ******* MODO LOOT *******
 ;---------------------------
 set %mode 1 ; [ 1 = PvM / 0 = PvP ] ; Modo de arranque por defecto.
-;--------------------------------------------------------
-; ********* CORTAR CUERPOS [ Sólo en modo PvP ] *********
-;--------------------------------------------------------
+;-----------------------------------
+; ********* CORTAR CUERPOS *********
+;-----------------------------------
 set %cortar_cadaver #FALSE ; [ #TRUE = SÍ o #FALSE = NO ]
 ;--------------------------------
 ; **** Abrir y lotear bolsas ****
