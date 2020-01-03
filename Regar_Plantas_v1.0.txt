@@ -21,14 +21,14 @@
 ; Version: 1.0
 ; Client Tested with: 2.0.3
 ; EUO version tested with: EasyUO 1.5 Version 243
-; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Shard: Ultima Alianza (Â¡Hasta la muerte!)
 ; Revision Date: 03/01/2020
 ; Public Release: 03/01/2020
-; Purpose: Riega rápidamente las plantas al pulsar una tecla.
+; Purpose: Riega rÃ¡pidamente las plantas al pulsar una tecla.
 ;________________________________
 ;
 ; ///////////////////////////////
-; ******** CONFIGURACIÓN ********
+; ******** CONFIGURACIÃ“N ********
 ; ///////////////////////////////
 ;________________________________
 ;
@@ -36,7 +36,7 @@ set %tecla F12
 ;________________________________________________
 ;
 ; //////////////////////////////////////////////
-; ************* FIN CONFIGURACIÓN *************
+; ************* FIN CONFIGURACIÃ“N *************
 ; //////////////////////////////////////////////
 ;________________________________________________
 ;
@@ -117,7 +117,7 @@ onhotkey %tecla
                                    }
                          }
                     }
-                    gosub wait_for GUMP 263_231 CLOSE ; Cerrar el menú de la planta.
+                    gosub wait_for GUMP 263_231 CLOSE ; Cerrar el menÃº de la planta.
                     set #SYSMSGCOL 88
                     event sysmessage PLANTAS TERMINADAS! :D
                     wait 20
@@ -144,7 +144,7 @@ return
 
 sub setupJarra
 finditem %jarra_agua C_ , #BACKPACKID
-if #FINDCNT = 0 ; Si no hay ninguno, paramos.
+if #FINDCNT = 0 ; Si no hay ninguna, paramos.
    {
      event exmsg #CHARID 0 89 CONSIGUE UNA JARRA DE AGUA!!
      halt
