@@ -17,20 +17,24 @@
 ;
 ; Script Name: Auto-Hider
 ; Author: Sthil Lauda
-; Version: 1.1
+; Version: 1.2
 ; Client Tested with: 2.0.3
 ; EUO version tested with: EasyUO 1.5 Version 243
 ; Shard: Ultima Alianza (¡Hasta la muerte!)
 ; Revision Date: 23-11-2018
 ; Public Release: 29-07-2019
 ; Global Variables Used:
-; Purpose: Oculta el PJ automáticamente, si es revelado.
+; Purpose: Oculta el PJ automáticamente, si es revelado, incluso si llevas una linterna equipada.
 ;==================================
-set %version 1.1
+set %version 1.2
 ;
 set #SYSMSGCOL 89
 event sysmessage Auto-Hider %version
 wait 40
+
+set %linterna_apagada IYD
+set %linterna_encendida VXD
+
 ;
 ;========================================================
 ;
@@ -42,13 +46,15 @@ loop:
 gosub check_muerto
 if ( H in #CHARSTATUS || #TARGCURS = 1 || #LLIFTEDKIND = 1 ) ; Si ya estamos ocultos, o vamos a hacer click en algo, o estamos levantando un objeto, entonces no hacemos nada.
      {
+       gosub encencerLinterna
        wait 20
        goto loop
      }
      else
         {
-          if ( H Notin #CHARSTATUS && #TARGCURS = 0 && #LLIFTEDKIND = 0 ) ; Si no estamos ocultos, y no vamos a hacer clicks (o castear algún hechizo), ni a levantar un objeto, entonces nos ocultamos...
+          if ( H Notin #CHARSTATUS && #TARGCURS = 0 && #LLIFTEDKIND = 0 ) ; Si no estamos ocultos, y no vamos a hacer clicks, ni a levantar nada, entonces nos ocultamos...
                {
+                 gosub apagarLinterna
                  event macro 13 21 ; Use SKILL Hiding
                  gosub waitForSysVar CHARSTATUS = H 50
                }
@@ -68,6 +74,33 @@ if #CHARGHOST = Yes
    {
      wait 1
      goto _checkDead
+   }
+return
+
+sub encencerLinterna
+finditem %linterna_apagada C_ , #CHARID
+if #FINDCNT > 0
+   {
+     set #LOBJECTID #FINDID
+     event macro 17
+   }
+   else
+      {
+        finditem %linterna_apagada C_ , #BACKPACKID
+        if #FINDCNT > 0
+           {
+             set #LOBJECTID #FINDID
+             event macro 17
+           }
+      }
+return
+
+sub apagarLinterna
+finditem %linterna_encendida C_ , #CHARID
+if #FINDCNT > 0
+   {
+     set #LOBJECTID #FINDID
+     event macro 17
    }
 return
 
