@@ -180,8 +180,8 @@ set %pociones WUF
 set %flechas LNK_RWF
 set %custom_pvm LGG_XYF_SEE_UZF_EAG_GUF_QEJ_LWK_WXD_EWS ; Pólvoras, Libros, Vasijas, Escamas, Madera muerta, Huesos, Cristal de fundición, Corazón nórdico, etc...
 set %golems YWL_RCG_QSL_LYAB
-set %gemas BVG_YVF_CVF_CWF_RVF_GVF_BWF_VVF_DWF_ZVF_OVF_TVF_FVF_HVF_QVF_QUF_GWF_
- +BVF_VUF_PVF_BUF_FVF_NVF_AWF_DVF_UVF_KVF_EVF_WVF_FWF_RVF_WUF_BVF_MWF_XVF_HEJ_MVF
+set %gemas UVF_EWF_TVF_DWF_MWF_XVF_BVF_SVF_AWF_YVF_EVF_CWF_DVF_CVF_GWF_QVF_
+ +JVF_KVF_WVF_MVF_OVF_ZVF_BWF_GVF_FVF_LVF_VVF_PVF_NVF_VUF_IVF_RVF_FWF_HVF
 set %regsmagia RZF_SZF_KZF_JZF_KUF_WZF_MZF_JUF
 set %regsnigro FUF_TZF_XZF_PZF_YZF_EUF_VZF_NZF
 set %regsalquimiaysastre QZF_DAG_OZF_IUF_LZF_HUF
