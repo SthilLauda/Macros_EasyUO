@@ -11,7 +11,7 @@
 ; EUO version tested with: EasyUO 1.5 Version 243
 ; Shard: Ultima Alianza (¡Hasta la muerte!)
 ; Public Release: 04/05/2019
-; Revised On: 30/07/2019
+; Revised On: 04/01/2019
 ; Propósito: Mover de un contendor a otro todos los objetos de un determinado tipo.
 ; Instrucciones: Elegir las bolsas de origen y destino, y por último el tipo de objeto.
 
