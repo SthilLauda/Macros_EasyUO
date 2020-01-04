@@ -284,7 +284,7 @@ SUB moveItem
               SET %droptimeout #SYSTIME + 1000 ; Timeout del DROP en milisegundos
               dropwait:
               EXEVENT dropC %_newItemLocation
-              FINDITEM %_litemID %_NEWITEMLOCATION
+              FINDITEM %_litemID %_newItemLocation
               IF ( #FINDKIND <> -1 ) && ( #SYSTIME < %droptimeout )
                    {
                      GOTO dropwait
