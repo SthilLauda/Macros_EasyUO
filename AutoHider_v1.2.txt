@@ -22,7 +22,7 @@
 ; EUO version tested with: EasyUO 1.5 Version 243
 ; Shard: Ultima Alianza (¡Hasta la muerte!)
 ; Revision Date: 23-11-2018
-; Public Release: 29-07-2019
+; Public Release: 04/01/2019
 ; Global Variables Used:
 ; Purpose: Oculta el PJ automáticamente, si es revelado, incluso si llevas una linterna equipada.
 ;==================================
