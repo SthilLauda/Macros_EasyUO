@@ -44,8 +44,21 @@
 ; Purpose: Lotear y cortar el cadaver.
 ; Instrucciones: - Configurar las teclas rápidas (hotkeys).
 ;                - Si quieres que no lotee alguna cosa, desactiva la línea correspondiente añadiendo un ";" delante Ejem: " ;gosub moveItem %gemas %contenedor %bolsa_loot ".
-; Agradecimientos a: Bishop, Samara y Gargamel ^^.
-set %version v3.0
+--------------------------------------------------
+; Agradecimientos a: Bishop, Samara y Gargamel ^^
+--------------------------------------------------;
+- Mejora en PvM: Si el NPC desaperece al cortarlo, ahora lo lotea del suelo.
+- Mejora en PvP: Revisión del modulo "aspidadora".
+- Añadida comprobación de filo en el arma tajadora.
+- Añadida Auto-Configuración de la bolsa de loot.
+- Arreglado fallo al lotear bolsas de segundo nivel en cofres.
+- Mejorado el filtro de joyas (se añade "Suerte").
+- Añadido nuevo filtro para minerales (se añade "Eclipse").
+- Añadido aviso por sobrecarga de peso.
+- Correcciones en varias listas de ID's.
+- Incrementada la velocidad general de la macro.
+- Añadido al loot: instrumentos musicales, mineral, pieles, y plumas.
+- Añadidos nuevos mensajes y colores.
 ;
 ;________________________________
 ;
