@@ -183,7 +183,7 @@ set %joyas IJG_SJG_UJG_HJG
 set %runas QWL_SWL_RWL_PWL
 set %pociones WUF
 set %flechas LNK_RWF
-set %custom_pvm LGG_XYF_SEE_UZF_EAG_GUF_QEJ_LWK_WXD_EWS ; Pólvoras, Libros, Vasijas, Escamas, Madera muerta, Huesos, Cristal de fundición, Corazón nórdico, etc...
+set %custom_pvm LGG_XYF_SEE_UZF_EAG_GUF_QEJ_LWK_WXD_EWS_NLF ; Pólvoras, Libros, Vasijas, Escamas, Madera muerta, Huesos, Cristal de fundición, Corazón nórdico, Tejido del Caos, etc...
 set %golems YWL_RCG_QSL_LYAB
 set %gemas UVF_EWF_TVF_DWF_MWF_XVF_BVF_SVF_AWF_YVF_EVF_CWF_DVF_CVF_GWF_QVF_
  +JVF_KVF_WVF_MVF_OVF_ZVF_BWF_GVF_FVF_LVF_VVF_PVF_NVF_VUF_IVF_RVF_FWF_HVF
