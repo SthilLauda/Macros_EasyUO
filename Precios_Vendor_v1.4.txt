@@ -54,6 +54,7 @@ goto mainloop
 ;
 sub startMacro
 {
+ignoreitem reset CON_PRECIO
 configurar:
 if %confp = 1 || %confp = N/A
    {
@@ -106,28 +107,38 @@ if %conf = 1
 goto TESC
 
 VendorLoop:
+set %num_items 0
 finditem * C_ , %contenedor_1
 if #FINDCNT > 0
    {
      for #FINDINDEX 1 #FINDCNT
          {
-           set #LOBJECTID #FINDID
-           event macro 1 0 KickAss Precio %precio
-           target
-           set #LTARGETID #FINDID
-           set #LTARGETKIND 1
-           event macro 22
-           if #FINDCNT > 1 ; Control de Spam Detection...
-              {
-                wait 5s
-              }
-              else
-                 {
-                   wait 20
-                 }
+           event property #FINDID
+           if ( Precio Notin #property || %precio Notin #property ) ; Evitamos perder tiempo poniendo el mismo precio a algo que ya lo tiene...
+                {
+                  set #LOBJECTID #FINDID
+                  event macro 1 0 KickAss Precio %precio
+                  target
+                  set #LTARGETID #FINDID
+                  set #LTARGETKIND 1
+                  event macro 22
+                  set %num_items %num_items + 1
+                  if #FINDCNT > 1 ; Control de Spam Detection...
+                      {
+                        wait 5s
+                      }
+                      else
+                         {
+                           wait 20
+                         }
+                }
+                else
+                   {
+                     ignoreitem #FINDID CON_PRECIO
+                   }
          }
      set #sysmsgcol 88
-     event sysmessage TERMINADO! :-)
+     event sysmessage TERMINADO! [ %num_items ] Items!
      set #menubutton n/a
      goto mainloop
    }
