@@ -15,12 +15,13 @@
 ; Public Release: 10/01/2020
 ; Global Variables Used: Ninguna.
 ; Purpose: Le pone el precio a todos los objetos que hay en un contenedor.
-;_________________________________________
+;_________________________________
 ;
-; ////////////////////////////////////////
-; ******** ¡NO HAY CONFIGURACIÓN! ********
-; ////////////////////////////////////////
-;_________________________________________
+; ////////////////////////////////
+; ******** CONFIGURACIÓN! ********
+; ////////////////////////////////
+;_________________________________
+set %nombre_vendor XXXXXXX ; Pon aquí el nombre de tu vendor.
 ;
 set #SYSMSGCOL 1187
 event sysmessage ====================
@@ -117,7 +118,7 @@ if #FINDCNT > 0
            if ( Precio Notin #property || %precio Notin #property ) ; Evitamos perder tiempo poniendo el mismo precio a algo que ya lo tiene...
                 {
                   set #LOBJECTID #FINDID
-                  event macro 1 0 KickAss Precio %precio
+                  event macro 1 0 %nombre_vendor Precio %precio
                   target
                   set #LTARGETID #FINDID
                   set #LTARGETKIND 1
