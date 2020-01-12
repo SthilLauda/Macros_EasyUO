@@ -18,12 +18,12 @@
 ;^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 ;
 ; Author: Sthil Lauda
-; Version: 1.0
+; Version: 1.1
 ; Client Tested with: 2.0.3
 ; EUO version tested with: EasyUO 1.5 Version 243
 ; Shard: Ultima Alianza (¡Hasta la muerte!)
 ; Revision Date: 03/01/2020
-; Public Release: 03/01/2020
+; Public Release: 12/01/2020
 ; Purpose: Riega rápidamente las plantas al pulsar una tecla.
 ;________________________________
 ;
@@ -45,7 +45,7 @@ set %pixel_con_1_de_agua 3270631 ; X:217 Y:97
 set %pixel_con_2_de_agua 3270631 ; X:220 Y:94
 set %jarra_agua GZF_PTD
 set %pilones TEE_QEE_WEE_VEE
-set %plantas TCF_YVE_NWE_IWE_ICF_VWE_MWE_NXE_JWE_UWE_BCF_BXE_CCF_BWE_UAF
+set %plantas TCF_YVE_NWE_IWE_ICF_VWE_MWE_NXE_JWE_UWE_BCF_BXE_CCF_BWE_UAF_OLI_QLI
 set %planta_regada #FALSE
 ignoreitem reset
 
@@ -56,13 +56,16 @@ loop:
 onhotkey %tecla
          {
            finditem %plantas G_1
+           set %numero_plantas 0
+           set %plantas_regadas 0
            if #FINDCNT > 0
               {
                 for #FINDINDEX 1 #FINDCNT
-                    {
+                    {                      
                       if #FINDZ = #CHARPOSZ
                          {
-                           set #LOBJECTID #FINDID
+                           set %numero_plantas %numero_plantas + 1
+			set #LOBJECTID #FINDID
                            set %jstart #jindex
                            event macro 17
                            gosub wait_for MSG No_consigues Las_plantas_mutadas_no 1
@@ -95,7 +98,8 @@ onhotkey %tecla
                                              }
                                           if ( %planta_regada )
                                                {
-                                                 finditem %jarra_agua C_ , #BACKPACKID
+                                                 set %plantas_regadas %plantas_regadas + 1
+					    finditem %jarra_agua C_ , #BACKPACKID
                                                  if #FINDCNT > 0
                                                     {
                                                       set #LOBJECTID #FINDID
@@ -119,7 +123,9 @@ onhotkey %tecla
                     }
                     gosub wait_for GUMP 263_231 CLOSE ; Cerrar el menú de la planta.
                     set #SYSMSGCOL 88
-                    event sysmessage PLANTAS TERMINADAS! :D
+                    event sysmessage PLANTAS TERMINADAS! [ %numero_plantas ] Plantas.
+                    wait 20
+		  event sysmessage PLANTAS REGADAS! [ %plantas_regadas ] Regadas.
                     wait 20
               }
          }
@@ -144,7 +150,7 @@ return
 
 sub setupJarra
 finditem %jarra_agua C_ , #BACKPACKID
-if #FINDCNT = 0 ; Si no hay ninguna, paramos.
+if #FINDCNT = 0 ; Si no hay ninguno, paramos.
    {
      event exmsg #CHARID 0 89 CONSIGUE UNA JARRA DE AGUA!!
      halt
@@ -152,7 +158,7 @@ if #FINDCNT = 0 ; Si no hay ninguna, paramos.
    else
       {
         set #SYSMSGCOL 73
-        event sysmessage OK: Jarra de agua...
+        event sysmessage OK: Llenando la Jarra de agua...
         wait 1s
         set #LOBJECTID #FINDID
         event macro 17
@@ -232,8 +238,6 @@ return #result
 
 wait 1
 goto _lets_wait_for_a_message
-
-
 ;======================================================================
 sub wait_for_GUMP ; version 1.4 ~Locke
 ;=================================================================
