@@ -110,6 +110,7 @@ if ( #TRUE in #RESULT )
        if TE_ACEPTA in #RESULT || TU_HABILIDAD in #RESULT || %fail > 5 3
           {
             event macro 1 0 all release
+            wait 1s
             gosub hiding
             set %recientameados %recientameados , _ , %tmp_animal
             goto nuevotarget
