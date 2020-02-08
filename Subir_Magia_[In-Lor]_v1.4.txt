@@ -32,7 +32,7 @@
 ; (________mrf\____.dBBBb.________)____)
 ;
 ; Author: Sthil Lauda
-; Version: 1.3
+; Version: 1.4
 ; Client Tested with: 2.0.3
 ; EUO version tested with: EasyUO 1.5 Version 243
 ; Shard: Ultima Alianza (¡Hasta la muerte!)
@@ -216,6 +216,7 @@ if ( #TRUE in #result )
                              wait 1
                            }
                            until #MANA = #MAXMANA
+                           wait 2s
                     }
           }
        if en_paz in #result ; OK, estamos bien de maná.
