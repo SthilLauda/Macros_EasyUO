@@ -66,8 +66,8 @@ chooseskill Anim real
 gosub setupHid
 gosub resetDomados
 gosub resetCamino
-;gosub comprobar_comida
-;gosub choose_pace run ; Lo primero, cambiar el modo de moverse a "correr".
+gosub comprobar_comida
+gosub choose_pace run ; Lo primero, cambiar el modo de moverse a "correr".
 goto movimiento
 
 INICIO:
