@@ -28,7 +28,7 @@
 ;    _   -    _   -  (_ __)     _    ~~;~~     -_
 ;       _- _-  _    < / < \  _-  _    -     _-   _
 ;
-set %version v1.12
+set %version v1.13
 ;
 ; *** NOTAS "MÁGICAS" ^^ *** :
 ; - Si la macro de domar se os para en un determinado sitio y el pj no se mueve, pausad la macro,
@@ -36,6 +36,8 @@ set %version v1.12
 ;   Le dais al play una vez, y otra al stop. Una vez hecho esto, volver a encender la macro de domar.
 ;
 ; MEJORAS :
+; - Añadidas varias protecciones.
+; - Añadidas opciones para resetear la lista de animales y la ruta.
 ; - Añadido un "sub" para comer cada cierto tiempo hasta quedar saciado.
 ; - Añadido un "sub" para activar el modo "always run" para que vaya corriendo por el mapa en lugar de ir andando.
 ; - Añadido el "sub" pathFind para moverse (Author: ScriptFellow).
@@ -58,199 +60,169 @@ set #SYSMSGCOl 88
 event SysMessage TammingGenius by Nilaween
 event SysMessage [ MOD+ Sthil %version ]
 set #SYSMSGCOl 43
+wait 20
 event SysMessage Intentando acudir a la ultima posicion. Por favor, ayudame a llegar.
 chooseskill Anim real
-ignoreitem *bloqueados
-gosub comprobar_comida
-gosub choose_pace run ; Lo primero, cambiar el modo de moverse a "correr".
 gosub setupHid
+gosub resetDomados
+gosub resetCamino
+;gosub comprobar_comida
+;gosub choose_pace run ; Lo primero, cambiar el modo de moverse a "correr".
 goto movimiento
 
 INICIO:
+chooseskill Anim real
 set *posicion *posicion + 1
 gosub hiding
 
 nuevotarget:
 set %fail 0
-set %intentos 3
-set %distancia 19
+set %intentos 0
+set %distancia 0
+set #LTARGETID N/A
 set %tiempo_actual #SCNT
 if %proxima_vez <= %tiempo_actual ; Comer cada cierto tiempo si hay hambre
-{
-  gosub comprobar_comida
-}
-set #LTARGETID N/A
+   {
+     gosub comprobar_comida
+   }
 finditem * G_25
-for #FINDINDEX 1 #FINDCNT
-{
-if #FINDREP <> 3 2
-ignoreitem #FINDID IGNORE_ANIMALS
-set *bloqueados *bloqueados , _ , #FINDID
-if #FINDREP = 3 && #FINDID notIn %recientameados && #FINDDIST < %distancia && #FINDX < 755 2
-set %tmp_animal #FINDID
-set %distancia #FINDDIST
-}
-if %tmp_animal = #CHARID
-goto movimiento
-event PROPERTY %tmp_animal
-if ( OSO in #PROPERTY && #SKILL < 601 ) || SERPIENTE in #PROPERTY || HORRENDO in #PROPERTY 2
-set %recientameados %recientameados , _ , %tmp_animal
-goto nuevotarget
-gosub checkBugTarget
-repitiendotarget:
-set %jstart #jindex
-event macro 13 35
-target
-set #LTARGETID %tmp_animal
-set #LTARGETKIND 1
-event macro 22
-gosub wait_for MSG TE_ACEPTA TU_HABILIDAD YA_ESTA NO_PUEDE_SER NO_PUEDES_DOMAR GET_THERE NO_PUEDES_VER SEE_THE_TARGET UNEXPECTED_TARGET FUERA_DE_TU ESTAS_DEMASIADO_LEJOS NO_CONSIGUES 200
-if ( #TRUE in #RESULT )
-     {
-       if TE_ACEPTA in #RESULT || TU_HABILIDAD in #RESULT || %fail > 5 3
-          {
-            event macro 1 0 all release
-            wait 1s
-            gosub hiding
-            set %recientameados %recientameados , _ , %tmp_animal
-            goto nuevotarget
-          }
-       if YA_ESTA in #RESULT || NO_PUEDE_SER in #RESULT || NO_PUEDES_DOMAR in #RESULT || GET_THERE in #RESULT || %intentos <= 0 3
-          {
-            set *bloqueados *bloqueados , _ , %tmp_animal
-            ignoreitem %tmp_animal IGNORE_ANIMALS
-            gosub hiding
-            goto nuevotarget
-          }
-       if SEE_THE_TARGET in #RESULT
-          {
-            goto nuevotarget
-          }
-       if NO_PUEDES_VER in #RESULT || UNEXPECTED_TARGET in #RESULT || FUERA_DE_TU in #RESULT
-          {
-            set %fail %fail + 1
-            gosub seguir
-            gosub hiding
-            goto repitiendotarget
-          }
-       if ESTAS_DEMASIADO_LEJOS in #RESULT
-          {
-            gosub seguir
-            gosub hiding
-            goto repitiendotarget
-          }
-       if NO_CONSIGUES in #RESULT
-          {
-            set %intentos %intentos + 1
-            gosub hiding
-          }
-     }
-goto repitiendotarget
-
-;=====================================================
-; Rutina para, en caso de hambre, comer hasta saciarse
-;=====================================================
-; v2.2
-sub comprobar_comida
-{
-  hambriento:
-  set %jrnl #jindex ; Marcamos un índice de las líneas del diario.
-  event macro 4 0 .hungry
-  wait 20
-  while #true
-     {
-       if #jindex > %jrnl ; Si aparece una nueva línea.
-          {
-            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de línea.
-            scanjournal %jrnl   ; La leemos...
-            if Dentro_de_1_minuto in #journal
-               {
-                 wait 120s ; Save del server...
-               }
-            if Estas_no_le_afecta_el_hambre in #journal || Estas_tan_lleno_que_no_puedes in #journal || Estas_totalmente_saciado in #journal
-               {
-                 set %proxima_vez %tiempo_actual + %tiempo_alimentacion
-                 return
-               }
-               else
-                  {
-                    if Estas_lleno in #journal || Estas_contento in #journal || Estas_en_inanicion in #journal || Estas_hambriento in #journal || Sientes_mucho in #journal || Estas_con_hambre in #journal || Estas_parcialmente in #journal || Estas_bien_lleno in #journal || Te_sientes_casi_lleno in #journal
-                       {
-                         finditem %comida C_ , #backpackid
-                         if #findcnt > 0
-                            {
-                              set #lobjectid #findid
-                              event macro 17
-                              wait 20
-                              goto hambriento
-                            }
-                            else
+if #FINDCNT > 0 && #FINDKIND = 1
+   {
+     for #FINDINDEX 1 #FINDCNT
+         {
+           if #FINDREP <> 3
+              {
+                ignoreitem #FINDID IGNORE_NOT_ANIMALS
+                set *bloqueados *bloqueados , _ , #FINDID
+              }
+              else
+                 {
+                   if ( #FINDREP = 3 && #FINDID notIn %recientameados ) ; && #FINDX < 755
+                        {
+                          set %tmp_animal #FINDID
+                          set %distancia #FINDDIST
+                          event PROPERTY %tmp_animal
+                          if ( OSO in #PROPERTY && #SKILL < 601 ) || SERPIENTE in #PROPERTY || HORRENDO in #PROPERTY
                                {
-                                 event exmsg #charid 3 48 COMPRA COMIDA!!
-                                 wait 40
-                                 set %proxima_vez %tiempo_actual + %tiempo_alimentacion
+                                 set %recientameados %recientameados , _ , %tmp_animal
+                                 goto nuevotarget
                                }
-                       }
-                       else ; Mensaje extraño, repetimos...
-                          {
-                            goto hambriento
-                          }
-                  }
-          }
-       return
-     } ; FIN While
-}
-return
-
-sub setupHid ; <==============================>
-display yesno ********************** [ HIDING ] **********************$$
-            + ¿Quieres intentar OCULTAR tu PJ mientras macreas?       $$
-            + ******************************************************* $$
-if ( #dispres = yes )
-     {
-       set %hiding #TRUE
-     }
-     else
-        {
-          set %hiding #FALSE
-        }
-return
-
-sub hiding ; <==============================>
-if ( %hiding )
-     {
-       if ( H Notin #CHARSTATUS )
+                          break
+                        }
+                 }
+         }
+         gosub checkBugTarget
+         repitiendotarget:
+         finditem %tmp_animal
+         if #FINDCNT > 0
             {
-              event macro 13 21 ; Use skill Hiding
-              gosub waitForSysVar CHARSTATUS = H 55
+              if #FINDDIST < 8
+                 {
+                   set %jstart #jindex
+                   event macro 13 35
+                   target
+                   set #LTARGETID %tmp_animal
+                   set #LTARGETKIND 1
+                   event macro 22
+                   gosub wait_for MSG TE_ACEPTA TU_HABILIDAD YA_ESTA NO_PUEDE_SER NO_PUEDES_DOMAR GET_THERE NO_PUEDES_VER SEE_THE_TARGET UNEXPECTED_TARGET FUERA_DE_TU ESTAS_DEMASIADO_LEJOS NO_CONSIGUES 200
+                   if ( #TRUE in #RESULT )
+                        {
+                          if TE_ACEPTA in #RESULT || TU_HABILIDAD in #RESULT || %fail > 5
+                             {
+                               if TE_ACEPTA in #RESULT
+                                  {
+                                    event macro 1 0 all release
+                                    wait 1s
+                                  }
+                               gosub hiding
+                               set %recientameados %recientameados , _ , %tmp_animal
+                               ignoreitem %tmp_animal IGNORE_TAMED_ANIMALS
+                               goto nuevotarget
+                             }
+                          if SEE_THE_TARGET in #RESULT || YA_ESTA in #RESULT || NO_PUEDE_SER in #RESULT || NO_PUEDES_DOMAR in #RESULT || GET_THERE in #RESULT || %intentos > 5
+                             {
+                               set *bloqueados *bloqueados , _ , %tmp_animal
+                               ignoreitem %tmp_animal IGNORE_TAMED_ANIMALS
+                               set #SYSMSGCOL 1570
+                               event sysmessage IGNORANDO ANIMAL :(
+                               wait 20
+                               gosub hiding
+                               goto nuevotarget
+                             }
+                          if NO_PUEDES_VER in #RESULT || UNEXPECTED_TARGET in #RESULT || FUERA_DE_TU in #RESULT
+                             {
+                               set %fail %fail + 1
+                               gosub seguir
+                               gosub hiding
+                               goto repitiendotarget
+                             }
+                          if ESTAS_DEMASIADO_LEJOS in #RESULT
+                             {
+                               gosub seguir
+                               gosub hiding
+                               goto repitiendotarget
+                             }
+                          if NO_CONSIGUES in #RESULT
+                             {
+                               set %intentos %intentos + 1
+                               gosub hiding
+                             }
+                        }
+                        else
+                           {
+                             set %fail %fail + 1
+                             gosub hiding
+                             goto repitiendotarget
+                           }
+                 }
+                 else
+                    {
+                      gosub seguir
+                      gosub hiding
+                      goto repitiendotarget
+                    }
             }
-     }
-return
+            else
+               {
+                 goto nuevotarget
+               }
+   }
+   else
+      {
+        goto movimiento
+      }
+goto INICIO
 
 sub checkBugTarget ; <==============================>
 finditem %tmp_animal
-if #FINDX In %ignore_locs_X && #FINDY In %ignore_locs_Y && #FINDZ In %ignore_locs_Z ; El animal está en una parte del mapa (Yew) bugeado, y el PJ se queda atrapado.
+if #FINDCNT > 0
    {
-     set *bloqueados *bloqueados , _ , #FINDID
-     ignoreitem #FINDID ANIMAL_BUGEADO
-     set #SYSMSGCOL 38
-     event sysmessage IGNORANDO ANIMAL! :-(
-     wait 20
-     goto nuevotarget
+     if #FINDX In %ignore_locs_X && #FINDY In %ignore_locs_Y && #FINDZ In %ignore_locs_Z ; El animal está en una parte del mapa (Yew) bugeado, y el PJ se queda atrapado.
+        {
+          set *bloqueados *bloqueados , _ , #FINDID
+          ignoreitem #FINDID ANIMAL_BUGEADO
+          set #SYSMSGCOL 1570
+          event sysmessage IGNORANDO ANIMAL! :-(
+          wait 20
+        }
+        else ; Podemos acercarnos al bicho sin que nos quedemos flapados... :P
+           {
+             gosub seguir
+           }
    }
-   else ; Podemos acercarnos al bicho sin que nos quedemos flapados... :P
-      {
-        gosub pathFind #FINDX #FINDY #FINDZ 1 5
-      }
 return
 
 sub seguir ; <==============================>
 if %tiempopathfind > #SYSTIME && %tiempopathfind <> N/A
-return
+   {
+     return
+   }
 set %tiempopathfind #SYSTIME + 2000
 finditem %tmp_animal
-if #FINDKIND <> -1 && #FINDDIST > 4
-gosub pathFind #FINDX #FINDY #FINDZ 1 5
+if #FINDCNT > 0 && #FINDDIST > 4
+   {
+     gosub pathFind #FINDX #FINDY #FINDZ 1 5
+   }
 return
 
 MOVIMIENTO:
@@ -327,8 +299,116 @@ goto INICIO
 move 682 907
 move 721 925
 set *posicion -1
+set #SYSMSGCOL 1165
+event sysmessage NUEVA RONDA! :D
+wait 20
+ignoreitem reset IGNORE_TAMED_ANIMALS
 deletevar recientameados
 goto INICIO
+
+sub setupHid ; <==============================>
+display yesno ********************** [ HIDING ] **********************$$
+            + ¿Quieres intentar OCULTAR tu PJ mientras macreas?       $$
+            + ******************************************************* $$
+if ( #dispres = yes )
+     {
+       set %hiding #TRUE
+     }
+     else
+        {
+          set %hiding #FALSE
+        }
+return
+
+sub resetDomados ; <==============================>
+display yesno ******** [ RESETEO ANIMALES ] ********** $$
+            + ¿Quieres RESETEAR la LISTA DE ANIMALES ? $$
+            + **************************************** $$
+if ( #dispres = yes )
+     {
+       deletevar recientameados
+       set *bloqueados N/A
+       ignoreitem reset IGNORE_TAMED_ANIMALS
+     }
+return
+
+sub resetCamino ; <==============================>
+display yesno ********* [ RESETEO CAMINO ] ******* $$
+            + ¿Quieres RESETEAR el CAMINO ANDADO ? $$
+            + ************************************ $$
+if ( #dispres = yes )
+     {
+       set *posicion N/A
+     }
+return
+
+
+
+sub hiding ; <==============================>
+if ( %hiding )
+     {
+       if ( H Notin #CHARSTATUS )
+            {
+              event macro 13 21 ; Use skill Hiding
+              gosub waitForSysVar CHARSTATUS = H 55
+            }
+     }
+return
+
+;=====================================================
+; Rutina para, en caso de hambre, comer hasta saciarse
+;=====================================================
+; v2.2
+sub comprobar_comida
+{
+  hambriento:
+  set %jrnl #jindex ; Marcamos un índice de las líneas del diario.
+  event macro 4 0 .hungry
+  wait 20
+  while #true
+     {
+       if #jindex > %jrnl ; Si aparece una nueva línea.
+          {
+            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de línea.
+            scanjournal %jrnl   ; La leemos...
+            if Dentro_de_1_minuto in #journal
+               {
+                 wait 120s ; Save del server...
+               }
+            if Estas_no_le_afecta_el_hambre in #journal || Estas_tan_lleno_que_no_puedes in #journal || Estas_totalmente_saciado in #journal
+               {
+                 set %proxima_vez %tiempo_actual + %tiempo_alimentacion
+                 return
+               }
+               else
+                  {
+                    if Estas_lleno in #journal || Estas_contento in #journal || Estas_en_inanicion in #journal || Estas_hambriento in #journal || Sientes_mucho in #journal || Estas_con_hambre in #journal || Estas_parcialmente in #journal || Estas_bien_lleno in #journal || Te_sientes_casi_lleno in #journal
+                       {
+                         finditem %comida C_ , #backpackid
+                         if #findcnt > 0
+                            {
+                              set #lobjectid #findid
+                              event macro 17
+                              wait 20
+                              goto hambriento
+                            }
+                            else
+                               {
+                                 event exmsg #charid 3 48 COMPRA COMIDA!!
+                                 wait 40
+                                 set %proxima_vez %tiempo_actual + %tiempo_alimentacion
+                               }
+                       }
+                       else ; Mensaje extraño, repetimos...
+                          {
+                            goto hambriento
+                          }
+                  }
+          }
+       return
+     } ; FIN While
+}
+return
 
 ;-@ ============================== @-;
 ;-@ ############################## @-;
