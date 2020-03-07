@@ -33,7 +33,7 @@ set %version v1.13
 ; *** NOTAS "MÁGICAS" ^^ *** :
 ; - Si la macro de domar se os para en un determinado sitio y el pj no se mueve, pausad la macro,
 ;   abrid una nueva pestaña en el EasyUO, y escribid lo siguiente: set *posicion 0
-;   Le dais al play una vez, y otra al stop. Una vez hecho esto, volver a encender la macro de domar.
+;   Le dais al play una vez, y otra al stop. Una vez hecho esto, volver a la otra pestaña para encender la macro de domar.
 ;
 ; MEJORAS :
 ; - Añadidas varias protecciones.
