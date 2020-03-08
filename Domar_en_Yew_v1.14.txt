@@ -28,16 +28,16 @@
 ;    _   -    _   -  (_ __)     _    ~~;~~     -_
 ;       _- _-  _    < / < \  _-  _    -     _-   _
 ;
-set %version v1.13
+set %version v1.14
 ;
 ; *** NOTAS "MÁGICAS" ^^ *** :
 ; - Si la macro de domar se os para en un determinado sitio y el pj no se mueve, pausad la macro,
 ;   abrid una nueva pestaña en el EasyUO, y escribid lo siguiente: set *posicion 0
-;   Le dais al play una vez, y otra al stop. Una vez hecho esto, volver a la otra pestaña para encender la macro de domar.
+;   Le dais al play una vez, y otra al stop. Una vez hecho esto, volver a encender la macro de domar.
 ;
 ; MEJORAS :
-; - Añadidas varias protecciones.
-; - Añadidas opciones para resetear la lista de animales y la ruta.
+; - Añadido modo "killer" para limpiar Yew de animales que ya están tameados por otras personas ¬¬
+; - Añadidas protecciones.
 ; - Añadido un "sub" para comer cada cierto tiempo hasta quedar saciado.
 ; - Añadido un "sub" para activar el modo "always run" para que vaya corriendo por el mapa en lugar de ir andando.
 ; - Añadido el "sub" pathFind para moverse (Author: ScriptFellow).
@@ -53,19 +53,26 @@ set %proxima_vez #SCNT ; Trigger
 set %comida RGG_NRD_QSD_ZBG_WLI_QRD_END_FUD_YLI_WLI_HGI
      +_KGI_EGI_QLI_KLI_MLI_KRD_HQD_AQD_MQE_VQE_TQE_JQE_IQE
      +_GQE_SPE_ZPE_OQE_BDF_KPE_RQE_YSD_SQD_YWI_AXI_PQD_QQD
+set %armas FMH_GFF_EPH_LPH_BPH_CUO_TSF_LPO_JPH_ZTH_RMH_SOH_TLH_
+ +FUO_WSF_ATF_OMH_XPO_NMH_BNF_LTF_VPO_WTH_VRH_KTF_
+ +OLH_FFF_ZSF_YTH_BUO_ASF_ISF_BSF_QPF_KPH_CUH_NPO_MPH_UOH_TRH_XRH_CSF_
+ +KPO_POH_RRH_WPO_EMH_MSF_OPO_BUH_GUO_VTH_BFF_QMH_YSF_NSF_LSF_
+ +GMH_JTF_SRH_CNF_FBG_HNF_ZPF_GBG_OSF_INF_HSF_AUO_ZTO_FSF_WRH_MTF_JPO_
+ +RPF_HFF_XSF_YPO_DMH_XTH_QOH_URH_CQF_CFF_PMH_AUH_SPO_CPH_AQF_
+ +MPO_YRH_JOH_KSF_ZRF_PPF_SMH_NPO_GUO_XHF_NPF
+set %siguiendo 0
+set #LPC 900
 ;
 ; ********* MACRO *********
 ;
 set #SYSMSGCOl 88
 event SysMessage TammingGenius by Nilaween
 event SysMessage [ MOD+ Sthil %version ]
-set #SYSMSGCOl 43
-wait 20
-event SysMessage Intentando acudir a la ultima posicion. Por favor, ayudame a llegar.
 chooseskill Anim real
 gosub setupHid
 gosub resetDomados
 gosub resetCamino
+gosub comprobar_armamento
 gosub comprobar_comida
 gosub choose_pace run ; Lo primero, cambiar el modo de moverse a "correr".
 goto movimiento
@@ -102,9 +109,13 @@ if #FINDCNT > 0 && #FINDKIND = 1
                           set %tmp_animal #FINDID
                           set %distancia #FINDDIST
                           event PROPERTY %tmp_animal
-                          if ( OSO in #PROPERTY && #SKILL < 601 ) || SERPIENTE in #PROPERTY || HORRENDO in #PROPERTY
+                          if ( OSO in #PROPERTY && #SKILL < 601 ) || SERPIENTE in #PROPERTY || HORRENDO in #PROPERTY || Cuerpo in #PROPERTY
                                {
                                  set %recientameados %recientameados , _ , %tmp_animal
+                                 if Cuerpo in #PROPERTY ; Animal muerto...
+                                    {
+                                      ignoreitem #FINDID IGNORE_NOT_ANIMALS
+                                    }
                                  goto nuevotarget
                                }
                           break
@@ -116,8 +127,9 @@ if #FINDCNT > 0 && #FINDKIND = 1
          finditem %tmp_animal
          if #FINDCNT > 0
             {
-              if #FINDDIST < 8
+              if #FINDDIST < 2
                  {
+                   set %siguiendo 0
                    set %jstart #jindex
                    event macro 13 35
                    target
@@ -141,14 +153,34 @@ if #FINDCNT > 0 && #FINDKIND = 1
                              }
                           if SEE_THE_TARGET in #RESULT || YA_ESTA in #RESULT || NO_PUEDE_SER in #RESULT || NO_PUEDES_DOMAR in #RESULT || GET_THERE in #RESULT || %intentos > 5
                              {
-                               set *bloqueados *bloqueados , _ , %tmp_animal
-                               ignoreitem %tmp_animal IGNORE_TAMED_ANIMALS
-                               set #SYSMSGCOL 1570
-                               event sysmessage IGNORANDO ANIMAL :(
-                               wait 20
-                               gosub hiding
-                               goto nuevotarget
-                             }
+                               if YA_ESTA in #RESULT
+                                  {
+                                    if ( %kill_ya_domadas )
+                                         {
+                                           event exmsg #charid 3 88 Uhmm... ???
+                                           wait 40
+                                           event exmsg #charid 3 73 ¡MUERTEEEEE! >:-)
+                                           wait 40
+                                           gosub kill
+                                           gosub hiding
+                                           goto nuevotarget
+                                         }
+                                         else
+                                            {
+                                              goto _descartar_animal
+                                            }
+                                  }
+                                  else
+                                     {
+                                       _descartar_animal:
+                                       set *bloqueados *bloqueados , _ , %tmp_animal
+                                       ignoreitem %tmp_animal IGNORE_TAMED_ANIMALS
+                                       set #SYSMSGCOL 1570
+                                       event sysmessage IGNORANDO ANIMAL :(
+                                       wait 20
+                                       gosub hiding
+                                       goto nuevotarget
+                                     }
                           if NO_PUEDES_VER in #RESULT || UNEXPECTED_TARGET in #RESULT || FUERA_DE_TU in #RESULT
                              {
                                set %fail %fail + 1
@@ -177,6 +209,11 @@ if #FINDCNT > 0 && #FINDKIND = 1
                  }
                  else
                     {
+                      set %fail %fail + 1
+                      if %fail >= 15
+                         {
+                           goto movimiento
+                         }
                       gosub seguir
                       gosub hiding
                       goto repitiendotarget
@@ -193,33 +230,76 @@ if #FINDCNT > 0 && #FINDKIND = 1
       }
 goto INICIO
 
+sub kill
+finditem %tmp_animal
+if ( #FINDCNT > 0 )
+     {
+       finditem %arma_elegida C_ , #CHARID
+       if ( #FINDCNT < 1 ) ; Si no tenemos el arma puesta
+            {
+              finditem %arma_elegida C_ , #BACKPACKID
+              if ( #FINDCNT > 0 ) ; La equipamos si es que está en la mochila
+                   {
+                     set #LOBJECTID %arma_elegida
+                     event macro 17 0
+                     wait 20
+                   }
+                   else ; Mal asunto, no encontramos el arma... pedimos una...
+                      {
+                        gosub comprobar_armamento
+                      }
+            }
+       set #LTARGETID %tmp_animal
+       set #LOBJECTID %arma_elegida
+       event sysmessage SACRIFICANDO ANIMAL ...
+       repeat
+            {
+              finditem %tmp_animal ; Buscamos si sigue existiendo...
+              if #FINDCNT > 0
+                 {
+                   repeat
+                        {
+                          if #FINDDIST > 1 ; Si no estamos cerca...
+                             {
+                               gosub pathFind #FINDX #FINDY #FINDZ 1 2 ; Andamos hacia ella... Tolerancia 1
+                               wait 2s
+                             }
+                        }
+                        until #FINDDIST <= 1 ; Hasta estar cerca para pegarle
+                 }
+              event macro 27 0 ; Atacamos sin parar...
+              wait 3s
+              finditem %tmp_animal ; Buscamos si sigue existiendo...
+            }
+            until #FINDCNT = 0 ; Hasta que desaparezca del mapa...
+            wait 40
+     }
+return
+
 sub checkBugTarget ; <==============================>
 finditem %tmp_animal
 if #FINDCNT > 0
    {
-     if #FINDX In %ignore_locs_X && #FINDY In %ignore_locs_Y && #FINDZ In %ignore_locs_Z ; El animal está en una parte del mapa (Yew) bugeado, y el PJ se queda atrapado.
-        {
-          set *bloqueados *bloqueados , _ , #FINDID
-          ignoreitem #FINDID ANIMAL_BUGEADO
-          set #SYSMSGCOL 1570
-          event sysmessage IGNORANDO ANIMAL! :-(
-          wait 20
-        }
-        else ; Podemos acercarnos al bicho sin que nos quedemos flapados... :P
-           {
-             gosub seguir
-           }
+     if ( #FINDX In %ignore_locs_X && #FINDY In %ignore_locs_Y && #FINDZ In %ignore_locs_Z ) || %siguiendo >= 3 ; El animal está en una parte del mapa (Yew) bugeado, y el PJ se queda atrapado.
+          {
+            set *bloqueados *bloqueados , _ , #FINDID
+            ignoreitem #FINDID ANIMAL_BUGEADO
+            set #SYSMSGCOL 1570
+            event sysmessage IGNORANDO ANIMAL! :-(( %siguiendo
+            wait 20
+            set %siguiendo 0
+          }
+          else ; Podemos acercarnos al bicho sin que nos quedemos flapados... :P
+             {
+               set %siguiendo %siguiendo + 1
+               gosub seguir
+             }
    }
 return
 
 sub seguir ; <==============================>
-if %tiempopathfind > #SYSTIME && %tiempopathfind <> N/A
-   {
-     return
-   }
-set %tiempopathfind #SYSTIME + 2000
 finditem %tmp_animal
-if #FINDCNT > 0 && #FINDDIST > 4
+if #FINDCNT > 0 && #FINDDIST > 1
    {
      gosub pathFind #FINDX #FINDY #FINDZ 1 5
    }
@@ -269,38 +349,41 @@ goto INICIO
 move 536 984
 goto INICIO
 13:
-move 514 1065
+move 534 989
 goto INICIO
 14:
-move 484 1102
+move 514 1065
 goto INICIO
 15:
-move 506 1153
+move 484 1102
 goto INICIO
 16:
-move 538 1130
+move 506 1153
 goto INICIO
 17:
-move 552 1065
+move 538 1130
 goto INICIO
 18:
-move 576 1037
+move 552 1065
 goto INICIO
 19:
-move 615 1017
+move 576 1037
 goto INICIO
 20:
-move 636 963
+move 615 1017
 goto INICIO
 21:
-move 602 934
+move 636 963
 goto INICIO
 22:
+move 602 934
+goto INICIO
+23:
 move 682 907
 move 721 925
 set *posicion -1
-set #SYSMSGCOL 1165
-event sysmessage NUEVA RONDA! :D
+set #SYSMSGCOL 120
+event sysmessage NUEVA RONDA ! :D
 wait 20
 ignoreitem reset IGNORE_TAMED_ANIMALS
 deletevar recientameados
@@ -340,6 +423,12 @@ if ( #dispres = yes )
      {
        set *posicion N/A
      }
+     else
+        {
+          set #SYSMSGCOl 43
+          event SysMessage Intentando acudir a la ultima posicion. Por favor, ayudame a llegar.
+          wait 40
+        }
 return
 
 
@@ -410,12 +499,169 @@ sub comprobar_comida
 }
 return
 
+sub setup_arma
+set %arma_elegida #FINDID
+event property %arma_elegida
+set %descripcion_arma #property
+gosub split %descripcion_arma $ PROPIEDADES_ARMA
+if ( Durabilidad in %descripcion_arma ) ; Nos quedamos con el primer arma válida que veamos...
+     {
+       set #sysmsgcol 73
+       event sysmessage OK, Arma: %PROPIEDADES_ARMA1
+       wait 40
+       if Durabilidad in %PROPIEDADES_ARMA8
+          {
+            event sysmessage %PROPIEDADES_ARMA8
+            wait 40
+          }
+       if Durabilidad in %PROPIEDADES_ARMA9
+          {
+            event sysmessage %PROPIEDADES_ARMA9
+            wait 40
+          }
+       if Durabilidad in %PROPIEDADES_ARMA11
+          {
+            event sysmessage %PROPIEDADES_ARMA11
+            wait 40
+          }
+       if Durabilidad in %PROPIEDADES_ARMA12
+          {
+            event sysmessage %PROPIEDADES_ARMA12
+            wait 40
+          }
+       if Durabilidad in %PROPIEDADES_ARMA10
+          {
+            event sysmessage %PROPIEDADES_ARMA10
+            wait 40
+          }
+       finditem %arma_elegida C_ , #CHARID
+       if ( #FINDCNT = 0 ) ; Si la elegida no está ya puesta, nos la equipamos...
+            {
+              set #LOBJECTID %arma_elegida
+              event macro 17 0
+              wait 20
+            }
+       set #sysmsgcol 1570
+       event sysmessage AUTO-KILL ON >:-)
+       wait 40
+       set %kill_ya_domadas #TRUE
+       display Se recomienda llevar algo de armadura :D $$
+             + ¡ALGUNOS ANIMALES HACEN DAÑO! O_O
+     }
+     else ; No parece un arma de filo estándard, tipo Kryss
+        {
+          set #sysmsgcol 28
+          event sysmessage NO ME VALE UN %PROPIEDADES_ARMA1 ...
+          wait 40
+          ignoreitem #FINDID
+          goto busca_arma ; Volvemos a revisar el pj y la mochila
+        }
+return
+
+sub comprobar_armamento
+busca_arma:
+finditem %armas C_ , #CHARID
+if ( #FINDCNT > 0 )
+     {
+       gosub setup_arma
+       return
+     }
+     else ; Si no hay un arma equipada en el pj
+        {
+          finditem %armas C_ , #BACKPACKID
+          if ( #FINDCNT > 0 )
+               {
+                 gosub setup_arma
+                 return
+               }
+               else ; Si tampoco encontramos en la mochila...
+                  {
+                    display ********* PROBLEMA CON LAS ARMAS *********$
+                          + ¡ATENCIÓN! ¡Necesito un arma de filo decente!$
+                          + o si no, ¡No podré exterminar a los animales que$
+                          + ya están domados y olvidados por el mapa!$
+                          + *********************** :-( ***********************$
+                          set #sysmsgcol 43
+                          event sysmessage AUTOKILL OFF :-(
+                          wait 40
+                          set %kill_ya_domadas #FALSE
+                  }
+        }
+return
+
 ;-@ ============================== @-;
 ;-@ ############################## @-;
 ;-@ SUBS públicos del Foro EasyUO  @-;
 ;-@ ############################## @-;
 ;-@ ============================== @-;
 ;
+;**
+;* Splits a string by a divider into an array and
+;* copies the result into the desired namespace
+;* @param %1 The string to split
+;* @param %2 Divider
+;* @param %3 Array name
+;* @param %4 {optional} Result namespace. If no
+;*           namespace is given it will create the
+;*           array using the %-notation
+;* @sideEffects Creates a number of variables
+;*              with name as given in %3 followed by
+;*              a digit
+;* @returns The length of the array
+sub split
+  namespace Push
+  namespace Local split , #systime
+  set !lpc #lpc
+  if #lpc < 500
+     set #lpc 500
+
+  set !string %1
+  set !divider %2
+  set !arrayName %3
+  if %0 > 3
+     set !namespace %4
+  else
+     set !namespace #false
+
+  set !length 0
+  repeat
+  {
+     set !length !length + 1
+     str Pos !string !divider 1
+     if #strRes = 0
+     {
+        set !done #true
+        set ! . !arrayName , !length !string
+     }
+     else
+     {
+        set !pos #strRes
+        set !len !pos - 1
+        str Left !string !len
+        set ! . !arrayName , !length #strRes
+        str Del !string 1 !pos
+        set !string #strRes
+     }
+  }
+  until ( !done = #true )
+  set #result !length
+
+  if !namespace <> #false
+  {
+     namespace Copy !arrayName , * To Local !namespace
+  }
+  else
+  {
+    for !i 1 #result
+    {
+       set !value !arrayName , !i
+       set % . !arrayName , !i ! . !value
+    }
+  }
+  set #lpc !lpc
+  namespace Clear
+  namespace Pop
+return #result
 ;===========================================================
 ; Name: pathFind
 ; Author: ScriptFellow (the.WZA)
