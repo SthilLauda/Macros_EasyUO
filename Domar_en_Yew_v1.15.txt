@@ -28,7 +28,7 @@
 ;    _   -    _   -  (_ __)     _    ~~;~~     -_
 ;       _- _-  _    < / < \  _-  _    -     _-   _
 ;
-set %version v1.14
+set %version v1.15
 ;
 ; *** NOTAS "MÁGICAS" ^^ *** :
 ; - Si la macro de domar se os para en un determinado sitio y el pj no se mueve, pausad la macro,
@@ -37,8 +37,8 @@ set %version v1.14
 ;
 ; MEJORAS :
 ; - Añadido modo "killer" para limpiar Yew de animales que ya están tameados por otras personas ¬¬
-; - Añadidas protecciones.
 ; - Añadidas opciones para resetear los animales ya domados y la ruta por el mapa.
+; - Añadidas protecciones.
 ; - Añadido un "sub" para comer cada cierto tiempo hasta quedar saciado.
 ; - Añadido un "sub" para activar el modo "always run" para que vaya corriendo por el mapa en lugar de ir andando.
 ; - Añadido el "sub" pathFind para moverse (Author: ScriptFellow).
@@ -51,6 +51,7 @@ set %ignore_locs_Y 1002_999_948_940_1066_936_836_835_834_822_831_833_821_1100_82
 set %ignore_locs_Z -4_-3_-5
 set %tiempo_actual #SCNT ; Reloj
 set %proxima_vez #SCNT ; Trigger
+set %hay_regs #TRUE
 set %comida RGG_NRD_QSD_ZBG_WLI_QRD_END_FUD_YLI_WLI_HGI
      +_KGI_EGI_QLI_KLI_MLI_KRD_HQD_AQD_MQE_VQE_TQE_JQE_IQE
      +_GQE_SPE_ZPE_OQE_BDF_KPE_RQE_YSD_SQD_YWI_AXI_PQD_QQD
@@ -235,6 +236,34 @@ sub kill
 finditem %tmp_animal
 if ( #FINDCNT > 0 )
      {
+       set #LTARGETID %tmp_animal
+       set #LOBJECTID %arma_elegida
+       event sysmessage SACRIFICANDO ANIMAL ...
+       chooseskill Mage real
+       if #SKILL >= 300 && %hay_regs ; Llegamos al tercer círculo, y tenemos regs.
+          {
+            _reNox:
+            if #MANA >= 9 ; Tenemos suficiente maná...
+               {
+                 set %jstart #jindex
+                 event macro 15 19 ; Cast Spell Poison / Envenenar (In Nox): Envenena al individuo seleccionado.
+                 target
+                 set #LTARGETKIND 1
+                 event macro 22
+                 gosub wait_for MSG Necesitas El_hechizo_falla 40
+                 if ( #TRUE in #RESULT )
+                      {
+                        if ( Necesitas in #RESULT )
+                             {
+                               set %hay_regs #FALSE
+                             }
+                        if ( El_hechizo_falla in #RESULT )
+                             {
+                               goto _reNox
+                             }
+                      }
+               }
+          }
        finditem %arma_elegida C_ , #CHARID
        if ( #FINDCNT < 1 ) ; Si no tenemos el arma puesta
             {
@@ -250,9 +279,6 @@ if ( #FINDCNT > 0 )
                         gosub comprobar_armamento
                       }
             }
-       set #LTARGETID %tmp_animal
-       set #LOBJECTID %arma_elegida
-       event sysmessage SACRIFICANDO ANIMAL ...
        repeat
             {
               finditem %tmp_animal ; Buscamos si sigue existiendo...
