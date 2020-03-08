@@ -545,8 +545,17 @@ if ( Durabilidad in %descripcion_arma ) ; Nos quedamos con el primer arma válid
        event sysmessage AUTO-KILL ON >:-)
        wait 40
        set %kill_ya_domadas #TRUE
-       display Se recomienda llevar algo de armadura :D $$
-             + ¡ALGUNOS ANIMALES HACEN DAÑO! O_O
+       if #AR < 25 ; Mineral de Aqua
+          {
+            display Se recomienda llevar algo de armadura :D $$
+                  + ¡ALGUNOS ANIMALES HACEN DAÑO! O_O
+          }
+          else
+             {
+               set #SYSMSGCOL 88
+               event sysmessage OK Armadura: #AR
+               wait 40
+             }
      }
      else ; No parece un arma de filo estándard, tipo Kryss
         {
