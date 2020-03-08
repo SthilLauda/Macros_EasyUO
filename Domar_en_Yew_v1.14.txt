@@ -547,6 +547,10 @@ if ( Durabilidad in %descripcion_arma ) ; Nos quedamos con el primer arma válid
        set %kill_ya_domadas #TRUE
        if #AR < 25 ; Mineral de Aqua
           {
+            set #SYSMSGCOL 38
+            event sysmessage *** PELIGRO ! ***
+            event sysmessage Nivel de Armadura: #AR
+            wait 40
             display Se recomienda llevar algo de armadura :D $$
                   + ¡ALGUNOS ANIMALES HACEN DAÑO! O_O
           }
