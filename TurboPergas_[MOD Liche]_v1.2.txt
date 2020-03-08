@@ -21,28 +21,28 @@
 ; Version: 1.2
 ; Client Tested with: 2.0.3
 ; EUO version tested with: EasyUO 1.5 Version 243
-; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Shard: Ultima Alianza (Â¡Hasta la muerte!)
 ; Revision Date: 12/01/2020
 ; Public Release: 12/01/2020
-; Purpose: Macro de escriba con todos los hechizos, para seleccionar cuál hacer..
+; Purpose: Macro de escriba con todos los hechizos, para seleccionar cuÃ¡l hacer..
 ;===============================================================================
 set %version v1.2
 ;________________________________
 ;
 ; ///////////////////////////////
-; ******** CONFIGURACIÓN ********
+; ******** CONFIGURACIÃ“N ********
 ; ///////////////////////////////
 ;________________________________
 ;
-set %cofre ZPFXMND              ; Cofre donde está la bolsa del escriba y la bolsa de regs.
+set %cofre ZPFXMND              ; Cofre donde estÃ¡ la bolsa del escriba y la bolsa de regs.
 set %bolsaregs OAZMEPD          ; Bolsa en el cofre con los regs.
 set %bolsa_escriba AVTHUND      ; Bolsa mediana con 3 bolsitas; 1 de plumas, 1 de pergas en blanco o lotes de pergaminos, y 1 para los pergas hechos.
 set %bolsaplumas AHZRIND        ; Bolsa donde estan las plumas y tinteros.
 set %bolsapergas_blanco LJOFWMD ; Bolsa con pergaminos en blanco.
 set %bolsapergas_hechos KJOFWMD ; Bolsa donde se depositaran los pergas que se hagan
 set %cantidadpergas 50          ; Cantidad maxima de pergas que quieres hacer del tiron, tener en cuenta el peso
-set %minpergas 10               ; Cantidad minima de pergas en la mochila antes de reponer más
-set %tiempo_alimentacion 360    ; Cada cuántos segundos va a comprobar si tiene hambre (6 minutos).
+set %minpergas 10               ; Cantidad minima de pergas en la mochila antes de reponer mÃ¡s
+set %tiempo_alimentacion 360    ; Cada cuÃ¡ntos segundos va a comprobar si tiene hambre (6 minutos).
 ;=================================================================
 ;========= Poner un 1 en el tipo de perga que quieras hacer ======
 ;=================================================================
@@ -120,7 +120,7 @@ set %elementalagua
 ;________________________________________________
 ;
 ; //////////////////////////////////////////////
-; ************* FIN CONFIGURACIÓN *************
+; ************* FIN CONFIGURACIÃ“N *************
 ; //////////////////////////////////////////////
 ;________________________________________________
 ;
@@ -153,7 +153,7 @@ set %pergashechos QXL_PXL_AYL_ZKL_CYL_BYL_NXL_WXL_VXL_YXL_XXL_IYL_HYL_KYL_JYL_EY
 +_DYL_GYL_FYL_STL_RTL_UTL_TTL_OTL_VTL_YTL_XTL_IUL_HUL_KUL_JUL_EUL_DUL_GUL_FUL_QUL_PUL_SUL_RUL_MUL
 +_LUL_OUL_NUL_YUL_XUL_AVL_ZUL_UUL_TUL_WUL_VUL_GVL_FVL_IVL_HVL_CVL
 set %_worldsavejournalindex #jindex ; Journal para escanear en busca de save's del server.
-set *CEOWorldSaving #FALSE        ; Indica si hay un save del server en marcha.
+set *CEOWorldSaving #FALSE          ; Indica si hay un save del server en marcha.
 set %PRE_MEDIT #TRUE
 set %start_liche #TRUE
 set #LPC 5000
@@ -174,7 +174,7 @@ set #SYSMSGCOL 1187
 event sysmessage ===========================
 wait 20
 
-display yesno ¿Quieres transformarte en LICHE para macrear los pergas?
+display yesno Â¿Quieres transformarte en LICHE para macrear los pergas?
 if #dispres = yes
    {
      if %skill_recro < 700
@@ -188,8 +188,8 @@ if #dispres = yes
         }
      if %skill_spirit < 400
         {
-          display OK ¡ Te faltan 40 puntos de Spirit Speak ! $$
-                    +¡ Son necesarios si quieres transformarte en Liche !
+          display OK Â¡ Te faltan 40 puntos de Spirit Speak ! $$
+                    +Â¡ Son necesarios si quieres transformarte en Liche !
           set #SYSMSGCOL 38
           event sysmessage [ OK ] Desactivando "Modo LICHE" :-(
           wait 20
@@ -219,14 +219,14 @@ if #dispres = yes
         wait 20
         set %modo_liche #FALSE
       }
-finditem %bastones C_ , #CHARID ; Bastón de clérigo :D
+finditem %bastones C_ , #CHARID ; BastÃ³n de clÃ©rigo :D
 if #FINDCNT = 0
    {
      finditem %bastones C_ , #BACKPACKID
      if #FINDCNT = 0
         {
-          display OK ¡ No tienes ningún bastón en la mochila ! $$
-                    +¡ Te conviene llevar uno de Clérigo / Medit !
+          display OK Â¡ No tienes ningÃºn bastÃ³n en la mochila ! $$
+                    +Â¡ Te conviene llevar uno de ClÃ©rigo / Medit !
           set #SYSMSGCOL 43
           event sysmessage [ OK ] Sin ayuda de un BASTON :-(
           wait 20
@@ -286,8 +286,8 @@ if #FINDCNT = 0 ; Si no lo llevamos puesto,
       }
 if %skill_focus < 1000
    {
-     display OK ¡ No tienes la habilidad "Concentración/Focus" ! $$
-              +¡ Te conviene para regenerar el maná rápidamente !
+     display OK Â¡ No tienes la habilidad "ConcentraciÃ³n/Focus" ! $$
+              +Â¡ Te conviene para regenerar el manÃ¡ rÃ¡pidamente !
      set #SYSMSGCOL 43
      event sysmessage [ OK ] Regenerando mana por otros medios... :-(
      wait 20
@@ -3233,7 +3233,7 @@ if #FINDCNT > 0
                  }
          }
    }
-   else ; No hay ningún perga.
+   else ; No hay ningÃºn perga.
       {
         set %pergacnt_blanco 0
         set %pergacnt_lote 0
@@ -3258,7 +3258,7 @@ if #FINDCNT > 0
                               {
                                 set #SYSMSGCOL 43
                                 event sysmessage NO QUEDAN PERGAS EN BLANCO!
-                                ignoreitem #FINDID ; Este montón ya no sirve.
+                                ignoreitem #FINDID ; Este montÃ³n ya no sirve.
                                 goto _checkPergasBlancos
                               }
                       }
@@ -3282,7 +3282,7 @@ if #FINDCNT > 0
                                            {
                                              set #SYSMSGCOL 43
                                              event sysmessage NO QUEDAN LOTES DE PERGAS!
-                                             ignoreitem #FINDID ; Este montón ya no sirve.
+                                             ignoreitem #FINDID ; Este montÃ³n ya no sirve.
                                              goto _checkPergasBlancos
                                            }
                                    }
@@ -3305,11 +3305,11 @@ if #FINDCNT > 0
                                                    {
                                                      set #SYSMSGCOL 43
                                                      event sysmessage NO QUEDAN PERGAS EN BLANCO!
-                                                     ignoreitem #FINDID ; Este montón ya no sirve.
+                                                     ignoreitem #FINDID ; Este montÃ³n ya no sirve.
                                                      goto _checkPergasBlancos
                                                    }
                                            }
-                                           else ; No estamos usando ningún tipo de perga...
+                                           else ; No estamos usando ningÃºn tipo de perga...
                                               {
                                                 if %pergacnt_blanco = 0 && %pergacnt_lote = 0
                                                    {
@@ -3327,7 +3327,7 @@ if #FINDCNT > 0
                                                            {
                                                              set #SYSMSGCOL 43
                                                              event sysmessage NO QUEDAN LOTES DE PERGAS!
-                                                             ignoreitem #FINDID ; Este montón ya no sirve.
+                                                             ignoreitem #FINDID ; Este montÃ³n ya no sirve.
                                                              goto _checkPergasBlancos
                                                            }
                                                    }
@@ -3419,7 +3419,7 @@ if ( #TRUE in #result )
      {
        if pierdes in #result
           {
-            goto _reMedit ; Meditamos hasta que no perdamos la concentración
+            goto _reMedit ; Meditamos hasta que no perdamos la concentraciÃ³n
           }
        if trance in #result
           {
@@ -3436,7 +3436,7 @@ if ( #TRUE in #result )
                         return
                       }
                  }
-                 else ; Meditamos hasta llenar la barra al máximo...
+                 else ; Meditamos hasta llenar la barra al mÃ¡ximo...
                     {
                       repeat
                            {
@@ -3446,7 +3446,7 @@ if ( #TRUE in #result )
                            until #MANA = #MAXMANA
                     }
           }
-       if en_paz in #result ; OK, estamos bien de maná.
+       if en_paz in #result ; OK, estamos bien de manÃ¡.
           {
             return
           }
@@ -3467,7 +3467,7 @@ if #HITS <= 40 || %start_liche
      _recarga:
      repeat
           {
-            if %skill_spirit >= 700 ; Hablar con Espíritus
+            if %skill_spirit >= 700 ; Hablar con EspÃ­ritus
                {
                  if #MANA >= 20
                     {
@@ -3508,13 +3508,13 @@ if #HITS <= 40 || %start_liche
                      {
                        set #SYSMSGCOL 43
                        event sysmessage RECARGANDO VIDA [ #HITS / #MAXHITS ]
-                       if %skill_spirit >= 700 ; Hablar con Espíritus
+                       if %skill_spirit >= 700 ; Hablar con EspÃ­ritus
                           {
                             set %heal_time #SCNT + 1
                           }
                           else
                              {
-                               if %skill_spirit < 700 ; Modo "básico"
+                               if %skill_spirit < 700 ; Modo "bÃ¡sico"
                                   {
                                     set %heal_time #SCNT + 10
                                   }
@@ -3554,7 +3554,7 @@ if ( %skill_recro >= 700 && %skill_spirit >= 400 ) ; Nos podemos transformar en 
                {
                  _liche:
                  set %jstart #jindex
-                 event macro 1 0 .nigro 11 ; ¡Modo Liche!
+                 event macro 1 0 .nigro 11 ; Â¡Modo Liche!
                  gosub wait_for MSG El_hechizo_falla 5
                  if ( #TRUE in #RESULT )
                       {
@@ -3585,13 +3585,13 @@ if ( %skill_recro >= 700 && %skill_spirit >= 400 ) ; Nos podemos transformar en 
                  gosub bastonClerigo
                  gosub anilloMedit
                  gosub collarIntel
-                 gosub meditar ; Llenamos a tope el maná del liche.
+                 gosub meditar ; Llenamos a tope el manÃ¡ del liche.
                  gosub checkHits ; Recargamos la vida...
                  set %start_liche #FALSE
                }
                else
                   {
-                    gosub meditar ; Llenamos a tope el maná del liche.
+                    gosub meditar ; Llenamos a tope el manÃ¡ del liche.
                     goto _liche
                   }
           }
@@ -3620,7 +3620,7 @@ _baston:
 finditem %baston C_ , #CHARID
 if #FINDCNT = 0
    {
-     finditem %baston #BACKPACKID ; Bastón de clérigo :D
+     finditem %baston #BACKPACKID ; BastÃ³n de clÃ©rigo :D
      if #FINDCNT > 0
         {
           set #LOBJECTID %baston
@@ -3672,7 +3672,7 @@ if ( %skill_recro >= 700 && %skill_spirit >= 400 ) ; Nos podemos transformar en 
                {
                  _resetLiche:
                  set %jstart #jindex
-                 event macro 1 0 .nigro 11 ; ¡Modo Humano! :D
+                 event macro 1 0 .nigro 11 ; Â¡Modo Humano! :D
                  gosub wait_for MSG El_hechizo_falla 5
                  if ( #TRUE in #RESULT )
                       {
@@ -3702,7 +3702,7 @@ if ( %skill_recro >= 700 && %skill_spirit >= 400 ) ; Nos podemos transformar en 
                }
                else
                   {
-                    gosub meditar ; Llenamos a tope el maná del liche.
+                    gosub meditar ; Llenamos a tope el manÃ¡ del liche.
                     goto _resetLiche
                   }
           }
@@ -3716,14 +3716,14 @@ return
 sub comprobar_comida
 {
   hambriento:
-  set %jrnl #jindex ; Marcamos un índice de las líneas del diario.
+  set %jrnl #jindex ; Marcamos un Ã­ndice de las lÃ­neas del diario.
   event macro 4 0 .hungry
   wait 20
   while #true
      {
-       if #jindex > %jrnl ; Si aparece una nueva línea.
+       if #jindex > %jrnl ; Si aparece una nueva lÃ­nea.
           {
-            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de línea.
+            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de lÃ­nea.
             scanjournal %jrnl   ; La leemos...
             if Estas_no_le_afecta_el_hambre in #journal || Estas_tan_lleno_que_no_puedes in #journal || Estas_totalmente_saciado in #journal
                {
@@ -3749,7 +3749,7 @@ sub comprobar_comida
                                  set %proxima_vez %tiempo_actual + %tiempo_alimentacion
                                }
                        }
-                       else ; Mensaje extraño, repetimos...
+                       else ; Mensaje extraÃ±o, repetimos...
                           {
                             goto hambriento
                           }
