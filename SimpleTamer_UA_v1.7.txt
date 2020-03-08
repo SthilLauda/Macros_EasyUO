@@ -38,16 +38,16 @@
 ;       _- _-  _    < / < \  _-  _    -     _-   _
 ;
 ; Author: Sthil Lauda
-; Version: 1.6
+; Version: 1.7
 ; Client Tested with: 2.0.3
 ; EUO version tested with: EasyUO 1.5 Version 243
 ; Shard: Ultima Alianza ¡Hasta la muerte!
-; Revision Date: 181218
+; Revision Date: 08/03/2020
 ; Public Release: 11/21/2005 - 18/12/2018
 ; Purpose: Macro de domar semi asistida.
 ; Instrucciones: Llevar al PJ andando por el mapa en busca de animales.
 ;
-set %version v1.6
+set %version v1.7
 ;________________________________
 ;
 ; ///////////////////////////////
@@ -764,7 +764,7 @@ set %arma_elegida #FINDID
 event property %arma_elegida
 set %descripcion_arma #property
 gosub split %descripcion_arma $ PROPIEDADES_ARMA
-if ( Durabilidad in %PROPIEDADES_ARMA8 ) || Durabilidad in %PROPIEDADES_ARMA9 || Durabilidad in %PROPIEDADES_ARMA10 || Durabilidad in %PROPIEDADES_ARMA11 ) ; Nos quedamos con el primer arma válida que veamos...
+if ( Durabilidad in %descripcion_arma ) ; Nos quedamos con el primer arma válida que veamos...
      {
        if ( %mensajes )
                {
@@ -786,6 +786,11 @@ if ( Durabilidad in %PROPIEDADES_ARMA8 ) || Durabilidad in %PROPIEDADES_ARMA9 ||
                       event sysmessage %PROPIEDADES_ARMA11
                       wait 40
                     }
+		 if Durabilidad in %PROPIEDADES_ARMA12
+                    {
+                      event sysmessage %PROPIEDADES_ARMA12
+                      wait 40
+                    }   
                  if Durabilidad in %PROPIEDADES_ARMA10
                     {
                       event sysmessage %PROPIEDADES_ARMA10
