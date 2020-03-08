@@ -36,7 +36,7 @@ set %version v1.15
 ;   Le dais al play una vez, y otra al stop. Una vez hecho esto, volver a encender la macro de domar.
 ;
 ; MEJORAS :
-; - Añadido modo "killer" para limpiar Yew de animales que ya están tameados por otras personas ¬¬
+; - Añadido modo "Killer" para limpiar Yew de animales que ya están tameados por otras personas ¬¬
 ; - Añadidas opciones para resetear los animales ya domados y la ruta por el mapa.
 ; - Añadidas protecciones.
 ; - Añadido un "sub" para comer cada cierto tiempo hasta quedar saciado.
