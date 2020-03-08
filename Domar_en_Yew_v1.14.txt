@@ -38,6 +38,7 @@ set %version v1.14
 ; MEJORAS :
 ; - Añadido modo "killer" para limpiar Yew de animales que ya están tameados por otras personas ¬¬
 ; - Añadidas protecciones.
+; - Añadidas opciones para resetear los animales ya domados y la ruta por el mapa.
 ; - Añadido un "sub" para comer cada cierto tiempo hasta quedar saciado.
 ; - Añadido un "sub" para activar el modo "always run" para que vaya corriendo por el mapa en lugar de ir andando.
 ; - Añadido el "sub" pathFind para moverse (Author: ScriptFellow).
