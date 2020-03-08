@@ -1,0 +1,4008 @@
+; ======================================================================================================
+;  '||   ||` '||`   ||                                 /.\      '||`
+;   ||   ||   ||    ||     ''                         // \\      ||   ''
+;   ||   ||   ||  ''||''   ||  '||),,(|,   '''|.     //...\\     ||   ||   '''|.  `||''|,  '''/  '''|.
+;   ||   ||   ||    ||     ||   || || ||  .|''||    //     \\    ||   ||  .|''||   ||  ||   //  .|''||
+;   `|...|'  .||.   `|..' .||. .||    ||. `|..||. .//       \\. .||. .||. `|..||. .||  ||. /... `|..||.
+; ======================================================================================================
+;
+; Script Name: Escriba [ LICHE ]
+;
+;    ,
+;   "\",
+;   "=\=",
+;    "=\=",
+;     "=\=",
+;      "-\-"       ,---,
+;         \       _)   (_
+;   ldb    `     [__INK__]
+;
+; Author: elchungako [ MOD+ Sthil ]
+; Version: 1.2
+; Client Tested with: 2.0.3
+; EUO version tested with: EasyUO 1.5 Version 243
+; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Revision Date: 12/01/2020
+; Public Release: 12/01/2020
+; Purpose: Macro de escriba con todos los hechizos, para seleccionar cuál hacer..
+;===============================================================================
+set %version v1.2
+;________________________________
+;
+; ///////////////////////////////
+; ******** CONFIGURACIÓN ********
+; ///////////////////////////////
+;________________________________
+;
+set %cofre ZPFXMND              ; Cofre donde está la bolsa del escriba y la bolsa de regs.
+set %bolsaregs OAZMEPD          ; Bolsa en el cofre con los regs.
+set %bolsa_escriba AVTHUND      ; Bolsa mediana con 3 bolsitas; 1 de plumas, 1 de pergas en blanco o lotes de pergaminos, y 1 para los pergas hechos.
+set %bolsaplumas AHZRIND        ; Bolsa donde estan las plumas y tinteros.
+set %bolsapergas_blanco LJOFWMD ; Bolsa con pergaminos en blanco.
+set %bolsapergas_hechos KJOFWMD ; Bolsa donde se depositaran los pergas que se hagan
+set %cantidadpergas 50          ; Cantidad maxima de pergas que quieres hacer del tiron, tener en cuenta el peso
+set %minpergas 10               ; Cantidad minima de pergas en la mochila antes de reponer más
+set %tiempo_alimentacion 360    ; Cada cuántos segundos va a comprobar si tiene hambre (6 minutos).
+;=================================================================
+;========= Poner un 1 en el tipo de perga que quieras hacer ======
+;=================================================================
+set %torpeza
+set %comida
+set %debilidadmental
+set %curacion
+set %flecham 1
+set %vision
+set %armadurar
+set %debilidad
+
+set %agilidad
+set %astucia
+set %sanar
+set %herir
+set %trampam
+set %eliminart
+set %proteccion
+set %fuerza
+
+set %bendicion
+set %boladefuego
+set %cerrojomagico
+set %envenenar
+set %telequinesis
+set %teleport
+set %abrircerraduras
+set %murodepiedra
+
+set %sanarmasivo
+set %proteccionmasiva
+set %maldicion
+set %murodefuego
+set %grancuracion
+set %relampago
+set %drenarmana
+set %recall
+
+set %bladeespirit
+set %disiparmuro
+set %incognito
+set %refejarmagia
+set %golpemental
+set %paralizar
+set %muroveneno
+set %convocarcriatura
+
+set %disipar
+set %descargaenergia
+set %explosion
+set %invisibilidad
+set %marcarruna
+set %maldicionmasiva
+set %muroparalizante
+set %detectar
+
+set %tormenta
+set %muroenergia
+set %llamarada
+set %portalmagico
+set %vampiromana
+set %disiparmasivo
+set %lluviameteoros
+set %polimorfismo
+
+set %terremoto
+set %vorticedeenergia
+set %resucitar
+set %elementalaire
+set %demonio
+set %elementaltierra
+set %elementalfuego
+set %elementalagua
+;________________________________________________
+;
+; //////////////////////////////////////////////
+; ************* FIN CONFIGURACIÓN *************
+; //////////////////////////////////////////////
+;________________________________________________
+;
+set %mandragora MZF
+set %musgo JUF
+set %perla KUF
+set %belladona WZF
+set %ajo KZF
+set %seda RZF
+set %ginsen JZF
+set %ceniza SZF
+set %plumas PBG
+set %pergaminos MMF
+set %tiempo_actual #SCNT ; Reloj
+set %proxima_vez #SCNT   ; Trigger
+set %pergacnt_blanco 0
+set %pergacnt_lote 0
+set %bastones QMH_ZPF_CQF
+set %joya_collar SJG
+set %joya_brazalete IJG
+set %joya_anillo UJG
+set %azufre FUF
+set %obsidiana VZF
+set %ceniza_vol TZF
+set %comida RGG_NRD_QSD_ZBG_WLI_QRD_END_FUD_YLI_WLI_HGI
+    +_KGI_EGI_QLI_KLI_MLI_KRD_HQD_AQD_MQE_VQE_TQE_JQE_IQE
+    +_GQE_SPE_ZPE_OQE_BDF_KPE_RQE_YSD_SQD_YWI_AXI_PQD_QQD
+    +_FWI
+set %pergashechos QXL_PXL_AYL_ZKL_CYL_BYL_NXL_WXL_VXL_YXL_XXL_IYL_HYL_KYL_JYL_EYL_NTL_QTL_PTL_AUL_ZTL_CUL_BUL_WTL
++_DYL_GYL_FYL_STL_RTL_UTL_TTL_OTL_VTL_YTL_XTL_IUL_HUL_KUL_JUL_EUL_DUL_GUL_FUL_QUL_PUL_SUL_RUL_MUL
++_LUL_OUL_NUL_YUL_XUL_AVL_ZUL_UUL_TUL_WUL_VUL_GVL_FVL_IVL_HVL_CVL
+set %_worldsavejournalindex #jindex ; Journal para escanear en busca de save's del server.
+set *CEOWorldSaving #FALSE        ; Indica si hay un save del server en marcha.
+set %PRE_MEDIT #TRUE
+set %start_liche #TRUE
+set #LPC 5000
+chooseskill insc real
+set %skillini #skill
+chooseskill necr real
+set %skill_recro #SKILL
+chooseskill Spir Real
+set %skill_spirit #SKILL
+chooseskill Focu real
+set %skill_focus #SKILL
+
+set #SYSMSGCOL 1187
+event sysmessage ===========================
+set #SYSMSGCOL 1165
+event sysmessage Escriba %version "MOD Liche"
+set #SYSMSGCOL 1187
+event sysmessage ===========================
+wait 20
+
+display yesno ¿Quieres transformarte en LICHE para macrear los pergas?
+if #dispres = yes
+   {
+     if %skill_recro < 700
+        {
+          set #SYSMSGCOL 38
+          event sysmessage Habilidad de Nigro insuficiente! :-(
+          wait 20
+          set #SYSMSGCOL 43
+          event sysmessage Fin de la macro... [ HALT ]
+          halt
+        }
+     if %skill_spirit < 400
+        {
+          display OK ¡ Te faltan 40 puntos de Spirit Speak ! $$
+                    +¡ Son necesarios si quieres transformarte en Liche !
+          set #SYSMSGCOL 38
+          event sysmessage [ OK ] Desactivando "Modo LICHE" :-(
+          wait 20
+          set %modo_liche #FALSE
+          set #SYSMSGCOL 43
+          event sysmessage Fin de la macro... [ HALT ]
+          halt
+        }
+        else
+           {
+             set #SYSMSGCOL 1081
+             event sysmessage [ OK ] Activando "Modo LICHE" :D
+             wait 20
+             set %modo_liche #TRUE
+             if %skill_spirit >= 700
+                {
+                  set #SYSMSGCOL 1930
+                  event sysmessage [ OK ] Absorbiendo vida con SpiritSpeak :D
+                  wait 1s
+                }
+           }
+   }
+   else
+      {
+        set #SYSMSGCOL 38
+        event sysmessage [ OK ] Desactivando "Modo LICHE" :-(
+        wait 20
+        set %modo_liche #FALSE
+      }
+finditem %bastones C_ , #CHARID ; Bastón de clérigo :D
+if #FINDCNT = 0
+   {
+     finditem %bastones C_ , #BACKPACKID
+     if #FINDCNT = 0
+        {
+          display OK ¡ No tienes ningún bastón en la mochila ! $$
+                    +¡ Te conviene llevar uno de Clérigo / Medit !
+          set #SYSMSGCOL 43
+          event sysmessage [ OK ] Sin ayuda de un BASTON :-(
+          wait 20
+        }
+        else
+           {
+             set #SYSMSGCOL 1570
+             event sysmessage [ OK ] BASTON detectado... :D
+             set %baston #FINDID
+             wait 1s
+           }
+   }
+   else
+      {
+        set #SYSMSGCOL 1570
+        event sysmessage [ OK ] BASTON detectado... :D
+        set %baston #FINDID
+        wait 1s
+      }
+finditem %joya_collar C_ , #CHARID ; Buscamos el collar en el personaje,
+if #FINDCNT = 0 ; Si no lo llevamos puesto,
+   {
+     finditem %joya_collar C_ , #BACKPACKID
+     if #FINDCNT > 0
+        {
+          set #SYSMSGCOL 1570
+          event sysmessage [ OK ] COLLAR detectado... :D
+          set %collar #FINDID
+          wait 1s
+        }
+   }
+   else
+      {
+        set #SYSMSGCOL 1570
+        event sysmessage [ OK ] COLLAR detectado... :D
+        set %collar #FINDID
+        wait 1s
+      }
+finditem %joya_anillo C_ , #CHARID ; Buscamos el anillo en el personaje,
+if #FINDCNT = 0 ; Si no lo llevamos puesto,
+   {
+     finditem %joya_anillo C_ , #BACKPACKID
+     if #FINDCNT > 0
+        {
+          set #SYSMSGCOL 1570
+          event sysmessage [ OK ] ANILLO detectado... :D
+          set %anillo #FINDID
+          wait 1s
+        }
+   }
+   else
+      {
+        set #SYSMSGCOL 1570
+        event sysmessage [ OK ] ANILLO detectado... :D
+        set %anillo #FINDID
+        wait 1s
+      }
+if %skill_focus < 1000
+   {
+     display OK ¡ No tienes la habilidad "Concentración/Focus" ! $$
+              +¡ Te conviene para regenerar el maná rápidamente !
+     set #SYSMSGCOL 43
+     event sysmessage [ OK ] Regenerando mana por otros medios... :-(
+     wait 20
+   }
+   else
+      {
+        set #SYSMSGCOL 1165
+        event sysmessage [ OK ] Regenerando mana con FOCUS :D
+        wait 1s
+      }
+
+set #SYSMSGCOL 18
+event sysmessage TOCA TU MOCHILA
+wait 20
+repeat
+     {
+       wait 1
+     }
+     until #CONTID = #BACKPACKID
+set %backpack_X #CONTPOSX
+set %backpack_Y #CONTPOSY
+set #SYSMSGCOL 73
+event sysmessage Posicion: %backpack_X %backpack_Y
+wait 40
+
+comienzo:
+gosub bastonClerigo
+gosub anilloMedit
+gosub collarIntel
+set #LOBJECTID %cofre
+event macro 17 0
+gosub wait_for GUMP %cofre 5
+set #LOBJECTID %bolsaregs
+event macro 17 0
+gosub wait_for GUMP %bolsaregs 5
+set #LOBJECTID %bolsa_escriba
+event macro 17 0
+gosub wait_for GUMP %bolsa_escriba 5
+set #LOBJECTID %bolsapergas_hechos
+event macro 17 0
+gosub wait_for GUMP %bolsapergas_hechos 5
+set #LOBJECTID %bolsapergas_blanco
+event macro 17 0
+gosub wait_for GUMP %bolsapergas_blanco 5
+set #LOBJECTID %bolsaregs
+event macro 17 0
+gosub wait_for GUMP %bolsaregs 5
+set #LOBJECTID %bolsaplumas
+event macro 17 0
+gosub wait_for GUMP %bolsaplumas 5
+gosub plumas
+finditem %plumas C_ , #BACKPACKID
+if #FINDCNT > 0
+   {
+     set #SYSMSGCOL 73
+     event sysmessage SELECCIONANDO PLUMA...
+     wait 40
+     set #LOBJECTID #FINDID
+     event macro 17
+     wait 1s
+   }
+inicio:
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+set %skillinc #SKILL - %skillini
+setuotitle escriba: #SKILL ( %skillinc )
+; Comer cada cierto tiempo si hay hambre
+set %tiempo_actual #SCNT
+if ( %proxima_vez <= %tiempo_actual ) && ( #MAXMANA < 200 ) ; No somos un Liche...
+     {
+       gosub comprobar_comida
+     }
+;==================================================================================
+if %torpeza = 1
+{
+gosub plumas
+gosub pergas
+gosub musgo
+gosub belladona
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 10
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 130
+gosub wait_for GUMP 530_480 2
+click 270 110
+gosub wait_for GUMP 530_480 10
+for %tor 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 10
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %comida = 1
+{
+gosub plumas
+gosub pergas
+gosub ajo
+gosub ginsen
+gosub mandragora
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 10
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 130
+gosub wait_for GUMP 530_480 2
+click 270 130
+gosub wait_for GUMP 530_480 10
+for %comi 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 10
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %debilidadmental   = 1
+{
+gosub plumas
+gosub pergas
+gosub belladona
+gosub ginsen
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 10
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 130
+gosub wait_for GUMP 530_480 2
+click 270 150
+gosub wait_for GUMP 530_480 10
+for %deviment 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 10
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %curacion = 1
+{
+gosub plumas
+gosub pergas
+gosub ajo
+gosub ginsen
+gosub seda
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 10
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 130
+gosub wait_for GUMP 530_480 2
+click 270 170
+gosub wait_for GUMP 530_480 10
+for %curac 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 10
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %flecham = 1
+{
+gosub plumas
+gosub pergas
+gosub ceniza
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 10
+gosub meditar
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 130
+gosub wait_for GUMP 530_480 2
+click 270 190
+gosub wait_for GUMP 530_480 10
+for %flem 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 10
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %vision = 1
+{
+gosub plumas
+gosub pergas
+gosub seda
+gosub ceniza
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 10
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 130
+gosub wait_for GUMP 530_480 2
+click 270 210
+gosub wait_for GUMP 530_480 10
+for %vis 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 10
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %armadurar = 1
+{
+gosub plumas
+gosub pergas
+gosub ajo
+gosub seda
+gosub ceniza
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 10
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 130
+gosub wait_for GUMP 530_480 2
+click 270 230
+gosub wait_for GUMP 530_480 10
+for %armrea 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 10
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %debilidad = 1
+{
+gosub plumas
+gosub pergas
+gosub ajo
+gosub belladona
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 10
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 130
+gosub wait_for GUMP 530_480 2
+click 270 250
+gosub wait_for GUMP 530_480 10
+for %debi 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 10
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %agilidad = 1
+{
+gosub plumas
+gosub pergas
+gosub musgo
+gosub mandragora
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 10
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 150
+gosub wait_for GUMP 530_480 2
+click 270 110
+gosub wait_for GUMP 530_480 10
+for %agi 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 10
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %astucia = 1
+{
+gosub plumas
+gosub pergas
+gosub mandragora
+gosub belladona
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 10
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 150
+gosub wait_for GUMP 530_480 2
+click 270 130
+gosub wait_for GUMP 530_480 10
+for %ast 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 10
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %sanar = 1
+{
+gosub plumas
+gosub pergas
+gosub ajo
+gosub ginsen
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 10
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 150
+gosub wait_for GUMP 530_480 2
+click 270 150
+gosub wait_for GUMP 530_480 10
+for %san 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 10
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %herir = 1
+{
+gosub plumas
+gosub pergas
+gosub belladona
+gosub seda
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 10
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 150
+gosub wait_for GUMP 530_480 2
+click 270 170
+gosub wait_for GUMP 530_480 10
+for %heri 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 10
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %trampam = 1
+{
+gosub plumas
+gosub pergas
+gosub ajo
+gosub seda
+gosub ceniza
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 10
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 150
+gosub wait_for GUMP 530_480 2
+click 270 190
+gosub wait_for GUMP 530_480 10
+for %trm 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 10
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %eliminart = 1
+{
+gosub plumas
+gosub pergas
+gosub musgo
+gosub ceniza
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 10
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 150
+gosub wait_for GUMP 530_480 2
+click 270 210
+gosub wait_for GUMP 530_480 10
+for %elimi 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 10
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %proteccion = 1
+{
+gosub plumas
+gosub pergas
+gosub ajo
+gosub ginsen
+gosub ceniza
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 10
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 150
+gosub wait_for GUMP 530_480 2
+click 270 230
+gosub wait_for GUMP 530_480 10
+for %prot 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 10
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %fuerza = 1
+{
+gosub plumas
+gosub pergas
+gosub mandragora
+gosub belladona
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 10
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 150
+gosub wait_for GUMP 530_480 2
+click 270 250
+gosub wait_for GUMP 530_480 10
+for %fu 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 10
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %bendicion = 1
+{
+gosub plumas
+gosub pergas
+gosub ajo
+gosub mandragora
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 10
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 170
+gosub wait_for GUMP 530_480 2
+click 270 110
+gosub wait_for GUMP 530_480 10
+for %bles 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 10
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %boladefuego = 1
+{
+gosub plumas
+gosub pergas
+gosub perla
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 10
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 170
+gosub wait_for GUMP 530_480 2
+click 270 130
+gosub wait_for GUMP 530_480 10
+for %bolaf 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 10
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %cerrojomagico = 1
+{
+gosub plumas
+gosub pergas
+gosub musgo
+gosub ajo
+gosub ceniza
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 10
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 170
+gosub wait_for GUMP 530_480 2
+click 270 150
+gosub wait_for GUMP 530_480 10
+for %cerrojom 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 10
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %envenenar = 1
+{
+gosub plumas
+gosub pergas
+gosub belladona
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 10
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 170
+gosub wait_for GUMP 530_480 2
+click 270 170
+gosub wait_for GUMP 530_480 10
+for %envene 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 10
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %telequinesis = 1
+{
+gosub plumas
+gosub pergas
+gosub musgo
+gosub mandragora
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 10
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 170
+gosub wait_for GUMP 530_480 2
+click 270 190
+gosub wait_for GUMP 530_480 10
+for %teleq 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 10
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %teleport = 1
+{
+gosub plumas
+gosub pergas
+gosub musgo
+gosub mandragora
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 10
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 170
+gosub wait_for GUMP 530_480 2
+click 270 210
+gosub wait_for GUMP 530_480 10
+for %telepor 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 10
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %abrircerraduras = 1
+{
+gosub plumas
+gosub pergas
+gosub musgo
+gosub ceniza
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 10
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 170
+gosub wait_for GUMP 530_480 2
+click 270 230
+gosub wait_for GUMP 530_480 10
+for %abrirc 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 10
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %murodepiedra = 1
+{
+gosub plumas
+gosub pergas
+gosub musgo
+gosub ajo
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 10
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 170
+gosub wait_for GUMP 530_480 2
+click 270 250
+gosub wait_for GUMP 530_480 10
+for %murp 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 10
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;========================================================================
+if %sanarmasivo = 1
+{
+gosub plumas
+gosub pergas
+gosub ajo
+gosub ginsen
+gosub mandragora
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 15
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 190
+gosub wait_for GUMP 530_480 2
+click 270 110
+gosub wait_for GUMP 530_480 10
+for %sanmas 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 15
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %proteccionmasiva = 1
+{
+gosub plumas
+gosub pergas
+gosub ajo
+gosub ginsen
+gosub mandragora
+gosub ceniza
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 15
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 190
+gosub wait_for GUMP 530_480 2
+click 270 130
+gosub wait_for GUMP 530_480 10
+for %protmas 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 15
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %maldicion = 1
+{
+gosub plumas
+gosub pergas
+gosub ajo
+gosub belladona
+gosub ceniza
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 15
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 190
+gosub wait_for GUMP 530_480 2
+click 270 150
+gosub wait_for GUMP 530_480 10
+for %maldi 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 15
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %murodefuego = 1
+{
+gosub plumas
+gosub pergas
+gosub perla
+gosub seda
+gosub ceniza
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 15
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 190
+gosub wait_for GUMP 530_480 2
+click 270 170
+gosub wait_for GUMP 530_480 10
+for %murofu 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 15
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %grancuracion = 1
+{
+gosub plumas
+gosub pergas
+gosub ajo
+gosub ginsen
+gosub mandragora
+gosub seda
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 15
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 190
+gosub wait_for GUMP 530_480 2
+click 270 190
+gosub wait_for GUMP 530_480 10
+for %grancur 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 15
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %relampago = 1
+{
+gosub plumas
+gosub pergas
+gosub mandragora
+gosub ceniza
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 15
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 190
+gosub wait_for GUMP 530_480 2
+click 270 210
+gosub wait_for GUMP 530_480 10
+for %relam 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 15
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %drenarmana = 1
+{
+gosub plumas
+gosub pergas
+gosub perla
+gosub mandragora
+gosub seda
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 15
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 190
+gosub wait_for GUMP 530_480 2
+click 270 230
+gosub wait_for GUMP 530_480 10
+for %drenm 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 15
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %recall = 1
+{
+gosub plumas
+gosub pergas
+gosub perla
+gosub musgo
+gosub mandragora
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 15
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 190
+gosub wait_for GUMP 530_480 2
+click 270 250
+gosub wait_for GUMP 530_480 10
+for %rec 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 15
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %bladeespirit = 1
+{
+gosub plumas
+gosub pergas
+gosub perla
+gosub mandragora
+gosub belladona
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 20
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 210
+gosub wait_for GUMP 530_480 2
+click 270 110
+gosub wait_for GUMP 530_480 10
+for %blade 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 20
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %disiparmuro = 1
+{
+gosub plumas
+gosub pergas
+gosub perla
+gosub ajo
+gosub seda
+gosub ceniza
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 20
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 210
+gosub wait_for GUMP 530_480 2
+click 270 130
+gosub wait_for GUMP 530_480 10
+for %dispmur 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 20
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %incognito = 1
+{
+gosub plumas
+gosub pergas
+gosub musgo
+gosub ajo
+gosub belladona
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 20
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 210
+gosub wait_for GUMP 530_480 2
+click 270 150
+gosub wait_for GUMP 530_480 10
+for %dincog 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 20
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %refejarmagia = 1
+{
+gosub plumas
+gosub pergas
+gosub ajo
+gosub mandragora
+gosub seda
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 20
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 210
+gosub wait_for GUMP 530_480 2
+click 270 170
+gosub wait_for GUMP 530_480 10
+for %refm 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 20
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %golpemental = 1
+{
+gosub plumas
+gosub pergas
+gosub perla
+gosub mandragora
+gosub belladona
+gosub ceniza
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 20
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 210
+gosub wait_for GUMP 530_480 2
+click 270 190
+gosub wait_for GUMP 530_480 10
+for %golpm 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 20
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %paralizar = 1
+{
+gosub plumas
+gosub pergas
+gosub ajo
+gosub mandragora
+gosub seda
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 20
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 210
+gosub wait_for GUMP 530_480 2
+click 270 210
+gosub wait_for GUMP 530_480 10
+for %paral 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 20
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %muroveneno = 1
+{
+gosub plumas
+gosub pergas
+gosub perla
+gosub belladona
+gosub seda
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 20
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 210
+gosub wait_for GUMP 530_480 2
+click 270 230
+gosub wait_for GUMP 530_480 10
+for %murv 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 20
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %convocarcriatura = 1
+{
+gosub plumas
+gosub pergas
+gosub musgo
+gosub mandragora
+gosub seda
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 20
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 210
+gosub wait_for GUMP 530_480 2
+click 270 250
+gosub wait_for GUMP 530_480 10
+for %comvc 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 20
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %disipar = 1
+{
+gosub plumas
+gosub pergas
+gosub ajo
+gosub mandragora
+gosub ceniza
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 20
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 230
+gosub wait_for GUMP 530_480 2
+click 270 110
+gosub wait_for GUMP 530_480 10
+for %disip 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 20
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %descargaenergia = 1
+{
+gosub plumas
+gosub pergas
+gosub perla
+gosub belladona
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 20
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 230
+gosub wait_for GUMP 530_480 2
+click 270 130
+gosub wait_for GUMP 530_480 10
+for %descen 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 20
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %explosion = 1
+{
+gosub plumas
+gosub pergas
+gosub musgo
+gosub mandragora
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 20
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 230
+gosub wait_for GUMP 530_480 2
+click 270 150
+gosub wait_for GUMP 530_480 10
+for %explo 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 20
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %invisibilidad = 1
+{
+gosub plumas
+gosub pergas
+gosub musgo
+gosub belladona
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 20
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 230
+gosub wait_for GUMP 530_480 2
+click 270 170
+gosub wait_for GUMP 530_480 10
+for %invis 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 20
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %marcarruna = 1
+{
+gosub plumas
+gosub pergas
+gosub perla
+gosub musgo
+gosub mandragora
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 20
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 230
+gosub wait_for GUMP 530_480 2
+click 270 190
+gosub wait_for GUMP 530_480 10
+for %marr 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 20
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %maldicionmasiva = 1
+{
+gosub plumas
+gosub pergas
+gosub ajo
+gosub mandragora
+gosub belladona
+gosub ceniza
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 20
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 230
+gosub wait_for GUMP 530_480 2
+click 270 210
+gosub wait_for GUMP 530_480 10
+for %maldm 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 20
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %muroparalizante = 1
+{
+gosub plumas
+gosub pergas
+gosub perla
+gosub ginsen
+gosub seda
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 20
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 230
+gosub wait_for GUMP 530_480 2
+click 270 230
+gosub wait_for GUMP 530_480 10
+for %murp 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 20
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %detectar = 1
+{
+gosub plumas
+gosub pergas
+gosub musgo
+gosub ceniza
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 20
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 230
+gosub wait_for GUMP 530_480 2
+click 270 250
+gosub wait_for GUMP 530_480 10
+for %det 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 20
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %tormenta = 1
+{
+gosub plumas
+gosub pergas
+gosub perla
+gosub musgo
+gosub mandragora
+gosub ceniza
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 40
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 250
+gosub wait_for GUMP 530_480 2
+click 270 110
+gosub wait_for GUMP 530_480 10
+for %tor 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 40
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %muroenergia = 1
+{
+gosub plumas
+gosub pergas
+gosub perla
+gosub mandragora
+gosub seda
+gosub ceniza
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 40
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 250
+gosub wait_for GUMP 530_480 2
+click 270 130
+gosub wait_for GUMP 530_480 10
+for %mure 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 40
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %llamarada = 1
+{
+gosub plumas
+gosub pergas
+gosub seda
+gosub ceniza
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 40
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 250
+gosub wait_for GUMP 530_480 2
+click 270 150
+gosub wait_for GUMP 530_480 10
+for %llam 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 40
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %portalmagico = 1
+{
+gosub plumas
+gosub pergas
+gosub perla
+gosub mandragora
+gosub ceniza
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 40
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 250
+gosub wait_for GUMP 530_480 2
+click 270 170
+gosub wait_for GUMP 530_480 10
+for %porm 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 40
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %vampiromana = 1
+{
+gosub plumas
+gosub pergas
+gosub perla
+gosub musgo
+gosub mandragora
+gosub seda
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 40
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 250
+gosub wait_for GUMP 530_480 2
+click 270 190
+gosub wait_for GUMP 530_480 10
+for %vamm 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 40
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %disiparmasivo = 1
+{
+gosub plumas
+gosub pergas
+gosub perla
+gosub ajo
+gosub mandragora
+gosub ceniza
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 40
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 250
+gosub wait_for GUMP 530_480 2
+click 270 210
+gosub wait_for GUMP 530_480 10
+for %dism 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 40
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %lluviameteoros = 1
+{
+gosub plumas
+gosub pergas
+gosub musgo
+gosub mandragora
+gosub seda
+gosub ceniza
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 40
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 250
+gosub wait_for GUMP 530_480 2
+click 270 230
+gosub wait_for GUMP 530_480 10
+for %lluv 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 40
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %polimorfismo = 1
+{
+gosub plumas
+gosub pergas
+gosub musgo
+gosub mandragora
+gosub seda
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 40
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 250
+gosub wait_for GUMP 530_480 2
+click 270 250
+gosub wait_for GUMP 530_480 10
+for %pol 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 40
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %terremoto = 1
+{
+gosub plumas
+gosub pergas
+gosub musgo
+gosub ginsen
+gosub mandragora
+gosub ceniza
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 50
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 270
+gosub wait_for GUMP 530_480 2
+click 270 110
+gosub wait_for GUMP 530_480 10
+for %ter 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 50
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %vorticedeenergia = 1
+{
+gosub plumas
+gosub pergas
+gosub perla
+gosub musgo
+gosub mandragora
+gosub belladona
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 50
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 270
+gosub wait_for GUMP 530_480 2
+click 270 130
+gosub wait_for GUMP 530_480 10
+for %vor 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 50
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %resucitar = 1
+{
+gosub plumas
+gosub pergas
+gosub musgo
+gosub ajo
+gosub ginsen
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 50
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 270
+gosub wait_for GUMP 530_480 2
+click 270 150
+gosub wait_for GUMP 530_480 10
+for %res 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 50
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %elementalaire = 1
+{
+gosub plumas
+gosub pergas
+gosub musgo
+gosub mandragora
+gosub seda
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 50
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 270
+gosub wait_for GUMP 530_480 2
+click 270 170
+gosub wait_for GUMP 530_480 10
+for %eai 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 50
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %demonio = 1
+{
+gosub plumas
+gosub pergas
+gosub musgo
+gosub mandragora
+gosub seda
+gosub ceniza
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 50
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 270
+gosub wait_for GUMP 530_480 2
+click 270 190
+gosub wait_for GUMP 530_480 10
+for %dem 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 50
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %elementaltierra = 1
+{
+gosub plumas
+gosub pergas
+gosub musgo
+gosub mandragora
+gosub seda
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 50
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 270
+gosub wait_for GUMP 530_480 2
+click 270 210
+gosub wait_for GUMP 530_480 10
+for %et 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 50
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %elementalfuego = 1
+{
+gosub plumas
+gosub pergas
+gosub musgo
+gosub mandragora
+gosub seda
+gosub ceniza
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 50
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 270
+gosub wait_for GUMP 530_480 2
+click 270 230
+gosub wait_for GUMP 530_480 10
+for %ef 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 50
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+;==================================================================================
+if %elementalagua = 1
+{
+gosub plumas
+gosub pergas
+gosub musgo
+gosub mandragora
+gosub seda
+if ( %modo_liche )
+     {
+       gosub liche
+       gosub checkHits
+       set %start_liche #FALSE
+     }
+if #MANA < 50
+gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17
+gosub wait_for GUMP 530_480 2
+click 70 270
+gosub wait_for GUMP 530_480 2
+click 270 250
+gosub wait_for GUMP 530_480 10
+for %ea 1 %cantidadpergas
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+if ( %modo_liche )
+     {
+       gosub liche
+     }
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 50
+gosub meditar
+}
+gosub dejar
+goto inicio
+}
+
+;=======================================================
+hacer:
+for %h 1 %cantidadpergas
+{
+click 323 496
+gosub wait_for GUMP 530_480 10
+if #MANA < 50
+gosub meditar
+}
+gosub dejar
+goto inicio
+
+;========================================================
+sub mandragora
+_mandragora:
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+finditem %mandragora C_ , #BACKPACKID
+if #FINDSTACK < %cantidadpergas
+{
+set %matcnt #findstack
+set %debocoger %cantidadpergas - %matcnt
+finditem %mandragora C_ , %bolsaregs
+if #FINDSTACK >= %debocoger
+   {
+     exevent drag #FINDID %debocoger
+     exevent dropc #BACKPACKID
+     wait 30
+     goto _mandragora
+   }
+   else
+      {
+        set #SYSMSGCOL 38
+        event sysmessage NO QUEDA MANDRAKE! :-(
+        wait 20
+        gosub resetLiche
+        halt
+      }
+}
+return
+
+;=========================================================
+sub musgo
+_musgo:
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+finditem %musgo C_ , #BACKPACKID
+if #FINDSTACK < %cantidadpergas
+{
+set %matcnt #findstack
+set %debocoger %cantidadpergas - %matcnt
+finditem %musgo C_ , %bolsaregs
+if #FINDSTACK >= %debocoger
+   {
+     exevent drag #FINDID %debocoger
+     exevent dropc #BACKPACKID
+     wait 30
+     goto _musgo
+   }
+   else
+      {
+        set #SYSMSGCOL 38
+        event sysmessage NO QUEDA MUSGO! :-(
+        wait 20
+        gosub resetLiche
+        halt
+      }
+}
+return
+
+;==========================================================
+sub perla
+_perla:
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+finditem %perla C_ , #BACKPACKID
+if #FINDSTACK < %cantidadpergas
+{
+set %matcnt #findstack
+set %debocoger %cantidadpergas - %matcnt
+finditem %perla C_ , %bolsaregs
+if #FINDSTACK >= %debocoger
+   {
+     exevent drag #FINDID %debocoger
+     exevent dropc #BACKPACKID
+     wait 30
+     goto _perla
+   }
+   else
+      {
+        set #SYSMSGCOL 38
+        event sysmessage NO QUEDA PERLA! :-(
+        wait 20
+        gosub resetLiche
+        halt
+      }
+}
+return
+
+;===========================================================
+sub belladona
+_belladona:
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+finditem %belladona C_ , #BACKPACKID
+if #FINDSTACK < %cantidadpergas
+{
+set %matcnt #findstack
+set %debocoger %cantidadpergas - %matcnt
+finditem %belladona C_ , %bolsaregs
+if #FINDSTACK >= %debocoger
+   {
+     exevent drag #FINDID %debocoger
+     exevent dropc #BACKPACKID
+     wait 30
+     goto _belladona
+   }
+   else
+      {
+        set #SYSMSGCOL 38
+        event sysmessage NO QUEDA BELLADONA! :-(
+        wait 20
+        gosub resetLiche
+        halt
+      }
+}
+return
+
+;===========================================================
+sub ajo
+_ajo:
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+finditem %ajo C_ , #BACKPACKID
+if #FINDSTACK < %cantidadpergas
+{
+set %matcnt #findstack
+set %debocoger %cantidadpergas - %matcnt
+finditem %ajo C_ , %bolsaregs
+if #FINDSTACK >= %debocoger
+   {
+     exevent drag #FINDID %debocoger
+     exevent dropc #BACKPACKID
+     wait 30
+     goto _ajo
+   }
+   else
+      {
+        set #SYSMSGCOL 38
+        event sysmessage NO QUEDA AJO! :-(
+        wait 20
+        gosub resetLiche
+        halt
+      }
+}
+return
+
+;============================================================
+sub seda
+_seda:
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+finditem %seda C_ , #BACKPACKID
+if #FINDSTACK < %cantidadpergas
+{
+set %matcnt #findstack
+set %debocoger %cantidadpergas - %matcnt
+finditem %seda C_ , %bolsaregs
+if #FINDSTACK >= %debocoger
+   {
+     exevent drag #FINDID %debocoger
+     exevent dropc #BACKPACKID
+     wait 30
+     goto _seda
+   }
+   else
+      {
+        set #SYSMSGCOL 38
+        event sysmessage NO QUEDA SEDA! :-(
+        wait 20
+        gosub resetLiche
+        halt
+      }
+}
+return
+
+;============================================================
+sub ginsen
+_ginsen:
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+finditem %ginsen C_ , #BACKPACKID
+if #FINDSTACK < %cantidadpergas
+{
+set %matcnt #findstack
+set %debocoger %cantidadpergas - %matcnt
+finditem %ginsen C_ , %bolsaregs
+if #FINDSTACK >= %debocoger
+   {
+     exevent drag #FINDID %debocoger
+     exevent dropc #BACKPACKID
+     wait 30
+     goto _ginsen
+   }
+   else
+      {
+        set #SYSMSGCOL 38
+        event sysmessage NO QUEDA GINSENG! :-(
+        wait 20
+        gosub resetLiche
+        halt
+      }
+}
+return
+
+;============================================================
+sub ceniza
+_ceniza:
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+finditem %ceniza C_ , #BACKPACKID
+if #FINDSTACK < %cantidadpergas
+{
+set %matcnt #findstack
+set %debocoger %cantidadpergas - %matcnt
+finditem %ceniza C_ , %bolsaregs
+if #FINDSTACK >= %debocoger
+   {
+     exevent drag #FINDID %debocoger
+     exevent dropc #BACKPACKID
+     wait 30
+     goto _ceniza
+   }
+   else
+      {
+        set #SYSMSGCOL 38
+        event sysmessage NO QUEDA CENIZA! :-(
+        wait 20
+        gosub resetLiche
+        halt
+      }
+}
+return
+
+;============================================================
+sub azufre
+_azufre:
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+finditem %azufre C_ , #BACKPACKID
+if #FINDSTACK < 5
+{
+set %matcnt #findstack
+set %debocoger 5 - %matcnt
+finditem %azufre C_ , %bolsaregs
+if #FINDSTACK >= %debocoger
+   {
+     exevent drag #FINDID %debocoger
+     exevent dropc #BACKPACKID
+     wait 30
+     goto _azufre
+   }
+   else
+      {
+        set #SYSMSGCOL 38
+        event sysmessage NO QUEDA AZUFRE! :-(
+        wait 20
+        gosub resetLiche
+        halt
+      }
+}
+return
+
+;============================================================
+sub obsidiana
+_obsidiana:
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+finditem %obsidiana C_ , #BACKPACKID
+if #FINDSTACK < 5
+{
+set %matcnt #findstack
+set %debocoger 5 - %matcnt
+finditem %obsidiana C_ , %bolsaregs
+if #FINDSTACK >= %debocoger
+   {
+     exevent drag #FINDID %debocoger
+     exevent dropc #BACKPACKID
+     wait 30
+     goto _obsidiana
+   }
+   else
+      {
+        set #SYSMSGCOL 38
+        event sysmessage NO QUEDA OBSIDIANA! :-(
+        wait 20
+        gosub resetLiche
+        halt
+      }
+}
+return
+
+;============================================================
+sub ceniza_vol
+_ceniza_vol:
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+finditem %ceniza_vol C_ , #BACKPACKID
+if #FINDSTACK < 5
+{
+set %matcnt #findstack
+set %debocoger 5 - %matcnt
+finditem %ceniza_vol C_ , %bolsaregs
+if #FINDSTACK >= %debocoger
+   {
+     exevent drag #FINDID %debocoger
+     exevent dropc #BACKPACKID
+     wait 30
+     goto _ceniza_vol
+   }
+   else
+      {
+        set #SYSMSGCOL 38
+        event sysmessage NO QUEDA CENIZA VOLCANICA! :-(
+        wait 20
+        gosub resetLiche
+        halt
+      }
+}
+return
+
+;============================================================
+sub plumas
+gosub refreshBackpack
+plumas:
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+finditem %plumas C_ , #BACKPACKID
+if #FINDCNT < 10
+{
+  finditem %plumas C_ , %bolsaplumas
+  if #FINDCNT > 0
+     {
+       exevent drag #FINDID 1
+       exevent dropc #BACKPACKID
+       wait 30
+       goto plumas
+     }
+     else
+        {
+          set #SYSMSGCOL 38
+          event sysmessage NO QUEDAN PLUMAS! :-(
+          wait 20
+          gosub resetLiche
+          halt
+        }
+}
+return
+
+;==============================================================
+sub pergas
+gosub refreshBackpack
+set %pergacnt_blanco 0
+set %pergacnt_lote 0
+_checkPergasBlancos:
+finditem %pergaminos C_ , #BACKPACKID
+if #FINDCNT > 0
+   {
+     for #FINDINDEX 1 #FINDCNT
+         {
+           if #FINDCOL = 0 ; Son en blanco
+              {
+                set %pergacnt_blanco #FINDSTACK
+                if #FINDSTACK >= %cantidadpergas ; Hay suficientes
+                   {
+                     set #LOBJECTID #FINDID
+                     return
+                   }
+                   else
+                      {
+                        set #SYSMSGCOL 88
+                        event sysmessage REPONIENDO PERGAS...
+                        wait 1s
+                        goto _rePonPergasBlanco
+                      }
+              }
+              else
+                 {
+                   if #FINDCOL = 48 ; Es un lote de pergaminos
+                      {
+                        if #WEIGHT <= #MAXWEIGHT - 10
+                           {
+                             gosub deshacer_lotes
+                             goto _checkPergasBlancos
+                           }
+                           else
+                              {
+                                return
+                              }
+                      }
+                 }
+         }
+   }
+   else ; No hay ningún perga.
+      {
+        set %pergacnt_blanco 0
+        set %pergacnt_lote 0
+        _rePonPergasBlanco:
+        finditem %pergaminos C_ , %bolsapergas_blanco
+        if #FINDCNT > 0
+           {
+             for #FINDINDEX 1 #FINDCNT
+                 {
+                   gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+                   if #FINDCOL = 0 ; Son en blanco
+                      {
+                        set %debocoger %cantidadpergas - %pergacnt_blanco
+                        if #FINDSTACK >= %debocoger ; Hay suficientes
+                           {
+                             exevent drag #FINDID %debocoger
+                             exevent dropc #BACKPACKID
+                             wait 30
+                             goto _checkPergasBlancos
+                           }
+                           else
+                              {
+                                set #SYSMSGCOL 43
+                                event sysmessage NO QUEDAN PERGAS EN BLANCO!
+                                ignoreitem #FINDID ; Este montón ya no sirve.
+                                goto _checkPergasBlancos
+                              }
+                      }
+                      else
+                         {
+                           if #FINDCOL = 48 ; Es un lote de pergaminos
+                              {
+                                if %pergacnt_lote > 0 ; Estamos usando lotes de pergas...
+                                   {
+                                     set %num_lotes abs ( %cantidadpergas / 4 )
+                                     set %debocoger %num_lotes - %pergacnt_lote
+                                     if #FINDSTACK >= %debocoger ; Hay suficientes
+                                        {
+                                          exevent drag #FINDID %debocoger
+                                          exevent dropc #BACKPACKID
+                                          wait 30
+                                          gosub deshacer_lotes
+                                          goto _checkPergasBlancos
+                                        }
+                                        else
+                                           {
+                                             set #SYSMSGCOL 43
+                                             event sysmessage NO QUEDAN LOTES DE PERGAS!
+                                             ignoreitem #FINDID ; Este montón ya no sirve.
+                                             goto _checkPergasBlancos
+                                           }
+                                   }
+                                   else
+                                      {
+                                        if %pergacnt_blanco > 0 ; Estamos usando pergas en blanco...
+                                           {
+                                             set %num_lotes abs ( %cantidadpergas / 4 )
+                                             set %num_lotes_pergas abs ( %pergacnt_blanco / 4 )
+                                             set %debocoger %num_lotes - %num_lotes_pergas
+                                             if #FINDSTACK >= %debocoger ; Hay suficientes
+                                                {
+                                                  exevent drag #FINDID %debocoger
+                                                  exevent dropc #BACKPACKID
+                                                  wait 30
+                                                  gosub deshacer_lotes
+                                                  goto _checkPergasBlancos
+                                                }
+                                                else
+                                                   {
+                                                     set #SYSMSGCOL 43
+                                                     event sysmessage NO QUEDAN PERGAS EN BLANCO!
+                                                     ignoreitem #FINDID ; Este montón ya no sirve.
+                                                     goto _checkPergasBlancos
+                                                   }
+                                           }
+                                           else ; No estamos usando ningún tipo de perga...
+                                              {
+                                                if %pergacnt_blanco = 0 && %pergacnt_lote = 0
+                                                   {
+                                                     set %num_lotes abs ( %cantidadpergas / 4 )
+                                                     set %debocoger %num_lotes - %pergacnt_lote
+                                                     if #FINDSTACK >= %debocoger ; Hay suficientes
+                                                        {
+                                                          exevent drag #FINDID %debocoger
+                                                          exevent dropc #BACKPACKID
+                                                          wait 30
+                                                          gosub deshacer_lotes
+                                                          goto _checkPergasBlancos
+                                                        }
+                                                        else
+                                                           {
+                                                             set #SYSMSGCOL 43
+                                                             event sysmessage NO QUEDAN LOTES DE PERGAS!
+                                                             ignoreitem #FINDID ; Este montón ya no sirve.
+                                                             goto _checkPergasBlancos
+                                                           }
+                                                   }
+                                              }
+                                      }
+                              }
+                         }
+                 }
+           }
+           else
+              {
+                set #SYSMSGCOL 38
+                event sysmessage NO QUEDAN PERGAS EN BLANCO! :-(
+                wait 20
+                gosub resetLiche
+                halt
+              }
+      }
+return
+
+sub deshacer_lotes
+finditem %pergaminos C_ , #BACKPACKID
+if #FINDCNT > 0
+   {
+     for #FINDINDEX 1 #FINDCNT
+         {
+           if #FINDCOL = 0 ; Son en blanco
+              {
+                continue
+              }
+              else
+                 {
+                   if #FINDCOL = 48 ; Es un lote de pergaminos
+                      {
+                        set %pergacnt_lote #FINDSTACK
+                        set %ID_lotes_stack #FINDID
+                        for %lotes 1 %pergacnt_lote
+                            {
+                              if #WEIGHT <= #MAXWEIGHT - 10
+                                 {
+                                   gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+                                   set #LOBJECTID %ID_lotes_stack
+                                   event macro 17
+                                   wait 20
+                                 }
+                                 else ; Nos estaos cargando demasiado de peso...
+                                    {
+                                      return
+                                    }
+                            }
+                      }
+                 }
+         }
+   }
+return
+
+;==============================================================
+sub dejar
+gosub refreshBackpack
+dejar:
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+finditem %pergashechos C_ , #BACKPACKID
+if #FINDSTACK >= %cantidadpergas || #WEIGHT >= #MAXWEIGHT - 10
+{
+exevent drag #FINDID #FINDSTACK
+exevent dropc %bolsapergas_hechos
+wait 30
+goto dejar
+}
+return
+
+;================================================================
+sub refreshBackpack
+event macro 9 7 ; Close Backpack
+event macro 8	7 ; Open Backpack
+gosub wait_for GUMP #BACKPACKID 4
+contpos %backpack_X %backpack_Y
+return
+
+;================================================================
+sub meditar
+set %PRE_MEDIT #TRUE
+_reMedit:
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+set %jstart #jindex
+event macro 13 46
+gosub wait_for MSG pierdes trance en_paz 5
+if ( #TRUE in #result )
+     {
+       if pierdes in #result
+          {
+            goto _reMedit ; Meditamos hasta que no perdamos la concentración
+          }
+       if trance in #result
+          {
+            set %jstart #jindex
+            gosub wait_for MSG pierdes en_paz 5
+            if ( #TRUE in #result )
+                 {
+                   if pierdes in #RESULT
+                      {
+                        goto _reMedit
+                      }
+                   if en_paz in #RESULT
+                      {
+                        return
+                      }
+                 }
+                 else ; Meditamos hasta llenar la barra al máximo...
+                    {
+                      repeat
+                           {
+                             wait 1s
+                             gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+                           }
+                           until #MANA = #MAXMANA
+                    }
+          }
+       if en_paz in #result ; OK, estamos bien de maná.
+          {
+            return
+          }
+     }
+     else
+        {
+          goto _reMedit
+        }
+return
+
+sub checkHits
+if #HITS <= 40 || %start_liche
+   {
+     set #SYSMSGCOL 43
+     event sysmessage RECARGANDO VIDA [ #HITS / #MAXHITS ]
+     wait 20
+     set %heal_time #SCNT
+     _recarga:
+     repeat
+          {
+            if %skill_spirit >= 700 ; Hablar con Espíritus
+               {
+                 if #MANA >= 20
+                    {
+                      set %jstart #jindex
+                      event macro 13 32
+                      gosub wait_for MSG Intentas_contactar_con_el_infierno No_tienes_ninguna_necesidad 5 ; Empezamos a contactar...
+                      if ( #TRUE in #RESULT )
+                           {
+                             if ( Intentas_contactar_con_el_infierno in #RESULT )
+                                  {
+                                    set %jstart #jindex
+                                    gosub wait_for MSG Logras_contactar No_logras_contactar 10 ; Finaliza el contacto con el Inframundo...
+                                  }
+                                  else
+                                     {
+                                       if ( No_tienes_ninguna_necesidad in #RESULT )
+                                            {
+                                              break
+                                            }
+                                     }
+                           }
+                    }
+                    else
+                       {
+                         gosub meditar
+                         goto _recarga
+                       }
+               }
+               else ; No nos podemos curar con SS, y ya estamos bajos de vida...
+                  {
+                    gosub resetLiche ; Nos quitamos el liche para al menos llegar hasta 100 de forma pasiva...
+                  }
+             wait 1
+             if #SCNT >= %heal_time
+                {
+                  gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+                  if #HITS < #MAXHITS
+                     {
+                       set #SYSMSGCOL 43
+                       event sysmessage RECARGANDO VIDA [ #HITS / #MAXHITS ]
+                       if %skill_spirit >= 700 ; Hablar con Espíritus
+                          {
+                            set %heal_time #SCNT + 1
+                          }
+                          else
+                             {
+                               if %skill_spirit < 700 ; Modo "básico"
+                                  {
+                                    set %heal_time #SCNT + 10
+                                  }
+                             }
+                     }
+                     else
+                        {
+                          if #HITS >= #MAXHITS
+                             {
+                               break
+                             }
+                        }
+                }
+          }
+          until #HITS = #MAXHITS
+          set #SYSMSGCOL 73
+          event sysmessage OK VIDA [ #HITS / #MAXHITS ]
+          wait 20
+   }
+return
+
+;================================================================
+sub liche
+if ( %skill_recro >= 700 && %skill_spirit >= 400 ) ; Nos podemos transformar en liche :D
+     {
+       if #MAXMANA < 200 ; Ya no somos un liche.
+          {
+            set %tiempo_actual #SCNT
+            if ( %proxima_vez <= %tiempo_actual )
+                 {
+                   gosub comprobar_comida
+                 }
+            gosub azufre
+            gosub obsidiana
+            gosub ceniza_vol
+            if #MANA >= 23
+               {
+                 _liche:
+                 set %jstart #jindex
+                 event macro 1 0 .nigro 11 ; ¡Modo Liche!
+                 gosub wait_for MSG El_hechizo_falla 5
+                 if ( #TRUE in #RESULT )
+                      {
+                        set #SYSMSGCOL 43
+                        event sysmessage FALLO! :(
+                        wait 1s
+                        goto _liche
+                      }
+                      else
+                         {
+                           set %liche_time #SCNT + 10
+                           set %start_liche #TRUE
+                           while #MAXMANA < 200
+                                 {
+                                   set #SYSMSGCOL 11
+                                   event sysmessage ESPERANDO AL LICHE! :D
+                                   wait 1s ; Esperar a la forma de liche.
+                                   if #SCNT > %liche_time ; Si tarda demasiado es que hemos fallado...
+                                      {
+                                        set #SYSMSGCOL 43
+                                        event sysmessage FALLO! :(
+                                        wait 1s ; Esperar a la forma de liche.
+                                        goto _liche
+                                      }
+                                 }
+                           wait 5s
+                         }
+                 gosub bastonClerigo
+                 gosub anilloMedit
+                 gosub collarIntel
+                 gosub meditar ; Llenamos a tope el maná del liche.
+                 gosub checkHits ; Recargamos la vida...
+                 set %start_liche #FALSE
+               }
+               else
+                  {
+                    gosub meditar ; Llenamos a tope el maná del liche.
+                    goto _liche
+                  }
+          }
+          else
+             {
+               set %tiempo_actual #SCNT
+               if ( %proxima_vez <= %tiempo_actual ) && ( #MAXMANA < 200 ) ; No somos un Liche...
+                    {
+                      gosub comprobar_comida
+                    }
+               gosub checkHits ; Recargamos la vida...
+             }
+     }
+     else
+        {
+          set %tiempo_actual #SCNT
+          if ( %proxima_vez <= %tiempo_actual )
+               {
+                 gosub comprobar_comida
+               }
+        }
+return
+
+sub bastonClerigo
+_baston:
+finditem %baston C_ , #CHARID
+if #FINDCNT = 0
+   {
+     finditem %baston #BACKPACKID ; Bastón de clérigo :D
+     if #FINDCNT > 0
+        {
+          set #LOBJECTID %baston
+          event macro 17
+          wait 30
+          goto _baston
+        }
+   }
+return
+
+sub collarIntel
+_collar:
+finditem %collar C_ , #CHARID ; Buscamos el collar en el personaje,
+if #FINDCNT = 0 ; Si no lo llevamos puesto,
+   {
+     finditem %collar C_ , #BACKPACKID
+     if #FINDCNT > 0
+        {
+          exevent drag %collar
+          exevent droppd
+          wait 30 ; Modo agresivo, subir hasta 30 para suavizar.
+          goto _collar
+        }
+   }
+return
+
+sub anilloMedit
+_anillo:
+finditem %anillo C_ , #CHARID ; Buscamos el anillo en el personaje,
+if #FINDCNT = 0 ; Si no lo llevamos puesto,
+   {
+     finditem %anillo C_ , #BACKPACKID
+     if #FINDCNT > 0
+        {
+          exevent drag #FINDID
+          exevent droppd
+          wait 30 ; Modo agresivo, subir hasta 30 para suavizar.
+          goto _anillo
+        }
+   }
+return
+;================================================================
+sub resetLiche
+if ( %skill_recro >= 700 && %skill_spirit >= 400 ) ; Nos podemos transformar en liche :D
+     {
+       if #MAXMANA >= 200 ; Si tenemos forma de liche...
+          {
+            if #MANA >= 23
+               {
+                 _resetLiche:
+                 set %jstart #jindex
+                 event macro 1 0 .nigro 11 ; ¡Modo Humano! :D
+                 gosub wait_for MSG El_hechizo_falla 5
+                 if ( #TRUE in #RESULT )
+                      {
+                        set #SYSMSGCOL 43
+                        event sysmessage FALLO! :(
+                        wait 1s
+                        goto _resetLiche
+                      }
+                      else
+                         {
+                           set %liche_time #SCNT + 10
+                           while #MAXMANA >= 200
+                                 {
+                                   set #SYSMSGCOL 11
+                                   event sysmessage ESPERANDO AL HUMANO! :D
+                                   wait 1s ; Esperar a la forma normal...
+                                   if #SCNT > %liche_time ; Si tarda demasiado es que hemos fallado...
+                                      {
+                                        set #SYSMSGCOL 43
+                                        event sysmessage FALLO! :(
+                                        wait 1s ; Esperar a la forma normal...
+                                        goto _resetLiche
+                                      }
+                                 }
+                           wait 2s
+                         }
+               }
+               else
+                  {
+                    gosub meditar ; Llenamos a tope el maná del liche.
+                    goto _resetLiche
+                  }
+          }
+     }
+return
+
+;=====================================================
+; Rutina para, en caso de hambre, comer hasta saciarse
+;=====================================================
+; v2.2
+sub comprobar_comida
+{
+  hambriento:
+  set %jrnl #jindex ; Marcamos un índice de las líneas del diario.
+  event macro 4 0 .hungry
+  wait 20
+  while #true
+     {
+       if #jindex > %jrnl ; Si aparece una nueva línea.
+          {
+            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de línea.
+            scanjournal %jrnl   ; La leemos...
+            if Estas_no_le_afecta_el_hambre in #journal || Estas_tan_lleno_que_no_puedes in #journal || Estas_totalmente_saciado in #journal
+               {
+                 set %proxima_vez %tiempo_actual + %tiempo_alimentacion
+                 return
+               }
+               else
+                  {
+                    if Estas_lleno in #journal || Estas_contento in #journal || Estas_en_inanicion in #journal || Estas_hambriento in #journal || Sientes_mucho in #journal || Estas_con_hambre in #journal || Estas_parcialmente in #journal || Estas_bien_lleno in #journal || Te_sientes_casi_lleno in #journal
+                       {
+                         finditem %comida C_ , #backpackid
+                         if #findcnt > 0
+                            {
+                              set #lobjectid #findid
+                              event macro 17
+                              wait 20
+                              goto hambriento
+                            }
+                            else
+                               {
+                                 event exmsg #charid 3 48 COMPRA COMIDA!!
+                                 wait 40
+                                 set %proxima_vez %tiempo_actual + %tiempo_alimentacion
+                               }
+                       }
+                       else ; Mensaje extraño, repetimos...
+                          {
+                            goto hambriento
+                          }
+                  }
+          }
+       return
+     } ; FIN While
+}
+return
+
+;================================================================
+sub save
+for %savecontrol 1 5
+{
+scanjournal
+if Comienza_la in #journal
+{
+wait 40s
+}
+}
+return
+
+;-----------------------------------------------------------
+; Script Name: CEOWorldSaveChecker
+; Author: CEO
+; Version: 1.0
+; Client Tested with: 4.0.10b
+; EUO version tested with: 1.42.00A5
+; Shard OSI / FS: OSI
+; Revision Date: 060105
+; Public Release: 060105
+; Global Variables Used:  *CEOWorldSaving
+; Purpose: Used to catch the world save message for freeshards and temporarily pause mainscript during save.
+;-------------------------------------------------------------
+sub CEOWorldSaveChecker
+; sub to pause a script during a RunUO world save.
+set %_text1 %1
+set %_text2 %2
+set %_text3 %3
+if %_worldsaveupcoming
+{
+        if %_worldsavetimer < #scnt
+        {
+                set %_worldsavetimer #scnt + %5
+                gosub popupworldsave 25 15 blue
+                goto _WSC_WAIT1
+        }
+        return
+}
+_WSC1:
+if %_worldsavejournalindex > #jindex
+        return
+scanjournal %_worldsavejournalindex
+if %_text1  in #JOURNAL
+{
+        set %_worldsaveupcoming #true
+        set %_worldsavetimer #scnt + %4
+        set %_worldsavejournalindex  %_worldsavejournalindex + 1
+        return
+}
+set %_worldsavejournalindex  %_worldsavejournalindex + 1
+goto _WSC1
+_WSC_WAIT1:
+if %_worldsavetimer < #scnt
+        goto _WSC_Complete
+wait 5
+set *CEOWorldSaving #true
+if %_worldsavejournalindex > #jindex
+        goto _WSC_WAIT1
+scanjournal %_worldsavejournalindex
+if %_text2 in #journal
+{
+        gosub popupworldsave 25 15 yellow
+        set %_worldsavejournalindex  %_worldsavejournalindex + 1
+        goto _WSC_WAIT2
+}
+set %_worldsavejournalindex  %_worldsavejournalindex + 1
+goto _WSC_WAIT1
+_WSC_WAIT2:
+if %_worldsavetimer < #scnt
+        goto _WSC_Complete
+wait 5
+if %_worldsavejournalindex > #jindex
+        goto _WSC_WAIT2
+scanjournal %_worldsavejournalindex
+if %_text3 notin #journal
+{
+        set %_worldsavejournalindex  %_worldsavejournalindex + 1
+        goto _WSC_WAIT2
+}
+_WSC_Complete:
+set %_worldsavejournalindex  #jindex
+set %_worldsaveupcoming #false
+set *CEOWorldSaving #false
+menu delete worldsave
+return
+
+sub popupworldsave
+set %x %1
+set %y %2
+set %worldcolor %3
+menu Clear
+menu Window Title World Save Monitor
+menu Window Color Black
+menu Window Size 160 160
+menu shape worldsave 20 15 125 125 1 7 2 olive 7 %worldcolor
+menu font bgcolor %worldcolor
+menu font color lime
+menu font type b
+menu font size 15
+set %x %x + 30
+set %y %y + 30
+menu text worldsave %x %y World
+set %x %x + 15
+set %y %y + 20
+menu text worldsave %x %y Save
+set %x %x + 15
+set %y %y + 20
+menu text worldsave %x %y Wait
+menu font size 9
+menu font bgcolor black
+menu font color lime
+menu font type n
+menu Show 920 770
+return
+
+;=================================================================
+sub wait_for
+;=================================================================
+; This "wait_for" sub package was created by Locke. If you use these subs please keep this header intact.
+; // end header
+; Documentation: the sub package grew to large with all the comments. To load them call the sub like this:
+; gosub wait_for docs    | or you can use doc, documention, what, or my personal favorite, kickass.
+; Thanks to ~BookWibble~ for helping with all the debugging and spotting a bug or three.
+; "wait_for core dispatcher" version 1.3 by Locke
+if %1 = doc || if %1 = docs || if %1 = documentation || if %1 = what || if %1 = kickass
+{
+Display ok Please click ok and wait for your browser to start.
+execute http://www.easyuo.com/forum/viewtopic.php?t=24716
+halt
+}
+nameSpace Push
+namespace local LLNS
+set #result N/A ; if #result isn't set by one of my wait_for subs it'll throw an error.
+set !LPC #lpc
+set #lpc 200
+for %i 0 %0
+set !_A . %i % . %i
+gosub wait_for_ , !_A1
+ignoreitem reset LLWAITFOR
+set #lpc !lpc
+namespace clear LLNS
+namespace pop
+if #result <> N/A
+return #result
+else
+display ok You specified an unknown wait_for command. Script returned #result and is halting.
+halt
+
+;======================================================================
+sub wait_for_MSG ; version 1.4 ~Locke
+;=================================================================
+if !_A0 < 3
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for MSG %message % , time_out_in_seconds$
++Script is halting
+halt
+}
+set !_timeout ( #scnt + !_A . !_A0 )
+_lets_wait_for_a_message:
+for %i %jstart #jindex
+{
+ scanjournal %i
+  for %ii 2 !_A0
+  {
+    if !_A . %ii in #journal && %jstart <> %i
+    set #result #true , #spc , !_A . %ii
+  }
+}
+
+if #true notin #result
+{
+set #result #false
+ if !_timeout =< #scnt
+ return #result
+wait 1
+goto _lets_wait_for_a_message
+}
+else
+return #result
+
+wait 1
+goto _lets_wait_for_a_message
+;======================================================================
+sub wait_for_GUMP ; version 1.4 ~Locke
+;=================================================================
+if !_A0 < 3
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for GUMP XXX_YYY % , time_out_in_seconds$
++Script is halting
+halt
+}
+if !_A3 <> CLOSE
+set !_timeout #scnt + !_A3
+else
+set !_timeout 0 ; no gump wait if %3 = CLOSE since we already believe it to be open.
+
+_lets_wait_for_a_gump:
+if #CONTID = !_A2 || #CONTSIZE = !_A2 || #CONTKIND = !_A2 || #CONTNAME = !_A2 || #CONTTYPE = !_A2
+{
+  if !_A5 <> N/A && !_A6 <> N/A
+  {
+  set !clickx !_A5 + #contposx
+  set !clicky !_A6 + #contposy
+  click !clickx !clicky
+  }
+  if !_A3 = CLOSE || if !_A4 = CLOSE || !_A5 = CLOSE || !_A6 = CLOSE
+  {
+  set !string #contsize
+  str pos !string _
+  set !pos #strres
+  str del !string #strres #strres
+  set !clickX #contposx + ( #strres / 2 )
+  str del !string 1 !pos
+  set !clickY #contposy + ( #strres / 2 )
+  click !clickx !clicky R
+  }
+return #true
+}
+
+if !_timeout =< #scnt && !_A4 = N/A
+return #false
+
+if !_A4 <> N/A && !_timeout =< #scnt
+{
+finditem !_A4
+ if #findkind <> -1
+ {
+  for #findindex 1 #findcnt
+  {
+   if #finddist > 2
+   ignoreitem #findid LLWAITFOR
+   else
+   break
+  }
+  set #lobjectid #findid
+  event macro 17 0
+  set !_timeout #scnt + !_A3
+ }
+ else
+ return #false
+}
+wait 1
+goto _lets_wait_for_a_gump
