@@ -41,17 +41,19 @@
 ;               ~~~        ~~         ~~           ~~
 ; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~      `"""""""`
 ;
-set %version v1.2
+set %version v1.3_BETA 
 ;
 ; Author: Sthil Lauda
-; Version: 1.2
+; Version: 1.3_BETA
 ; Client Tested with: 2.0.3
 ; EUO version tested with: 1.5 Version 142
 ; Shard: Ultima Alianza (¡Hasta la muerte!)
 ; Fecha: 07/12/2019
+; Actualizada 13/03/2020
 ; Purpose: Cocina pescado y carne para subir la skill de cocinar.
 ; Instrucciones; Necesitas filetes de pescado o filetes de carne cruda,
 ;                troncos o ramas para encender el horno, herramientas de cocinar, y el horno.
+;                Ir al banco de Britain con los materiales en el banco y darle al play :P
 ;------------------------------------------------------
 ;________________________________
 ;
@@ -60,8 +62,12 @@ set %version v1.2
 ; ///////////////////////////////
 ;________________________________
 ;
-set %stack_materiales 50         ; Montón de alimentos y troncos a procesar en la mochila.
-set %tiempo_alimentacion 360     ; cada cuantos segundos comprobar el hambre.
+set %bolsa_herramientas NRTHUND          ; Bolsa con herramientas de cocina.
+SET %bolsa_pergaminos_recompensa XGNDCPD ; Bolsa para dejar los pergaminos que da el horno, para subir 0.1 con cada pergamino.
+set %num_herramientas 10                 ; Numero de sartenes, cazos, etc, en la mochila.
+set %stack_alimentos 200                 ; Montón de alimentos y troncos a procesar en la mochila.
+set %stack_combustible 25                ; Cantidad de troncos o ramas en la mochila.
+set %tiempo_alimentacion 360             ; Cada cuantos segundos comprobar el hambre.
 ;________________________________________________
 ;
 ; //////////////////////////////////////////////
@@ -73,7 +79,7 @@ set %horno BPB                   ; Tipo de Horno.
 set %combustible ZLK_PEF         ; Troncos y ramas.
 set %alimentos_crudos IND_VRD    ; Filetes de pescado crudo (IND), Filetes de carne cruda (VRD).
 set %alimentos_cocinados HND_YRD ; Filetes de pescado asado (HND), Filetes de carne asada (YRD).
-set %herramientas IRD_GRD_HRD_CRD_FRD_BRD  ; Herramientas de Cocina.
+set %herramientas IRD_GRD_HRD_CRD_FRD_BRD_JRD  ; Herramientas de Cocina.
 set %comida RGG_NRD_QSD_ZBG_WLI_QRD_END_FUD_YLI_WLI_HGI
  +_KGI_EGI_QLI_KLI_MLI_KRD_AQD_MQE_VQE_TQE_JQE_IQE
  +_GQE_SPE_ZPE_OQE_BDF_KPE_RQE_YSD_SQD_YWI_AXI_PQD_QQD
@@ -83,6 +89,7 @@ set %proxima_vez #SCNT
 set *esperando #FALSE
 set %hid_timer #SCNT2               ; Reloj.
 set %bank_timer #SCNT               ; Reloj.
+set #LPC 1000
 
 set #SYSMSGCOL 88
 event sysmessage =============
@@ -95,9 +102,14 @@ wait 20
 gosub setupBank      ; Configuración de la posición del banco y el cofre.
 gosub setupHorno     ; Configuración del Horno.
 
+;========================================================
+;
+; ******************* LOOP PRINCIPAL ********************
+;
+;========================================================
 loop:
 gosub checkskill
-;gosub checkHungry
+gosub checkHungry
 finditem %ID_horno G_3
 if #FINDCNT > 0
    {
@@ -113,64 +125,102 @@ if #FINDCNT > 0
                if #FINDCNT > 0
                   {
                     set %ID_alimentos_crudos #FINDID
-                    ; Encender el Horno.
+                    ; Comprobar el Horno...
                     set #LOBJECTID %ID_horno
+                    set %jstart #jindex ; Comprobamos el horno.
                     event macro 17
                     target
-                    set #LTARGETID %ID_combustible
-                    set #LTARGETKIND 1
-                    event macro 22
-                    wait 20
-                    ; Seleccionar la Herramienta de Cocina.
-                    set #LOBJECTID %ID_horno
-                    event macro 17
-                    target
-                    set #LTARGETID %ID_herramientas
-                    set #LTARGETKIND 1
-                    event macro 22
-                    wait 20
-                    ; Usar el Horno con los alimentos.
-                    set #LOBJECTID %ID_horno
-                    event macro 17
-                    target
-                    set #LTARGETID %ID_alimentos_crudos
-                    set #LTARGETKIND 1
-                    event macro 22
-                    set %jstart #jindex ; Esperamos a que el horno esté disponible de nuevo.
-                    gosub wait_for MSG El_horno_se_apaga 400
-                    ; Descargar los alimentos cocinados si hay muchos o vamos pasados de peso...
-                    finditem %alimentos_cocinados C_ , #BACKPACKID
-                    if #FINDSTACK > %stack_alimentos
-                       {
-                         set #SYSMSGCOL 73
-                         event sysmessage Descargando alimentos...
-                         wait 20
-                         gosub goto_bank
-                         gosub dejarCocinadosBank
-                       }
+                    gosub wait_for MSG esta_apagado no_esta_encendido esta_encendido 40
+                    if ( #TRUE in #RESULT )
+                         {
+                           if ( esta_apagado in #RESULT || no_esta_encendido in #RESULT )
+                                {
+                                  set #LTARGETID %ID_combustible
+                                  set #LTARGETKIND 1
+                                  event macro 22
+                                  wait 20
+                                  set #LOBJECTID %ID_horno
+                                  event macro 17
+                                  target
+                                  goto _cocina
+                                }
+                           if ( esta_encendido in #RESULT ) ; Usar el Horno con los alimentos.
+                                {
+                                  _cocina:
+                                  finditem %alimentos_crudos C_ , #BACKPACKID
+                                  if #FINDCNT = 0
+                                     {
+                                       key ESC ; Limpiamos el puntero del target.
+                                       goto loop
+                                     }
+                                  set #LTARGETID %ID_alimentos_crudos
+                                  set #LTARGETKIND 1
+                                  event macro 22
+                                  set %jstart #jindex ; Esperamos a que el horno esté disponible de nuevo.
+                                  gosub wait_for MSG Alimentas Selecciona El_horno_se_apaga esta_apagado no_esta_encendido Logras Pones Fallas 400
+                                  if ( #TRUE in #RESULT )
+                                       {
+                                         if ( Selecciona in #RESULT )
+                                              {
+                                                gosub selectPuchero
+                                                set #LOBJECTID %ID_horno
+                                                event macro 17
+                                                target
+                                                goto _cocina
+                                              }
+                                         if ( Logras in #RESULT || Pones in #RESULT )
+                                              {
+                                                goto loop
+                                              }
+                                         if ( Fallas in #RESULT )
+                                              {
+                                                set #LOBJECTID %ID_horno
+                                                event macro 17
+                                                target
+                                                goto _cocina
+                                              }
+                                         if ( El_horno_se_apaga in #RESULT || esta_apagado in #RESULT no_esta_encendido in #RESULT )
+                                              {
+                                                goto loop
+                                              }
+                                       }
+                                }
+                         }
                   }
                   else ; Reponemos alimentos...
                      {
                        set #SYSMSGCOL 88
-                       event sysmessage Repondiendo ALIMENTOS...
+                       event sysmessage Reponiendo...
+                       wait 20
                        gosub goto_bank
+                       gosub dejarAlimentos
                        gosub pillarDelBank %alimentos_crudos
+                       gosub pillarDelBank %herramientas
+                       gosub pillarDelBank %combustible
                      }
              }
              else ; Reponemos herramientas...
                 {
                   set #SYSMSGCOL 88
-                  event sysmessage Repondiendo HERRAMIENTAS...
+                  event sysmessage Reponiendo...
+                  wait 20
                   gosub goto_bank
+                  gosub dejarAlimentos
                   gosub pillarDelBank %herramientas
+                  gosub pillarDelBank %combustible
+                  gosub pillarDelBank %alimentos_crudos
                 }
         }
         else ; Reponemos combustible...
            {
              set #SYSMSGCOL 88
-             event sysmessage Repondiendo COMBUSTIBLE...
+             event sysmessage Reponiendo...
+             wait 20
              gosub goto_bank
+             gosub dejarAlimentos
              gosub pillarDelBank %combustible
+             gosub pillarDelBank %herramientas
+             gosub pillarDelBank %alimentos_crudos
            }
    }
    else
@@ -181,6 +231,48 @@ if #FINDCNT > 0
         gosub goto_horno
       }
 goto loop
+;========================================================
+;
+; ***************** FIN LOOP PRINCIPAL *****************
+;
+;========================================================
+
+sub selectPuchero ; Seleccionar la Herramienta de Cocina.
+finditem %herramientas C_ , #BACKPACKID
+if #FINDCNT > 0
+   {
+     set %ID_herramientas #FINDID
+     set #LOBJECTID %ID_horno
+     event macro 17
+     target
+     set #LTARGETID %ID_herramientas
+     set #LTARGETKIND 1
+     event macro 22
+     wait 20
+   }
+   else ; Reponemos herramientas...
+      {
+        set #SYSMSGCOL 88
+        event sysmessage Reponiendo...
+        wait 20
+        gosub goto_bank
+        gosub dejarAlimentos
+        gosub pillarDelBank %herramientas
+        gosub pillarDelBank %combustible
+        gosub pillarDelBank %alimentos_crudos
+      }
+return
+
+sub dejarAlimentos
+finditem %alimentos_cocinados C_ , #BACKPACKID
+if #FINDSTACK >= %stack_alimentos
+   {
+     set #SYSMSGCOL 73
+     event sysmessage Descargando alimentos...
+     wait 20
+     gosub dejarCocinadosBank
+   }
+return
 
 sub dejarCocinadosBank ; <==============================>
 _abreBank0:
@@ -214,6 +306,15 @@ if #SCNT >= %bank_timer
                   wait 30
                   goto _dejarComida
                 }
+             _dejarPS:
+             finditem TVH C_ , #BACKPACKID ; Pergaminos de poder o "Receta de cocina para el Aprendidaje"
+             if #FINDCNT > 0
+                {
+                  exevent drag #FINDID #FINDSTACK
+                  exevent dropC %bolsa_pergaminos_recompensa
+                  wait 30
+                  goto _dejarPS
+                }
              return
            }
    }
@@ -229,7 +330,7 @@ if #SCNT >= %bank_timer
      if #CONTID <> %bank_ID ; El banco está cerrado...
         {
           event macro 1 0 Bank
-          wait 20
+          wait 40
           gosub wait_for GUMP %bank_ID 40 ; Esperar a que se abra el cofre del banco
           if ( #TRUE in #RESULT )
                {
@@ -248,11 +349,28 @@ if #SCNT >= %bank_timer
              finditem %item C_ , %bank_ID
              if %item = %combustible || %item = %alimentos_crudos
                 {
-                  if #FINDSTACK >= %stack_materiales
+                  if %item = %alimentos_crudos
                      {
-                       exevent drag #FINDID %stack_materiales
-                       exevent dropC #BACKPACKID
-                       wait 30
+                       set %stack_material %stack_alimentos
+                     }
+                     else
+                        {
+                          if %item = %combustible
+                             {
+                               set %stack_material %stack_combustible
+                             }
+                        }
+                  if #FINDSTACK >= %stack_material
+                     {
+                       set %ID_Item_Stack #FINDID
+                       finditem %item C_ , #BACKPACKID
+                       if #FINDSTACK < %stack_material
+                          {
+                            set %debocoger %stack_material - #FINDSTACK
+                            exevent drag %ID_Item_Stack %debocoger
+                            exevent dropC #BACKPACKID
+                            wait 30
+                          }
                      }
                      else
                         {
@@ -266,21 +384,38 @@ if #SCNT >= %bank_timer
                    {
                      if %item = %herramientas
                         {
-                          if #FINDCNT > 0
+                          finditem %item C_ , #BACKPACKID
+                          if #FINDCNT < %num_herramientas
                              {
-                               exevent drag #FINDID 1
-                               exevent dropC #BACKPACKID
-                               wait 30
+                               set %debocoger %num_herramientas - #FINDCNT
+                               set #LOBJECTID %bolsa_herramientas
+                               event macro 17
+                               gosub wait_for GUMP %bolsa_herramientas 40
+                               finditem %item C_ , %bolsa_herramientas
+                               if #FINDCNT > 0
+                                  {
+                                    for %h 1 %debocoger
+                                        {
+                                          finditem %item C_ , %bolsa_herramientas
+                                          if #FINDCNT > 0
+                                             {
+                                               exevent drag #FINDID 1
+                                               exevent dropC #BACKPACKID
+                                               wait 30
+                                             }
+                                        }
+                                  }
+                                  else
+                                     {
+                                       set #SYSMSGCOL 38
+                                       event sysmessage FALTAN MATERIALES! :-(
+                                       halt
+                                     }
+                               return
                              }
-                             else
-                                {
-                                  set #SYSMSGCOL 38
-                                  event sysmessage FALTAN MATERIALES! :-(
-                                  halt
-                                }
-                             return
+                          return
                         }
-                   }
+           }
    }
  wait 20
  goto _abreBank1
@@ -307,6 +442,9 @@ onhotkey ESC
                      set #SYSMSGCOL 88
                      event sysmessage OK: Bank %bank_ID
                      wait 40
+                     gosub pillarDelBank %herramientas
+                     gosub pillarDelBank %combustible
+                     gosub pillarDelBank %alimentos_crudos
                      gosub wait_for GUMP %bank_ID CLOSE ; Cerrar el cofre del banco...
                      return
                    }
@@ -416,18 +554,41 @@ if ( H Notin #CHARSTATUS ) && ( #CHARGHOST <> YES )
 return
 
 sub setupHorno ;<====================>
+set %ID_horno N/A
 _setupHorno:
 set #SYSMSGCOL 73
 event sysmessage Nos vamos al HORNO...
+wait 40
 gosub goto_horno
 finditem YOB_BPB G_3
 if #FINDCNT > 0
    {
-     set %ID_horno #FINDID
-     set #SYSMSGCOL 88
-     event sysmessage [ OK ] ID HORNO: %ID_horno
-     wait 40
+     for #FINDINDEX 1 #FINDCNT
+         {
+           if #FINDCOL = 451
+              {
+                GOSUB FindThingsDir #FINDX #FINDY Orientacion
+                if #FINDDIST <= 3 && %orientacion = 7 ; Es el Horno que tenemos justo en frente (el que está más a la derecha es orientación 0 (cero).
+                   {
+                     set %ID_horno #FINDID
+                     set #SYSMSGCOL 88
+                     event sysmessage [ OK ] ID HORNO: %ID_horno
+                     wait 40
+                   }
+              }
+         }
+     if %ID_horno = N/A
+        {
+          goto _noHayHorno
+        }
    }
+   else
+      {
+        _noHayHorno:
+        set #SYSMSGCOL 38
+        event sysmessage NO ENCUENTRO EL HORNO! :-(
+        halt
+      }
 return
 
 sub goto_horno
@@ -445,7 +606,7 @@ if #FINDCNT > 0
           gosub WalkThroughDoor KOJRJMD
         }
    }
-gosub pathLoop 1450 1616 20
+gosub pathLoop 1451 1615 20
 return
 
 sub goto_bank
@@ -809,4 +970,3 @@ return #result
 
 wait 1
 goto _lets_wait_for_a_message
-
