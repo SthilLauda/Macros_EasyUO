@@ -5,7 +5,7 @@
 ;  ||   ||   ||    ||     ||   || || ||  .|''||    //     \\    ||   ||  .|''||   ||  ||   //  .|''||
 ;  `|...|'  .||.   `|..' .||. .||    ||. `|..||. .//       \\. .||. .||. `|..||. .||  ||. /... `|..||.
 ; =====================================================================================================
-; Script Name: Cocinar
+; Script Name: Cocinar [Britain Bank]
 ;                            _          _
 ;                           (c)___c____(c)
 ;                            \ ........../
@@ -41,19 +41,19 @@
 ;               ~~~        ~~         ~~           ~~
 ; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~      `"""""""`
 ;
-set %version v1.3_BETA 
+set %version v1.4
 ;
 ; Author: Sthil Lauda
-; Version: 1.3_BETA
+; Version: 1.4
 ; Client Tested with: 2.0.3
 ; EUO version tested with: 1.5 Version 142
 ; Shard: Ultima Alianza (¡Hasta la muerte!)
 ; Fecha: 07/12/2019
-; Actualizada 13/03/2020
+; Actualizada: 13/03/2020
 ; Purpose: Cocina pescado y carne para subir la skill de cocinar.
-; Instrucciones; Necesitas filetes de pescado o filetes de carne cruda,
-;                troncos o ramas para encender el horno, herramientas de cocinar, y el horno.
-;                Ir al banco de Britain con los materiales en el banco y darle al play :P
+; Instrucciones; Poner en el primer nivel del cofre del banco de Britain, un buen montón de filetes de pescado
+;                o filetes de carne cruda, troncos o ramas para encender el horno, y herramientas de cocinar en una bolsa.
+;                También le puedes cargar de peso a mano echándole al principio más herramientas o alimentos.
 ;------------------------------------------------------
 ;________________________________
 ;
@@ -62,10 +62,10 @@ set %version v1.3_BETA
 ; ///////////////////////////////
 ;________________________________
 ;
-set %bolsa_herramientas NRTHUND          ; Bolsa con herramientas de cocina.
-SET %bolsa_pergaminos_recompensa XGNDCPD ; Bolsa para dejar los pergaminos que da el horno, para subir 0.1 con cada pergamino.
-set %num_herramientas 10                 ; Numero de sartenes, cazos, etc, en la mochila.
-set %stack_alimentos 200                 ; Montón de alimentos y troncos a procesar en la mochila.
+set %bolsa_herramientas NRTHUND          ; Bolsa con herramientas de cocina en el primer nivel del cofre.
+set %bolsa_pergaminos_recompensa XGNDCPD ; Bolsa para dejar los pergaminos que da el horno, para subir 0.1 con cada uno de ellos.
+set %num_herramientas 20                 ; Numero de sartenes, cazos, etc, en la mochila.
+set %stack_alimentos 600                 ; Cantidad de alimentos y troncos a procesar en la mochila.
 set %stack_combustible 25                ; Cantidad de troncos o ramas en la mochila.
 set %tiempo_alimentacion 360             ; Cada cuantos segundos comprobar el hambre.
 ;________________________________________________
@@ -265,7 +265,7 @@ return
 
 sub dejarAlimentos
 finditem %alimentos_cocinados C_ , #BACKPACKID
-if #FINDSTACK >= %stack_alimentos
+if #FINDSTACK > 0
    {
      set #SYSMSGCOL 73
      event sysmessage Descargando alimentos...
@@ -408,7 +408,7 @@ if #SCNT >= %bank_timer
                                   else
                                      {
                                        set #SYSMSGCOL 38
-                                       event sysmessage FALTAN MATERIALES! :-(
+                                       event sysmessage FALTAN HERRAMIENTAS! :-(
                                        halt
                                      }
                                return
