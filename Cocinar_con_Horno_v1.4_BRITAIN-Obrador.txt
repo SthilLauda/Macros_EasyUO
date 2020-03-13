@@ -54,6 +54,8 @@ set %version v1.4
 ; Instrucciones; Poner en el primer nivel del cofre del banco de Britain, un buen montón de filetes de pescado
 ;                o filetes de carne cruda, troncos o ramas para encender el horno, y herramientas de cocinar en una bolsa.
 ;                También le puedes cargar de peso a mano echándole al principio más herramientas o alimentos.
+;              - Si tienes la skill de Identificar objetos, irá usando los pergaminos de poder que da el horno, 
+;                subiendo 0.1 de habilidad extra con cada uno de ellos :D
 ;------------------------------------------------------
 ;________________________________
 ;
@@ -310,10 +312,30 @@ if #SCNT >= %bank_timer
              finditem TVH C_ , #BACKPACKID ; Pergaminos de poder o "Receta de cocina para el Aprendidaje"
              if #FINDCNT > 0
                 {
-                  exevent drag #FINDID #FINDSTACK
-                  exevent dropC %bolsa_pergaminos_recompensa
-                  wait 30
-                  goto _dejarPS
+                  chooseskill Item real ; Podemos identificarlos...
+                  if #SKILL >= 1000
+                     {
+                       for #FINDINDEX 1 #FINDCNT
+                           {
+                             event macro 13 3 ; Item ID
+                             target
+                             set #LTARGETID #FINDID
+                             set #LTARGETKIND 1
+                             event macro 22
+                             wait 20
+                             set #LOBJECTID #FINDID
+                             event macro 17
+                             wait 20
+                             gosub checkskill ; Comprobar GM cocina.
+                           }
+                     }
+                     else
+                        {
+                          exevent drag #FINDID #FINDSTACK
+                          exevent dropC %bolsa_pergaminos_recompensa
+                          wait 30
+                          goto _dejarPS
+                        }
                 }
              return
            }
@@ -629,6 +651,7 @@ gosub pathLoop 1456 1659 10
 return
 
 sub checkskill ;<====================>
+_check:
 chooseskill Cook real
 if #SKILL >= 1000
    {
