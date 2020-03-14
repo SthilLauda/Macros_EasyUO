@@ -41,21 +41,19 @@
 ;               ~~~        ~~         ~~           ~~
 ; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~      `"""""""`
 ;
-set %version v1.4
+set %version v1.5
 ;
 ; Author: Sthil Lauda
-; Version: 1.4
+; Version: 1.5
 ; Client Tested with: 2.0.3
 ; EUO version tested with: 1.5 Version 142
 ; Shard: Ultima Alianza (¡Hasta la muerte!)
 ; Fecha: 07/12/2019
-; Actualizada: 13/03/2020
+; Actualizada: 14/03/2020
 ; Purpose: Cocina pescado y carne para subir la skill de cocinar.
 ; Instrucciones; Poner en el primer nivel del cofre del banco de Britain, un buen montón de filetes de pescado
 ;                o filetes de carne cruda, troncos o ramas para encender el horno, y herramientas de cocinar en una bolsa.
 ;                También le puedes cargar de peso a mano echándole al principio más herramientas o alimentos.
-;              - Si tienes la skill de Identificar objetos, irá usando los pergaminos de poder que da el horno, 
-;                subiendo 0.1 de habilidad extra con cada uno de ellos :D
 ;------------------------------------------------------
 ;________________________________
 ;
@@ -91,7 +89,6 @@ set %proxima_vez #SCNT
 set *esperando #FALSE
 set %hid_timer #SCNT2               ; Reloj.
 set %bank_timer #SCNT               ; Reloj.
-set #LPC 1000
 
 set #SYSMSGCOL 88
 event sysmessage =============
@@ -287,7 +284,7 @@ if #SCNT >= %bank_timer
           gosub wait_for GUMP %bank_ID 40 ; Esperar a que se abra el cofre del banco
           if ( #TRUE in #RESULT )
                {
-                 goto _dejarComida
+                 goto _dejarPS
                }
                else
                   {
@@ -299,35 +296,31 @@ if #SCNT >= %bank_timer
         }
         else ; El banco ya está abierto... :-)
            {
-             _dejarComida:
-             finditem %alimentos_cocinados C_ , #BACKPACKID
-             if #FINDCNT > 0
-                {
-                  exevent drag #FINDID #FINDSTACK
-                  exevent dropC %bank_ID
-                  wait 30
-                  goto _dejarComida
-                }
              _dejarPS:
              finditem TVH C_ , #BACKPACKID ; Pergaminos de poder o "Receta de cocina para el Aprendidaje"
              if #FINDCNT > 0
                 {
+                  set %num_PS #FINDCNT
                   chooseskill Item real ; Podemos identificarlos...
                   if #SKILL >= 1000
                      {
-                       for #FINDINDEX 1 #FINDCNT
-                           {
-                             event macro 13 3 ; Item ID
-                             target
-                             set #LTARGETID #FINDID
-                             set #LTARGETKIND 1
-                             event macro 22
-                             wait 20
-                             set #LOBJECTID #FINDID
-                             event macro 17
-                             wait 20
-                             gosub checkskill ; Comprobar GM cocina.
-                           }
+                       _PS:
+                       finditem TVH C_ , #BACKPACKID
+                       if #FINDCNT > 0 && #FINDCOL = 538 ; PS de cocina, color rojo.
+                          {
+                            event macro 13 3 ; Item ID
+                            target
+                            set #LTARGETID #FINDID
+                            set #LTARGETKIND 1
+                            event macro 22
+                            wait 20
+                            set #LOBJECTID #FINDID
+                            event macro 17
+                            wait 20
+                            gosub comprobar_comida
+                            gosub checkskill ; Comprobar GM cocina.
+                            goto _PS
+                          }
                      }
                      else
                         {
@@ -336,6 +329,15 @@ if #SCNT >= %bank_timer
                           wait 30
                           goto _dejarPS
                         }
+                }
+             _dejarComida:
+             finditem %alimentos_cocinados C_ , #BACKPACKID
+             if #FINDCNT > 0
+                {
+                  exevent drag #FINDID #FINDSTACK
+                  exevent dropC %bank_ID
+                  wait 30
+                  goto _dejarComida
                 }
              return
            }
@@ -445,7 +447,7 @@ return
 
 sub setupBank ; <==============================>
 display OK *********************** [ BANK ] ***********************$$
-         + Acércate hasta el banco y pulsa la tecla ESCAPE. $$
+         + Acércate a la farola o a la papelera del banco y pulsa la tecla ESCAPE. $$
          + ********************************************************
 _hotLoop:
 onhotkey ESC
@@ -498,15 +500,7 @@ repeat
        set %old_pos_Y #CHARPOSY
        set %old_pos_Z #CHARPOSZ
        event pathfind %destino_x %destino_y %destino_z
-       if ( %hiding )
-            {
-              wait 40
-            }
-            else
-               {
-                 wait 10
-               }
-       gosub hiding ; Ocultarse.
+       wait 20
      }
      until ( #CHARPOSX = %destino_x && #CHARPOSY = %destino_y && #CHARPOSZ = %destino_z )
 return
@@ -582,22 +576,22 @@ set #SYSMSGCOL 73
 event sysmessage Nos vamos al HORNO...
 wait 40
 gosub goto_horno
-finditem YOB_BPB G_3
+finditem YOB_BPB_EPB G_3
 if #FINDCNT > 0
    {
      for #FINDINDEX 1 #FINDCNT
          {
-           if #FINDCOL = 451
-              {
-                GOSUB FindThingsDir #FINDX #FINDY Orientacion
-                if #FINDDIST <= 3 && %orientacion = 7 ; Es el Horno que tenemos justo en frente (el que está más a la derecha es orientación 0 (cero).
-                   {
-                     set %ID_horno #FINDID
-                     set #SYSMSGCOL 88
-                     event sysmessage [ OK ] ID HORNO: %ID_horno
-                     wait 40
-                   }
-              }
+           if ( #FINDCOL = 451 ) ; Un horno que esté sin encender, libre para nosotros solos.
+                {
+                  if ( #FINDX = 1448 && #FINDY = 1615 ) || ( #FINDX = 1448 && #FINDY = 1614 ) || ( #FINDX = 1448 && #FINDY = 1612 ) || ( #FINDX = 1448 && #FINDY = 1612 )
+                       {
+                         set %ID_horno #FINDID
+                         set #SYSMSGCOL 88
+                         event sysmessage [ OK ] ID HORNO: %ID_horno
+                         wait 40
+                         return
+                       }
+                }
          }
      if %ID_horno = N/A
         {
@@ -628,7 +622,9 @@ if #FINDCNT > 0
           gosub WalkThroughDoor KOJRJMD
         }
    }
-gosub pathLoop 1451 1615 20
+gosub pathLoop 1452 1616 20
+gosub pathLoop 1449 1616 20
+gosub pathLoop 1450 1613 20
 return
 
 sub goto_bank
@@ -648,6 +644,7 @@ gosub pathLoop 1465 1635 20
 gosub pathLoop 1465 1647 17
 gosub pathLoop 1465 1657 10
 gosub pathLoop 1456 1659 10
+gosub pathLoop %bank_x %bank_y %bank_z
 return
 
 sub checkskill ;<====================>
@@ -717,6 +714,91 @@ sub comprobar_comida ;<==============================>
           }
        return
      } ; FIN While
+}
+return
+
+;===========================================================
+; Name: pathFind
+; Author: ScriptFellow (the.WZA)
+; Parameters: %1 = X
+;             %2 = Y
+;             %3 = Z
+;             %4 = tolerance
+;             %5 = timeout (in seconds)
+; Purpose: Pathfind to the given coordinates
+; Return: %return (#true or #false )
+;-----------------------------------------------------------
+sub pathFind
+set %_x %1
+set %_y %2
+if %0 <= 2 || %2 = N/A
+   set %_z -1
+else
+   set %_z %3
+if %0 <= 3 || %3 = N/A
+   set %_tolerance 0
+else
+   set %_tolerance %4
+if %0 <= 4
+   set %_endTime #sCnt + 15
+else
+   set %_endTime #sCnt + %5
+set %return #false
+deleteJournal
+scanJournal 2
+event PathFind %_x %_y %_z
+_pathFindScanAgain:
+scanJournal 1
+if pathfinding in #journal
+   goto _pathFindOkay
+if can't_get_there in #journal || #sCnt > %_endTime
+   return
+goto _pathFindScanAgain
+_pathFindOkay:
+gosub _pathFindDist %_x %_y %_z #charPosX #charPosY #charPosZ
+set %return %return <= %_tolerance
+if %return
+{
+   if %_tolerance > 0
+   {
+      set %1 #cliLeft + #cliXRes / 2
+      set %2 #cliTop + #cliYRes / 2
+      if #charDir < 3
+          set %1 %1 + 1
+      else
+      {
+         if #charDir > 3 && #charDir < 7
+            set %1 %1 - 1
+      }
+      if #charDir = 0 || #charDir = 6
+         set %2 %2 - 1
+      else
+      {
+         if #charDir > 1 && #charDir < 5
+            set %2 %2 + 1
+      }
+      click %1 %2 R
+   }
+   return
+}
+if #sCnt > %_endTime
+   return
+goto _pathFindOkay
+
+sub _pathFindDist
+set %1 %1 - %4 abs
+set %2 %2 - %5 abs
+set %3 %3 - %6 abs
+gosub max %1 %2 %3
+return
+
+; to be defined
+sub max
+set %return %1
+for %_idx 2 %0
+{
+   if % . %_idx > %return
+   set %return % . %_idx
 }
 return
 
