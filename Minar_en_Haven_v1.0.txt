@@ -1,0 +1,202 @@
+;*************************************************
+; Macro para MINAR (Heaven) by OverQueen
+;*************************************************
+set #SYSMSGCOL 10
+event sysmessage Macro para acumular hierro by OverQueen
+wait 20
+
+;*************************************************
+;            CONFIGURACIONES (EDITAR)
+;*************************************************
+set %Bolsa ONABKPD
+set %locs LOCATIONS_PISADAS
+set %lugaro 2440
+set %lugarp X
+set %borrado 0
+Set %Pico NPF_QPF
+
+;*************************************************
+;                  MINAR
+;*************************************************
+Inicio:
+GoSub EvitarExpulsion
+GoSub CompruebaPeso
+
+findItem %Pico C_ , #CharID
+if #FINDCNT = 0
+       {
+       findItem %Pico C_ , #BackpackID
+       if #FINDCNT = 0
+            {
+            set #sysmsgcol 33
+            event sysmessage no tienes pico :(
+            halt
+            }
+          exevent drag #FINDID #findstack
+          wait 5
+          exevent droppd
+          wait 10
+       }
+    set #LOBJECTID #FINDID
+    set %cmsg #jIndex
+    event macro 17
+    wait 10
+    set %fmsg #jIndex
+    for %i %cmsg %fmsg
+    {
+        scanJournal %i
+        if donde_quieres in #journal
+        {
+            set %seguridad 0
+            GoSub Picar
+        }
+    }
+goto Inicio:
+
+Sub Picar
+    set %cmsg #jIndex
+    set #lTargetX #CHARPOSX
+    set #lTargetY #CHARPOSY + 1
+    set #lTargetKind 3
+    target 5s
+    event macro 22
+    wait 10
+    set %fmsg #jIndex
+    for %i %cmsg %fmsg
+    {
+        scanJournal %i
+        if pones in #journal || No_encuentras in #journal
+        {
+            goto Inicio:
+        }
+        if Aqui_no_hay_nada_por in #journal || Prueba_a in #journal
+        {
+            goto moverse
+        }
+    }
+    gosub seguridad
+GoSub Picar
+
+moverse:
+
+    if #CHARPOSX , _ , #CHARPOSY notIn %locs
+    {
+        set %borrado %borrado + 3
+        if %borrado > 100
+        {
+            set %locs LOCATIONS_PISADAS
+            set %borrado 0
+        }
+        set %locs %locs , _ , #CHARPOSX , _ , #CHARPOSY
+    }
+    if %lugarp = X
+    {
+        if %lugaro < #CHARPOSX
+        {
+            for %i 1 6
+            {
+                event macro 5 7
+                wait 10
+            }
+        }
+    }
+    if %lugarp = Y
+    {
+        if %lugaro < #CHARPOSY
+        {
+            for %i 1 6
+            {
+                event macro 5 1
+                wait 10
+            }
+        }
+    }
+
+    set %mover #random % 9
+    event macro 5 %mover
+    wait 20
+    event macro 5 %mover
+    wait 20
+    if #CHARPOSX , _ , #CHARPOSY in %locs
+        goto moverse
+goto Inicio:
+
+sub seguridad
+{
+	set %seguridad %seguridad + 1
+	if %seguridad > 15
+	{
+		set %seguridad 0
+		goto Inicio:
+	}
+	return
+}
+
+;*************************************************
+;                 DEJAR MINERAL
+;*************************************************
+Sub CompruebaPeso
+if ( #weight + 30 > #maxweight  )
+    {
+        event SysMessage Vamos a guardar el mineral
+        if #CHARPOSY > 80 ; está en la mina de la izquierda
+        {
+        set %CHARPOSX 2438
+        set %CHARPOSY 94
+        set %CHARPOSXX 2430
+        set %CHARPOSYY 95
+        move 2428 95 a
+        move 2452 95 a
+        move 2457 90 a
+        }
+        if #CHARPOSY < 70 ; está en la mina de la derecha
+        {
+        set %CHARPOSX 2472
+        set %CHARPOSY 64
+        set %CHARPOSXX 2477
+        set %CHARPOSYY 59
+             move 2476 55 a
+             move 2476 59 a
+             move 2472 63 a
+             move 2472 73 a
+        }
+    msg $ bank $
+    wait 20
+    GoSub DejarMineral
+    }
+return
+
+Sub DejarMineral
+{
+    finditem DWJ C_ , #BACKPACKID ; Corregido BUG que impedía dejar el mineral [ Sthil Lauda ]
+    if #FINDSTACK > 0
+       {
+        wait 15
+        Exevent Drag #findid #findstack
+        wait 20
+        Exevent Dropc %Bolsa
+        wait 20
+        GoSub DejarMineral
+        }
+        move %CHARPOSX %CHARPOSY
+        move %CHARPOSXX %CHARPOSYY
+    }
+return
+
+
+;*************************************************
+;             EVITAR SER EXPULSADO
+;*************************************************
+
+Sub EvitarExpulsion
+chooseskill Mini real
+ if ( #SKILL >= 648 ) && ( #skillLock <> locked )
+ {
+   Exevent skilllock mini locked
+   if #skillLock <> locked
+   {
+      event SysMessage La habilidad de minar no pudo ser bloqueada, macro detenida
+   }
+   event SysMessage La habilidad de minar ha sido bloqueada
+ }
+return
