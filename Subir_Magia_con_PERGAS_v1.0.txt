@@ -1,0 +1,435 @@
+; ======================================================================================================
+;  '||   ||` '||`   ||                                 /.\      '||`
+;   ||   ||   ||    ||     ''                         // \\      ||   ''
+;   ||   ||   ||  ''||''   ||  '||),,(|,   '''|.     //...\\     ||   ||   '''|.  `||''|,  '''/  '''|.
+;   ||   ||   ||    ||     ||   || || ||  .|''||    //     \\    ||   ||  .|''||   ||  ||   //  .|''||
+;   `|...|'  .||.   `|..' .||. .||    ||. `|..||. .//       \\. .||. .||. `|..||. .||  ||. /... `|..||.
+; ======================================================================================================
+;
+; Nombre Script: Magery [ PERGAMINOS ]
+;                                   ....
+;                                 .'' .'''
+; .                             .'   :
+; \\                          .:    :
+;  \\                        _:    :       ..----.._
+;   \\                    .:::.....:::.. .'         ''.
+;    \\                 .'  #-. .-######'     #        '.
+;     \\                 '.##'/ ' ################       :
+;      \\                  #####################         :
+;       \\               ..##.-.#### .''''###'.._        :
+;        \\             :--:########:            '.    .' :
+;         \\..__...--.. :--:#######.'   '.         '.     :
+;         :     :  : : '':'-:'':'::        .         '.  .'
+;         '---'''..: :    ':    '..'''.      '.        :'
+;            \\  :: : :     '      ''''''.     '.      .:
+;             \\ ::  : :     '            '.      '      :
+;              \\::   : :           ....' ..:       '     '.
+;               \\::  : :    .....####\\ .~~.:.             :
+;                \\':.:.:.:'#########.===. ~ |.'-.   . '''.. :
+;                 \\    .'  ########## \ \ _.' '. '-.       '''.
+;                 :\\  :     ########   \ \      '.  '-.        :
+;                :  \\'    '   #### :    \ \      :.    '-.      :
+;               :  .'\\   :'  :     :     \ \       :      '-.    :
+;              : .'  .\\  '  :      :     :\ \       :        '.   :
+;              ::   :  \\'  :.      :     : \ \      :          '. :
+;              ::. :    \\  : :      :    ;  \ \     :           '.:
+;               : ':    '\\ :  :     :     :  \:\     :        ..'
+;                  :    ' \\ :        :     ;  \|      :   .'''
+;                  '.   '  \\:                         :.''
+;                   .:..... \\:       :            ..''
+;                  '._____|'.\\......'''''''.:..'''
+;                             \\
+; Author: Sthil Lauda
+; Version: 1.0
+; Client Tested with: 4.0.5b
+; EUO Version tested with: V1.42 (Build 009B)
+; Shard OSI / FS: (Ultima Alianza)
+; Public Release: 14/08/2019
+; Revised On: 29/03/2020
+; Propósito: Entrena la skill de Magia usando pergaminos de flecha mágica.
+; Configuración: Ninguna.
+set %version 1.0
+set #SYSMSGCOL 88
+event sysmessage =====================
+set #SYSMSGCOL 53
+event sysmessage Magia PERGAS %version
+set #SYSMSGCOL 88
+event sysmessage =====================
+wait 40
+set #SYSMSGCOL 88
+event sysmessage HAZ CLICK EN LA BOLSA DE PERGAS
+set #TARGCURS 1
+while #TARGCURS = 1
+      {
+        wait 1
+      }
+set %cofre #LTARGETID     ; ID del cofre con los pergas
+set #LOBJECTID %cofre
+event macro 17
+gosub wait_for GUMP %cofre 40
+set #SYSMSGCOL 73
+event sysmessage HAZ CLICK EN EL PERSONAJE OBJETIVO
+set #TARGCURS 1
+while #TARGCURS = 1
+      {
+        wait 1
+      }
+set %objetivo #LTARGETID   ; ID PJ que sube res magica
+; ----------------------------------------------------
+set %pergas CYL
+set %comida RGG_NRD_QSD_ZBG_WLI
+  +_QRD_END_FUD_YLI_WLI_HGI_JQE
+  +_KGI_EGI_QLI_KLI_MLI_KRD_HQD
+  +_AQD_MQE_VQE_TQE_IQE_PQD_QQD
+  +_GQE_SPE_ZPE_OQE_BDF_KPE_RQE
+  +_YSD_SQD_AXI
+set %tiempo_actual #SCNT
+set %proxima_vez_comer #SCNT
+set %tiempo_alimentacion 360 ; Cada cuántos segundos va a comprobar si tiene hambre.
+; ----------------------------------------------------
+
+loop:
+gosub checkHungry
+gosub checkskill
+finditem %pergas C_ , #BACKPACKID
+if #FINDCNT > 0
+   {
+     set #LOBJECTID #FINDID
+     event macro 17
+     target 3s
+     finditem %objetivo G_20
+     if #FINDCNT > 0 ; Todavía sigue ahí... xD
+        {
+          set #LTARGETID #FINDID
+          set #LTargetKind 1
+          event macro 22
+          wait 10
+        }
+        else
+           {
+             key ESC
+             set #SYSMSGCOL 38
+             event sysmessage EL OBJETIVO HA DESAPARECIDO! :-(
+             halt
+           }
+     if #MANA < 3
+        {
+          gosub meditar
+        }
+   }
+   else
+      {
+        gosub perga
+      }
+goto loop
+
+sub checkHungry
+set %tiempo_actual #SCNT
+if %proxima_vez_comer <= %tiempo_actual
+   {
+     gosub comprobar_comida
+   }
+return
+
+sub checkSkill
+chooseskill Mage real
+if #SKILL >= 1000
+   {
+     set #SYSMSGCOL 73
+     event sysmessage SOMOS GM MAGERY! :-)
+     halt
+   }
+return
+
+sub meditar ; <==============================>
+_reMedit:
+if #MANA >= #MAXMANA ; Tenemos el maná a tope (por si nos están cantando, etc...)
+   {
+     wait 40
+     return
+   }
+set %jstart #jindex
+event macro 13 46
+gosub wait_for MSG pierdes trance en_paz 50
+if ( #TRUE in #result )
+     {
+       if pierdes in #result
+          {
+            goto _reMedit ; Meditamos hasta que no perdamos la concentración
+          }
+       if trance in #result
+          {
+            set %jstart #jindex
+            gosub wait_for MSG pierdes en_paz 50
+            if ( #TRUE in #result )
+                 {
+                   if pierdes in #RESULT
+                      {
+                        goto _reMedit
+                      }
+                   if en_paz in #RESULT
+                      {
+                        return
+                      }
+                 }
+                 else ; Meditamos hasta llenar la barra al máximo...
+                    {
+                      repeat
+                           {
+                             wait 20
+                           }
+                           until #MANA = #MAXMANA
+                    }
+          }
+       if en_paz in #result ; OK, estamos bien de maná.
+          {
+            return
+          }
+     }
+     else
+        {
+          goto _reMedit
+        }
+return
+
+sub perga
+finditem %pergas C_ , %cofre ;ID cofre pergas
+if #FINDCNT > 0
+   {
+     if #WEIGHT <= #MAXWEIGHT - 40
+        {
+          for #FINDINDEX 1 #FINDCNT
+              {
+                if #FINDSTACK < 100 ; Es un stack pequeño...
+                   {
+                     exevent drag #FINDID #FINDSTACK
+                     exevent dropc #BACKPACKID
+                     wait 30
+                     break
+                   }
+                   else
+                      {
+                        if #FINDSTACK >= 100 ; Es un stack decente... cojemos sólo un trozo de 100 pergas... xD
+                           {
+                             exevent drag #FINDID 100
+                             exevent dropc #BACKPACKID
+                             wait 30
+                             break
+                           }
+                      }
+              }
+        }
+   }
+   else
+      {
+        set #SYSMSGCOL 38
+        event sysmessage NO QUEDAN PERGAMINOS! :-(
+        halt
+      }
+return
+
+;=====================================================
+; Rutina para, en caso de hambre, comer hasta saciarse
+;=====================================================
+; v2.2
+sub comprobar_comida
+{
+  hambriento:
+  set %jrnl #jindex ; Marcamos un índice de las líneas del diario.
+  event macro 4 0 .hungry
+  wait 20
+  while #true
+     {
+       if #jindex > %jrnl ; Si aparece una nueva línea.
+          {
+            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de línea.
+            scanjournal %jrnl   ; La leemos...
+            if Dentro_de_1_minuto in #journal
+               {
+                 wait 140s ; Save del server...
+               }
+            if Estas_no_le_afecta_el_hambre in #journal || Estas_tan_lleno_que_no_puedes in #journal || Estas_totalmente_saciado in #journal
+               {
+                 set %proxima_vez_comer %tiempo_actual + %tiempo_alimentacion
+                 return
+               }
+               else
+                  {
+                    if Estas_lleno in #journal || Estas_contento in #journal || Estas_en_inanicion in #journal || Estas_hambriento in #journal || Sientes_mucho in #journal || Estas_con_hambre in #journal || Estas_parcialmente in #journal || Estas_bien_lleno in #journal || Te_sientes_casi_lleno in #journal
+                       {
+                         comer:
+                         finditem %comida C_ , #backpackid
+                         if #findcnt > 0
+                            {
+                              set #lobjectid #findid
+                              event macro 17
+                              wait 20
+                              goto hambriento
+                            }
+                            else ; No hay comida en la mochila...
+                               {
+                                 finditem %comida C_ , %cofre
+                                 if #findcnt > 0
+                                    {
+                                      exevent drag #findid 1
+                                      exevent dropc #BACKPACKID
+                                      wait 30
+                                      goto comer
+                                    }
+                                    else ; Y tampoco en el cofre...
+                                       {
+                                         event exmsg #CHARID 3 48 COMPRA COMIDA!! :-(
+                                         wait 40
+                                         set %proxima_vez_comer %tiempo_actual + %tiempo_alimentacion
+                                         return
+                                       }
+                               }
+                       }
+                       else ; Mensaje extraño, repetimos...
+                          {
+                            goto hambriento
+                          }
+                  }
+          }
+       return
+     } ; FIN While
+}
+return
+
+;-@ ============================== @-;
+;-@ ############################## @-;
+;-@ SUBS públicos del Foro EasyUO  @-;
+;-@ ############################## @-;
+;-@ ============================== @-;
+;
+;=================================================================
+sub wait_for
+;=================================================================
+; This "wait_for" sub package was created by Locke. If you use these subs please keep this header intact.
+; Documentation: the sub package grew to large with all the comments. To load them call the sub like this:
+; gosub wait_for docs    | or you can use doc, documention, what, or my personal favorite, kickass.
+
+; "wait_for core dispatcher" version 1.2 by Locke
+if %1 = doc || if %1 = docs || if %1 = documentation || if %1 = what || if %1 = kickass
+{
+Display ok Please click ok and wait for your browser to start.
+execute http://www.easyuo.com/forum/viewtopic.php?t=24716
+halt
+}
+nameSpace Push
+namespace local LLNS
+set #result N/A ; if #result isn't set by one of my wait_for subs it'll throw an error.
+set !LPC #lpc
+set #lpc 200
+for %i 0 %0
+set !_A . %i % . %i
+gosub wait_for_ , !_A1
+set #lpc !lpc
+namespace clear LLNS
+namespace pop
+if #result <> N/A
+return #result
+else
+display ok You specified an unknown wait_for command. Script returned #result and is halting.
+halt
+;=================================================================
+sub wait_for_MSG ; version 1.4 ~Locke
+;=================================================================
+if !_A0 < 3
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for MSG %message time_out_in_seconds$
++Script is halting
+halt
+}
+set !_timeout ( #scnt2 + !_A . !_A0 )
+_lets_wait_for_a_message:
+for %i %jstart #jindex
+{
+ scanjournal %i
+  for %ii 2 !_A0
+  {
+    if !_A . %ii in #journal && %jstart <> %i
+    set #result #true , #spc , !_A . %ii
+  }
+}
+
+if #true notin #result
+{
+set #result #false
+ if !_timeout =< #scnt2
+ return #result
+wait 1
+goto _lets_wait_for_a_message
+}
+else
+return #result
+
+wait 1
+goto _lets_wait_for_a_message
+
+;======================================================================
+sub wait_for_GUMP ; version 1.4 ~Locke
+;=================================================================
+; Añadido #CONTID ^^
+if !_A0 < 3
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for GUMP XXX_YYY time_out_in_seconds$
++Script is halting
+halt
+}
+if !_A3 <> CLOSE
+set !_timeout #scnt2 + !_A3
+else
+set !_timeout 0 ; no gump wait if %3 = CLOSE since we already believe it to be open.
+
+_lets_wait_for_a_gump:
+if #CONTSIZE = !_A2 || #CONTKIND = !_A2 || #CONTNAME = !_A2 || #CONTTYPE = !_A2 || #CONTID = !_A2
+{
+ if !_A5 <> N/A && !_A6 <> N/A
+ {
+ set !clickx !_A5 + #contposx
+ set !clicky !_A6 + #contposy
+ click !clickx !clicky
+ }
+ if !_A3 = CLOSE || if !_A4 = CLOSE || !_A5 = CLOSE || !_A6 = CLOSE
+ {
+ set !string #contsize
+ str pos !string _
+ set !pos #strres
+ str del !string #strres #strres
+ set !clickX #contposx + ( #strres / 2 )
+ str del !string 1 !pos
+ set !clickY #contposy + ( #strres / 2 )
+ click !clickx !clicky R
+ }
+return #true
+}
+
+if ( !_timeout =< #scnt2 ) && ( !_A4 = N/A )
+   {
+     return #false
+   }
+
+if !_A4 <> N/A && !_timeout =< #scnt2
+{
+finditem !_A4
+if #findkind <> -1
+{
+ for #findindex 1 #findcnt
+ {
+  if #finddist > 2
+  ignoreitem #findid LLWAITFOR
+  else
+  break
+ }
+ set #lobjectid #findid
+ event macro 17 0
+ set !_timeout #scnt2 + !_A3
+}
+else
+return #false
+}
+wait 1
+goto _lets_wait_for_a_gump
