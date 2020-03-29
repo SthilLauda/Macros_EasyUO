@@ -46,8 +46,8 @@
 ; Shard OSI / FS: (Ultima Alianza)
 ; Public Release: 14/08/2019
 ; Revised On: 29/03/2020
-; PropÛsito: Entrena la skill de Magia usando pergaminos de flecha m·gica.
-; ConfiguraciÛn: Ninguna.
+; Prop√≥sito: Entrena la skill de Magia usando pergaminos de flecha m√°gica.
+; Configuraci√≥n: Ninguna.
 set %version 1.0
 set #SYSMSGCOL 88
 event sysmessage =====================
@@ -56,6 +56,7 @@ event sysmessage Magia PERGAS %version
 set #SYSMSGCOL 88
 event sysmessage =====================
 wait 40
+
 set #SYSMSGCOL 88
 event sysmessage HAZ CLICK EN LA BOLSA DE PERGAS
 set #TARGCURS 1
@@ -85,7 +86,7 @@ set %comida RGG_NRD_QSD_ZBG_WLI
   +_YSD_SQD_AXI
 set %tiempo_actual #SCNT
 set %proxima_vez_comer #SCNT
-set %tiempo_alimentacion 360 ; Cada cu·ntos segundos va a comprobar si tiene hambre.
+set %tiempo_alimentacion 360 ; Cada cu√°ntos segundos va a comprobar si tiene hambre.
 ; ----------------------------------------------------
 
 loop:
@@ -98,7 +99,7 @@ if #FINDCNT > 0
      event macro 17
      target 3s
      finditem %objetivo G_20
-     if #FINDCNT > 0 ; TodavÌa sigue ahÌ... xD
+     if #FINDCNT > 0 ; Todav√≠a sigue ah√≠... xD
         {
           set #LTARGETID #FINDID
           set #LTargetKind 1
@@ -143,7 +144,7 @@ return
 
 sub meditar ; <==============================>
 _reMedit:
-if #MANA >= #MAXMANA ; Tenemos el man· a tope (por si nos est·n cantando, etc...)
+if #MANA >= #MAXMANA ; Tenemos el man√° a tope (por si nos est√°n cantando, etc...)
    {
      wait 40
      return
@@ -155,7 +156,7 @@ if ( #TRUE in #result )
      {
        if pierdes in #result
           {
-            goto _reMedit ; Meditamos hasta que no perdamos la concentraciÛn
+            goto _reMedit ; Meditamos hasta que no perdamos la concentraci√≥n
           }
        if trance in #result
           {
@@ -172,7 +173,7 @@ if ( #TRUE in #result )
                         return
                       }
                  }
-                 else ; Meditamos hasta llenar la barra al m·ximo...
+                 else ; Meditamos hasta llenar la barra al m√°ximo...
                     {
                       repeat
                            {
@@ -181,7 +182,7 @@ if ( #TRUE in #result )
                            until #MANA = #MAXMANA
                     }
           }
-       if en_paz in #result ; OK, estamos bien de man·.
+       if en_paz in #result ; OK, estamos bien de man√°.
           {
             return
           }
@@ -200,7 +201,7 @@ if #FINDCNT > 0
         {
           for #FINDINDEX 1 #FINDCNT
               {
-                if #FINDSTACK < 100 ; Es un stack pequeÒo...
+                if #FINDSTACK < 100 ; Es un stack peque√±o...
                    {
                      exevent drag #FINDID #FINDSTACK
                      exevent dropc #BACKPACKID
@@ -209,7 +210,7 @@ if #FINDCNT > 0
                    }
                    else
                       {
-                        if #FINDSTACK >= 100 ; Es un stack decente... cojemos sÛlo un trozo de 100 pergas... xD
+                        if #FINDSTACK >= 100 ; Es un stack decente... cojemos s√≥lo un trozo de 100 pergas... xD
                            {
                              exevent drag #FINDID 100
                              exevent dropc #BACKPACKID
@@ -235,14 +236,14 @@ return
 sub comprobar_comida
 {
   hambriento:
-  set %jrnl #jindex ; Marcamos un Ìndice de las lÌneas del diario.
+  set %jrnl #jindex ; Marcamos un √≠ndice de las l√≠neas del diario.
   event macro 4 0 .hungry
   wait 20
   while #true
      {
-       if #jindex > %jrnl ; Si aparece una nueva lÌnea.
+       if #jindex > %jrnl ; Si aparece una nueva l√≠nea.
           {
-            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de lÌnea.
+            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de l√≠nea.
             scanjournal %jrnl   ; La leemos...
             if Dentro_de_1_minuto in #journal
                {
@@ -285,7 +286,7 @@ sub comprobar_comida
                                        }
                                }
                        }
-                       else ; Mensaje extraÒo, repetimos...
+                       else ; Mensaje extra√±o, repetimos...
                           {
                             goto hambriento
                           }
@@ -298,7 +299,7 @@ return
 
 ;-@ ============================== @-;
 ;-@ ############################## @-;
-;-@ SUBS p˙blicos del Foro EasyUO  @-;
+;-@ SUBS p√∫blicos del Foro EasyUO  @-;
 ;-@ ############################## @-;
 ;-@ ============================== @-;
 ;
@@ -371,7 +372,7 @@ goto _lets_wait_for_a_message
 ;======================================================================
 sub wait_for_GUMP ; version 1.4 ~Locke
 ;=================================================================
-; AÒadido #CONTID ^^
+; A√±adido #CONTID ^^
 if !_A0 < 3
 {
 display ok You haven't specified enough vars.$
