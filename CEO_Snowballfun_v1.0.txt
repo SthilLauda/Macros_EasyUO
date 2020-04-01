@@ -38,7 +38,7 @@
 ; Purpose: Encuentra personas para lanzarles bolas de nieve continuamente.
 ;============================================
 initevents
-set %version 1.3
+set %version 1.0
 set %snowballtype FOD
 set %total 0
 set %totalsnowballs 0
