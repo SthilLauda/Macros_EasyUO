@@ -3388,15 +3388,23 @@ return
 sub dejar
 gosub refreshBackpack
 dejar:
+set %total_pergas_hechos 0
 gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
 finditem %pergashechos C_ , #BACKPACKID
-if #FINDSTACK >= %cantidadpergas || #WEIGHT >= #MAXWEIGHT - 10
-{
-exevent drag #FINDID #FINDSTACK
-exevent dropc %bolsapergas_hechos
-wait 30
-goto dejar
-}
+if #FINDCNT > 0
+   {
+     for #FINDINDEX 1 #FINDCNT
+         {
+           set %total_pergas_hechos %total_pergas_hechos + #FINDSTACK
+          }
+     if %total_pergas_hechos >= %cantidadpergas || #WEIGHT >= #MAXWEIGHT - 10
+        {
+          exevent drag #FINDID #FINDSTACK
+          exevent dropc %bolsapergas_hechos
+          wait 30
+          goto dejar
+        }
+   }
 return
 
 ;================================================================
