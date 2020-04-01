@@ -18,7 +18,7 @@
 ;   ldb    `     [__INK__]
 ;
 ; Author: elchungako [ MOD+ Sthil ]
-; Version: 1.4
+; Version: 1.5
 ; Client Tested with: 2.0.3
 ; EUO version tested with: EasyUO 1.5 Version 243
 ; Shard: Ultima Alianza (¡Hasta la muerte!)
@@ -26,7 +26,7 @@
 ; Public Release: 01/04/2020
 ; Purpose: Macro de escriba con todos los hechizos, para seleccionar cuál hacer..
 ;===============================================================================
-set %version v1.4
+set %version v1.5
 ;________________________________
 ;
 ; ///////////////////////////////
