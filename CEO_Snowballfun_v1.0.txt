@@ -29,13 +29,13 @@
 ; -shimrod
 ;
 ; Author: CEO & SthiL
-; Version: 1.3
+; Version: 1.0
 ; Client Tested with: 4.0.1b
 ; EUO version tested with: 1.4 (005F)
 ; Shard OSI / FS:
-; Revision Date: 12-17-03
-; Public Release:12-17-03
-; Purpose: Finds people to throw snowballs at and allows you to continuously throw snowballs at them.
+; Revision Date: 01-04-2020
+; Public Release: 12-17-2003
+; Purpose: Encuentra personas para lanzarles bolas de nieve continuamente.
 ;============================================
 initevents
 set %version 1.3
@@ -56,7 +56,7 @@ gosub findallsnowballs
 finditem %snowballtype
 if %totalsnowballs = 0
 {
-   display ok You do not have a pile of snow in your pack.$
+   display ok No tienes ningún montón de nieve en la mochila! :-( $
 }
 ;=============================================
 ;=============================================
@@ -353,7 +353,7 @@ menu text hthrown 150 20 Lanzadas:
 menu text hpeople 10 35 Total Players:
 menu button Throw 90 60 50 20 Lanzar
 menu button FindPlayers 10 60 80 20 Buscar Players
-menu button AddPlayer 140 60 70 20 A�adir Player
+menu button AddPlayer 140 60 70 20 Añadir Player
 menu button Clear 210 60 40 20 Borrar
 set #menubutton N/A
 menu delete total
