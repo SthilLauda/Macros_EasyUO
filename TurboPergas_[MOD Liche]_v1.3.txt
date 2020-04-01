@@ -3410,7 +3410,8 @@ return
 ;================================================================
 sub refreshBackpack
 event macro 9 7 ; Close Backpack
-event macro 8	7 ; Open Backpack
+wait 20
+event macro 8 7 ; Open Backpack
 gosub wait_for GUMP #BACKPACKID 4
 contpos %backpack_X %backpack_Y
 return
