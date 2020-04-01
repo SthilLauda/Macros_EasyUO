@@ -527,6 +527,7 @@ if ( %modo_liche )
      }
 if #MANA < 10
 gosub meditar
+finditem %pergaminos C_ , #BACKPACKID
 set #LOBJECTID #FINDID
 event macro 17
 gosub wait_for GUMP 530_480 2
