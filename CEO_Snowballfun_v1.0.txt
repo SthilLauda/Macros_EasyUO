@@ -1,0 +1,365 @@
+;======================================================================================================
+; '||   ||` '||`   ||                                 /.\      '||`
+;  ||   ||   ||    ||     ''                         // \\      ||   ''
+;  ||   ||   ||  ''||''   ||  '||),,(|,   '''|.     //...\\     ||   ||   '''|.  `||''|,  '''/  '''|.
+;  ||   ||   ||    ||     ||   || || ||  .|''||    //     \\    ||   ||  .|''||   ||  ||   //  .|''||
+;  `|...|'  .||.   `|..' .||. .||    ||. `|..||. .//       \\. .||. .||. `|..||. .||  ||. /... `|..||.
+;======================================================================================================
+;
+; Script Name: CEOSnowballFun
+;
+;         ()         `.. ..  `...     `..    `....     `..        `..
+;      ()-'`-.     `..    `..`. `..   `..  `..    `..  `..        `..
+;       `|  |\\     `..      `.. `..  `..`..        `..`..   `.   `..
+;    '   |__| \)      `..    `..  `.. `..`..        `..`..  `..   `..
+;  .     //\\__          `.. `..   `. `..`..        `..`.. `. `.. `..
+;       ((  `--(   `..    `..`..    `. ..  `..     `.. `. `.    `....
+;  .     )\          `.. ..  `..      `..    `....     `..        `..
+;          ,--._
+;   `  ,-'`-    ;-.       `.. `..         `.       `..      `..
+;    ,:      ,     `.     `.    `..      `. ..     `..      `..
+;   /. `  ,-'    .   \    `.     `..    `.  `..    `..      `..
+;  (  ;           `.  )   `... `.      `..   `..   `..      `..
+;  | '   ,    `.      |   `.     `..  `...... `..  `..      `..
+;  (    /    .     (  )   `.      `. `..       `.. `..      `..
+;   \         )     `/    `.... `.. `..         `..`........`........
+;    `.  /   '     ,'
+;      `-:_    _,-'         Consider yourself hit by a snowball !!
+;          `--'
+; -shimrod
+;
+; Author: CEO & SthiL
+; Version: 1.3
+; Client Tested with: 4.0.1b
+; EUO version tested with: 1.4 (005F)
+; Shard OSI / FS:
+; Revision Date: 12-17-03
+; Public Release:12-17-03
+; Purpose: Finds people to throw snowballs at and allows you to continuously throw snowballs at them.
+;============================================
+initevents
+set %version 1.3
+set %snowballtype FOD
+set %total 0
+set %totalsnowballs 0
+set %currentsnowball 1
+set %sthrow 0
+set %attempts 0
+set %pattempts 0
+set %force #true
+set %wait1 10
+ignoreitem reset 1
+ignoreitem reset 2
+ignoreitem #charid
+gosub initmenu
+gosub findallsnowballs
+finditem %snowballtype
+if %totalsnowballs = 0
+{
+   display ok You do not have a pile of snow in your pack.$
+}
+;=============================================
+;=============================================
+;Modify this time to increase/decrease the wait between tosses
+set %snowballwait 150
+;=============================================
+;=============================================
+set #menubutton N/A
+Mainloop:
+menu delete status
+if #menubutton <> N/A
+        gosub #menubutton
+wait %wait1
+goto Mainloop
+ 
+sub FindPlayers
+menu delete FindPlayers
+menu button StopScan 10 60 80 20 Stop Scan
+for %i 1 %total
+{
+        set %victim %victim . %i
+        ignoreitem %victim 1
+}
+set #menubutton N/A
+FindPlayers1:
+if #menubutton <> N/A
+{
+        if #menubutton <> StopScan
+        {
+                set %temp #menubutton
+                gosub StopScan
+                set #menubutton %temp
+        }
+        ignoreitem reset 1
+        return
+}
+finditem NAB_QAB_OAB_IS_HS G_15
+if #findkind <>  -1
+{
+        set %pattempts  %pattempts + 1
+        menu delete status
+        menu font color yellow
+        menu text status 55 5 Escaneando...( , #findid , )
+        wait 5
+        gosub throwsnowball #findid
+        if #result
+        {
+        ;       event ExMsg %victim 0 33 Splat
+                set %total %total + 1
+                set %victim . %total %victim
+                set %valid . %total #true
+                ignoreitem #findid 1
+        }
+        menu delete total
+        menu font color lime
+        menu text total 90 35 %total , / , %pattempts
+        if ! #result
+                ignoreitem #findid 2
+        set %snowballwait . %currentsnowball #scnt2 + %snowballwait
+        set %currentsnowball %currentsnowball + 1
+        if %currentsnowball > %totalsnowballs
+        {
+                set %currentsnowball 1
+        }
+        goto FindPlayers1
+}
+wait %wait1
+gosub StopScan
+set #menubutton N/A
+return
+ 
+sub Throw
+if %total = 0
+{
+        menu delete status
+        menu font color yellow
+        menu text status 55 5 No hay players en la lista!
+        wait %wait1
+        set #menubutton N/A
+        return 
+}
+menu delete throw
+menu button StopThrow 90 60 50 20 Stop
+set #menubutton N/A
+Throw1:
+if #menubutton <> N/A
+{
+        if #menubutton <> StopThrow
+        {
+                set %temp #menubutton
+                gosub StopThrow
+                set #menubutton %temp
+        }
+        return
+}
+for %i 1 %total
+{
+        if %valid . %i
+        {
+                set %victim %victim . %i
+                finditem %victim G_15
+                if #findkind <> -1 || %force
+                {
+                        gosub throwsnowball %victim %i
+                        set %snowballwait . %currentsnowball #scnt2 + %snowballwait
+                        set %currentsnowball %currentsnowball + 1
+;                       wait %wait1 %wait1
+                        if %currentsnowball > %totalsnowballs
+                        {
+                                set %currentsnowball 1
+                        }
+                        goto Throw2
+                }
+                menu font color blue
+                menu delete status
+                menu text status 55 5 Target fuera de rango o invisible.
+        }
+;wait 5
+Throw2:
+        if #menubutton <> N/A
+        {
+                if #menubutton <> StopThrow
+                {
+                        set %temp #menubutton
+                        gosub StopThrow
+                        set #menubutton %temp
+                }
+                return
+        }
+}
+goto Throw1
+return
+ 
+sub StopThrow
+menu delete Stopthrow
+menu button Throw 90 60 50 20 Lanzar
+set #menubutton N/A
+return
+ 
+sub StopScan
+menu delete StopScan
+menu button FindPlayers 10 60 80 20 Buscar Players
+set #menubutton N/A
+return
+ 
+sub throwsnowball
+set %victim %1
+throwagain:
+gosub snowballwait
+set %snowballid %snowballid . %currentsnowball
+set #lobjectid %snowballid . %currentsnowball
+gosub resetjournal
+event macro 17 0
+wait 10
+gosub FindJournalMessage1 la_nieve_no_esta
+if #result
+{
+        wait 1s
+        goto throwagain
+}
+target 4s
+set #ltargetid %victim
+set #ltargetkind 1
+gosub resetjournal
+event macro 22 0
+wait 10
+set %attempts %attempts + 1
+gosub FindJournalMessage1 has_dado_a
+if #result
+{
+        menu delete status
+        menu font color lime
+        menu text status 55 5 Bolazo! xDD
+        event ExMsg %victim 0 88 Bolazo! xDD
+        set %sthrow %sthrow + 1
+        menu delete tthrown
+        menu text tthrown 200 20 %sthrow , / , %attempts
+        wait 7
+        return #true
+}
+menu font color lime
+menu delete tthrown
+menu text tthrown 200 20 %sthrow , / , %attempts
+return #false
+ 
+sub snowballwait
+if %snowballwait . %currentsnowball < #scnt2
+        return
+snowballwait1:
+wait 5
+set %waittime ( %snowballwait . %currentsnowball  - #scnt2 ) / 10
+if %snowballwait . %currentsnowball  > #scnt2
+{
+        menu delete status
+        menu font color yellow
+        menu text status 55 5 Recarga en... ( , %waittime , )
+        goto snowballwait1
+}
+menu delete status
+menu font color lime
+menu text status 55 5 Esperando para lanzar...
+wait 5
+return
+ 
+sub FindJournalMessage1
+set %jc %1
+FJM1:
+scanjournal %jc
+if %1 in #journal
+   return #true
+if #journal = N/A
+   return #false
+set %jc %jc + 1
+goto FJM1
+ 
+Sub clear
+ignoreitem reset
+set %total 0
+menu delete total
+menu font color lime
+menu text total 90 35 %total
+return
+ 
+sub AddPlayer
+menu delete status
+menu font color fuchsia
+menu text status 55 5 Apunta a un jugador!
+set #targcurs 1
+target
+Addplayer1:
+wait 1
+if #targcurs = 1
+        goto AddPlayer1
+set %victim #ltargetid
+set %pattempts %pattempts + 1
+gosub throwsnowball %victim
+if #result
+{
+                set %total %total + 1
+                set %victim . %total %victim
+                set %valid . %total #true
+                set %snowballwait . %currentsnowball #scnt2 + %snowballwait
+}
+menu delete total
+menu font color lime
+menu text total 90 35 %total , / , %pattempts
+if ! #result
+        ignoreitem #findid 2
+ 
+set %currentsnowball %currentsnowball + 1
+if %currentsnowball > %totalsnowballs
+{
+        set %currentsnowball 1
+}
+set #menubutton N/A
+return
+ 
+sub resetjournal
+scanjournal 1
+deletejournal
+return
+ 
+sub findallsnowballs
+;pause
+getanother:
+finditem %snowballtype
+if #findkind <> -1
+{
+        set %totalsnowballs %totalsnowballs + 1
+        set %snowballid . %totalsnowballs #findid
+        set %snowballwait . %totalsnowballs 0
+ 
+        ignoreitem #findid 2
+        goto getanother
+}
+menu delete tballs
+menu font color lime
+menu text tballs 110 20 %totalsnowballs
+return
+ 
+sub initmenu
+menu clear
+menu window size 280 100
+menu window title CEOSnowballFun %version
+menu window color black
+menu Font Name Default
+menu font bgcolor BLACK
+menu font color red
+menu show
+menu font size 9
+menu text hstatus 10 5 Status:
+menu text hballs 10 20 Total Bolas Nieve:
+menu text hthrown 150 20 Lanzadas:
+menu text hpeople 10 35 Total Players:
+menu button Throw 90 60 50 20 Lanzar
+menu button FindPlayers 10 60 80 20 Buscar Players
+menu button AddPlayer 140 60 70 20 Añadir Player
+menu button Clear 210 60 40 20 Borrar
+set #menubutton N/A
+menu delete total
+menu font color lime
+menu text total 90 35 %total
+menu text tthrown 200 20 %sthrow
+;halt
+menu hideeuo
+return
