@@ -290,7 +290,7 @@ str pos #PROPERTY ]
 set %d #strRes - %i
 str mid #PROPERTY %i %d
 set %cantidad_keg #strRes
-if %cantidad_keg = 1000
+if %cantidad_keg >= 1000
    {
      gosub mover_keg
    }
