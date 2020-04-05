@@ -5,16 +5,16 @@
 ;   ||   ||   ||    ||     ||   || || ||  .|''||    //     \\    ||   ||  .|''||   ||  ||   //  .|''||
 ;   `|...|'  .||.   `|..' .||. .||    ||. `|..||. .//       \\. .||. .||. `|..||. .||  ||. /... `|..||.
 ; =====================================================================================================
-; Script Name: CartografÌa
+; Script Name: Cartograf√≠a
 ; Author: Sthil Lauda
 ; Version: 1.1
 ; Client Tested with: 2.0.3
 ; EUO version tested with: EasyUO 1.5 Version 243
-; Shard: Ultima Alianza (°Hasta la muerte!)
+; Shard: Ultima Alianza (¬°Hasta la muerte!)
 ; Revision Date: 04/04/2020
 ; Public Release: 04/04/2020
 ; Global Variables Used: Ninguna.
-; Purpose: Entrena la habilidad de cartografÌa haciendo mapas de ciudad y convirtiÈndolos a tickets de recompensa.
+; Purpose: Entrena la habilidad de cartograf√≠a haciendo mapas de ciudad y convirti√©ndolos a tickets de recompensa.
 ;-------------------------------------------------------------------------
 ; *** INSTRUCCIONES ***
 ;----------------------
@@ -24,7 +24,7 @@
 ;________________________________
 ;
 ; ///////////////////////////////
-; ******** CONFIGURACI”N ********
+; ******** CONFIGURACI√ìN ********
 ; ///////////////////////////////
 ;________________________________
 ;
@@ -32,13 +32,13 @@ set %bolsa_lotes_mapas LJOFWMD         ; Bolsa con lotes de mapas.
 set %bolsa_plumas QQWFWMD              ; Bolsa con plumas del tipo "Kit de Escritura de Mapas".
 set %papelera EAELWND                  ; Ponemos #LOBJECTID del sistema de recompensa.
 set %bolsa_mapas_ticketearID XSMMPQD   ; Bolsa en la mochila del personaje para almacenar mapas hechos y convertirlos a tickets.
-set %max_lotes_backpack 5              ; N˙mero de lotes de mapas en blanco a mover a la mochila en cada tanda (Cada lote son 4 mapas, luego 5 x 4 = 20 mapas en blanco en cada ronda).
-set %max_mapas_mochila 60              ; N˙mero m·ximo de mapas en la bolsa de mapas de la mochila, antes de convertirlos a tickets (cuidado con el peso XD).
-set %tiempo_alimentacion 360           ; Cada cu·ntos segundos va a comprobar si tiene hambre (6 minutos).
+set %max_lotes_backpack 5              ; N√∫mero de lotes de mapas en blanco a mover a la mochila en cada tanda (Cada lote son 4 mapas, luego 5 x 4 = 20 mapas en blanco en cada ronda).
+set %max_mapas_mochila 60              ; N√∫mero m√°ximo de mapas en la bolsa de mapas de la mochila, antes de convertirlos a tickets (cuidado con el peso... XD).
+set %tiempo_alimentacion 360           ; Cada cu√°ntos segundos va a comprobar si tiene hambre (6 minutos).
 ;________________________________________________
 ;
 ; //////////////////////////////////////////////
-; ************* FIN CONFIGURACI”N *************
+; ************* FIN CONFIGURACI√ìN *************
 ; //////////////////////////////////////////////
 ;________________________________________________
 ;
@@ -150,12 +150,12 @@ if #FINDCNT > 0
                 {
                   set #LOBJECTID #FINDID
                   event macro 17
-                  gosub wait_for GUMP 585_401 30 ; Esperar a que se abra el men˙ de la la papelera
-                  contpos %menu_reciclarx %menu_reciclary ; Situamos el men˙ de papelera en su sitio
+                  gosub wait_for GUMP 585_401 30 ; Esperar a que se abra el men√∫ de la la papelera
+                  contpos %menu_reciclarx %menu_reciclary ; Situamos el men√∫ de papelera en su sitio
                   set %clickx #contposx + %boton_eliminar_offsetx
                   set %clicky #contposy + %boton_eliminar_offsety
                   click %clickx %clicky f dmc
-                  gosub wait_for GUMP 585_401 30 ; Esperar a que vuelva el men˙ de la papelera
+                  gosub wait_for GUMP 585_401 30 ; Esperar a que vuelva el men√∫ de la papelera
                   set %clickx #contposx + %boton_target_offsetx
                   set %clicky #contposy + %boton_target_offsety
                   click %clickx %clicky f dmc
@@ -275,7 +275,7 @@ sub checkSkill
 chooseskill Cart real
 if #SKILL >= 1000
    {
-     display °Somos GM CartÛgrafo! :-)
+     display ¬°Somos GM Cart√≥grafo! :-)
      halt
    }
 return
@@ -307,14 +307,14 @@ return
 sub comprobar_comida
 {
   hambriento:
-  set %jrnl #jindex ; Marcamos un Ìndice de las lÌneas del diario.
+  set %jrnl #jindex ; Marcamos un √≠ndice de las l√≠neas del diario.
   event macro 4 0 .hungry
   wait 20
   while #true
      {
-       if #jindex > %jrnl ; Si aparece una nueva lÌnea.
+       if #jindex > %jrnl ; Si aparece una nueva l√≠nea.
           {
-            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de lÌnea.
+            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de l√≠nea.
             scanjournal %jrnl   ; La leemos...
             if Estas_no_le_afecta_el_hambre in #journal || Estas_tan_lleno_que_no_puedes in #journal || Estas_totalmente_saciado in #journal
                {
@@ -340,7 +340,7 @@ sub comprobar_comida
                                  set %proxima_vez %tiempo_actual + %tiempo_alimentacion
                                }
                        }
-                       else ; Mensaje extraÒo, repetimos...
+                       else ; Mensaje extra√±o, repetimos...
                           {
                             goto hambriento
                           }
@@ -487,7 +487,7 @@ halt
 ;======================================================================
 sub wait_for_GUMP ; version 1.4 ~Locke
 ;=================================================================
-; AÒadido #CONTID ^^
+; A√±adido #CONTID ^^
 if !_A0 < 3
 {
 display ok You haven't specified enough vars.$
