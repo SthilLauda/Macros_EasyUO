@@ -41,15 +41,15 @@
 ;               ~~~        ~~         ~~           ~~
 ; ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~      `"""""""`
 ;
-set %version v1.5
+set %version v1.6
 ;
 ; Author: Sthil Lauda
-; Version: 1.5
+; Version: 1.6
 ; Client Tested with: 2.0.3
 ; EUO version tested with: 1.5 Version 142
 ; Shard: Ultima Alianza (¡Hasta la muerte!)
 ; Fecha: 07/12/2019
-; Actualizada: 14/03/2020
+; Actualizada: 07/04/2020
 ; Purpose: Cocina pescado y carne para subir la skill de cocinar.
 ; Instrucciones; Poner en el primer nivel del cofre del banco de Britain, un buen montón de filetes de pescado
 ;                o filetes de carne cruda, troncos o ramas para encender el horno, y herramientas de cocinar en una bolsa.
@@ -178,7 +178,7 @@ if #FINDCNT > 0
                                                 target
                                                 goto _cocina
                                               }
-                                         if ( El_horno_se_apaga in #RESULT || esta_apagado in #RESULT no_esta_encendido in #RESULT )
+                                         if ( El_horno_se_apaga in #RESULT || esta_apagado in #RESULT || no_esta_encendido in #RESULT )
                                               {
                                                 goto loop
                                               }
