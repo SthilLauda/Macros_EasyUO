@@ -1,0 +1,130 @@
+;======================================================================================================
+; '||   ||` '||`   ||                                 /.\      '||`
+;  ||   ||   ||    ||     ''                         // \\      ||   ''
+;  ||   ||   ||  ''||''   ||  '||),,(|,   '''|.     //...\\     ||   ||   '''|.  `||''|,  '''/  '''|.
+;  ||   ||   ||    ||     ||   || || ||  .|''||    //     \\    ||   ||  .|''||   ||  ||   //  .|''||
+;  `|...|'  .||.   `|..' .||. .||    ||. `|..||. .//       \\. .||. .||. `|..||. .||  ||. /... `|..||.
+;======================================================================================================
+;
+; Script Name: Buscar Tesoros
+;  ____________________________________________________________________
+; / \-----     ---------  -----------     -------------- ------    ----\
+; \_/__________________________________________________________________/
+; |~ ~~ ~~~ ~ ~ ~~~ ~ _____.----------._ ~~~  ~~~~ ~~   ~~  ~~~~~ ~~~~|
+; |  _   ~~ ~~ __,---'_       "         `. ~~~ _,--.  ~~~~ __,---.  ~~|
+; | | \___ ~~ /      ( )   "          "   `-.,' (') \~~ ~ (  / _\ \~~ |
+; |  \    \__/_   __(( _)_      (    "   "     (_\_) \___~ `-.___,'  ~|
+; |~~ \     (  )_(__)_|( ))  "   ))          "   |    "  \ ~~ ~~~ _ ~~|
+; |  ~ \__ (( _( (  ))  ) _)    ((     \\//    " |   "    \_____,' | ~|
+; |~~ ~   \  ( ))(_)(_)_)|  "    ))    //\\ " __,---._  "  "   "  /~~~|
+; |    ~~~ |(_ _)| | |   |   "  (   "      ,-'~~~ ~~~ `-.   ___  /~ ~ |
+; | ~~     |  |  |   |   _,--- ,--. _  "  (~~  ~~~~  ~~~ ) /___\ \~~ ~|
+; |  ~ ~~ /   |      _,----._,'`--'\.`-._  `._~~_~__~_,-'  |H__|  \ ~~|
+; |~~    / "     _,-' / `\ ,' / _'  \`.---.._          __        " \~ |
+; | ~~~ / /   .-' , / ' _,'_  -  _ '- _`._ `.`-._    _/- `--.   " " \~|
+; |  ~ / / _-- `---,~.-' __   --  _,---.  `-._   _,-'- / ` \ \_   " |~|
+; | ~ | | -- _    /~/  `-_- _  _,' '  \ \_`-._,-'  / --   \  - \_   / |
+; |~~ | \ -      /~~| "     ,-'_ /-  `_ ._`._`-...._____...._,--'  /~~|
+; | ~~\  \_ /   /~~/    ___  `---  ---  - - ' ,--.     ___        |~ ~|
+; |~   \      ,'~~|  " (o o)   "         " " |~~~ \_,-' ~ `.     ,'~~ |
+; | ~~ ~|__,-'~~~~~\    \"/      "  "   "    /~ ~~   O ~ ~~`-.__/~ ~~~|
+; |~~~ ~~~  ~~~~~~~~`.______________________/ ~~~    |   ~~~ ~~ ~ ~~~~|
+; |____~jrei~__~_______~~_~____~~_____~~___~_~~___~\_|_/ ~_____~___~__|
+; / \----- ----- ------------  ------- ----- -------  --------  -------\
+; \_/__________________________________________________________________/
+;
+; Author: Sthil Lauda
+; Version: 1.0
+; Client Tested with: 2.0.3
+; EUO version tested with: EasyUO 1.5 Version 243
+; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Public Release: 13/04/20
+; Revised On: 13/04/20
+; Propósito: Ayuda a encontrar el sitio donde está el tesoro.
+; Instrucciones: Andar por el mapa hasta que encuentre algo... xD
+;
+set %tesoros AXE_BXE_CXE_DXE_EXE_FXE_GXE_HXE_IXE_
+    +JXE_KXE_LXE_MXD_NXE_PUI_VWE_MWE_RGH_MPG_BUD_
+    +HIF_JIF_IIF_KIF_IKF
+ignoreitem reset TESOROS_ENCONTRADOS
+
+loop:
+finditem %tesoros G_10
+if #FINDCNT > 0
+   {
+     set #SYSMSGCOL 1165
+     event sysmessage *** TESORO ENCONTRADO! ***
+     wait 40
+     gosub waitforprop #FINDID
+     gosub FindThingsDir #FINDX #FINDY Orientacion
+     gosub traducirOrientacion
+     DISPLAY OK PROPIEDADES: #PROPERTY $$
+     +FINDX: #FINDX $
+     +FINDY: #FINDY $
+     +FINDZ: #FINDZ $
+     +DISTANCIA: #FINDDIST casillas $
+     +ORIENTACION: %direccion
+     display yesno ¿QUIERES INTENTAR ABRIR EL TESORO ENCONTRADO?
+     if #DISPRES = yes
+        {
+          set #LOBJECTID #FINDID
+          event macro 17 0
+          wait 20
+        }
+     ignoreitem #FINDID TESOROS_ENCONTRADOS
+   }
+   wait 1
+goto loop
+
+SUB FindThingsDir ; <===================================================>
+;ver 1.2 10Jul04 by Roadkill
+;purpose: find the direction from you that a thing is
+;%1= #findx of object, it's UO world coord
+;%2=#findy of object, it's UO world coord
+;%3= the name of the return var, i.e. 'dir', 'thingsdirection' by default
+;%3 holds its dir from you 0-nw 1-n 2-ne 3-e 4-se 5-s 6-sw 7-w 8-sametile
+;* @example call rksubs.txt FindThingsDir %mapxcoord %mapycoord spotdir
+	SET !itsX %1
+	SET !itsY %2
+	if %0 < 3
+		set %3 thingsdirection
+	IF !itsX = #charposx && !itsY < #charposy
+		SET % . %3 1 ;N
+		SET %direccion NORTE
+	IF !itsX > #charposx && !itsY < #charposy
+		SET % . %3 2 ;NE
+		SET %direccion NORESTE
+	IF !itsX > #charposx && !itsY = #charposy
+		SET % . %3 3 ;E
+		SET %direccion ESTE
+	IF !itsX > #charposx && !itsY > #charposy
+		SET % . %3 4 ;SE
+		SET %direccion SURESTE
+	IF !itsX = #charposx && !itsY > #charposy
+		SET % . %3 5 ;S
+		SET %direccion SUR
+	IF !itsX < #charposx && !itsY > #charposy
+		SET % . %3 6 ;SW
+		SET %direccion SUROESTE
+	IF !itsX < #charposx && !itsY = #charposy
+		SET % . %3 7 ;W
+		SET %direccion OESTE
+	IF !itsX < #charposx && !itsY < #charposy
+		SET % . %3 0 ;NW
+		SET %direccion NOROESTE
+	IF !itsX = #charposx && !itsY = #charposy
+		SET % . %3 8 ;same tile
+		SET %direccion MISMO-SPOT-PJ
+RETURN
+
+sub waitforprop ; <===================================================>
+event property #charid
+wait 1
+set %oldprop #property
+event property %1
+_testforprop:
+if #property = %oldprop
+   {
+     goto _testforprop
+   }
+return
