@@ -130,6 +130,16 @@ if #FINDCNT > 0
      event macro 22 0
      wait 10
    }
+   else ; No hay vendas!
+      {        
+        event macro 1 0 all come
+        wait 5s
+        event macro 1 0 all stop
+        wait 20
+        set #SYSMSGCOL 38
+        event sysmessage NO HAY VENDAS!! :-(
+        halt
+      }
 gosub wait_for MSG aplicas_las pones_el_vendas curas_a pero_fallas no_necesita_curarse estas_demasiado estas_demasiado 15
 if ( #true in #result )
      {
