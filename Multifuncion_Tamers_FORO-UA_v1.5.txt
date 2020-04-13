@@ -1,0 +1,894 @@
+;==================================
+; Script: Macro multifunción para subir un tamer.
+; Autor: KraTezZ
+; Version Easyuo: 1.5 243
+; Version: 1.4
+; Cliente: 7.0.8.2
+; Fecha del script: 28 Mayo 2016 (Scripts indivuduales desde 03/06/12).
+; Finalidad: Subir las habilidades que cualquier tamer pueda necesitar.
+;==================================
+; FUNCIONAMIENTO:
+; Esta macro permite al usuario tener una sola macro que englobe casi todas
+; las macros necesarias para macrear las habilidades que un tamer puede necesitar.
+; Incluye: RASTREAR; CONOCIMIENTO ANIMAL; ENCANTAR; MÚSICA; OCULTARSE; CAMINAR OCULTO;
+; PASTOREAR; VETERINARIA; PACIFICAR
+
+set %tiempo_alimentacion 360 ; Cada cuántos segundos va a comprobar si tiene hambre.
+set %tiempo_ronda 960        ; Cada cuántos segundos puede comprar instrumentos en el vendor.
+set %comida RGG_NRD_QSD_ZBG_WLI
+ +_QRD_END_FUD_YLI_WLI_HGI_JQE
+ +_KGI_EGI_QLI_KLI_MLI_KRD_HQD
+ +_AQD_MQE_VQE_TQE_IQE_PQD_QQD
+ +_GQE_SPE_ZPE_OQE_BDF_KPE_RQE
+ +_YSD_SQD_YWI_AXI_HND
+set %tiempo_actual #SCNT
+set %proxima_vez #SCNT
+set %esperando_timer #SCNT
+set %vendor_timer #SCNT
+
+Conf:
+set #SYSMSGCOL 88
+event sysmessage =========
+event sysmessage ¿Que habilidad quieres macrear?
+event sysmessage Pulsa un numero:
+event sysmessage 1-. Rastrear
+event sysmessage 2-. Conocimiento animal
+event sysmessage 3-. Musica
+event sysmessage 4-. Encantar + Musica
+event sysmessage 5-. Ocultarse
+event sysmessage 6-. Ocultarse + Caminar oculto
+event sysmessage 7-. Pastorear
+event sysmessage 8-. Veterinaria
+event sysmessage 9-. Pacificar
+event sysmessage =========
+Eleccion:
+onhotkey 1
+{
+event ExMsg #CHARID 0 73 -. Entrenamos Rastrear$
+goto PreRastrear
+}
+onhotkey 2
+{
+event ExMsg #CHARID 0 73 -. Entrenamos Conocimiento animal$
+goto PreConAnimal
+}
+onhotkey 3
+{
+event ExMsg #CHARID 0 73 -. Entrenamos Musica$
+goto PreMusica
+}
+onhotkey 4
+{
+event ExMsg #CHARID 0 73 -. Entrenamos Encantar y Musica$
+goto PreEncantar
+}
+onhotkey 5
+{
+event ExMsg #CHARID 0 73 -. Entrenamos Ocultarse$
+goto PreOcultarse
+}
+onhotkey 6
+{
+event ExMsg #CHARID 0 73 -. Entrenamos Ocultarse y Caminar oculto$
+goto PreCaminar
+}
+onhotkey 7
+{
+event ExMsg #CHARID 0 73 -. Entrenamos Pastorear$
+goto PrePastorear
+}
+onhotkey 8
+{
+event ExMsg #CHARID 0 73 -. Entrenamos Veterinaria$
+goto PreVeterinaria
+}
+onhotkey 9
+{
+event ExMsg #CHARID 0 73 -. Entrenamos Pacificar$
+goto PrePacificar
+}
+goto Eleccion
+
+; BLOQUE RASTREAR
+PreRastrear:
+set #SYSMSGCOL 1165
+event sysmessage Situate junto a un animal y pulsa ESC para empezar:
+Rastrear:
+onhotkey ESC
+{
+Rastreo:
+event macro 13 38
+wait 10
+click 20 160
+wait 10
+click 17 58
+wait 3s
+gosub Comer
+goto Rastreo
+}
+goto Rastrear
+
+; BLOQUE CONOCIMIENTO ANIMAL
+PreConAnimal:
+set #SYSMSGCOL 1165
+event sysmessage Selecciona al animal con el que macrear y pulsa ESC para empezar:
+wait 20
+set #TARGCURS 1
+target
+while #TARGCURS = 1
+      {
+        wait 1
+      }
+set %animal #LTARGETID
+ConAnimal:
+onhotkey ESC
+{
+AnimalLore:
+event macro 13 2
+target
+set #LTARGETID %animal
+set #LTARGETKIND 1
+event macro 22 0
+gosub wait_for GUMP 414_405 50
+set %cont_x #CONTPOSX
+set %cont_y #CONTPOSY
+contpos %cont_x %cont_y
+click 164 220 f dmc
+set %tiempo_actual #SCNT
+if ( %proxima_vez <= %tiempo_actual )
+     {
+       gosub comprobar_comida
+     }
+goto AnimalLore
+}
+goto ConAnimal
+
+; BLOQUE MÚSICA
+PreMusica:
+gosub askForSetup
+wait 3s
+_rePonInstrumentos:
+finditem LQF_QRF_MQF_PRF C_ , #BACKPACKID
+if #FINDCNT > 0 ; Hay instrumentos...
+   {
+     set #SYSMSGCOL 1165
+     event sysmessage *** PRESIONA TECLA ESC ***
+     _waitKey:
+     onhotkey ESC
+            {
+              set #LOBJECTID #FINDID
+              event macro 17 ; Seleccionar instrumento.
+              Musica:
+              finditem LQF_QRF_MQF_PRF C_ , #BACKPACKID
+              if #FINDCNT > 0
+                 {
+                   event macro 13 9 ; Pacificar cada segundo...
+                   target 1s
+                   key ESC
+                   set %tiempo_actual #SCNT
+                   if ( %proxima_vez <= %tiempo_actual )
+                        {
+                          gosub comprobar_comida
+                        }
+                   goto Musica
+                 }
+                 else
+                    {
+                      goto _rePonInstrumentos
+                    }
+            }
+     wait 1
+     goto _waitKey
+   }
+   else ; No quedan en la mochila...
+      {
+        if ( %modo_cofre ) ; Buscamos en un cofre...
+             {
+               finditem LQF_QRF_MQF_PRF C_ , %bolsa_instrumentos
+               if #FINDCNT > 0
+                  {
+                    exevent drag #FINDID 1
+                    exevent dropc #BACKPACKID
+                    wait 30
+                    goto _rePonInstrumentos
+                  }
+                  else
+                     {
+                       set #SYSMSGCOL 38
+                       event sysmessage NO QUEDAN INSTRUMENTOS! :-(
+                       halt
+                     }
+             }
+             else ; Tampoco quedan en la bolsa...
+                {
+                  if ( %tienda_musica ) ; Hemos activado la opción de una tienda de aparejos y accesorios (Minoc, etc)...
+                       {
+                         gosub vendor
+                         wait 2s
+                         goto _rePonInstrumentos
+                       }
+                }
+      }
+goto Musica
+
+; BLOQUE ENCANTAR + MÚSICA
+PreEncantar:
+gosub askForSetup
+set #SYSMSGCOL 1165
+event sysmessage Selecciona al animal con el que macrear y pulsa ESC para empezar:
+event macro 13 15
+target
+targLoop:
+if #targcurs = 1
+      {
+        wait 1
+        goto targLoop
+      }
+set %animal #LTARGETID
+set #SYSMSGCOL 1165
+event sysmessage *** PRESIONA TECLA ESC ***
+wait 20
+Encantar:
+onhotkey ESC
+{
+Encanta:
+set %tiempo_actual #SCNT
+if ( %proxima_vez <= %tiempo_actual )
+     {
+       gosub comprobar_comida
+     }
+if ( %modo_cofre ) ; Buscamos en un cofre...
+     {
+       _rePon:
+       gosub selectInstrumento
+       finditem LQF_QRF_MQF_PRF C_ , #BACKPACKID
+       if #FINDCNT = 0
+          {
+            finditem LQF_QRF_MQF_PRF C_ , %bolsa_instrumentos
+            if #FINDCNT > 0
+               {
+                 exevent drag #FINDID 1
+                 exevent dropc #BACKPACKID
+                 wait 30
+                 goto _rePon
+               }
+               else
+                  {
+                    set #SYSMSGCOL 38
+                    event sysmessage NO QUEDAN INSTRUMENTOS :(
+                    halt
+                  }
+          }
+          else
+             {
+               gosub checkAnimal
+               gosub encantarAnimal
+               goto Encanta
+             }
+     }
+     else
+        {
+          if ( %tienda_musica ) ; Hemos activado la opción de una tienda de aparejos y accesorios (Minoc, etc)...
+               {
+                 finditem LQF_QRF_MQF_PRF C_ , #BACKPACKID
+                 if #FINDCNT > 0
+                    {
+                      gosub checkAnimal
+                      gosub encantarAnimal
+                    }
+                    else
+                       {
+                         gosub vendor
+                         wait 2s
+                         gosub selectInstrumento
+                       }
+               }
+        }
+goto Encanta
+}
+wait 1
+goto Encantar
+
+sub askForSetup
+_bolsaOvendor:
+display yesno ¿Quieres macrear usando un cofre con instrumentos?
+if #DISPRES = yes
+   {
+     set #SYSMSGCOL 1165
+     event sysmessage CLICK EN EL COFRE O BOLSA
+     set #TARGCURS 1
+     while #TARGCURS = 1
+           {
+             wait 1
+           }
+     set %bolsa_instrumentos #LTARGETID
+     set #LOBJECTID %bolsa_instrumentos
+     event macro 17
+     gosub wait_for GUMP %bolsa_instrumentos 20
+     if ( #TRUE in #RESULT )
+          {
+            set #SYSMSGCOL 73
+            event sysmessage ID COFRE: %bolsa_instrumentos
+            set %modo_cofre #TRUE
+            set %tienda_musica #FALSE
+            wait 20
+          }
+          else
+             {
+               set #SYSMSGCOL 38
+               event sysmessage PROBLEMA ABRIENDO LA BOLSA
+               wait 20
+               goto _bolsaOvendor
+             }
+   }
+   else
+      {
+        display yesno ¿Quieres macrear comprando instrumentos a un vendor?
+        if #DISPRES = yes
+           {
+             set %modo_cofre #FALSE
+             set %tienda_musica #TRUE
+             set #SYSMSGCOL 73
+             event sysmessage MACREANDO EN UNA TIENDA :-)
+             wait 20
+           }
+           else
+              {
+                set #SYSMSGCOL 73
+                event sysmessage MACREANDO CON LA MOCHILA :-(
+                wait 20
+              }
+      }
+return
+
+sub checkAnimal
+_animal:
+finditem %animal G
+if #FINDCNT > 0
+   {
+     if #FINDDIST > 3
+        {
+          event macro 1 0 all come ; LLAMANDO A ANIMAL
+          wait 5s
+          event macro 1 0 all stop
+          wait 1s
+          goto _animal
+        }
+   }
+   else
+      {
+        set #SYSMSGCOL 38
+        event sysmessage EL ANIMAL YA NO ESTA :(
+        halt
+      }
+return
+
+sub selectInstrumento
+finditem LQF_QRF_MQF_PRF C_ , #BACKPACKID
+if #FINDCNT > 0
+   {
+     set #LOBJECTID #FINDID
+     event macro 17
+     wait 20
+   }
+return
+
+sub encantarAnimal
+finditem LQF_QRF_MQF_PRF C_ , #BACKPACKID
+if #FINDCNT > 0
+   {
+     event macro 13 15
+     target
+     set #LTARGETID %animal
+     set #LTARGETKIND 1
+     event macro 22
+     wait 3s
+   }
+return
+
+sub vendor
+_waitToVendor:
+finditem HS_IS G_2 ; Monitorizamos el vendor con el que macreamos...
+if #FINDCNT = 0 ; Si no encontramos un vendor
+   {
+     if #SCNT >= %wait_timer ; Mostramos mensaje cada minuto...
+        {
+          set #SYSMSGCOL 88
+          event sysmessage ESPERANDO AL VENDOR ¬¬
+          set %wait_timer #SCNT + 60
+        }
+        wait 1s
+        goto _waitToVendor
+   }
+   else ; Hemos encontrado al vendor...
+      {
+         _waitToRonda:
+         if #SCNT > %vendor_timer ; Le podemos comprar o esperamos que reponga instrumentos...
+            {
+              for #FINDINDEX 1 #FINDCNT
+                  {
+                    if #FINDID = #CHARID
+                       {
+                         continue
+                       }
+                    gosub waitforprop #FINDID
+                    if Comerciante in #PROPERTY
+                       {
+                         gosub GetName #FINDID nombre_vendor
+                         event macro 1 0 %nombre_vendor Hola
+                         wait 20
+                         event macro 1 0 %nombre_vendor Buy
+                         gosub wait_for GUMP 800_590 20
+                         click 312 581 f dmc ; Página 5 del menú
+                         gosub wait_for GUMP 800_590 20
+                         click 374 330 f dmc ; Panderetas...
+                         gosub wait_for GUMP 800_590 20
+                         click 600 534 f dmc ; OKAY...
+                         event macro 1 0 %nombre_vendor Gracias
+                         set %vendor_timer #SCNT + %tiempo_ronda
+                         return
+                       }
+                  }
+            }
+            else ; No podemos comprarla todavía...
+                {
+                  if #SCNT >= %esperando_timer ; Mostramos mensaje cada minuto...
+                     {
+                       set %tiempo_espera abs ( %vendor_timer - #SCNT )
+                       if %tiempo_espera > 60
+                          {
+                            set %tiempo_espera_mins abs ( %vendor_timer - #SCNT ) / 60
+                            set #SYSMSGCOL 18
+                            event sysmessage RESTANTE: [ %tiempo_espera_mins ] Minutos...
+                            set %esperando_timer #SCNT + 60
+                            wait 20
+                          }
+                          else
+                             {
+                               if %tiempo_espera < 60
+                                  {
+                                    set %tiempo_espera_secs abs ( %vendor_timer - #SCNT )
+                                    set #SYSMSGCOL 18
+                                    event sysmessage RESTANTE: [ %tiempo_espera_secs ] Secs
+                                    wait 20
+                                    set %esperando_timer #SCNT + 1
+                                  }
+                             }
+
+                             goto _waitToRonda
+                     }
+                     else
+                        {
+                          goto _waitToRonda
+                        }
+                }
+      }
+return
+
+;BLOQUE OCULTARSE
+PreOcultarse:
+set #SYSMSGCOL 1165
+event sysmessage Pulsa ESC cuando estes listo para empezar a macrear:
+Ocultarse:
+onhotkey ESC
+{
+Oculta:
+event macro 13 21
+wait 3s
+set %tiempo_actual #SCNT
+if ( %proxima_vez <= %tiempo_actual )
+     {
+       gosub comprobar_comida
+     }
+goto Oculta
+}
+goto Ocultarse
+
+;BLOQUE CAMINAR OCULTO
+PreCaminar:
+set #SYSMSGCOL 1165
+event sysmessage Situate en un espacio en el que puedas
+event sysmessage dar tres pasos hacia el norte y pulsa ESC:
+set %inicioX #CHARPOSX
+set %inicioY #CHARPOSY
+set %finX #CHARPOSX
+set %finY #CHARPOSY - 5
+Caminar:
+onhotkey ESC
+{
+Oculta:
+set %tiempo_actual #SCNT
+if ( %proxima_vez <= %tiempo_actual )
+     {
+       gosub comprobar_comida
+     }
+event macro 13 21
+wait 3s
+if #CHARSTATUS = H
+{
+goto Camina
+}
+goto Oculta
+
+Camina:
+move %finX %finY 0 5s
+wait 20
+if #CHARSTATUS = H
+{
+move %inicioX %inicioY 0 5s
+wait 20
+if #CHARSTATUS = H
+{
+goto Camina
+}
+goto Oculta
+}
+goto Oculta
+}
+goto Caminar
+
+; BLOQUE PASTOREAR
+PrePastorear:
+set #SYSMSGCOL 1165
+event sysmessage Equipa un cayado, selecciona el animal a pastorear y pulsa ESC para empezar:
+finditem DMH_EMH
+set #LOBJECTID #FINDID
+event macro 17 0
+target
+set %animal #LTARGETID
+Pastorear:
+onhotkey ESC
+{
+Pastoreo:
+finditem DMH_EMH
+set #LOBJECTID #FINDID
+event macro 17 0
+target
+set #LTARGETID %animal
+set #LTARGETKIND 1
+event macro 22 0
+wait 8s
+set %tiempo_actual #SCNT
+if ( %proxima_vez <= %tiempo_actual )
+     {
+       gosub comprobar_comida
+     }
+goto Pastoreo
+}
+goto Pastorear
+
+;BLOQUE VETERINARIA
+PreVeterinaria:
+set #SYSMSGCOL 1165
+event sysmessage Ten muchas vendas y un pilon de agua en la mochila.
+event sysmessage Selecciona el animal a curar y pulsa ESC:
+finditem WEE_VEE_QEE_TEE C_ , #BACKPACKID
+if #FINDCNT > 0
+   {
+     set %pilon #FINDID
+   }
+   else
+      {
+        set #SYSMSGCOL 38
+        event sysmessage NO HAY PILON DE AGUA!
+        halt
+      }
+msg .vendas$
+target
+set %animal #LTARGETID
+Veterinaria:
+onhotkey ESC
+{
+Cura:
+finditem ZLF C_ , #BACKPACKID
+if #FINDCNT = 0
+   {
+     msg all stop$
+     msg all stop$
+     halt
+   }
+if #FINDSTACK < 100
+   {
+     goto Limpia
+   }
+set %tiempo_actual #SCNT
+if ( %proxima_vez <= %tiempo_actual )
+     {
+       gosub comprobar_comida
+     }
+set #LOBJECTID #FINDID
+event macro 17 0
+target
+set #LTARGETID %animal
+set #LTARGETKIND 1
+event macro 22 0
+wait 20
+scanjournal 1
+if no_necesita_curarse in #journal
+   {
+     wait 20
+     goto Cura
+   }
+wait 6s
+goto Cura
+
+Limpia:
+finditem AMF C_ , #BACKPACKID
+if #FINDCNT = 0
+   {
+     finditem ZLF C_ , #BACKPACKID
+     if #FINDCNT > 0
+        {
+          exevent drag #FINDID #FINDSTACK
+          exevent dropc #BACKPACKID
+          wait 30
+          goto Cura
+        }
+   }
+   else
+      {
+        set #LOBJECTID #FINDID
+        event macro 17 0
+        target
+        set #LTARGETID %pilon
+        set #LTARGETKIND 1
+        event macro 22
+        wait 20
+        goto Limpia
+      }
+}
+goto Veterinaria
+
+;BLOQUE PACIFICAR
+PrePacificar:
+set #SYSMSGCOL 1165
+event sysmessage Selecciona un NPC con karma negativa y pulsa ESC para comenzar:
+event macro 13 9
+target
+set %animal #LTARGETID
+Pacificar:
+onhotkey ESC
+{
+Pacifica:
+event macro 13 9
+taregt
+set #LTARGETID %animal
+set #LTARGETKIND 1
+event macro 22 0
+wait 6s
+gosub Comer
+goto Pacifica
+}
+goto Pacificar
+
+;* @name GetName
+;* @author Roadkill
+;* @ver 1.0 24Jan04
+;* @purpose get the name of a creature/vendor
+;* @params %1= the id of the thing whose name you want, required
+;*      @%2= variable name to return the ID in, required
+;* @returns @%2 and #result
+;* @changes #property, #strres, @%2, !strlength
+;* @example call rksubs.txt GetName %beetle beetlename
+;* @status: tested
+sub GetName
+        set %id_property %1
+        gosub waitforprop %id_property
+        str pos #property $
+        set !strlength #strres - 1
+        str left #property !strlength
+        set % . %2 #strres
+return % . %2
+
+sub waitforprop ; <===================================================>
+event property #charid
+wait 1
+set %oldprop #property
+event property %1
+_testforprop:
+if #property = %oldprop
+   {
+     goto _testforprop
+   }
+return
+
+;=====================================================
+; Rutina para, en caso de hambre, comer hasta saciarse
+;=====================================================
+; v2.4
+sub comprobar_comida
+{
+  hambriento:
+  set %jrnl #JINDEX ; Marcamos un índice de las líneas del diario.
+  event macro 4 0 .hungry
+  wait 20
+  while #TRUE
+     {
+       if #JINDEX > %jrnl ; Si aparece una nueva línea.
+          {
+            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de línea.
+            scanjournal %jrnl   ; La leemos...
+            if Dentro_de_1_minuto in #JOURNAL
+               {
+                 wait 120s ; Save del server...
+               }
+            if no_te_puedes_comer_eso in #JOURNAL
+               {
+                 event exmsg #CHARID 3 48 ESTO NO ES COMIDA!!
+                 wait 40
+                 ignoreitem #FINDID ComidaID ; Lo guardamos en una lista de ID's que no se pueden comer [ ignoreitem reset ComidaID ].
+                 goto hambriento
+               }
+            if Estas_no_le_afecta_el_hambre in #JOURNAL || Estas_tan_lleno_que_no_puedes in #JOURNAL || Estas_totalmente_saciado in #JOURNAL
+               {
+                 set %proxima_vez %tiempo_actual + %tiempo_alimentacion
+                 return
+               }
+               else
+                  {
+                    if Estas_lleno in #JOURNAL || Estas_contento in #JOURNAL || Estas_en_inanicion in #JOURNAL || Estas_hambriento in #JOURNAL || Sientes_mucho in #JOURNAL || Estas_con_hambre in #JOURNAL || Estas_parcialmente in #JOURNAL || Estas_bien_lleno in #JOURNAL || Te_sientes_casi_lleno in #JOURNAL
+                       {
+                         finditem %comida C_ , #BACKPACKID
+                         if #findcnt > 0
+                            {
+                              set #LOBJECTID #FINDID
+                              event macro 17
+                              goto hambriento ; Seguimos comiendo...
+                            }
+                            else
+                               {
+                                 event exmsg #CHARID 3 48 COMPRA COMIDA!!
+                                 wait 40
+                                 set %proxima_vez %tiempo_actual + %tiempo_alimentacion
+                               }
+                       }
+                       else ; Mensaje extraño, repetimos...
+                          {
+                            goto hambriento
+                          }
+                  }
+          }
+       return
+     } ; FIN While
+}
+return
+
+sub Comer
+set %comida YSD_QQD_FUD_HND
+finditem %comida c_ , #BACKPACKID
+set #LOBJECTID #FINDID
+event macro 17 0
+wait 10
+return
+
+;=================================================================
+sub wait_for
+;=================================================================
+; This "wait_for" sub package was created by Locke. If you use these subs please keep this header intact.
+; Documentation: the sub package grew to large with all the comments. To load them call the sub like this:
+; gosub wait_for docs    | or you can use doc, documention, what, or my personal favorite, kickass.
+
+; "wait_for core dispatcher" version 1.2 by Locke
+if %1 = doc || if %1 = docs || if %1 = documentation || if %1 = what || if %1 = kickass
+{
+Display ok Please click ok and wait for your browser to start.
+execute http://www.easyuo.com/forum/viewtopic.php?t=24716
+halt
+}
+nameSpace Push
+namespace local LLNS
+set #result N/A ; if #result isn't set by one of my wait_for subs it'll throw an error.
+set !LPC #lpc
+set #lpc 200
+for %i 0 %0
+set !_A . %i % . %i
+gosub wait_for_ , !_A1
+set #lpc !lpc
+namespace clear LLNS
+namespace pop
+if #result <> N/A
+return #result
+else
+display ok You specified an unknown wait_for command. Script returned #result and is halting.
+halt
+;=================================================================
+sub wait_for_MSG ; version 1.4 ~Locke
+;=================================================================
+if !_A0 < 3
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for MSG %message time_out_in_seconds$
++Script is halting
+halt
+}
+set !_timeout ( #scnt + !_A . !_A0 )
+_lets_wait_for_a_message:
+for %i %jstart #jindex
+{
+ scanjournal %i
+  for %ii 2 !_A0
+  {
+    if !_A . %ii in #journal && %jstart <> %i
+    set #result #true , #spc , !_A . %ii
+  }
+}
+
+if #true notin #result
+{
+set #result #false
+ if !_timeout =< #scnt
+ return #result
+wait 1
+goto _lets_wait_for_a_message
+}
+else
+return #result
+
+wait 1
+goto _lets_wait_for_a_message
+
+;======================================================================
+sub wait_for_GUMP ; version 1.4 ~Locke
+;=================================================================
+; Añadido #CONTID para "sub abrir_cofre"
+if !_A0 < 3
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for GUMP XXX_YYY time_out_in_seconds$
++Script is halting
+halt
+}
+if !_A3 <> CLOSE
+set !_timeout #scnt2 + !_A3
+else
+set !_timeout 0 ; no gump wait if %3 = CLOSE since we already believe it to be open.
+
+_lets_wait_for_a_gump:
+if #CONTSIZE = !_A2 || #CONTKIND = !_A2 || #CONTNAME = !_A2 || #CONTTYPE = !_A2 || #CONTID = !_A2
+{
+ if !_A5 <> N/A && !_A6 <> N/A
+ {
+ set !clickx !_A5 + #contposx
+ set !clicky !_A6 + #contposy
+ click !clickx !clicky
+ }
+ if !_A3 = CLOSE || if !_A4 = CLOSE || !_A5 = CLOSE || !_A6 = CLOSE
+ {
+ set !string #contsize
+ str pos !string _
+ set !pos #strres
+ str del !string #strres #strres
+ set !clickX #contposx + ( #strres / 2 )
+ str del !string 1 !pos
+ set !clickY #contposy + ( #strres / 2 )
+ click !clickx !clicky R
+ }
+return #true
+}
+
+if ( !_timeout =< #scnt2 ) && ( !_A4 = N/A )
+   {
+     return #false
+   }
+
+if !_A4 <> N/A && !_timeout =< #scnt2
+{
+finditem !_A4
+if #findkind <> -1
+{
+ for #findindex 1 #findcnt
+ {
+  if #finddist > 2
+  ignoreitem #findid LLWAITFOR
+  else
+  break
+ }
+ set #lobjectid #findid
+ event macro 17 0
+ set !_timeout #scnt2 + !_A3
+}
+else
+return #false
+}
+wait 1
+goto _lets_wait_for_a_gump
