@@ -30,18 +30,18 @@
 ; *******************************************************************************
 ;
 ; Author: Sthil Lauda
-; Version: 3.5
+; Version: 3.6
 ; Client Tested with: 2.0.3
 ; EUO version tested with: EasyUO 1.5 Version 243
 ; Shard: Ultima Alianza (¡Hasta la muerte!)
 ; Public Release: 04/03/18
-; Revised On: 12/08/19
+; Revised On: 13/04/20
 ; Propósito: Procesa cofres del tesoro; Desactiva la trampa, fuerza la cerradura, y lotea el cofre.
 ; Instrucciones: - Se requieren ganzúas en la mochila, una bolsa para el loot, y opcionalmente pergas de In Vas Mani... ^^
 ;                - Es posible que tengáis que ir añadiendo ID's de objetos a lotear en %tesoros, %items_cofres, etc.
 ;
 ;========================================================
-set %version 3.5
+set %version 3.6
 ;________________________________
 ;
 ; ///////////////////////////////
@@ -212,7 +212,7 @@ OnHotKey %TeclaAuto ; ** Desactivar Trampa + Forzar + Lotear **
              event macro 13 48 ; Use Skill Remove Trap
              target 3s
              set #ltargetid %idcaja
-             set #LtargetKind
+             set #LtargetKind 1
              gosub ResetJournal
              set %jstart #jindex ; Marcamos el journal
              event macro 22
