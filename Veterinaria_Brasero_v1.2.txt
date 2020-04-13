@@ -32,11 +32,11 @@
 ;
 ; Script Name: Veterinaria con Brasero
 ; Author: Sthil Lauda
-; Version: 2.10
+; Version: 1.2
 ; Client Tested with: 2.0.3
 ; EUO version tested with: 1.5 Version 142
 ; Shard OSI / FS: Ultima Alianza ¡Hasta la muerte!
-; Revision Date: 25/03/2019
+; Revision Date: 13/04/2020
 ; Public Release: 15/07/2019
 ; Purpose: Aplica vendas a un animal encima de un brasero, para subir veterinaria.
 ;________________________________
