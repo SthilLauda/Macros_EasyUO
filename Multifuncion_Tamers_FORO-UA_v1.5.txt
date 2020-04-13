@@ -1,20 +1,21 @@
 ;==================================
-; Script: Macro multifunciÛn para subir un tamer.
-; Autor: KraTezZ
+; Script: Macro multifunci√≥n para subir un tamer.
+; Autor: KraTezZ [MOD+ "Cofre/Vendor" Sthil Lauda]
 ; Version Easyuo: 1.5 243
 ; Version: 1.4
 ; Cliente: 7.0.8.2
 ; Fecha del script: 28 Mayo 2016 (Scripts indivuduales desde 03/06/12).
+; Actualizado 13/04/2020
 ; Finalidad: Subir las habilidades que cualquier tamer pueda necesitar.
 ;==================================
 ; FUNCIONAMIENTO:
 ; Esta macro permite al usuario tener una sola macro que englobe casi todas
 ; las macros necesarias para macrear las habilidades que un tamer puede necesitar.
-; Incluye: RASTREAR; CONOCIMIENTO ANIMAL; ENCANTAR; M⁄SICA; OCULTARSE; CAMINAR OCULTO;
+; Incluye: RASTREAR; CONOCIMIENTO ANIMAL; ENCANTAR; M√öSICA; OCULTARSE; CAMINAR OCULTO;
 ; PASTOREAR; VETERINARIA; PACIFICAR
 
-set %tiempo_alimentacion 360 ; Cada cu·ntos segundos va a comprobar si tiene hambre.
-set %tiempo_ronda 960        ; Cada cu·ntos segundos puede comprar instrumentos en el vendor.
+set %tiempo_alimentacion 360 ; Cada cu√°ntos segundos va a comprobar si tiene hambre.
+set %tiempo_ronda 960        ; Cada cu√°ntos segundos puede comprar instrumentos en el vendor.
 set %comida RGG_NRD_QSD_ZBG_WLI
  +_QRD_END_FUD_YLI_WLI_HGI_JQE
  +_KGI_EGI_QLI_KLI_MLI_KRD_HQD
@@ -29,7 +30,7 @@ set %vendor_timer #SCNT
 Conf:
 set #SYSMSGCOL 88
 event sysmessage =========
-event sysmessage øQue habilidad quieres macrear?
+event sysmessage ¬øQue habilidad quieres macrear?
 event sysmessage Pulsa un numero:
 event sysmessage 1-. Rastrear
 event sysmessage 2-. Conocimiento animal
@@ -143,7 +144,7 @@ goto AnimalLore
 }
 goto ConAnimal
 
-; BLOQUE M⁄SICA
+; BLOQUE M√öSICA
 PreMusica:
 gosub askForSetup
 wait 3s
@@ -201,7 +202,7 @@ if #FINDCNT > 0 ; Hay instrumentos...
              }
              else ; Tampoco quedan en la bolsa...
                 {
-                  if ( %tienda_musica ) ; Hemos activado la opciÛn de una tienda de aparejos y accesorios (Minoc, etc)...
+                  if ( %tienda_musica ) ; Hemos activado la opci√≥n de una tienda de aparejos y accesorios (Minoc, etc)...
                        {
                          gosub vendor
                          wait 2s
@@ -211,7 +212,7 @@ if #FINDCNT > 0 ; Hay instrumentos...
       }
 goto Musica
 
-; BLOQUE ENCANTAR + M⁄SICA
+; BLOQUE ENCANTAR + M√öSICA
 PreEncantar:
 gosub askForSetup
 set #SYSMSGCOL 1165
@@ -268,7 +269,7 @@ if ( %modo_cofre ) ; Buscamos en un cofre...
      }
      else
         {
-          if ( %tienda_musica ) ; Hemos activado la opciÛn de una tienda de aparejos y accesorios (Minoc, etc)...
+          if ( %tienda_musica ) ; Hemos activado la opci√≥n de una tienda de aparejos y accesorios (Minoc, etc)...
                {
                  finditem LQF_QRF_MQF_PRF C_ , #BACKPACKID
                  if #FINDCNT > 0
@@ -291,7 +292,7 @@ goto Encantar
 
 sub askForSetup
 _bolsaOvendor:
-display yesno øQuieres macrear usando un cofre con instrumentos?
+display yesno ¬øQuieres macrear usando un cofre con instrumentos?
 if #DISPRES = yes
    {
      set #SYSMSGCOL 1165
@@ -323,7 +324,7 @@ if #DISPRES = yes
    }
    else
       {
-        display yesno øQuieres macrear comprando instrumentos a un vendor?
+        display yesno ¬øQuieres macrear comprando instrumentos a un vendor?
         if #DISPRES = yes
            {
              set %modo_cofre #FALSE
@@ -394,7 +395,7 @@ if #FINDCNT = 0 ; Si no encontramos un vendor
      if #SCNT >= %wait_timer ; Mostramos mensaje cada minuto...
         {
           set #SYSMSGCOL 88
-          event sysmessage ESPERANDO AL VENDOR ¨¨
+          event sysmessage ESPERANDO AL VENDOR ¬¨¬¨
           set %wait_timer #SCNT + 60
         }
         wait 1s
@@ -419,7 +420,7 @@ if #FINDCNT = 0 ; Si no encontramos un vendor
                          wait 20
                          event macro 1 0 %nombre_vendor Buy
                          gosub wait_for GUMP 800_590 20
-                         click 312 581 f dmc ; P·gina 5 del men˙
+                         click 312 581 f dmc ; P√°gina 5 del men√∫
                          gosub wait_for GUMP 800_590 20
                          click 374 330 f dmc ; Panderetas...
                          gosub wait_for GUMP 800_590 20
@@ -430,7 +431,7 @@ if #FINDCNT = 0 ; Si no encontramos un vendor
                        }
                   }
             }
-            else ; No podemos comprarla todavÌa...
+            else ; No podemos comprarla todav√≠a...
                 {
                   if #SCNT >= %esperando_timer ; Mostramos mensaje cada minuto...
                      {
@@ -699,14 +700,14 @@ return
 sub comprobar_comida
 {
   hambriento:
-  set %jrnl #JINDEX ; Marcamos un Ìndice de las lÌneas del diario.
+  set %jrnl #JINDEX ; Marcamos un √≠ndice de las l√≠neas del diario.
   event macro 4 0 .hungry
   wait 20
   while #TRUE
      {
-       if #JINDEX > %jrnl ; Si aparece una nueva lÌnea.
+       if #JINDEX > %jrnl ; Si aparece una nueva l√≠nea.
           {
-            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de lÌnea.
+            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de l√≠nea.
             scanjournal %jrnl   ; La leemos...
             if Dentro_de_1_minuto in #JOURNAL
                {
@@ -742,7 +743,7 @@ sub comprobar_comida
                                  set %proxima_vez %tiempo_actual + %tiempo_alimentacion
                                }
                        }
-                       else ; Mensaje extraÒo, repetimos...
+                       else ; Mensaje extra√±o, repetimos...
                           {
                             goto hambriento
                           }
@@ -830,7 +831,7 @@ goto _lets_wait_for_a_message
 ;======================================================================
 sub wait_for_GUMP ; version 1.4 ~Locke
 ;=================================================================
-; AÒadido #CONTID para "sub abrir_cofre"
+; A√±adido #CONTID para "sub abrir_cofre"
 if !_A0 < 3
 {
 display ok You haven't specified enough vars.$
