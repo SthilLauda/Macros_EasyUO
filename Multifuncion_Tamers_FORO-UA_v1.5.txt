@@ -435,6 +435,7 @@ if #FINDCNT = 0 ; Si no encontramos un vendor
                          gosub wait_for GUMP 800_590 20
                          click 600 534 f dmc ; OKAY...
                          event macro 1 0 %nombre_vendor Gracias
+                         wait 20
                          set %vendor_timer #SCNT + %tiempo_ronda
                          return
                        }
