@@ -82,7 +82,7 @@ set #TARGCURS 1
 target
 while #TARGCURS = 1
       {
-        wait 5
+        wait 1
       }
 set #SYSMSGCOL 18
 set %animal #LTARGETID
@@ -135,7 +135,9 @@ if #FINDCNT > 0
         event macro 1 0 all come
         wait 5s
         event macro 1 0 all stop
-        wait 20
+        wait 1s
+        event macro 1 0 all stop
+        wait 1s
         set #SYSMSGCOL 38
         event sysmessage NO HAY VENDAS!! :-(
         halt
