@@ -143,8 +143,18 @@ if #FINDCNT = 0
                      wait 30
                      goto _rePonKeg
                    }
+                   else
+                      {
+                        ignoreitem #FINDID BAD_KEGS
+                      }
               }
          }
+         else
+           {
+             set #SYSMSGCOL 38
+             event sysmessage NO QUEDAN KEGS! :(
+             halt
+           }
    }
 return
 
