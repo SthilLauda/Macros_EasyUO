@@ -25,28 +25,28 @@
 ; Version: 1.0
 ; Client Tested with: 2.0.3
 ; EUO version tested with: EasyUO 1.5 Version 243
-; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Shard: Ultima Alianza (Â¡Hasta la muerte!)
 ; Revision Date: 15/04/2020
 ; Public Release: 15/04/2020
 ; Global Variables Used: Ninguna.
 ; Purpose: Entrena la habilidad envenenando un arma con pociones de un keg de veneno menor.
 ;
 ; *** NOTAS ***
-; - ¡Llevar comida en la mochila!
+; - Â¡Llevar comida en la mochila!
 ; - Armas soportadas: Katana, Espada Larga, Espada Ancha, Espada Vikinga, Sable, Kryss, o Recolector de Huesos.
 ;________________________________
 ;
 ; ///////////////////////////////
-; ******** CONFIGURACIÓN ********
+; ******** CONFIGURACIÃ“N ********
 ; ///////////////////////////////
 ;________________________________
 ;
-set %cofre_kegs_y_frascos UXVXMND ; Cofre con kegs de 1000 pociones de veneno menor, un arma de filo, y 50 pociones vacías.
-set %tiempo_alimentacion 360      ; Cada cuántos segundos va a comprobar si tiene hambre.
+set %cofre_kegs_y_frascos UXVXMND ; Cofre con kegs de 1000 pociones de veneno menor, un arma de filo, y 50 pociones vacÃ­as.
+set %tiempo_alimentacion 360      ; Cada cuÃ¡ntos segundos va a comprobar si el pj tiene hambre.
 ;________________________________________________
 ;
 ; //////////////////////////////////////////////
-; ************* FIN CONFIGURACIÓN *************
+; ************* FIN CONFIGURACIÃ“N *************
 ; //////////////////////////////////////////////
 ;________________________________________________
 ;
@@ -155,7 +155,7 @@ if #FINDCNT > 0
    {
      for #FINDINDEX 1 #FINDCNT
          {
-           if #FINDCOL = 0 ; Botella vacía
+           if #FINDCOL = 0 ; Botella vacÃ­a
               {
                 return ; Ya tenemos una
               }
@@ -166,7 +166,7 @@ if #FINDCNT > 0
                         gosub envenenar
                         goto _botella
                       }
-                      else ; Poción extraña, la movemos al cofre... ¬¬
+                      else ; PociÃ³n extraÃ±a, la movemos al cofre... Â¬Â¬
                          {
                            exevent drag #FINDID #FINDSTACK
                            exevent dropc %cofre_kegs_y_frascos
@@ -185,7 +185,7 @@ if #FINDSTACK = 0
         {
            for #FINDINDEX 1 #FINDCNT
                {
-                 if #FINDCOL = 0 ; Botella vacía
+                 if #FINDCOL = 0 ; Botella vacÃ­a
                     {
                       exevent drag #FINDID 1
                       exevent dropc #BACKPACKID
@@ -236,7 +236,7 @@ if #FINDCNT = 0
    {
      gosub arma
    }
-; Preparar poción de Veneno Menor
+; Preparar pociÃ³n de Veneno Menor
 finditem %keg C_ , #BACKPACKID
 if #FINDCNT > 0
    {
@@ -246,7 +246,7 @@ if #FINDCNT > 0
         {
           for #FINDINDEX 1 #FINDCNT
               {
-                if #FINDCOL = 0 ; Botella vacía
+                if #FINDCOL = 0 ; Botella vacÃ­a
                    {
                      event macro 17
                      target
@@ -306,14 +306,14 @@ return
 sub comprobar_comida ;<==============================>
 {
   hambriento:
-  set %jrnl #jindex ; Marcamos un índice de las líneas del diario.
+  set %jrnl #jindex ; Marcamos un Ã­ndice de las lÃ­neas del diario.
   event macro 4 0 .hungry
   wait 20
   while #true
      {
-       if #jindex > %jrnl ; Si aparece una nueva línea.
+       if #jindex > %jrnl ; Si aparece una nueva lÃ­nea.
           {
-            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de línea.
+            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de lÃ­nea.
             scanjournal %jrnl   ; La leemos...
             if Estas_no_le_afecta_el_hambre in #journal || Estas_tan_lleno_que_no_puedes in #journal || Estas_totalmente_saciado in #journal
                {
@@ -339,7 +339,7 @@ sub comprobar_comida ;<==============================>
                                  set %proxima_vez %tiempo_actual + %tiempo_alimentacion
                                }
                        }
-                       else ; Mensaje extraño, repetimos...
+                       else ; Mensaje extraÃ±o, repetimos...
                           {
                             goto hambriento
                           }
@@ -352,7 +352,7 @@ return
 
 ;-@ ============================== @-;
 ;-@ ############################## @-;
-;-@ SUBS públicos del Foro EasyUO  @-;
+;-@ SUBS pÃºblicos del Foro EasyUO  @-;
 ;-@ ############################## @-;
 ;-@ ============================== @-;
 
@@ -424,7 +424,7 @@ goto _lets_wait_for_a_message
 ;======================================================================
 sub wait_for_GUMP ; version 1.4 ~Locke
 ;=================================================================
-; Añadido #CONTID ^^
+; AÃ±adido #CONTID ^^
 if !_A0 < 3
 {
 display ok You haven't specified enough vars.$
