@@ -193,6 +193,10 @@ if #FINDSTACK = 0
                       goto _frasco
                     }
                }
+               else
+                  {
+                    ignoreitem #FINDID BAD_POTIONS
+                  }
         }
         else
            {
