@@ -1,0 +1,494 @@
+; ======================================================================================================
+;  '||   ||` '||`   ||                                 /.\      '||`
+;   ||   ||   ||    ||     ''                         // \\      ||   ''
+;   ||   ||   ||  ''||''   ||  '||),,(|,   '''|.     //...\\     ||   ||   '''|.  `||''|,  '''/  '''|.
+;   ||   ||   ||    ||     ||   || || ||  .|''||    //     \\    ||   ||  .|''||   ||  ||   //  .|''||
+;   `|...|'  .||.   `|..' .||. .||    ||. `|..||. .//       \\. .||. .||. `|..||. .||  ||. /... `|..||.
+; =====================================================================================================
+; Script Name: Fabricar Pucheros
+; Author: Sthil Lauda
+; Version: 1.0
+; Client Tested with: 2.0.3
+; EUO version tested with: EasyUO 1.5 Version 243
+; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Revision Date: 15/04/2020
+; Public Release: 15/04/2020
+; Global Variables Used: Ninguna.
+; Purpose: Fabrica pucheros hasta llenar una bolsa entera.
+;________________________________
+;
+; ///////////////////////////////
+; ******** CONFIGURACIÓN ********
+; ///////////////////////////////
+;________________________________
+;
+set %cofre ZPFXMND ; <----------- ID de un cofre con una bolsa con lingotes. El cofre se abre automáticamente.
+set %bolsa_lingotes VGRWJPD ; <-- ID de la bolsa de los lingotes. La bolsa se abre automáticamente cuando se abre el cofre.
+set %bolsa_cocinero XVVIPPD ; <-- ID de una bolsa grande con una bolsita pequeña para dejar los pucheros. La bolsa se abre automáticamente.
+set %bolsa_pucheros YDOFWMD ; <-- ID de la bolsa para dejar los pucheros. La bolsa se abre automáticamente cuando se abre la bolsa del cocinero.
+set %limite_producto 9      ; <-- Número máximo de pucheros en la mochila antes de descargarlos a la bolsa (ojo con el peso XD).
+set %tiempo_alimentacion 360 ; Cada cuántos segundos va a comprobar si tiene hambre (5 minutos).
+;________________________________________________
+;
+; //////////////////////////////////////////////
+; ************* FIN CONFIGURACIÓN *************
+; //////////////////////////////////////////////
+;________________________________________________
+;
+set %tiempo_actual #SCNT ; Reloj
+set %proxima_vez %tiempo_actual ; Trigger
+set %comida RGG_NRD_QSD_ZBG_WLI_QRD_END_FUD_YLI_WLI_HGI
+    +_KGI_EGI_QLI_KLI_MLI_KRD_HQD_AQD_MQE_VQE_TQE_JQE_IQE
+    +_GQE_SPE_ZPE_OQE_BDF_KPE_RQE_YSD_SQD_YWI_AXI_PQD_QQD
+set %producto_guardar RCG_NWH_FRD_IRD_GRD_HRD_CRD_BRD_JRD
+set %lingotes RMK
+set %herramienta GTL
+set %start #TRUE
+
+set #SYSMSGCOL 1187
+event sysmessage =======================
+wait 20
+set #SYSMSGCOL 1165
+event sysmessage Fabricar Pucheros v1.0
+wait 20
+set #SYSMSGCOL 1187
+event sysmessage =======================
+wait 20
+
+inicio:
+gosub Herramientas
+for %h 1 %limite_producto
+    {
+      gosub HacerProducto
+    }
+goto inicio
+
+sub Herramientas ;<=========================>
+ciclo:
+gosub ReponerMaterial pesado 15 15
+gosub ReponerMaterial hierro 90 90
+gosub ReponerMaterial bronce 15 15
+finditem %herramienta C_ , #BACKPACKID
+if #FINDCNT < 2
+   {
+     if #FINDCNT > 0
+        {
+          set #LOBJECTID #FINDID
+          event macro 17
+          gosub wait_for GUMP 530_480 50
+          contpos 40 40
+          click 70 170 f dmc ; Herramientas
+          gosub wait_for GUMP 530_480 50
+          contpos 40 40
+          click 430 350 f dmc ; Siguiente
+          gosub wait_for GUMP 530_480 50
+          contpos 40 40
+          click 270 190 f dmc ; Herramientas de Artesano
+          gosub wait_for GUMP 530_480 50
+          contpos 40 40
+          set %start #TRUE
+          goto ciclo
+        }
+        else
+           {
+             sound
+             set #SYSMSGCOL 38
+             event sysmessage ERROR: NECESITO AL MENOS 1 HERRAMIENTA
+             display ERROR: NECESITO AL MENOS 1 HERRAMIENTA
+                   + DE ARTESANO PARA EMPEZAR :-(
+             halt
+           }
+   }
+return
+
+sub HacerProducto ;<=========================>
+finditem %producto_guardar C_ , #BACKPACKID
+if #FINDCNT >= %limite_producto || #WEIGHT >= #MAXWEIGHT -
+   {
+     set #LOBJECTID %bolsa_cocinero
+     event macro 17
+     gosub wait_for GUMP %bolsa_cocinero 40
+     set #LOBJECTID %bolsa_pucheros
+     event macro 17
+     gosub wait_for GUMP %bolsa_pucheros 40
+     _dejar:
+     finditem %producto_guardar C_ , %bolsa_pucheros
+     if #FINDCNT >= 255
+        {
+          set #SYSMSGCOL 88
+          event sysmessage BOLSA LLENA! :D
+          halt
+        }
+     finditem %producto_guardar C_ , #BACKPACKID
+     if #FINDCNT > 0
+        {
+          exevent drag #FINDID #FINDSTACK
+          exevent dropc %bolsa_pucheros
+          wait 30
+          goto _dejar
+        }
+   }
+if #CONTSIZE <> 530_480
+   {
+     finditem %herramienta C_ , #BACKPACKID
+     if #FINDCNT > 0
+        {
+          set #LOBJECTID #FINDID
+          event macro 17
+          wait 10
+        }
+   }
+set %jstart #jindex
+if %start
+   {
+     click 69 272 f dmc ; Objetos Taberna
+     gosub wait_for GUMP 530_480 50
+     contpos 40 40
+     click 435 349 f dmc ; Siguiente
+     gosub wait_for GUMP 530_480 50
+     set %jstart #jindex
+     contpos 40 40
+     click 272 230 f dmc ; Olla
+     gosub wait_for GUMP 530_480 50
+     contpos 40 40
+     set %start #FALSE
+   }
+click 326 497 f dmc ; Fabricar Último
+gosub wait_for MSG No_tienes_los_recursos Pones_el 50
+if ( #TRUE in #RESULT )
+     {
+       if Pones_el in #RESULT
+          {
+            return
+          }
+       if No_tienes_los_recursos in #RESULT
+          {
+            goto inicio
+          }
+     }
+return
+
+sub ReponerMaterial ;<=========================>
+set %mineral_tmp %1
+set %min_cantidad %2
+set %max_cantidad %3
+set %id_mineral_backpack N/A
+set #LOBJECTID %cofre
+event macro 17
+gosub wait_for GUMP %cofre 40
+if ( #TRUE in #RESULT )
+     {
+       set #LOBJECTID %bolsa_lingotes
+       event macro 17
+       gosub wait_for GUMP %bolsa_lingotes 40
+       if ( #TRUE in #RESULT )
+            {
+              _repon1:
+              finditem %lingotes C_ , %bolsa_lingotes
+              if #FINDCNT > 0
+                 {
+                   for #FINDINDEX 1 #FINDCNT
+                       {
+                         gosub waitforprop #FINDID
+                         set %property_mineral #property
+                         if %mineral_tmp in %property_mineral
+                            {
+                              set %id_mineral_bolsa #FINDID
+                              break ; Hemos encontrado el tipo de mineral.
+                            }
+                       }
+                 }
+              finditem %lingotes C_ , #BACKPACKID
+              if #FINDCNT > 0
+                 {
+                   for #FINDINDEX 1 #FINDCNT
+                       {
+                         event property #FINDID
+                         wait 10
+                         set %property_mineral #property
+                         if %mineral_tmp in %property_mineral
+                            {
+                              set %id_mineral_backpack #FINDID
+                              break ; Hemos encontrado el tipo de mineral.
+                            }
+                       }
+                  }
+              finditem %id_mineral_backpack C_ , #BACKPACKID
+              if #FINDSTACK < %min_cantidad
+                 {
+                   set %max_cantidad %max_cantidad - #FINDSTACK
+                   finditem %id_mineral_bolsa C_ , %bolsa_lingotes
+                   if #FINDSTACK >= %max_cantidad
+                      {
+                        exevent drag %id_mineral_bolsa %max_cantidad
+                        exevent dropC #BACKPACKID
+                        wait 30
+                        goto _repon1
+                      }
+                      else
+                         {
+                           set #sysmsgcol 28
+                           event sysmessage NO QUEDAN LINGOTES!
+                           wait 20
+                           halt
+                           set #RESULT #FALSE
+                         }
+                 }
+                 else ; Tenemos el suficiente mineral
+                    {
+                      set #RESULT #TRUE
+                    }
+            }
+     }
+return #RESULT
+
+sub waitforprop
+event property #charid
+wait 1
+set %oldprop #property
+event property %1
+_testforprop:
+if #property = %oldprop
+   {
+     goto _testforprop
+   }
+return
+;=================================================================
+sub wait_for
+;=================================================================
+; This "wait_for" sub package was created by Locke. If you use these subs please keep this header intact.
+; // end header
+; Documentation: the sub package grew to large with all the comments. To load them call the sub like this:
+; gosub wait_for docs    | or you can use doc, documention, what, or my personal favorite, kickass.
+; Thanks to ~BookWibble~ for helping with all the debugging and spotting a bug or three.
+; "wait_for core dispatcher" version 1.3 by Locke
+if %1 = doc || if %1 = docs || if %1 = documentation || if %1 = what || if %1 = kickass
+{
+Display ok Please click ok and wait for your browser to start.
+execute http://www.easyuo.com/forum/viewtopic.php?t=24716
+halt
+}
+nameSpace Push
+namespace local LLNS
+set #result N/A ; if #result isn't set by one of my wait_for subs it'll throw an error.
+set !LPC #lpc
+set #lpc 200
+for %i 0 %0
+set !_A . %i % . %i
+gosub wait_for_ , !_A1
+ignoreitem reset LLWAITFOR
+set #lpc !lpc
+namespace clear LLNS
+namespace pop
+if #result <> N/A
+return #result
+else
+display ok You specified an unknown wait_for command. Script returned #result and is halting.
+halt
+
+;======================================================================
+sub wait_for_MSG ; version 1.4 ~Locke
+;=================================================================
+if !_A0 < 3
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for MSG %message % , time_out_in_seconds$
++Script is halting
+halt
+}
+set !_timeout ( #scnt2 + !_A . !_A0 )
+_lets_wait_for_a_message:
+if #CONTSIZE = 530_480 ; MOD+ Sthil "Si detectamos el menú de crafteo durante la espera del mensaje, nos salimos.
+   {
+     set #result #true
+     return #result
+   }
+for %i %jstart #jindex
+{
+ scanjournal %i
+  for %ii 2 !_A0
+  {
+    if !_A . %ii in #journal && %jstart <> %i
+    set #result #true , #spc , !_A . %ii
+  }
+}
+
+if #true notin #result
+{
+set #result #false
+ if !_timeout =< #scnt2
+ return #result
+wait 1
+goto _lets_wait_for_a_message
+}
+else
+return #result
+
+wait 1
+goto _lets_wait_for_a_message
+
+
+;======================================================================
+sub wait_for_GUMP ; version 1.4 ~Locke
+;=================================================================
+if !_A0 < 3
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for GUMP XXX_YYY % , time_out_in_seconds$
++Script is halting
+halt
+}
+if !_A3 <> CLOSE
+set !_timeout #scnt2 + !_A3
+else
+set !_timeout 0 ; no gump wait if %3 = CLOSE since we already believe it to be open.
+
+_lets_wait_for_a_gump:
+if #CONTID = !_A2 || #CONTSIZE = !_A2 || #CONTKIND = !_A2 || #CONTNAME = !_A2 || #CONTTYPE = !_A2
+{
+  if !_A5 <> N/A && !_A6 <> N/A
+  {
+  set !clickx !_A5 + #contposx
+  set !clicky !_A6 + #contposy
+  click !clickx !clicky
+  }
+  if !_A3 = CLOSE || if !_A4 = CLOSE || !_A5 = CLOSE || !_A6 = CLOSE
+  {
+  set !string #contsize
+  str pos !string _
+  set !pos #strres
+  str del !string #strres #strres
+  set !clickX #contposx + ( #strres / 2 )
+  str del !string 1 !pos
+  set !clickY #contposy + ( #strres / 2 )
+  click !clickx !clicky R
+  }
+return #true
+}
+
+if !_timeout =< #scnt2 && !_A4 = N/A
+return #false
+
+if !_A4 <> N/A && !_timeout =< #scnt2
+{
+finditem !_A4
+ if #findkind <> -1
+ {
+  for #findindex 1 #findcnt
+  {
+   if #finddist > 2
+   ignoreitem #findid LLWAITFOR
+   else
+   break
+  }
+  set #lobjectid #findid
+  event macro 17 0
+  set !_timeout #scnt2 + !_A3
+ }
+ else
+ return #false
+}
+wait 1
+goto _lets_wait_for_a_gump
+
+;======================================================================
+sub wait_for_HOTKEY ; Version 0.8 ~Locke
+;=================================================================
+if !_A0 < 4
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for HOTKEY KEY ACTION % , time_out_in_seconds$
++Script is halting
+halt
+}
+set #lpc 300
+set %key_pressed N/A
+set !_Timeout !_A . !_A0 + #scnt2
+repeat
+{
+ for %i 2 !_A0
+ {
+ set !_key !_A . %i
+ onhotkey !_key
+ set %key_pressed !_Key
+ }
+}
+until !_timeout =< #scnt2 || %key_pressed <> N/A
+if %key_pressed <> N/A
+{
+for !i 2 !_A0
+{
+set !key_pos !_A . !i
+if %key_pressed in !key_pos
+break
+}
+set !i !i + 1
+set !next_var !_A . !i
+}
+if set in !next_var && %key_pressed <> N/A
+{
+set !string !next_var
+str pos !string _
+str del !string 1 #strres
+set !string #strres
+str pos !string _
+set !pos #strres - 1
+set !realpos #strres
+str left !string !pos
+set !var #strres
+str del !string 1 !realpos
+set % . !var #strres
+return % . !var
+}
+if %key_pressed <> N/A
+return !next_var
+
+return #false
+
+
+;======================================================================
+sub wait_for_ITEM ; Version 0.1 ~Locke
+;=================================================================
+; %A2 = #findid ; %A3 = C_ , %mod || G_ , %mod ; %A4 = wait_time in seconds
+if !_A0 < 4
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for ITEM # , findid C_ , % , mod % , timeout
++Script is halting
+halt
+}
+set !_timeout !_A4 + #scnt2
+repeat
+{
+finditem !_A2 !_A3
+if #findkind <> -1
+return #true
+wait 1
+}
+until #scnt2 => !_timeout
+return #false
+
+
+;======================================================================
+sub wait_for_RECALL ; Version 0.1 ~Locke
+;=================================================================
+; %A2 = wait_time in seconds
+if !_A0 < 2
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for RECALL % , timeout
++Script is halting
+halt
+}
+set !_timeout !_A2 + #scnt2
+set !old_POS_X #charposx
+set !old_POS_Y #charposy
+set !old_pos_Z #charposz
+repeat
+{
+if #CHARPOSX <> !old_POS_X || #CHARPOSY <> !old_POS_Y || #CHARPOSZ <> !old_POS_Z
+return #true
+wait 1
+}
+until #scnt2 => !_timeout
+return #false
