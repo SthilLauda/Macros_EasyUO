@@ -50,7 +50,7 @@
 ; Global Variables Used: Ninguna.
 ; Purpose: Come tartas de Evathia para recargar 10 puntos de vida, maná, y estamina, cada 60 segundos durante 10 minutos.
 ; Configuración: Ninguna.
-; Requisitios: Tener tartas de Evathia en la mochila.
+; Requisitos: Tener tartas de Evathia en la mochila.
 
 set #SYSMSGCOL 1187
 event sysmessage =============================
