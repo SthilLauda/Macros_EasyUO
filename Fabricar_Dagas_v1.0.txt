@@ -10,15 +10,15 @@
 ; Version: 1.0
 ; Client Tested with: 2.0.3
 ; EUO version tested with: EasyUO 1.5 Version 243
-; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Shard: Ultima Alianza (Â¡Hasta la muerte!)
 ; Revision Date: 15/04/2020
 ; Public Release: 15/04/2020
 ; Global Variables Used: Ninguna.
-; Purpose: Fabrica dagas hasta llenar una bolsa entera.
+; Purpose: Fabrica dagas hasta llenar una bolsa entera (255).
 ;________________________________
 ;
 ; ///////////////////////////////
-; ******** CONFIGURACIÓN ********
+; ******** CONFIGURACIÃ“N ********
 ; ///////////////////////////////
 ;________________________________
 ;
@@ -28,7 +28,7 @@ set %bolsa_dagas HTTWMQD
 ;________________________________________________
 ;
 ; //////////////////////////////////////////////
-; ************* FIN CONFIGURACIÓN *************
+; ************* FIN CONFIGURACIÃ“N *************
 ; //////////////////////////////////////////////
 ;________________________________________________
 ;
@@ -85,7 +85,7 @@ if #CONTSIZE <> 530_480
           event macro 17
           gosub wait_for GUMP 530_480 40
           contpos 40 40
-          click 67 292 f dmc ; Menú de Esgrima
+          click 67 292 f dmc ; MenÃº de Esgrima
           gosub wait_for GUMP 530_480 40
           contpos 40 40
           click 274 111 f dmc ; Daga
