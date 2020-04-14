@@ -1,0 +1,509 @@
+; ======================================================================================================
+;  '||   ||` '||`   ||                                 /.\      '||`
+;   ||   ||   ||    ||     ''                         // \\      ||   ''
+;   ||   ||   ||  ''||''   ||  '||),,(|,   '''|.     //...\\     ||   ||   '''|.  `||''|,  '''/  '''|.
+;   ||   ||   ||    ||     ||   || || ||  .|''||    //     \\    ||   ||  .|''||   ||  ||   //  .|''||
+;   `|...|'  .||.   `|..' .||. .||    ||. `|..||. .//       \\. .||. .||. `|..||. .||  ||. /... `|..||.
+; =====================================================================================================
+;                       ______
+;                    .-"      "-.
+;                   /            \
+;       _          |              |          _
+;      ( \         |,  .-.  .-.  ,|         / )
+;       > "=._     | )(__/  \__)( |     _.=" <
+;      (_/"=._"=._ |/     /\     \| _.="_.="\_)
+;             "=._ (_     ^^     _)"_.="
+;                 "=\__|IIIIII|__/="
+;                _.="| \IIIIII/ |"=._
+;      _     _.="_.="\          /"=._"=._     _
+;     ( \_.="_.="     `--------`     "=._"=._/ )
+;      > _.="                            "=._ <
+;     (_/   jgs                              \_)
+;
+; Script Name: Entrenar Poisoning
+; Author: Sthil Lauda
+; Version: 1.0
+; Client Tested with: 2.0.3
+; EUO version tested with: EasyUO 1.5 Version 243
+; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Revision Date: 15/04/2020
+; Public Release: 15/04/2020
+; Global Variables Used: Ninguna.
+; Purpose: Entrena la habilidad envenenando un arma con pociones de un keg de veneno menor.
+;
+; *** NOTAS ***
+; - ¡Llevar comida en la mochila!
+; - Armas soportadas: Katana, Espada Larga, Espada Ancha, Espada Vikinga, Sable, Kryss, o Recolector de Huesos.
+;________________________________
+;
+; ///////////////////////////////
+; ******** CONFIGURACIÓN ********
+; ///////////////////////////////
+;________________________________
+;
+set %cofre_kegs_y_frascos UXVXMND ; Cofre con kegs de 1000 pociones de veneno menor, un arma de filo, y 50 pociones vacías.
+set %tiempo_alimentacion 360      ; Cada cuántos segundos va a comprobar si tiene hambre.
+;________________________________________________
+;
+; //////////////////////////////////////////////
+; ************* FIN CONFIGURACIÓN *************
+; //////////////////////////////////////////////
+;________________________________________________
+;
+set %keg QMJ_YBK_XBK
+set %pocion WUF
+set %arma OMH_GMH_BPH_WRH_FUO_ATF_KTF_KPH
+set %comida RGG_NRD_QSD_ZBG_WLI_QRD_END_FUD_YLI_WLI_HGI
+ +_KGI_EGI_QLI_KLI_MLI_KRD_AQD_MQE_VQE_TQE_JQE_IQE
+ +_GQE_SPE_ZPE_OQE_BDF_KPE_RQE_YSD_SQD_YWI_AXI_PQD_QQD
+ +_HND_YRD_
+set %tiempo_actual #SCNT
+set %proxima_vez #SCNT
+
+set #SYSMSGCOL 1187
+event sysmessage ===============
+wait 20
+set #SYSMSGCOL 1165
+event sysmessage Poisoning v1.0
+wait 20
+set #SYSMSGCOL 1187
+event sysmessage ===============
+wait 20
+
+gosub openContainer
+
+;========================================================
+;
+; ******************* LOOP PRINCIPAL ********************
+;
+;========================================================
+inicio:
+gosub checkSkill
+gosub checkHungry
+gosub quitarKeg
+gosub reponKeg
+gosub checkPocion
+gosub arma
+gosub envenenar
+goto inicio
+;========================================================
+;
+; ***************** FIN LOOP PRINCIPAL *****************
+;
+;========================================================
+
+sub openContainer
+set #LOBJECTID %cofre_kegs_y_frascos
+event macro 17
+gosub wait_for GUMP %cofre_kegs_y_frascos 50
+return
+
+sub checkSkill
+chooseskill Pois real
+if #SKILL >= 1000
+   {
+     set #SYSMSGCOL 73
+     event sysmessage SOMOS GM POISON! :-)
+     halt
+   }
+return
+
+sub quitarKeg
+_quitaKeg:
+finditem %keg C_ , #BACKPACKID
+if #FINDCNT > 0
+   {
+     for #FINDINDEX 1 #FINDCNT
+         {
+           if #FINDCOL = 0
+              {
+                exevent drag #FINDID #FINDSTACK
+                exevent dropc %cofre_kegs_y_frascos
+                wait 20
+                goto _quitaKeg
+              }
+         }
+   }
+return
+
+sub reponKeg
+_rePonKeg:
+finditem %keg C_ , #BACKPACKID
+if #FINDCNT = 0
+   {
+     finditem %keg C_ , %cofre_kegs_y_frascos
+     if #FINDCNT > 0
+        {
+          for #FINDINDEX 1 #FINDCNT
+              {
+                if #FINDCOL = 368
+                   {
+                     exevent drag #FINDID #FINDSTACK
+                     exevent dropc #BACKPACKID
+                     wait 30
+                     goto _rePonKeg
+                   }
+              }
+         }
+   }
+return
+
+sub checkPocion
+_botella:
+finditem %pocion C_ , #BACKPACKID
+if #FINDCNT > 0
+   {
+     for #FINDINDEX 1 #FINDCNT
+         {
+           if #FINDCOL = 0 ; Botella vacía
+              {
+                return ; Ya tenemos una
+              }
+              else
+                 {
+                   if #FINDCOL = 368 ; Verde Poison
+                      {
+                        gosub envenenar
+                        goto _botella
+                      }
+                      else ; Poción extraña, la movemos al cofre... ¬¬
+                         {
+                           exevent drag #FINDID #FINDSTACK
+                           exevent dropc %cofre_kegs_y_frascos
+                           wait 30
+                           goto _botella
+                         }
+                 }
+         }
+   }
+_frasco:
+finditem %pocion C_ , #BACKPACKID
+if #FINDSTACK = 0
+   {
+     finditem %pocion C_ , %cofre_kegs_y_frascos
+     if #FINDSTACK > 0
+        {
+           for #FINDINDEX 1 #FINDCNT
+               {
+                 if #FINDCOL = 0 ; Botella vacía
+                    {
+                      exevent drag #FINDID 1
+                      exevent dropc #BACKPACKID
+                      wait 30
+                      goto _frasco
+                    }
+               }
+        }
+        else
+           {
+             set #SYSMSGCOL 38
+             event sysmessage NO QUEDAN FRASCOS! :(
+             halt
+           }
+   }
+return
+
+sub arma
+_arma:
+finditem %arma C_ , #BACKPACKID
+if #FINDCNT = 0
+   {
+     finditem %arma C_ , %cofre_kegs_y_frascos
+     if #FINDCNT > 0
+        {
+          exevent drag #FINDID #FINDSTACK
+          wait 10
+          exevent dropc #BACKPACKID
+          gosub wait_for ITEM #FINDID C_ , #BACKPACKID 40
+          goto _arma
+        }
+   }
+return
+
+sub envenenar
+finditem %keg C_ , #BACKPACKID
+if #FINDCNT = 0
+   {
+     gosub reponKeg
+   }
+finditem %pocion C_ , #BACKPACKID
+if #FINDSTACK = 0
+   {
+     gosub checkPocion
+   }
+finditem %arma C_ , #BACKPACKID
+if #FINDCNT = 0
+   {
+     gosub arma
+   }
+; Preparar poción de Veneno Menor
+finditem %keg C_ , #BACKPACKID
+if #FINDCNT > 0
+   {
+     set #LOBJECTID #FINDID
+     finditem %pocion C_ , #BACKPACKID
+     if #FINDCNT > 0
+        {
+          for #FINDINDEX 1 #FINDCNT
+              {
+                if #FINDCOL = 0 ; Botella vacía
+                   {
+                     event macro 17
+                     target
+                     set #LTARGETID #FINDID
+                     set #LTARGETKIND 1
+                     event macro 22
+                     wait 20
+                   }
+              }
+        }
+   }
+; Envenenar el Arma
+finditem %arma C_ , #BACKPACKID
+if #FINDCNT > 0
+   {
+     set %ID_arma #FINDID
+     finditem %pocion C_ , #BACKPACKID
+     if #FINDCNT > 0
+        {
+          for #FINDINDEX 1 #FINDCNT
+              {
+                if #FINDCOL = 368 ; Verde Poison
+                   {
+                     set %jstart #jindex
+                     event macro 13 30 ; Skill de envenenar
+                     target
+                     set #LTARGETID %ID_arma
+                     set #LTARGETKIND 1
+                     event macro 22
+                     target
+                     set #LTARGETID #FINDID
+                     set #LTARGETKIND 1
+                     event macro 22
+                     gosub wait_for MSG No_logras Pones_el 100
+                     if ( #TRUE in #RESULT )
+                          {
+                            break
+                          }
+                   }
+              }
+        }
+   }
+return
+
+sub checkHungry ;<====================>
+set %tiempo_actual #SCNT
+if %proxima_vez <= %tiempo_actual
+   {
+     gosub comprobar_comida
+   }
+return
+
+;=====================================================
+; Rutina para, en caso de hambre, comer hasta saciarse
+;=====================================================
+; v2.2
+sub comprobar_comida ;<==============================>
+{
+  hambriento:
+  set %jrnl #jindex ; Marcamos un índice de las líneas del diario.
+  event macro 4 0 .hungry
+  wait 20
+  while #true
+     {
+       if #jindex > %jrnl ; Si aparece una nueva línea.
+          {
+            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de línea.
+            scanjournal %jrnl   ; La leemos...
+            if Estas_no_le_afecta_el_hambre in #journal || Estas_tan_lleno_que_no_puedes in #journal || Estas_totalmente_saciado in #journal
+               {
+                 set %proxima_vez %tiempo_actual + %tiempo_alimentacion
+                 return
+               }
+               else
+                  {
+                    if Estas_lleno in #journal || Estas_contento in #journal || Estas_en_inanicion in #journal || Estas_hambriento in #journal || Sientes_mucho in #journal || Estas_con_hambre in #journal || Estas_parcialmente in #journal || Estas_bien_lleno in #journal || Te_sientes_casi_lleno in #journal
+                       {
+                         finditem %comida C_ , #backpackid
+                         if #findcnt > 0
+                            {
+                              set #lobjectid #findid
+                              event macro 17
+                              wait 20
+                              goto hambriento
+                            }
+                            else
+                               {
+                                 event exmsg #charid 3 48 COMPRA COMIDA!!
+                                 wait 40
+                                 set %proxima_vez %tiempo_actual + %tiempo_alimentacion
+                               }
+                       }
+                       else ; Mensaje extraño, repetimos...
+                          {
+                            goto hambriento
+                          }
+                  }
+          }
+       return
+     } ; FIN While
+}
+return
+
+;-@ ============================== @-;
+;-@ ############################## @-;
+;-@ SUBS públicos del Foro EasyUO  @-;
+;-@ ############################## @-;
+;-@ ============================== @-;
+
+;=================================================================
+sub wait_for
+;=================================================================
+; This "wait_for" sub package was created by Locke. If you use these subs please keep this header intact.
+; Documentation: the sub package grew to large with all the comments. To load them call the sub like this:
+; gosub wait_for docs    | or you can use doc, documention, what, or my personal favorite, kickass.
+
+; "wait_for core dispatcher" version 1.2 by Locke
+if %1 = doc || if %1 = docs || if %1 = documentation || if %1 = what || if %1 = kickass
+{
+Display ok Please click ok and wait for your browser to start.
+execute http://www.easyuo.com/forum/viewtopic.php?t=24716
+halt
+}
+nameSpace Push
+namespace local LLNS
+set #result N/A ; if #result isn't set by one of my wait_for subs it'll throw an error.
+set !LPC #lpc
+set #lpc 200
+for %i 0 %0
+set !_A . %i % . %i
+gosub wait_for_ , !_A1
+set #lpc !lpc
+namespace clear LLNS
+namespace pop
+if #result <> N/A
+return #result
+else
+display ok You specified an unknown wait_for command. Script returned #result and is halting.
+halt
+;======================================================================
+sub wait_for_MSG ; version 1.4 ~Locke
+;=================================================================
+if !_A0 < 3
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for MSG %message % , time_out_in_seconds$
++Script is halting
+halt
+}
+set !_timeout ( #scnt2 + !_A . !_A0 )
+_lets_wait_for_a_message:
+for %i %jstart #jindex
+{
+ scanjournal %i
+  for %ii 2 !_A0
+  {
+    if !_A . %ii in #journal && %jstart <> %i
+    set #result #true , #spc , !_A . %ii
+  }
+}
+
+if #true notin #result
+{
+set #result #false
+ if !_timeout =< #scnt2
+ return #result
+wait 1
+goto _lets_wait_for_a_message
+}
+else
+return #result
+
+wait 1
+goto _lets_wait_for_a_message
+;======================================================================
+sub wait_for_GUMP ; version 1.4 ~Locke
+;=================================================================
+; Añadido #CONTID ^^
+if !_A0 < 3
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for GUMP XXX_YYY time_out_in_seconds$
++Script is halting
+halt
+}
+if !_A3 <> CLOSE
+set !_timeout #scnt2 + !_A3
+else
+set !_timeout 0 ; no gump wait if %3 = CLOSE since we already believe it to be open.
+
+_lets_wait_for_a_gump:
+if #CONTSIZE = !_A2 || #CONTKIND = !_A2 || #CONTNAME = !_A2 || #CONTTYPE = !_A2 || #CONTID = !_A2
+{
+ if !_A5 <> N/A && !_A6 <> N/A
+ {
+ set !clickx !_A5 + #contposx
+ set !clicky !_A6 + #contposy
+ click !clickx !clicky
+ }
+ if !_A3 = CLOSE || if !_A4 = CLOSE || !_A5 = CLOSE || !_A6 = CLOSE
+ {
+ set !string #contsize
+ str pos !string _
+ set !pos #strres
+ str del !string #strres #strres
+ set !clickX #contposx + ( #strres / 2 )
+ str del !string 1 !pos
+ set !clickY #contposy + ( #strres / 2 )
+ click !clickx !clicky R
+ }
+return #true
+}
+
+if ( !_timeout =< #scnt2 ) && ( !_A4 = N/A )
+   {
+     return #false
+   }
+
+if !_A4 <> N/A && !_timeout =< #scnt2
+{
+finditem !_A4
+if #findkind <> -1
+{
+ for #findindex 1 #findcnt
+ {
+  if #finddist > 2
+  ignoreitem #findid LLWAITFOR
+  else
+  break
+ }
+ set #lobjectid #findid
+ event macro 17 0
+ set !_timeout #scnt2 + !_A3
+}
+else
+return #false
+}
+wait 1
+goto _lets_wait_for_a_gump
+;======================================================================
+sub wait_for_ITEM ; Version 0.1 ~Locke
+;=================================================================
+; %A2 = #findid ; %A3 = C_ , %mod || G_ , %mod ; %A4 = wait_time in seconds
+if !_A0 < 4
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for ITEM # , findid C_ , % , mod % , timeout
++Script is halting
+halt
+}
+set !_timeout !_A4 + #scnt2
+repeat
+{
+finditem !_A2 !_A3
+if #findkind <> -1
+return #true
+wait 1
+}
+until #scnt2 => !_timeout
+return #false
