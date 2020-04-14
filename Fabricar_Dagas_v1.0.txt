@@ -1,0 +1,319 @@
+; ======================================================================================================
+;  '||   ||` '||`   ||                                 /.\      '||`
+;   ||   ||   ||    ||     ''                         // \\      ||   ''
+;   ||   ||   ||  ''||''   ||  '||),,(|,   '''|.     //...\\     ||   ||   '''|.  `||''|,  '''/  '''|.
+;   ||   ||   ||    ||     ||   || || ||  .|''||    //     \\    ||   ||  .|''||   ||  ||   //  .|''||
+;   `|...|'  .||.   `|..' .||. .||    ||. `|..||. .//       \\. .||. .||. `|..||. .||  ||. /... `|..||.
+; =====================================================================================================
+; Script Name: Fabricar Dagas
+; Author: Sthil Lauda
+; Version: 1.0
+; Client Tested with: 2.0.3
+; EUO version tested with: EasyUO 1.5 Version 243
+; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Revision Date: 15/04/2020
+; Public Release: 15/04/2020
+; Global Variables Used: Ninguna.
+; Purpose: Fabrica dagas hasta llenar una bolsa entera.
+;________________________________
+;
+; ///////////////////////////////
+; ******** CONFIGURACIÓN ********
+; ///////////////////////////////
+;________________________________
+;
+set %cofre_lingotes UXVXMND
+set %bolsa_martillos UOWTDPD
+set %bolsa_dagas HTTWMQD
+;________________________________________________
+;
+; //////////////////////////////////////////////
+; ************* FIN CONFIGURACIÓN *************
+; //////////////////////////////////////////////
+;________________________________________________
+;
+set %daga TSF_WSF
+set %iron RMK
+set %martillos GBG_FBG_TLH_CGG
+
+set #SYSMSGCOL 1187
+event sysmessage ====================
+wait 20
+set #SYSMSGCOL 1165
+event sysmessage Fabricar Dagas v1.0
+wait 20
+set #SYSMSGCOL 1187
+event sysmessage ====================
+wait 20
+
+;
+;========================================================
+;
+; ******************* LOOP PRINCIPAL ********************
+;
+;========================================================
+;
+loop:
+gosub vaciarDagas
+gosub martillos
+gosub lingotes
+gosub checkMenu
+gosub clickMenu
+gosub vaciarDagas
+goto loop
+;
+;========================================================
+;
+; ***************** FIN LOOP PRINCIPAL *****************
+;
+;========================================================
+;
+
+sub clickMenu
+click 323 496 f dmc
+gosub wait_for GUMP 530_480 40
+contpos 40 40
+return
+
+sub checkMenu
+if #CONTSIZE <> 530_480
+   {
+     finditem %iron C_ , #BACKPACKID
+     if #FINDCNT > 0
+        {
+          set #LOBJECTID #FINDID
+          event macro 17
+          gosub wait_for GUMP 530_480 40
+          contpos 40 40
+          click 67 292 f dmc ; Menú de Esgrima
+          gosub wait_for GUMP 530_480 40
+          contpos 40 40
+          click 274 111 f dmc ; Daga
+          gosub wait_for GUMP 530_480 40
+        }
+   }
+return
+
+sub lingotes
+finditem %iron C_ , #BACKPACKID
+if #FINDSTACK < 5
+   {
+     finditem %iron C_ , %cofre_lingotes
+     if #FINDCNT > 0
+        {
+          for #FINDINDEX 1 #FINDCNT
+              {
+                gosub waitforprop #FINDID
+                if Hierro in #PROPERTY
+                   {
+                     if #FINDSTACK >= 50
+                        {
+                          exevent drag #FINDID 50
+                          wait 10
+                          exevent dropc #BACKPACKID
+                          gosub wait_for ITEM #FINDID C_ , #BACKPACKID 40
+                        }
+                        else
+                           {
+                             set #SYSMSGCOL 38
+                             event sysmessage NO QUEDAN LINGOTES! :(
+                             halt
+                           }
+                   }
+              }
+        }
+        else
+           {
+             set #SYSMSGCOL 38
+             event sysmessage NO QUEDAN LINGOTES! :(
+             halt
+           }
+   }
+return
+
+sub martillos
+_martillo:
+finditem %martillos C_ , #CHARID
+if #FINDCNT = 0
+   {
+     finditem %martillos C_ , #BACKPACKID
+     if #FINDCNT < 2
+        {
+          finditem %martillos C_ , %bolsa_martillos
+          if #FINDCNT > 0
+             {
+               exevent drag #FINDID #FINDSTACK
+               wait 10
+               exevent dropc #BACKPACKID
+               gosub wait_for ITEM #FINDID C_ , #BACKPACKID 40
+               goto _martillo
+             }
+             else
+                {
+                  set #SYSMSGCOL 38
+                  event sysmessage NO QUEDAN MARTILLOS! :(
+                  halt
+                }
+        }
+     finditem %martillos C_ , #BACKPACKID
+     if #FINDCNT > 1
+        {
+          set #LOBJECTID #FINDID
+          event macro 17
+          gosub wait_for ITEM #FINDID C_ , #CHARID 40
+          goto _martillo
+        }
+   }
+return
+
+sub vaciarDagas
+_vaciar:
+finditem %daga C_ , %bolsa_dagas
+if #FINDCNT < 255
+   {
+     finditem %daga C_ , #BACKPACKID
+     if #FINDCNT > 0
+        {
+          exevent drag #FINDID #FINDSTACK
+          wait 10
+          exevent dropc %bolsa_dagas
+          gosub wait_for ITEM #FINDID C_ , %bolsa_dagas 40
+          goto _vaciar
+        }
+    }
+    else
+       {
+         set #SYSMSGCOL 88
+         event sysmessage BOLSA DE DAGAS LLENA! :D
+         halt
+       }
+return
+
+sub waitforprop
+event property #charid
+wait 1
+set %oldprop #property
+event property %1
+_testforprop:
+if #property = %oldprop
+   {
+     goto _testforprop
+   }
+return
+
+;=================================================================
+sub wait_for
+;=================================================================
+; This "wait_for" sub package was created by Locke. If you use these subs please keep this header intact.
+; // end header
+; Documentation: the sub package grew to large with all the comments. To load them call the sub like this:
+; gosub wait_for docs    | or you can use doc, documention, what, or my personal favorite, kickass.
+; Thanks to ~BookWibble~ for helping with all the debugging and spotting a bug or three.
+; "wait_for core dispatcher" version 1.3 by Locke
+if %1 = doc || if %1 = docs || if %1 = documentation || if %1 = what || if %1 = kickass
+{
+Display ok Please click ok and wait for your browser to start.
+execute http://www.easyuo.com/forum/viewtopic.php?t=24716
+halt
+}
+nameSpace Push
+namespace local LLNS
+set #result N/A ; if #result isn't set by one of my wait_for subs it'll throw an error.
+set !LPC #lpc
+set #lpc 200
+for %i 0 %0
+set !_A . %i % . %i
+gosub wait_for_ , !_A1
+ignoreitem reset LLWAITFOR
+set #lpc !lpc
+namespace clear LLNS
+namespace pop
+if #result <> N/A
+return #result
+else
+display ok You specified an unknown wait_for command. Script returned #result and is halting.
+halt
+
+;======================================================================
+sub wait_for_GUMP ; version 1.4 ~Locke
+;=================================================================
+if !_A0 < 3
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for GUMP XXX_YYY % , time_out_in_seconds$
++Script is halting
+halt
+}
+if !_A3 <> CLOSE
+set !_timeout #scnt2 + !_A3
+else
+set !_timeout 0 ; no gump wait if %3 = CLOSE since we already believe it to be open.
+
+_lets_wait_for_a_gump:
+if #CONTID = !_A2 || #CONTSIZE = !_A2 || #CONTKIND = !_A2 || #CONTNAME = !_A2 || #CONTTYPE = !_A2
+{
+  if !_A5 <> N/A && !_A6 <> N/A
+  {
+  set !clickx !_A5 + #contposx
+  set !clicky !_A6 + #contposy
+  click !clickx !clicky
+  }
+  if !_A3 = CLOSE || if !_A4 = CLOSE || !_A5 = CLOSE || !_A6 = CLOSE
+  {
+  set !string #contsize
+  str pos !string _
+  set !pos #strres
+  str del !string #strres #strres
+  set !clickX #contposx + ( #strres / 2 )
+  str del !string 1 !pos
+  set !clickY #contposy + ( #strres / 2 )
+  click !clickx !clicky R
+  }
+return #true
+}
+
+if !_timeout =< #scnt2 && !_A4 = N/A
+return #false
+
+if !_A4 <> N/A && !_timeout =< #scnt2
+{
+finditem !_A4
+ if #findkind <> -1
+ {
+  for #findindex 1 #findcnt
+  {
+   if #finddist > 2
+   ignoreitem #findid LLWAITFOR
+   else
+   break
+  }
+  set #lobjectid #findid
+  event macro 17 0
+  set !_timeout #scnt2 + !_A3
+ }
+ else
+ return #false
+}
+wait 1
+goto _lets_wait_for_a_gump
+;======================================================================
+sub wait_for_ITEM ; Version 0.1 ~Locke
+;=================================================================
+; %A2 = #findid ; %A3 = C_ , %mod || G_ , %mod ; %A4 = wait_time in seconds
+if !_A0 < 4
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for ITEM # , findid C_ , % , mod % , timeout
++Script is halting
+halt
+}
+set !_timeout !_A4 + #scnt2
+repeat
+{
+finditem !_A2 !_A3
+if #findkind <> -1
+return #true
+wait 1
+}
+until #scnt2 => !_timeout
+return #false
