@@ -10,15 +10,15 @@
 ; Version: 1.0
 ; Client Tested with: 2.0.3
 ; EUO version tested with: EasyUO 1.5 Version 243
-; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Shard: Ultima Alianza (Â¡Hasta la muerte!)
 ; Revision Date: 15/04/2020
 ; Public Release: 15/04/2020
 ; Global Variables Used: Ninguna.
-; Purpose: Fabrica morteros hasta llenar una bolsa entera.
+; Purpose: Fabrica morteros hasta llenar una bolsa entera (255).
 ;________________________________
 ;
 ; ///////////////////////////////
-; ******** CONFIGURACIÓN ********
+; ******** CONFIGURACIÃ“N ********
 ; ///////////////////////////////
 ;________________________________
 ;
@@ -28,7 +28,7 @@ set %bolsa_herramientas LWHDKOD
 ;________________________________________________
 ;
 ; //////////////////////////////////////////////
-; ************* FIN CONFIGURACIÓN *************
+; ************* FIN CONFIGURACIÃ“N *************
 ; //////////////////////////////////////////////
 ;________________________________________________
 ;
@@ -122,7 +122,7 @@ if ( %start ) || ( #CONTSIZE <> 530_480 )
             set %start #FALSE
           }
      }
-click 323 496 f dmc ; Fabricar último
+click 323 496 f dmc ; Fabricar Ãºltimo
 gosub wait_for GUMP 530_480 100
 contpos 40 40
 return
@@ -191,7 +191,7 @@ return
 
 ;-@ ============================== @-;
 ;-@ ############################## @-;
-;-@ SUBS públicos del Foro EasyUO  @-;
+;-@ SUBS pÃºblicos del Foro EasyUO  @-;
 ;-@ ############################## @-;
 ;-@ ============================== @-;
 
@@ -228,7 +228,7 @@ halt
 ;======================================================================
 sub wait_for_GUMP ; version 1.4 ~Locke
 ;=================================================================
-; Añadido #CONTID ^^
+; AÃ±adido #CONTID ^^
 if !_A0 < 3
 {
 display ok You haven't specified enough vars.$
