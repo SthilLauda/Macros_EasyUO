@@ -270,6 +270,10 @@ if #FINDCNT > 0
               {
                 if #FINDCOL = 368 ; Verde Poison
                    {
+                     if #TARGCURS = 1 : Limpiar el target
+                        {
+                          key ESC
+                        }
                      set %jstart #jindex
                      event macro 13 30 ; Skill de envenenar
                      target
