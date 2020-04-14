@@ -48,12 +48,9 @@
 ; Revision Date: 14/04/2020
 ; Public Release: 14/04/2020
 ; Global Variables Used: Ninguna.
-; Purpose: Comer tartas de Evathia automáticamente. XD
+; Purpose: Come tartas de Evathia para recargar 10 puntos de vida, maná, y estamina, cada 60 segundos durante 10 minutos.
 ; Configuración: Ninguna.
-
-set %tarta_time 600
-set %tarta_timer #SCNT
-set %tartas_evathienses NRD
+; Requisitios: Tener tartas de Evathia en la mochila.
 
 set #SYSMSGCOL 1187
 event sysmessage =============================
@@ -64,6 +61,10 @@ wait 20
 set #SYSMSGCOL 1187
 event sysmessage =============================
 wait 20
+
+set %tarta_time 600    ; 600 segundos ( 10 minutos )
+set %tarta_timer #SCNT
+set %tartas_evathienses NRD
 
 ;
 ;========================================================
