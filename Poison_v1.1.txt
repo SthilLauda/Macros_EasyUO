@@ -202,11 +202,11 @@ if #FINDSTACK = 0
                       wait 30
                       goto _frasco
                     }
+                    else
+                       {
+                         ignoreitem #FINDID BAD_POTIONS
+                       }
                }
-               else
-                  {
-                    ignoreitem #FINDID BAD_POTIONS
-                  }
         }
         else
            {
