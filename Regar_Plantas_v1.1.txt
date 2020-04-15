@@ -65,7 +65,7 @@ onhotkey %tecla
                       if #FINDZ = #CHARPOSZ
                          {
                            set %numero_plantas %numero_plantas + 1
-			                     set #LOBJECTID #FINDID
+			   set #LOBJECTID #FINDID
                            set %jstart #jindex
                            event macro 17
                            gosub wait_for MSG No_consigues Las_plantas_mutadas_no 1
@@ -99,7 +99,7 @@ onhotkey %tecla
                                           if ( %planta_regada )
                                                {
                                                  set %plantas_regadas %plantas_regadas + 1
-					                                       finditem %jarra_agua C_ , #BACKPACKID
+					         finditem %jarra_agua C_ , #BACKPACKID
                                                  if #FINDCNT > 0
                                                     {
                                                       set #LOBJECTID #FINDID
@@ -125,7 +125,7 @@ onhotkey %tecla
                     set #SYSMSGCOL 88
                     event sysmessage PLANTAS TERMINADAS! [ %numero_plantas ] Plantas.
                     wait 20
-		                event sysmessage PLANTAS REGADAS! [ %plantas_regadas ] Regadas.
+		    event sysmessage PLANTAS REGADAS! [ %plantas_regadas ] Regadas.
                     wait 20
               }
          }
