@@ -7,34 +7,26 @@
 ; =====================================================================================================
 ; Script Name: Precios Vendor
 ; Author: Sthil Lauda
-; Version: 1.4
+; Version: 1.5
 ; Client Tested with: 2.0.3
 ; EUO version tested with: EasyUO 1.5 Version 243
 ; Shard: Ultima Alianza (¡Hasta la muerte!)
-; Revision Date: 30-07-2019
-; Public Release: 10/01/2020
+; Revision Date: 30/07/2019
+; Public Release: 15/04/2020
 ; Global Variables Used: Ninguna.
-; Purpose: Le pone el precio a todos los objetos que hay en un contenedor.
-;_________________________________
+; Purpose: Pone el precio a todos los objetos de un tipo que hay en un contenedor.
+;_________________________________________
 ;
-; ////////////////////////////////
-; ******** CONFIGURACIÓN! ********
-; ////////////////////////////////
-;_________________________________
-;
-set %nombre_vendor XXXXXXX ; Pon aquí el nombre de tu vendor.
-;________________________________________________
-;
-; //////////////////////////////////////////////
-; ************* FIN CONFIGURACIÓN *************
-; //////////////////////////////////////////////
-;________________________________________________
+; ////////////////////////////////////////
+; ******** ¡NO HAY CONFIGURACIÓN! ********
+; ////////////////////////////////////////
+;_________________________________________
 ;
 set #SYSMSGCOL 1187
 event sysmessage ====================
 wait 20
 set #SYSMSGCOL 1165
-event sysmessage Precios Vendor v1.3
+event sysmessage Precios Vendor v1.5
 wait 20
 set #SYSMSGCOL 1187
 event sysmessage ====================
@@ -63,13 +55,28 @@ goto mainloop
 sub startMacro
 {
 ignoreitem reset CON_PRECIO
+set #SYSMSGCOL 43
+setuotitle Haz CLICK en el VENDOR
+event sysmessage ============================
+event sysmessage Haz CLICK en el VENDOR
+event sysmessage ============================
+wait 20
+set #TARGCURS 1
+while #TARGCURS = 1
+      {
+        wait 1
+      }
+gosub GetName #LTARGETID nombre_vendor
+set #SYSMSGCOL 88
+event sysmessage VENDOR: %nombre_vendor
+wait 20
 configurar:
 if %confp = 1 || %confp = N/A
    {
      set #sysmsgcol 1570
      setuotitle Haz CLICK el contenedor
      event sysmessage ====================
-     event sysmessage Haz click en la bolsa
+     event sysmessage Haz CLICK en la bolsa
      event sysmessage ====================
      set #TARGCURS 1
      target
@@ -86,12 +93,44 @@ if %confp = 1 || %confp = N/A
           }
           until #CONTID = %contenedor_1
      set %conf 1
-     goto TESC
+     goto TESC1
    }
-TESC:
+TESC1:
 if %conf = 1
    {
-     finditem * C_ , %contenedor_1
+     set #sysmsgcol 1570
+     setuotitle Haz CLICK en uno de los objetos
+     event sysmessage ====================
+     event sysmessage Haz CLICK en un objeto
+     event sysmessage ====================
+     set #TARGCURS 1
+     target
+     while #TARGCURS = 1
+           {
+             wait 1
+           }
+     set %objeto #LTARGETID
+     finditem %objeto
+     if #FINDCNT > 0
+        {
+          set %tipo_objeto #FINDTYPE
+          gosub GetName #FINDID nombre
+          event sysmessage TIPO: %nombre
+          wait 40
+        }
+        else
+           {
+             set #SYSMSGCOL 38
+             event sysmessage OBJETO NO ENCONTRADO!
+             wait 40
+             goto TESC1
+           }
+     set %conf 2
+     goto TESC2
+   }
+TESC2:
+if %conf = 2
+   {
      set #sysmsgcol 1165
      menu GetNum NUMPRECIO %precio
      set %precio #menures
@@ -116,13 +155,13 @@ goto TESC
 
 VendorLoop:
 set %num_items 0
-finditem * C_ , %contenedor_1
+finditem %tipo_objeto C_ , %contenedor_1
 if #FINDCNT > 0
    {
      for #FINDINDEX 1 #FINDCNT
          {
-           event property #FINDID
-           if ( Precio Notin #property || %precio Notin #property ) ; Evitamos perder tiempo poniendo el mismo precio a algo que ya lo tiene...
+           gosub waitforprop #FINDID
+           if ( Precio Notin #PROPERTY || %precio Notin #PROPERTY ) ; Evitamos perder tiempo poniendo el mismo precio a algo que ya lo tiene...
                 {
                   set #LOBJECTID #FINDID
                   event macro 1 0 %nombre_vendor Precio %precio
@@ -131,7 +170,7 @@ if #FINDCNT > 0
                   set #LTARGETKIND 1
                   event macro 22
                   set %num_items %num_items + 1
-                  if #FINDCNT > 1 ; Control de Spam Detection...
+                  if #FINDCNT > 5 ; Control de Spam Detection...
                       {
                         wait 5s
                       }
@@ -191,3 +230,34 @@ sub showEUOMenu1
 	menu Show 421 270
 return
 ;--------- EasyUO Menu Designer Code End ---------
+
+;* @name GetName
+;* @author Roadkill
+;* @ver 1.0 24Jan04
+;* @purpose get the name of a creature/vendor
+;* @params %1= the id of the thing whose name you want, required
+;*      @%2= variable name to return the ID in, required
+;* @returns @%2 and #result
+;* @changes #property, #strres, @%2, !strlength
+;* @example call rksubs.txt GetName %beetle beetlename
+;* @status: tested
+sub GetName
+        set %id_property %1
+        gosub waitforprop %id_property
+        str pos #property $
+        set !strlength #strres - 1
+        str left #property !strlength
+        set % . %2 #strres
+return % . %2
+
+sub waitforprop ; <===================================================>
+event property #charid
+wait 1
+set %oldprop #property
+event property %1
+_testforprop:
+if #property = %oldprop
+   {
+     goto _testforprop
+   }
+return
