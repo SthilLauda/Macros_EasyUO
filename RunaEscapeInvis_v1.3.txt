@@ -68,7 +68,7 @@ goto recallLoop
 ;============================================;
 
 sub potaInvis ;<======================>
-finditem WUF C_ , #BACKPACKID
+finditem WUF C_
 if #FINDCNT > 0
    {
      for #FINDINDEX 1 #FINDCNT
