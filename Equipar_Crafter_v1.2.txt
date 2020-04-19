@@ -11,22 +11,22 @@
 ; Version: 1.2
 ; Client Tested with: 2.0.3
 ; EUO version tested with: EasyUO 1.5 Version 243
-; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Shard: Ultima Alianza (Â¡Hasta la muerte!)
 ; Revision Date: 19/04/2020
 ; Public Release: 15/04/2020
 ; Global Variables Used: Ninguna.
-; Purpose: Equipa el personaje logeado usando distintos conjuntos de ropa y objetos.
+; Purpose: Equipar el personaje logeado usando distintos conjuntos de ropa y objetos.
 ;
 ; EJEMPLOS:
-;           - Alquimista: Joyas de suerte, ballesta de oro, las piezas de una armadura solaris sin guantes, y añadiendo guantes de alquiista.
-;           - Bowcraft: Joyas de suerte, las piezas de una armadura solaris sin casco, y añadiendo una bandana del arquero.
+;           - Alquimista: Joyas de suerte, ballesta de oro, las piezas de una armadura solaris sin guantes, y aÃ±adiendo guantes de alquiista.
+;           - Bowcraft: Joyas de suerte, las piezas de una armadura solaris sin casco, y aÃ±adiendo una bandana del arquero.
 ;           - Artesano: Anillo y pendientes de la suerte, ballesta de oro, las piezas de una armadura solaris, brazalete +10 de Magery, capa de mago +5.
 ;           - Herrero: Joyas de suerte, escudo de oro, las piezas de una armadura solaris, martillo +15.
 ;           - Cristalero: Joyas de suerte, escudo de oro, las piezas de una armadura solaris, piqueta goblin.
 ;________________________________
 ;
 ; ///////////////////////////////
-; ******** CONFIGURACIÓN ********
+; ******** CONFIGURACIÃ“N ********
 ; ///////////////////////////////
 ;________________________________
 ;
@@ -50,7 +50,7 @@ set %objetos_escriba YLUAOOD_JLTXOOD_TUTEAPD
 ;________________________________________________
 ;
 ; //////////////////////////////////////////////
-; ************* FIN CONFIGURACIÓN *************
+; ************* FIN CONFIGURACIÃ“N *************
 ; //////////////////////////////////////////////
 ;________________________________________________
 ;
@@ -121,7 +121,7 @@ sub vestir
 if %num_checks = 0
    {
      set #SYSMSGCOL 18
-     event sysmessage SELECCIONA UNA CASILLA! ¬¬
+     event sysmessage SELECCIONA UNA CASILLA! Â¬Â¬
      wait 20
      return
    }
@@ -154,7 +154,7 @@ sub desvestir
 if %num_checks = 0
    {
      set #SYSMSGCOL 18
-     event sysmessage SELECCIONA UNA CASILLA! ¬¬
+     event sysmessage SELECCIONA UNA CASILLA! Â¬Â¬
      wait 20
      return
    }
@@ -422,7 +422,7 @@ halt
 ;======================================================================
 sub wait_for_GUMP ; version 1.4 ~Locke
 ;=================================================================
-; Añadido #CONTID ^^
+; AÃ±adido #CONTID ^^
 if !_A0 < 3
 {
 display ok You haven't specified enough vars.$
