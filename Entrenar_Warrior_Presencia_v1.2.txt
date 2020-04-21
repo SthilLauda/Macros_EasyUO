@@ -1,0 +1,206 @@
+; ======================================================================================================
+;  '||   ||` '||`   ||                                 /.\      '||`
+;   ||   ||   ||    ||     ''                         // \\      ||   ''
+;   ||   ||   ||  ''||''   ||  '||),,(|,   '''|.     //...\\     ||   ||   '''|.  `||''|,  '''/  '''|.
+;   ||   ||   ||    ||     ||   || || ||  .|''||    //     \\    ||   ||  .|''||   ||  ||   //  .|''||
+;   `|...|'  .||.   `|..' .||. .||    ||. `|..||. .//       \\. .||. .||. `|..||. .||  ||. /... `|..||.
+; ======================================================================================================
+;
+; Script Name: Entrenar Warrior [ Presencia ]
+;
+; |\              //
+;  \\           _!_
+;   \\         /___\
+;    \\        [+++]
+;     \\    _ _\^^^/_ _
+;      \\/ (    '-'  ( )
+;      /( \/ | {&}   /\ \
+;        \  / \     / _> )
+;         "`   >:::;-'`""'-.
+;             /:::/         \
+;            /  /||   {&}   |
+;           (  / (\         /
+;           / /   \'-.___.-'
+;     jgs _/ /     \ \
+;        /___|    /___|
+;
+; Author: Sthil Lauda
+; Version: 1.2
+; Client Tested with: 2.0.3
+; EUO version tested with: EasyUO 1.5 Version 243
+; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Revision Date: 21/04/2020
+; Public Release: 17/08/2019
+; Purpose: Subir skill de tactics, sword, parry, etc, peleando contra una presencia incorpórea.
+set %version v1.2
+;________________________________
+;
+; ///////////////////////////////
+; ******** CONFIGURACIÓN ********
+; ///////////////////////////////
+;________________________________
+;
+set %tiempo_attack 5           ; En segundos, cada cuanto ordenar el ataque.
+set %tiempo_alimentacion 360   ; Cada cuántos segundos va a comprobar si tiene hambre (6 minutos).
+;________________________________________________
+;
+; //////////////////////////////////////////////
+; ************* FIN CONFIGURACIÓN *************
+; //////////////////////////////////////////////
+;________________________________________________
+;
+set %presencia IJB
+set %tipos_armas FMH_GFF_EPH_LPH_BPH_CUO_TSF_LPO_JPH_ZTH_RMH_SOH_TLH_
+ +FUO_WSF_ATF_OMH_XPO_NMH_BNF_LTF_VPO_WTH_VRH_KTF_
+ +OLH_FFF_ZSF_YTH_BUO_ASF_ISF_BSF_QPF_KPH_CUH_NPO_MPH_UOH_TRH_XRH_CSF_
+ +KPO_POH_RRH_WPO_EMH_MSF_OPO_BUH_GUO_VTH_BFF_QMH_YSF_NSF_LSF_
+ +GMH_JTF_SRH_CNF_FBG_HNF_ZPF_GBG_OSF_INF_HSF_AUO_ZTO_FSF_WRH_MTF_JPO_
+ +RPF_HFF_XSF_YPO_DMH_XTH_QOH_URH_CQF_CFF_PMH_AUH_SPO_CPH_AQF_
+ +MPO_YRH_JOH_KSF_ZRF_PPF_SMH_NPO_GUO_XHF
+set %escudos CIK_BIK_AIK_OIK_NIK_FIK_GIK_LIK_CQF_PMH_MIK_ZHK
+set %comida RGG_NRD_QSD_ZBG_WLI_QRD_END_FUD_YLI_WLI_HGI
+    +_KGI_EGI_QLI_KLI_MLI_KRD_HQD_AQD_MQE_VQE_TQE_JQE_IQE
+    +_GQE_SPE_ZPE_OQE_BDF_KPE_RQE_YSD_SQD_YWI_AXI_PQD_QQD
+    +_FWI_HND
+set %tiempo_actual #SCNT            ; Reloj
+set %proxima_vez #SCNT              ; Trigger
+set %proxima_vez_attack #SCNT
+
+set #SYSMSGCOL 1187
+event sysmessage =======================
+wait 20
+set #SYSMSGCOL 1165
+event sysmessage Entrenar Warrior %version
+wait 20
+set #SYSMSGCOL 1187
+event sysmessage =======================
+wait 2
+
+;========================================================
+;
+; ******************* LOOP PRINCIPAL *******************
+;
+;========================================================
+loop:
+set %tiempo_actual #SCNT ; Actualiza el reloj
+if %proxima_vez <= %tiempo_actual ; Triger de alimentación
+   {
+     gosub comprobar_comida
+   }
+finditem %presencia G_2
+if #findkind = -1 ; Esperar a una nueva presencia
+   {
+     wait 20
+     goto loop
+   }
+gosub comprobar_escudo ; En caso de romperse
+gosub comprobar_arma   ; En caso de romperse
+if %proxima_vez_attack <= %tiempo_actual ; Triger de ataque
+  {
+    gosub atacar
+  }
+goto loop
+;========================================================
+;
+; ***************** FIN LOOP PRINCIPAL *****************
+;
+;========================================================
+
+;=====================================================
+; Rutina para buscar y atacar una presencia incorpórea
+;=====================================================
+sub atacar
+finditem %presencia G_2
+if #findkind <> -1
+   {
+     set #LTARGETID #FINDID
+     event macro 27 ; Attack Last
+     wait 20
+     set %proxima_vez_attack %tiempo_actual + %tiempo_attack
+   }
+return
+
+;=====================================================
+; Rutina para, en caso de romperse el arma, reponer
+;=====================================================
+sub comprobar_arma
+finditem %tipos_armas C_ , #CHARID
+if #FINDKIND = -1 ; Si no está en el pj, entonces se ha roto...
+   {
+     finditem %tipos_armas C_ , #BACKPACKID ; Buscamos una en la mochila, y la equipamos...
+     if #FINDKIND <> -1
+        {
+          set #LOBJECTID #FINDID
+          event macro 17 0
+          wait 20
+        }
+   }
+return
+
+;=====================================================
+; Rutina para, en caso de romperse el escudo, reponer
+;=====================================================
+sub comprobar_escudo
+finditem %escudos C_ , #CHARID
+if #FINDKIND = -1 ; Si no está en el pj, entonces se ha roto...
+   {
+     finditem %escudos C_ , #BACKPACKID ; Buscamos uno en la mochila, y lo equipamos...
+     if #FINDKIND <> -1
+        {
+          set #LOBJECTID #FINDID
+          event macro 17 0
+          wait 20
+        }
+   }
+return
+
+;=====================================================
+; Rutina para, en caso de hambre, comer hasta saciarse
+;=====================================================
+; v2.2
+sub comprobar_comida
+{
+  hambriento:
+  set %jrnl #jindex ; Marcamos un índice de las líneas del diario.
+  event macro 4 0 .hungry
+  wait 20
+  while #true
+     {
+       if #jindex > %jrnl ; Si aparece una nueva línea.
+          {
+            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de línea.
+            scanjournal %jrnl   ; La leemos...
+            if Estas_no_le_afecta_el_hambre in #journal || Estas_tan_lleno_que_no_puedes in #journal || Estas_totalmente_saciado in #journal
+               {
+                 set %proxima_vez %tiempo_actual + %tiempo_alimentacion
+                 return
+               }
+               else
+                  {
+                    if Estas_lleno in #journal || Estas_contento in #journal || Estas_en_inanicion in #journal || Estas_hambriento in #journal || Sientes_mucho in #journal || Estas_con_hambre in #journal || Estas_parcialmente in #journal || Estas_bien_lleno in #journal || Te_sientes_casi_lleno in #journal
+                       {
+                         finditem %comida C_ , #backpackid
+                         if #findcnt > 0
+                            {
+                              set #lobjectid #findid
+                              event macro 17
+                              wait 20
+                              goto hambriento
+                            }
+                            else
+                               {
+                                 event exmsg #charid 3 48 COMPRA COMIDA!!
+                                 wait 40
+                                 set %proxima_vez %tiempo_actual + %tiempo_alimentacion
+                               }
+                       }
+                       else ; Mensaje extraño, repetimos...
+                          {
+                            goto hambriento
+                          }
+                  }
+          }
+       return
+     } ; FIN While
+}
+return
