@@ -28,24 +28,24 @@
 ; Version: 1.2
 ; Client Tested with: 2.0.3
 ; EUO version tested with: EasyUO 1.5 Version 243
-; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Shard: Ultima Alianza (Â¡Hasta la muerte!)
 ; Revision Date: 21/04/2020
 ; Public Release: 17/08/2019
-; Purpose: Subir skill de tactics, sword, parry, etc, peleando contra una presencia incorpórea.
+; Purpose: Subir skill de tactics, sword, parry, etc, peleando contra una presencia incorpÃ³rea.
 set %version v1.2
 ;________________________________
 ;
 ; ///////////////////////////////
-; ******** CONFIGURACIÓN ********
+; ******** CONFIGURACIÃ“N ********
 ; ///////////////////////////////
 ;________________________________
 ;
 set %tiempo_attack 5           ; En segundos, cada cuanto ordenar el ataque.
-set %tiempo_alimentacion 360   ; Cada cuántos segundos va a comprobar si tiene hambre (6 minutos).
+set %tiempo_alimentacion 360   ; Cada cuÃ¡ntos segundos va a comprobar si tiene hambre (6 minutos).
 ;________________________________________________
 ;
 ; //////////////////////////////////////////////
-; ************* FIN CONFIGURACIÓN *************
+; ************* FIN CONFIGURACIÃ“N *************
 ; //////////////////////////////////////////////
 ;________________________________________________
 ;
@@ -62,8 +62,8 @@ set %comida RGG_NRD_QSD_ZBG_WLI_QRD_END_FUD_YLI_WLI_HGI
     +_KGI_EGI_QLI_KLI_MLI_KRD_HQD_AQD_MQE_VQE_TQE_JQE_IQE
     +_GQE_SPE_ZPE_OQE_BDF_KPE_RQE_YSD_SQD_YWI_AXI_PQD_QQD
     +_FWI_HND
-set %tiempo_actual #SCNT            ; Reloj
-set %proxima_vez #SCNT              ; Trigger
+set %tiempo_actual #SCNT           ; Reloj
+set %proxima_vez #SCNT             ; Trigger
 set %proxima_vez_attack #SCNT
 
 set #SYSMSGCOL 1187
@@ -83,7 +83,7 @@ wait 2
 ;========================================================
 loop:
 set %tiempo_actual #SCNT ; Actualiza el reloj
-if %proxima_vez <= %tiempo_actual ; Triger de alimentación
+if %proxima_vez <= %tiempo_actual ; Triger de alimentaciÃ³n
    {
      gosub comprobar_comida
    }
@@ -107,7 +107,7 @@ goto loop
 ;========================================================
 
 ;=====================================================
-; Rutina para buscar y atacar una presencia incorpórea
+; Rutina para buscar y atacar una presencia incorpÃ³rea
 ;=====================================================
 sub atacar
 finditem %presencia G_2
@@ -125,7 +125,7 @@ return
 ;=====================================================
 sub comprobar_arma
 finditem %tipos_armas C_ , #CHARID
-if #FINDKIND = -1 ; Si no está en el pj, entonces se ha roto...
+if #FINDKIND = -1 ; Si no estÃ¡ en el pj, entonces se ha roto...
    {
      finditem %tipos_armas C_ , #BACKPACKID ; Buscamos una en la mochila, y la equipamos...
      if #FINDKIND <> -1
@@ -142,7 +142,7 @@ return
 ;=====================================================
 sub comprobar_escudo
 finditem %escudos C_ , #CHARID
-if #FINDKIND = -1 ; Si no está en el pj, entonces se ha roto...
+if #FINDKIND = -1 ; Si no estÃ¡ en el pj, entonces se ha roto...
    {
      finditem %escudos C_ , #BACKPACKID ; Buscamos uno en la mochila, y lo equipamos...
      if #FINDKIND <> -1
@@ -161,14 +161,14 @@ return
 sub comprobar_comida
 {
   hambriento:
-  set %jrnl #jindex ; Marcamos un índice de las líneas del diario.
+  set %jrnl #jindex ; Marcamos un Ã­ndice de las lÃ­neas del diario.
   event macro 4 0 .hungry
   wait 20
   while #true
      {
-       if #jindex > %jrnl ; Si aparece una nueva línea.
+       if #jindex > %jrnl ; Si aparece una nueva lÃ­nea.
           {
-            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de línea.
+            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de lÃ­nea.
             scanjournal %jrnl   ; La leemos...
             if Estas_no_le_afecta_el_hambre in #journal || Estas_tan_lleno_que_no_puedes in #journal || Estas_totalmente_saciado in #journal
                {
@@ -194,7 +194,7 @@ sub comprobar_comida
                                  set %proxima_vez %tiempo_actual + %tiempo_alimentacion
                                }
                        }
-                       else ; Mensaje extraño, repetimos...
+                       else ; Mensaje extraÃ±o, repetimos...
                           {
                             goto hambriento
                           }
