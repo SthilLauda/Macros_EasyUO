@@ -35,19 +35,21 @@
 ;                             _________/   /    /
 ;                            \____________/    (
 ;
-; Author: SthiL
+; Author: Sthil Lauda
 ; Version: 1.0
 ; Client Tested with: 2.0.3
 ; EUO version tested with: EasyUO 1.5 Version 243
-; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Shard: Ultima Alianza (Â¡Hasta la muerte!)
 ; Public Release: 28/03/2019
 ; Global Variables Used: none
-; Purpose: Subir de nivel al pobre familiar :(
+; Purpose: Sube de nivel al pobre familiar :(
+
+; *** NOTA *** TambiÃ©n puedes entrenar a un GOLEM, poniendo de objetivo a tu WYRM en modo masoquismo ^^
 
 ;________________________________
 ;
 ; ///////////////////////////////
-; ******** CONFIGURACIÓN ********
+; ******** CONFIGURACIÃ“N ********
 ; ///////////////////////////////
 ;________________________________
 ;
@@ -56,7 +58,7 @@ set %tiempo_curacion 300 ; Cada cuantos segundos curar al objetivo.
 ;________________________________________________
 ;
 ; //////////////////////////////////////////////
-; ************* FIN CONFIGURACIÓN *************
+; ************* FIN CONFIGURACIÃ“N *************
 ; //////////////////////////////////////////////
 ;________________________________________________
 ;
@@ -90,7 +92,7 @@ if #findkind = -1 ; No hay objetivo...
 goto loop
 
 sub setupHeal
-display yesno ¿Quieres curar al objetivo usando la magia? (In Vas Mani)
+display yesno Â¿Quieres curar al objetivo usando la magia? (In Vas Mani)
 if #DISPRES = Yes
    {
      set %curar #TRUE
@@ -128,7 +130,7 @@ set %siguiente_kill %siguiente_kill + %tiempo_espera
 return
 
 sub inVasMani
-event macro 15 28 ; Mayor Curación (In Vas Mani).
+event macro 15 28 ; Mayor CuraciÃ³n (In Vas Mani).
 target 2s
 set #LTARGETID %objetivo
 set #LTARGETKIND 1
