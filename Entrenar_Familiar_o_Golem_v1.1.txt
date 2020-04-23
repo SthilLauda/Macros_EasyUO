@@ -110,7 +110,7 @@ if #FINDCNT = 0 ; No hay objetivo...
                 {
                   if ( %familiar )
                        {
-                         if ( %modo_presencias )
+                         if ( %modo_presencias ) ; Si estamos con presencias, fijamos el ID de la presencia que tenemos a tiro...
                               {
                                 set %ID_presencia #FINDID
                               }
