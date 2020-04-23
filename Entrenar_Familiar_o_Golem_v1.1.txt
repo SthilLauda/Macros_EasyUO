@@ -6,7 +6,7 @@
 ;   `|...|'  .||.   `|..' .||. .||    ||. `|..||. .//       \\. .||. .||. `|..||. .||  ||. /... `|..||.
 ; ======================================================================================================
 ;
-; Script Name: Entrenar Familiar
+; Script Name: Entrenar Familiar o Golem
 ;                    __                  __
 ;                   ( _)                ( _)
 ;                  / / \\              / /\_\_
@@ -39,27 +39,30 @@
 ; Version: 1.1
 ; Client Tested with: 2.0.3
 ; EUO version tested with: EasyUO 1.5 Version 243
-; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Shard: Ultima Alianza (Â¡Hasta la muerte!)
 ; Public Release: 28/03/2019
 ; Revison Date: 23/04/2020
 ; Global Variables Used: none
-; Purpose: Subir de nivel al pobre familiar :(
+; Purpose: Subir de nivel al pobre familiar :( o una mÃ¡quina Golem.
+; Notas: Soporta un objetivo fijo, o uno que se va renovando porque es un NPC que muere (por ejemplo en la zona de presencias incorpÃ³reas)
+
+; *** Â¡IMPORTANTE! *** -> Debes estar a 3 casillas o menos de distancia del objetivo al que vayas a atacar, o modificar "G_3" en la macro.
 
 ;________________________________
 ;
 ; ///////////////////////////////
-; ******** CONFIGURACIÓN ********
+; ******** CONFIGURACIÃ“N ********
 ; ///////////////////////////////
 ;________________________________
 ;
 set %tiempo_atacando 30  ; Total de tiempo atacando al objetivo.
 set %tiempo_kill 10      ; Cada cuantos segundos ordenar atacar al objetivo.
-set %tiempo_stop 60s     ; Cuántos segundos quedarse parado después de haber atacado durante el total de tiempo (%tiempo_atacando).
+set %tiempo_stop 60s     ; CuÃ¡ntos segundos quedarse parado despuÃ©s de haber atacado durante el total de tiempo (%tiempo_atacando).
 set %tiempo_curacion 300 ; Cada cuantos segundos curar al objetivo.
 ;________________________________________________
 ;
 ; //////////////////////////////////////////////
-; ************* FIN CONFIGURACIÓN *************
+; ************* FIN CONFIGURACIÃ“N *************
 ; //////////////////////////////////////////////
 ;________________________________________________
 ;
@@ -99,7 +102,7 @@ if #FINDCNT = 0 ; No hay objetivo...
                     else
                        {
                          event macro 1 0 All Stop
-                         wait %tiempo_stop ; Este el tiempo de espera para que te de tiempo a curar al Wyrm después de haberlo atacado durante %tiempo_atacando.
+                         wait %tiempo_stop ; Este el tiempo de espera para que te de tiempo a curar al Wyrm despuÃ©s de haberlo atacado durante %tiempo_atacando.
                          set %kill_time #SCNT + %tiempo_atacando ; Ampliamos el contador de tiempo para seguir atacando durante %tiempo_atacando.
                        }
              }
@@ -128,7 +131,7 @@ if #FINDCNT = 0 ; No hay objetivo...
 goto loop
 
 sub setupHeal
-display yesno ¿Quieres curar al objetivo usando la magia? (In Vas Mani)
+display yesno Â¿Quieres curar al objetivo usando la magia? (In Vas Mani)
 if #DISPRES = Yes
    {
      set %curar #TRUE
@@ -140,7 +143,7 @@ if #DISPRES = Yes
 return
 
 sub setupMacro
-display yesno ¿Quieres entrenar un Familiar? (Wyrm, Oso, Wisp, etc)
+display yesno Â¿Quieres entrenar un Familiar? (Wyrm, Oso, Wisp, etc)
 if #DISPRES = Yes
    {
      set %familiar #TRUE
@@ -148,10 +151,10 @@ if #DISPRES = Yes
    }
    else
       {
-        display yesno ¿Quieres entrenar un Golem? $$
-                    +Tendrás que ir ajustando "tiempo_atacando"
-                    +en la configuración de la macro a medida que
-                    +el Golem se vaya haciendo más fuerte.
+        display yesno Â¿Quieres entrenar un Golem? $$
+                    +TendrÃ¡s que ir ajustando "tiempo_atacando"
+                    +en la configuraciÃ³n de la macro a medida que
+                    +el Golem se vaya haciendo mÃ¡s fuerte.
         if #DISPRES = Yes
            {
              set %familiar #FALSE
@@ -187,7 +190,7 @@ if #FINDCNT > 0
    {
      if %presencia in #FINDTYPE ; Si el objetivo es una presencia
         {
-          set %objetivo %presencia ; Entonces fijamos como objetivo el TYPE de las presencias en lugar de un ID único...
+          set %objetivo %presencia ; Entonces fijamos como objetivo el TYPE de las presencias en lugar de un ID Ãºnico...
           set %modo_presencias #TRUE
           set #SYSMSGCOL 18
           event sysmessage OK: USANDO PRESENCIAS...
@@ -225,7 +228,7 @@ set %siguiente_kill #SCNT + %tiempo_kill
 return
 
 sub inVasMani
-event macro 15 28 ; Mayor Curación (In Vas Mani).
+event macro 15 28 ; Mayor CuraciÃ³n (In Vas Mani).
 target 2s
 set #LTARGETID %objetivo
 set #LTARGETKIND 1
