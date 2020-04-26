@@ -320,6 +320,7 @@ if ( #TRUE in #result )
                                   }
                            }
                            until #MANA = #MAXMANA
+                           wait 2s
                     }
           }
        if en_paz in #result ; OK, estamos bien de maná.
