@@ -46,6 +46,7 @@ onhotkey ESC
          set #LTARGETKIND 1
          event macro 22
          gosub wait_for GUMP 414_405 50
+         contpos 50 50
          click 164 220
          goto conocimiento_animal
        }
