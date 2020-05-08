@@ -12,7 +12,7 @@
 ; EUO version tested with: EasyUO 1.5 Version 243
 ; Shard: Ultima Alianza (¡Hasta la muerte!)
 ; Revision Date: 11/05/2019
-; Public Release: 31/07/2019
+; Public Release: 08/05/2020
 ; Global Variables Used:
 ; Purpose: Entrena la habilidad de "Conocimiento Animal"
 ; *************************************************
