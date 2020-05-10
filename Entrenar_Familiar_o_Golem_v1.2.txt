@@ -1,0 +1,346 @@
+; ======================================================================================================
+;  '||   ||` '||`   ||                                 /.\      '||`
+;   ||   ||   ||    ||     ''                         // \\      ||   ''
+;   ||   ||   ||  ''||''   ||  '||),,(|,   '''|.     //...\\     ||   ||   '''|.  `||''|,  '''/  '''|.
+;   ||   ||   ||    ||     ||   || || ||  .|''||    //     \\    ||   ||  .|''||   ||  ||   //  .|''||
+;   `|...|'  .||.   `|..' .||. .||    ||. `|..||. .//       \\. .||. .||. `|..||. .||  ||. /... `|..||.
+; ======================================================================================================
+;
+; Script Name: Entrenar Familiar
+;                    __                  __
+;                   ( _)                ( _)
+;                  / / \\              / /\_\_
+;                 / /   \\            / / | \ \
+;                / /     \\          / /  |\ \ \
+;               /  /   ,  \ ,       / /   /|  \ \
+;              /  /    |\_ /|      / /   / \   \_\
+;             /  /  |\/ _ '_| \   / /   /   \    \\
+;            |  /   |/  0 \0\    / |    |    \    \\
+;            |    |\|      \_\_ /  /    |     \    \\
+;            |  | |/    \.\ o\o)  /      \     |    \\
+;            \    |     /\\`v-v  /        |    |     \\
+;             | \/    /_| \\_|  /         |    | \    \\
+;             | |    /__/_     /   _____  |    |  \    \\
+;             \|    [__]  \_/  |_________  \   |   \    ()
+;              /    [___] (    \         \  |\ |   |   //
+;             |    [___]                  |\| \|   /  |/
+;            /|    [____]                  \  |/\ / / ||
+;       snd (  \   [____ /     ) _\      \  \    \| | ||
+;            \  \  [_____|    / /     __/    \   / / //
+;            |   \ [_____/   / /        \    |   \/ //
+;            |   /  '----|   /=\____   _/    |   / //
+;         __ /  /        |  /   ___/  _/\    \  | ||
+;        (/-(/-\)       /   \  (/\/\)/  |    /  | /
+;                      (/\/\)           /   /   //
+;                             _________/   /    /
+;                            \____________/    (
+;
+; Author: Sthil Lauda
+; Version: 1.1
+; Client Tested with: 2.0.3
+; EUO version tested with: EasyUO 1.5 Version 243
+; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Public Release: 28/03/2019
+; Revison Date: 23/04/2020
+; Global Variables Used: none
+; Purpose: Subir de nivel al pobre familiar :(
+
+;________________________________
+;
+; ///////////////////////////////
+; ******** CONFIGURACIÓN ********
+; ///////////////////////////////
+;________________________________
+;
+set %tiempo_atacando 30  ; Total de tiempo atacando al objetivo.
+set %tiempo_kill 10      ; Cada cuantos segundos ordenar atacar al objetivo.
+set %tiempo_stop 60s     ; Cuántos segundos quedarse parado después de haber atacado durante el total de tiempo (%tiempo_atacando).
+set %tiempo_curacion 300 ; Cada cuantos segundos curar al objetivo.
+;________________________________________________
+;
+; //////////////////////////////////////////////
+; ************* FIN CONFIGURACIÓN *************
+; //////////////////////////////////////////////
+;________________________________________________
+;
+set %siguiente_kill #SCNT
+set %siguiente_invasmani #SCNT + %tiempo_curacion ; 5 Minutos
+set %cofre_timer #SCNT
+set %presencia IJB
+set %cofres JIB_HIF_BUD_IKF
+
+gosub setupMacro
+gosub setupHeal
+gosub setupObjetivo
+
+loop:
+finditem %objetivo G_3
+if #FINDCNT = 0 ; No hay objetivo...
+   {
+     wait 1s ; Esperamos...
+     goto loop
+   }
+   else ; Hay un objetivo...
+      {        
+        if ( %golem ) ; Hemos elegido macrear un Golem...
+             {
+               if ( #SCNT < %kill_time )
+                    {
+                      if ( #SCNT >= %siguiente_kill )
+                           {
+                             gosub allKill
+                           }
+                      if ( %curar )
+                           {
+                             if ( #SCNT >= %siguiente_invasmani )
+                                  {
+                                    gosub inVasMani
+                                  }
+                           }
+                    }
+                    else
+                       {
+                         event macro 1 0 All Stop
+                         wait %tiempo_stop ; Este el tiempo de espera para que te de tiempo a curar al Wyrm después de haberlo atacado durante %tiempo_atacando.
+                         set %kill_time #SCNT + %tiempo_atacando ; Ampliamos el contador de tiempo para seguir atacando durante %tiempo_atacando.
+                       }
+             }
+             else ; Hemos elegido macrear un Familiar...
+                {
+                  if ( %familiar )
+                       {
+                         if ( %modo_presencias )
+                              {
+                                set %ID_presencia #FINDID
+                              }
+                         if ( %modo_cofre )
+                              {
+                                if ( #SCNT >= %cofre_timer )
+                                     {
+                                       _cofreBackpack:
+                                       finditem %cofres C_ , #BACKPACKID
+                                       if #FINDCNT > 0 ; OK, tenemos el cofre...
+                                          {
+                                            set #SYSMSGCOL 73
+                                            event sysmessage TIRANDO EL COFRE... :D
+                                            wait 20
+                                            exevent drag #FINDID #FINDSTACK
+                                            exevent dropg %Presencia_X %Presencia_Y %Presencia_Z
+                                            wait 30
+                                            finditem %cofres G_2
+                                            if #FINDCNT > 0 ; OK, ha caido bien en el suelo...
+                                               {
+                                                 set %cofre_timer #SCNT + 180
+                                               }
+                                               else ; Igual es que ha caido encima de la pierna del Wyrm y ha vuelto a la mochila... xDDDDD
+                                                  {
+                                                    goto _cofreBackpack ; Repetimos a ver si hay suerte...
+                                                  }
+                                          }
+                                          else ; No está en la mochila... miramos a ver si ya está en el suelo...
+                                             {
+                                               finditem %cofres G_2
+                                               if #FINDCNT > 0 ; Nos los echamos en la mochila...
+                                                  {
+                                                    set #SYSMSGCOL 73
+                                                    event sysmessage RECOGIENDO COFRE... :D
+                                                    wait 20
+                                                    exevent drag #FINDID #FINDSTACK
+                                                    exevent dropc #BACKPACKID
+                                                    wait 30
+                                                    goto _cofreBackpack
+                                                  }
+                                                  else ; Tampoco está en la mochila o está demasiado lejos...
+                                                     {
+                                                       finditem %cofres G_5
+                                                       if #FINDCNT > 0 ; Está, pero más lejos de lo que debería...
+                                                          {
+                                                            if #FINDDIST > 2
+                                                               {
+                                                                 set #SYSMSGCOL 88
+                                                                 event sysmessage ESTAS MUY LEJOS DEL COFRE!
+                                                                 wait 20
+                                                                 event sysmessage PARANDO MACRO... :-(
+                                                                 wait 20
+                                                                 halt
+                                                               }
+                                                          }
+                                                          else ; No está... Nos lo han robado o algo, jaja... xDDD
+                                                             {
+                                                               set #SYSMSGCOL 88
+                                                               event sysmessage NO ENCUENTRO EL COFRE! :-(
+                                                               wait 20
+                                                               event sysmessage PARANDO MACRO... :-(
+                                                               wait 20
+                                                               halt
+                                                             }
+                                                     }
+                                             }
+                                     }
+                              }
+                         if ( #SCNT >= %siguiente_kill )
+                              {
+                                gosub allKill
+                              }
+                         if ( %curar )
+                              {
+                                if ( #SCNT >= %siguiente_invasmani )
+                                     {
+                                       gosub inVasMani
+                                     }
+                              }
+                       }
+                }
+      }
+goto loop
+
+sub setupHeal
+display yesno ¿Quieres curar al objetivo usando la magia? (In Vas Mani)
+if #DISPRES = Yes
+   {
+     set %curar #TRUE
+   }
+   else
+      {
+        set %curar #FALSE
+      }
+return
+
+sub setupMacro
+display yesno ¿Quieres entrenar un Familiar? (Wyrm, Oso, Wisp, etc)
+if #DISPRES = Yes
+   {
+     set %familiar #TRUE
+     set %golem #FALSE
+     display yesno ¿Quieres entrenarlo con un cofre en la mochila? (Para familiares que tienen MAGIA) $$
+                 + NOTA: ¡Debes estar a dos casillas de la presencia para poder manejar el cofre!
+     if #DISPRES = Yes
+        {
+          set %modo_cofre #TRUE
+        }
+        else
+           {
+             set %modo_cofre #FALSE
+           }
+   }
+   else
+      {
+        display yesno ¿Quieres entrenar un Golem? $$
+                    +Tendrás que ir ajustando "tiempo_atacando"
+                    +en la configuración de la macro a medida que
+                    +el Golem se vaya haciendo más fuerte.
+        if #DISPRES = Yes
+           {
+             set %familiar #FALSE
+             set %golem #TRUE
+             set %kill_time #SCNT + %tiempo_atacando
+           }
+           else
+              {
+                set #SYSMSGCOL 38
+                event sysmessage DEBES ELEGIR UNA OPCION!
+                halt
+              }
+      }
+return
+
+sub setupObjetivo
+set #SYSMSGCOL 73
+event sysmessage CLICK EN EL OBJETIVO
+wait 20
+set #TARGCURS 1
+while #TARGCURS = 1
+      {
+        wait 1
+      }
+wait 3s
+set %objetivo #LTARGETID
+gosub GetName %objetivo nombre_objetivo
+set #SYSMSGCOL 88
+event sysmessage OBJETIVO: %nombre_objetivo
+wait 40
+finditem %objetivo
+if #FINDCNT > 0
+   {
+     if %presencia in #FINDTYPE ; Si el objetivo es una presencia
+        {
+          set %objetivo %presencia ; Entonces fijamos como objetivo el TYPE de las presencias en lugar de un ID único...
+          set %modo_presencias #TRUE
+          set %Presencia_X #FINDX
+          set %Presencia_Y #FINDY
+          set %Presencia_Z #FINDZ
+          set #SYSMSGCOL 18
+          event sysmessage OK: USANDO PRESENCIAS...
+          wait 40
+        }
+        else
+           {
+             set %modo_presencias #FALSE
+             return
+           }
+   }
+   else
+      {
+        set #SYSMSGCOL 38
+        event sysmessage NO ENCUENTRO EL OBJETIVO! :(
+        halt
+      }
+return
+
+sub allKill
+event macro 1 0 All Kill
+target
+if ( %modo_presencias )
+     {
+       set #LTARGETID %ID_presencia
+     }
+     else
+        {
+          set #LTARGETID %objetivo
+        }
+set #LTARGETKIND 1
+event macro 22
+wait 20
+set %siguiente_kill #SCNT + %tiempo_kill
+return
+
+sub inVasMani
+event macro 15 28 ; Mayor Curación (In Vas Mani).
+target 2s
+set #LTARGETID %objetivo
+set #LTARGETKIND 1
+event macro 22
+wait 3s
+set %siguiente_invasmani #SCNT + %tiempo_curacion
+return
+
+;* @name GetName
+;* @author Roadkill
+;* @ver 1.0 24Jan04
+;* @purpose get the name of a creature/vendor
+;* @params %1= the id of the thing whose name you want, required
+;*      @%2= variable name to return the ID in, required
+;* @returns @%2 and #result
+;* @changes #property, #strres, @%2, !strlength
+;* @example call rksubs.txt GetName %beetle beetlename
+;* @status: tested
+sub GetName
+        set %id_property %1
+        gosub waitforprop %id_property
+        str pos #property $
+        set !strlength #strres - 1
+        str left #property !strlength
+        set % . %2 #strres
+return % . %2
+
+sub waitforprop ; <===================================================>
+event property #charid
+wait 1
+set %oldprop #property
+event property %1
+_testforprop:
+if #property = %oldprop
+   {
+     goto _testforprop
+   }
+return
