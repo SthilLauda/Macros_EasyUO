@@ -69,7 +69,7 @@ set %siguiente_kill #SCNT
 set %siguiente_invasmani #SCNT + %tiempo_curacion ; 5 Minutos
 set %cofre_timer #SCNT
 set %presencia IJB
-set %cofres JIB_HIF_BUD_IKF
+set %cofres JIB_HIF_BUD_IKF_IIF
 
 gosub setupMacro
 gosub setupHeal
