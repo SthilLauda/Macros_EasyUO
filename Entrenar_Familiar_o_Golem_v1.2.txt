@@ -43,7 +43,7 @@
 ; Public Release: 28/03/2019
 ; Revison Date: 23/04/2020
 ; Global Variables Used: none
-; Purpose: Subir de nivel al pobre familiar :(
+; Purpose: Subir de nivel al pobre familiar... :(
 ;
 ; *** NOTA ***: ¡Si tu familiar tiene magia, necesitas un cofre en la mochila para bloquearlo y que no se mueva al tirar hechizos!
 
