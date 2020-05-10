@@ -103,7 +103,7 @@ if #FINDCNT = 0 ; No hay objetivo...
                     else
                        {
                          event macro 1 0 All Stop
-                         wait %tiempo_stop ; Este el tiempo de espera para que te de tiempo a curar al Wyrm después de haberlo atacado durante %tiempo_atacando.
+                         wait %tiempo_stop ; Este es el tiempo de espera para que te dé tiempo a curar al Wyrm después de haberlo atacado durante %tiempo_atacando.
                          set %kill_time #SCNT + %tiempo_atacando ; Ampliamos el contador de tiempo para seguir atacando durante %tiempo_atacando.
                        }
              }
