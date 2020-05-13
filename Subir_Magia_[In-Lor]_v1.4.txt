@@ -35,15 +35,15 @@
 ; Version: 1.4
 ; Client Tested with: 2.0.3
 ; EUO version tested with: EasyUO 1.5 Version 243
-; Shard: Ultima Alianza (°Hasta la muerte!)
+; Shard: Ultima Alianza (¬°Hasta la muerte!)
 ; Revision Date: 08/02/2019
 ; Public Release: 02/01/2019
 ; Global Variables Used:
 ; Purpose: Macrea Magia o Medit desde un cofre o directamente comprando a los vendors (ir a la ciudad de Wind o Ver Lor Reg).
 ; ==================================
-set %numeroregs 200             ; N˙mero de regs que coger· para reponerse cada vez.
+set %numeroregs 200             ; N√∫mero de regs que coger√° para reponerse cada vez.
 set %tiempo_ronda 1020          ; Segundos que les cuesta a los vendors reponer los regs.
-set %tiempo_alimentacion 360    ; Cada cu·ntos segundos va a comprobar si tiene hambre (6 minutos).
+set %tiempo_alimentacion 360    ; Cada cu√°ntos segundos va a comprobar si tiene hambre (6 minutos).
 ; ==================================
 
 chooseskill mage real
@@ -62,7 +62,7 @@ set %stats_timer #SCNT
 set %ronda_timer #SCNT
 set %tiempo_actual #SCNT
 set %proxima_vez #SCNT
-event sysmessage Iniciando Macro...
+event sysmessage Iniciando Macro... :D
 event sysmessage
 set #targCurs 0
 
@@ -70,31 +70,31 @@ configurar:
 if %confp = 1 || %confp = N/A
 {
 _modeMacro:
-display yesno øQuieres subir la habilidad de MAGIA?
+display yesno ¬øQuieres subir la habilidad de MAGIA?
 if ( #dispres = yes )
      {
        set %subir_magia #TRUE
        set %subir_medit #FALSE
-       set %managastado #MAXMANA - abs ( #MAXMANA - 4 ) ; Este n˙mero simboliza el man· gastado m·ximo antes de meditar
+       set %managastado #MAXMANA - abs ( #MAXMANA - 4 ) ; Este n√∫mero simboliza el man√° gastado m√°ximo antes de meditar
      }
      else
         {
-          display yesno øQuieres subir la habilidad de MEDITAR?
+          display yesno ¬øQuieres subir la habilidad de MEDITAR?
           if ( #dispres = yes )
               {
                 set %subir_medit #TRUE
                 set %subir_magia #FALSE
-                set %managastado #MAXMANA - 4 ; Este n˙mero simboliza el man· gastado m·ximo antes de meditar
+                set %managastado #MAXMANA - 4 ; Este n√∫mero simboliza el man√° gastado m√°ximo antes de meditar
               }
               else
                  {
-                   display OK DEBES CONTESTAR SI EN ALGUNA PREGUNTA! ¨¨
+                   display OK DEBES CONTESTAR SI EN ALGUNA PREGUNTA! ¬¨¬¨
                    set #SYSMSGCOL 43
-                   event sysmessage DEBES CONTESTAR SI EN ALGUNA PREGUNTA! ¨¨
+                   event sysmessage DEBES CONTESTAR SI EN ALGUNA PREGUNTA! ¬¨¬¨
                    goto _modeMacro
                  }
         }
-display yesno øQuieres macrear en casa usando un cofre?
+display yesno ¬øQuieres macrear en casa usando un cofre?
 if ( #dispres = yes )
      {
        set #sysmsgcol 1264
@@ -109,7 +109,7 @@ if ( #dispres = yes )
      }
      else
         {
-          display yesno øQuieres macrear desde una tienda de magia?
+          display yesno ¬øQuieres macrear desde una tienda de magia?
           if ( #dispres = yes )
                {
                  set %modo_tienda #TRUE
@@ -192,7 +192,7 @@ if ( #TRUE in #result )
      {
        if pierdes in #result
           {
-            goto _reMedit ; Meditamos hasta que no perdamos la concentraciÛn
+            goto _reMedit ; Meditamos hasta que no perdamos la concentraci√≥n
           }
        if trance in #result
           {
@@ -209,7 +209,7 @@ if ( #TRUE in #result )
                         return
                       }
                  }
-                 else ; Meditamos hasta llenar la barra al m·ximo...
+                 else ; Meditamos hasta llenar la barra al m√°ximo...
                     {
                       repeat
                            {
@@ -219,7 +219,7 @@ if ( #TRUE in #result )
                            wait 2s
                     }
           }
-       if en_paz in #result ; OK, estamos bien de man·.
+       if en_paz in #result ; OK, estamos bien de man√°.
           {
             return
           }
@@ -237,7 +237,7 @@ if %modo_tienda && %ceniza_ok && %seda_ok
    {
      set %ceniza_ok #FALSE
      set %seda_ok #FALSE
-     set %ronda_timer #SCNT + %tiempo_ronda ; ⁄ltimo Vendor al que le compramos algo...
+     set %ronda_timer #SCNT + %tiempo_ronda ; √öltimo Vendor al que le compramos algo...
    }
 return
 
@@ -267,7 +267,7 @@ if #FINDSTACK >= %debocoger
                 {
                   gosub buyRegsMagos
                 }
-                else ; TodavÌa no podemos comprar los regs
+                else ; Todav√≠a no podemos comprar los regs
                    {
                      if #SCNT > %stats_timer
                         {
@@ -311,7 +311,7 @@ if #FINDSTACK >= %debocoger
            {
              gosub buyRegsMagos
            }
-           else ; TodavÌa no podemos comprar los regs
+           else ; Todav√≠a no podemos comprar los regs
               {
                 if #SCNT > %stats_timer
                    {
@@ -394,7 +394,7 @@ if #FINDCNT > 0
                                }
                                else
                                   {
-                                    if artes_arcanas in #RESULT ; 6 p·ginas en el men˙
+                                    if artes_arcanas in #RESULT ; 6 p√°ginas en el men√∫
                                        {
                                          move %vendor_X %vendor_Y 1 5s
                                          event macro 1 0 %nombre_vendor buy
@@ -410,7 +410,7 @@ if #FINDCNT > 0
                                        }
                                        else
                                           {
-                                            if hago_pociones in #RESULT ; 2 p·ginas en el men˙
+                                            if hago_pociones in #RESULT ; 2 p√°ginas en el men√∫
                                                {
                                                  set %alquimista %alquimista , _ , #FINDID
                                                  move %vendor_X %vendor_Y 1 5s
@@ -578,14 +578,14 @@ return
 sub comprobar_comida
 {
   hambriento:
-  set %jrnl #jindex ; Marcamos un Ìndice de las lÌneas del diario.
+  set %jrnl #jindex ; Marcamos un √≠ndice de las l√≠neas del diario.
   event macro 4 0 .hungry
   wait 20
   while #true
      {
-       if #jindex > %jrnl ; Si aparece una nueva lÌnea.
+       if #jindex > %jrnl ; Si aparece una nueva l√≠nea.
           {
-            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de lÌnea.
+            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de l√≠nea.
             scanjournal %jrnl   ; La leemos...
             if Estas_no_le_afecta_el_hambre in #journal || Estas_tan_lleno_que_no_puedes in #journal || Estas_totalmente_saciado in #journal
                {
@@ -611,7 +611,7 @@ sub comprobar_comida
                                  set %proxima_vez %tiempo_actual + %tiempo_alimentacion
                                }
                        }
-                       else ; Mensaje extraÒo, repetimos...
+                       else ; Mensaje extra√±o, repetimos...
                           {
                             goto hambriento
                           }
