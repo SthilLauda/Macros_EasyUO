@@ -193,42 +193,6 @@ else
 display ok You specified an unknown wait_for command. Script returned #result and is halting.
 halt
 ;=================================================================
-sub wait_for_MSG ; version 1.4 ~Locke
-;=================================================================
-if !_A0 < 3
-{
-display ok You haven't specified enough vars.$
-+The basic format is: gosub wait_for MSG %message time_out_in_seconds$
-+Script is halting
-halt
-}
-set !_timeout ( #scnt2 + !_A . !_A0 )
-_lets_wait_for_a_message:
-for %i %jstart #jindex
-{
- scanjournal %i
-  for %ii 2 !_A0
-  {
-    if !_A . %ii in #journal && %jstart <> %i
-    set #result #true , #spc , !_A . %ii
-  }
-}
-
-if #true notin #result
-{
-set #result #false
- if !_timeout =< #scnt2
- return #result
-wait 1
-goto _lets_wait_for_a_message
-}
-else
-return #result
-
-wait 1
-goto _lets_wait_for_a_message
-
-;=================================================================
 sub wait_for_GUMP ; version 1.4 ~Locke
 ;=================================================================
 ; Añadido #CONTID para "sub abrir_cofre"
