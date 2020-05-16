@@ -48,11 +48,11 @@ set %version 1.0
 ; ///////////////////////////////
 ;________________________________
 ;
-set %autorast #FALSE
 set %teclarast r
 set %teclaanimal e
 set %teclapjs w
 set %teclamosnters q
+set %autorast #FALSE
 ; _______________________________________________
 ;
 ; //////////////////////////////////////////////
@@ -71,6 +71,7 @@ set #SYSMSGCOL 1187
 event sysmessage ==================
 wait 20
 
+
 loopStart:
 OnHotKey %teclarast
        {
@@ -79,6 +80,13 @@ OnHotKey %teclarast
        wait 1
 goto loopStart
 
+;
+;========================================================
+;
+; ******************* LOOP PRINCIPAL ********************
+;
+;========================================================
+;
 comienzo:
 if ( %autorast )
      {
