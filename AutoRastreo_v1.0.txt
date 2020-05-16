@@ -35,7 +35,7 @@
 ; Version: 1.0
 ; Client Tested with: 2.0.3
 ; EUO version tested with: EasyUO 1.5 Version 243
-; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Shard: Ultima Alianza (Â¡Hasta la muerte!)
 ; Revision Date: 15/05/2020
 ; Public Release:  15/05/2020
 ; Purpose: Rastrea de forma continua los distintos tipos de NPC.
@@ -44,7 +44,7 @@ set %version 1.0
 ;________________________________
 ;
 ; ///////////////////////////////
-; ******** CONFIGURACIÓN ********
+; ******** CONFIGURACIÃ“N ********
 ; ///////////////////////////////
 ;________________________________
 ;
@@ -53,6 +53,13 @@ set %teclarast r
 set %teclaanimal e
 set %teclapjs w
 set %teclamosnters q
+; _______________________________________________
+;
+; //////////////////////////////////////////////
+; ************* FIN CONFIGURACIÃ“N *************
+; //////////////////////////////////////////////
+; _______________________________________________
+;
 
 set #SYSMSGCOL 1187
 event sysmessage ==================
@@ -107,6 +114,13 @@ if ( ! %autorast )
          goto loopStart
        }
 goto loopStart
+;
+;========================================================
+;
+; ***************** FIN LOOP PRINCIPAL *****************
+;
+;========================================================
+;
 
 sub esperar
 set %tiempo #SCNT + 5
@@ -209,7 +223,7 @@ goto _lets_wait_for_a_message
 ;=================================================================
 sub wait_for_GUMP ; version 1.4 ~Locke
 ;=================================================================
-; Añadido #CONTID para "sub abrir_cofre"
+; AÃ±adido #CONTID para "sub abrir_cofre"
 if !_A0 < 3
 {
 display ok You haven't specified enough vars.$
