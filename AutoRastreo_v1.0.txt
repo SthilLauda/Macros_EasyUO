@@ -48,11 +48,11 @@ set %version 1.0
 ; ///////////////////////////////
 ;________________________________
 ;
-set %teclarast r
-set %teclaanimal e
-set %teclapjs w
-set %teclamosnters q
-set %autorast #FALSE
+set %teclarast r         ; Activar / Desactivar el rastreo automático.
+set %teclaanimal e       ; Elegir "animales" (Monturas) en el menú de rastrear.
+set %teclapjs w          ; Elegir "personajes" (PJ's) en el menú de rastrear.
+set %teclamosnters q     ; Elegir "Monstruos" (Bichos) en el menú de rastrear.
+set %autorast #FALSE     ; Comenzar con "auto rastreo" activado.
 ; _______________________________________________
 ;
 ; //////////////////////////////////////////////
