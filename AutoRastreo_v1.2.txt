@@ -1,0 +1,340 @@
+; ======================================================================================================
+;  '||   ||` '||`   ||                                 /.\      '||`
+;   ||   ||   ||    ||     ''                         // \\      ||   ''
+;   ||   ||   ||  ''||''   ||  '||),,(|,   '''|.     //...\\     ||   ||   '''|.  `||''|,  '''/  '''|.
+;   ||   ||   ||    ||     ||   || || ||  .|''||    //     \\    ||   ||  .|''||   ||  ||   //  .|''||
+;   `|...|'  .||.   `|..' .||. .||    ||. `|..||. .//       \\. .||. .||. `|..||. .||  ||. /... `|..||.
+; ======================================================================================================
+;
+; Script Name: AutoRastreo
+;
+;             ______
+;          .-'      `-.
+;        .'            `.
+;       /                \
+;      ;                 ;`
+;      |         H       |;
+;      ;                 ;|
+;      '\               / ;
+;       \`.           .' /
+;        `.`-._____.-' .'
+;          / /`_____.-'
+;         / / /
+;        / / /
+;       / / /
+;      / / /
+;     / / /
+;    / / /
+;   / / /
+;  / / /
+; / / /
+; \/_/
+;
+;
+; Author: Odonell [ MOD+ Sthil ]
+; Version: 1.2
+; Client Tested with: 2.0.3
+; EUO version tested with: EasyUO 1.5 Version 243
+; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Revision Date: 19/05/2020
+; Public Release:  15/05/2020
+; Purpose: Rastrea de forma continua los distintos tipos de NPC.
+;===============================================================
+set %version 1.2
+;________________________________
+;
+; ///////////////////////////////
+; ******** CONFIGURACIÓN ********
+; ///////////////////////////////
+;________________________________
+;
+set %autorast #FALSE
+set %teclarast r
+set %teclaanimal e
+set %teclapjs w
+set %teclamosnters q
+; _______________________________________________
+;
+; //////////////////////////////////////////////
+; ************* FIN CONFIGURACIÓN *************
+; //////////////////////////////////////////////
+; _______________________________________________
+;
+set #SYSMSGCOL 1187
+event sysmessage ==================
+wait 20
+set #SYSMSGCOL 1165
+event sysmessage AutoRastreo v . %version
+wait 20
+set #SYSMSGCOL 1187
+event sysmessage ==================
+wait 20
+
+loopStart:
+OnHotKey %teclarast
+       {
+         goto autorast
+       }
+       wait 1
+goto loopStart
+
+;
+;========================================================
+;
+; ******************* LOOP PRINCIPAL ********************
+;
+;========================================================
+;
+comienzo:
+if ( %autorast )
+     {
+       _loopRast:
+       event macro 13 38 ; Ratrear...
+       gosub wait_for GUMP 280_570 40
+       OnHotKey %teclaanimal
+              {
+                wait 20
+                set #SYSMSGCOL 53
+                event sysmessage [ OK ]
+                wait 40
+                click 15 159 f dmc
+                gosub esperar
+              }
+       OnHotKey %teclapjs
+              {
+                wait 20
+                set #SYSMSGCOL 53
+                event sysmessage [ OK ]
+                wait 40
+                click 15 69 f dmc
+                gosub esperar
+              }
+       OnHotKey %teclamosnters
+              {
+                wait 20
+                set #SYSMSGCOL 53
+                event sysmessage [ OK ]
+                wait 40
+                click 15 130 f dmc
+                gosub esperar
+              }
+       OnHotKey %teclarast ; ON / OFF
+              {
+                wait 20
+                set #SYSMSGCOL 43
+                event sysmessage [ OK ]
+                wait 40
+                goto autorast
+              }
+              goto _loopRast
+     }
+if ( ! %autorast )
+       {
+         goto loopStart
+       }
+goto loopStart
+;
+;========================================================
+;
+; ***************** FIN LOOP PRINCIPAL *****************
+;
+;========================================================
+;
+
+sub esperar
+set %tiempo_espera #SCNT + 5
+repeat
+     {
+       set %restante abs ( %tiempo_espera - #SCNT )
+       set #SYSMSGCOL 73
+       event sysmessage ESPERANDO... [ %restante ]
+       wait 20
+     }
+     until ( #SCNT >= %tiempo_espera || #CONTSIZE = 71_90 || #CONTSIZE = 70_90 || #CONTSIZE = 85_94 || #CONTSIZE = 97_90 )
+if #CONTSIZE = 70_90 || #CONTSIZE = 71_90 || #CONTSIZE = 85_94 || #CONTSIZE = 97_90 ; Flecha de rastrear...
+   {
+     set #SYSMSGCOL 88
+     event sysmessage OK: RASTREANDO NPC...
+     wait 40
+     set #SYSMSGCOL 43
+     event sysmessage PULSA [ %teclarast ] PARA DETENER...
+     wait 20
+     set %tiempo_rastreo #SCNT + 10
+     _loopRastreando:
+     if ( #CONTSIZE <> 70_90 && #CONTSIZE <> 71_90 && #CONTSIZE <> 85_94 #CONTSIZE <> 97_90 ) ; ¿No hay flecha de rastreo?
+          {
+            display yesno ¿ Quieres seguir rastreando ?
+            if #DISPRES = yes
+               {
+                 goto comienzo
+               }
+               else
+                  {
+                    goto autorast
+                  }
+          }
+     OnHotKey %teclarast
+       {
+         _FIN:
+         set #SYSMSGCOL 1165
+         event sysmessage ******* FIN RASTREO *******
+         wait 20
+         goto comienzo
+       }
+       wait 1
+       goto _loopRastreando
+   }
+return
+
+autorast:
+if ( %autorast )
+     {
+       gosub wait_for GUMP 280_570 CLOSE
+       set %autorast #FALSE
+       set #SYSMSGCOL 38
+       event sysmessage Auto Rastreo [ OFF ]
+       wait 20
+     }
+     else
+        {
+          if ( ! %autorast )
+               {
+                 set %autorast #TRUE
+                 set #SYSMSGCOL 73
+                 event sysmessage Auto Rastreo [ ON ]
+                 wait 20
+               }
+        }
+goto comienzo
+
+;=================================================================
+sub wait_for
+;=================================================================
+; This "wait_for" sub package was created by Locke. If you use these subs please keep this header intact.
+; Documentation: the sub package grew to large with all the comments. To load them call the sub like this:
+; gosub wait_for docs    | or you can use doc, documention, what, or my personal favorite, kickass.
+
+; "wait_for core dispatcher" version 1.2 by Locke
+if %1 = doc || if %1 = docs || if %1 = documentation || if %1 = what || if %1 = kickass
+{
+Display ok Please click ok and wait for your browser to start.
+execute http://www.easyuo.com/forum/viewtopic.php?t=24716
+halt
+}
+nameSpace Push
+namespace local LLNS
+set #result N/A ; if #result isn't set by one of my wait_for subs it'll throw an error.
+set !LPC #lpc
+set #lpc 200
+for %i 0 %0
+set !_A . %i % . %i
+gosub wait_for_ , !_A1
+set #lpc !lpc
+namespace clear LLNS
+namespace pop
+if #result <> N/A
+return #result
+else
+display ok You specified an unknown wait_for command. Script returned #result and is halting.
+halt
+;=================================================================
+sub wait_for_MSG ; version 1.4 ~Locke
+;=================================================================
+if !_A0 < 3
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for MSG %message time_out_in_seconds$
++Script is halting
+halt
+}
+set !_timeout ( #scnt2 + !_A . !_A0 )
+_lets_wait_for_a_message:
+for %i %jstart #jindex
+{
+ scanjournal %i
+  for %ii 2 !_A0
+  {
+    if !_A . %ii in #journal && %jstart <> %i
+    set #result #true , #spc , !_A . %ii
+  }
+}
+
+if #true notin #result
+{
+set #result #false
+ if !_timeout =< #scnt2
+ return #result
+wait 1
+goto _lets_wait_for_a_message
+}
+else
+return #result
+
+wait 1
+goto _lets_wait_for_a_message
+
+;=================================================================
+sub wait_for_GUMP ; version 1.4 ~Locke
+;=================================================================
+; Añadido #CONTID para "sub abrir_cofre"
+if !_A0 < 3
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for GUMP XXX_YYY time_out_in_seconds$
++Script is halting
+halt
+}
+if !_A3 <> CLOSE
+set !_timeout #scnt2 + !_A3
+else
+set !_timeout 0 ; no gump wait if %3 = CLOSE since we already believe it to be open.
+
+_lets_wait_for_a_gump:
+if #CONTSIZE = !_A2 || #CONTKIND = !_A2 || #CONTNAME = !_A2 || #CONTTYPE = !_A2 || #CONTID = !_A2
+{
+ if !_A5 <> N/A && !_A6 <> N/A
+ {
+ set !clickx !_A5 + #contposx
+ set !clicky !_A6 + #contposy
+ click !clickx !clicky
+ }
+ if !_A3 = CLOSE || if !_A4 = CLOSE || !_A5 = CLOSE || !_A6 = CLOSE
+ {
+ set !string #contsize
+ str pos !string _
+ set !pos #strres
+ str del !string #strres #strres
+ set !clickX #contposx + ( #strres / 2 )
+ str del !string 1 !pos
+ set !clickY #contposy + ( #strres / 2 )
+ click !clickx !clicky R
+ }
+return #true
+}
+
+if ( !_timeout =< #scnt2 ) && ( !_A4 = N/A )
+   {
+     return #false
+   }
+
+if !_A4 <> N/A && !_timeout =< #scnt2
+{
+finditem !_A4
+if #findkind <> -1
+{
+ for #findindex 1 #findcnt
+ {
+  if #finddist > 2
+  ignoreitem #findid LLWAITFOR
+  else
+  break
+ }
+ set #lobjectid #findid
+ event macro 17 0
+ set !_timeout #scnt2 + !_A3
+}
+else
+return #false
+}
+wait 1
+goto _lets_wait_for_a_gump
