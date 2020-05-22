@@ -15,7 +15,7 @@
 ;                         l/                _) )_             \I                                 +
 ;      +                                    `\ /'
 ;
-; Script Name: Smart Brasero [ +MOD Terathan ]
+; Script Name: Smart Brasero
 ;
 ;          (
 ;          )
@@ -30,16 +30,16 @@
 ;    `'(_ )_)(_)_)'
 ;
 ; Author: Sthil Lauda
-; Version: 1.2
+; Version: 1.4
 ; Client Tested with: 2.0.3
 ; EUO version tested with: 1.5 Version 130
 ; Shard: Ultima Alianza
 ; Release: 28/04/2019
-; Revision date: 16/05/2020
+; Revision date: 22/05/2020
 ; Purpose: Intenta macrear healing sin morir en el intento... XD
 ;==================================
 ;
-set %version v1.2
+set %version v1.4
 ; ________________________________
 ;
 ; ///////////////////////////////
@@ -143,7 +143,10 @@ gosub initMacro     ; Seleccionar la macro correspondiente.
 Heal_loop:
 gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
 gosub checkStatus       ; ¿Vivo o Muerto?
-gosub checkHungry       ; Alimentación.
+if ( ! %matriarca )
+     {
+       gosub checkHungry       ; Alimentación.
+     }
 gosub checkPlayerBack   ; Miramos si ha vuelto el otro player en caso de que estuviéramos en modo "VS".
 if ( %matriarca )
      {
@@ -314,7 +317,22 @@ if ( %skill_magey >= 1000 )
        if ( #MAXWEIGHT < 1000 ) ; Si no aguantamos 1k de peso, no estamos transformados en Orco...
             {
               move %start_X %start_Y 0 30s
-              gosub pickItemsBank
+              gosub checkHungry ; Alimentación.
+              finditem %seda C_ , #BACKPACKID
+              if #FINDSTACK < 5
+                 {
+                   gosub pickItemsBank
+                 }
+              finditem %mandrake C_ , #BACKPACKID
+              if #FINDSTACK < 5
+                 {
+                   gosub pickItemsBank
+                 }
+              finditem %blood C_ , #BACKPACKID
+              if #FINDSTACK < 5
+                 {
+                   gosub pickItemsBank
+                 }
               if ( #MANA < 40 )
                    {
                      gosub meditar
@@ -325,7 +343,7 @@ if ( %skill_magey >= 1000 )
               wait 20
               click 68 66 d dmc ; Doble click en Terathan
               gosub waitForSysVar MAXWEIGHT > 1000 100 ; Esperamos 10s (en décimas) a que suba el peso máximo del pj
-              if ( #MAXWEIGHT < 1000 ) ; Si no aguantamos 1k de peso, no estamos transformados en Orco...
+              if ( #MAXWEIGHT >= 2000 ) ; Si aguantamos 2k de peso, es que estamos transformados en Terathan...
                    {
                      set #sysmsgcol 73
                      event sysmessage OK: MATRIARCA!! :D
@@ -511,14 +529,47 @@ if ( #CONTID <> %bank_ID ) && ( #CHARGHOST <> YES ) ; El cofre del banco está c
      }
      else ; El cofre del banco ya está abierto...
         {
+          _waitToVenda:
+          savepix 30 47 1 ; Posición X / Y del icono
+          if ( #pixCol = %pixel_vendazo ) ; Bucle para esperar a que desaparezca el icono de la vendas...
+               {
+                  wait 20
+                  set #SYSMSGCOL 38
+                  event sysmessage VIDA: #HITS / #MAXHITS
+                  wait 20
+                  goto _waitToVenda
+               }
           if ( %matriarca )
                {
-                 gosub reponerItem %seda %min_seda SEDA
-                 gosub reponerItem %mandrake %min_mandron MANDRAKE
-                 gosub reponerItem %blood %min_blood BLOOD_MOST
+                 finditem %seda C_ , #BACKPACKID
+                 if #FINDSTACK < 5
+                    {
+                      gosub reponerItem %seda %min_seda SEDA
+                      goto _rePick
+                    }
+                 finditem %mandrake C_ , #BACKPACKID
+                 if #FINDSTACK < 5
+                    {
+                      gosub reponerItem %mandrake %min_mandron MANDRAKE
+                      goto _rePick
+                    }
+                 finditem %blood C_ , #BACKPACKID
+                 if #FINDSTACK < 5
+                    {
+                      gosub reponerItem %blood %min_blood BLOOD_MOST
+                      goto _rePick
+                    }
                }
-          gosub reponerItem %comida %min_comida COMIDA
-          gosub reponerItem %vendaLimpia %min_vendas VENDAS
+          finditem %vendaLimpia C_ , #BACKPACKID
+          if #FINDCNT = 0 ; No podemos continuar sin vendas...
+             {
+               gosub reponerItem %vendaLimpia %min_vendas VENDAS
+             }
+          finditem %comida C_ , #BACKPACKID
+          if #FINDCNT = 0 ; No conviene continuar sin comida...
+             {
+               gosub reponerItem %comida %min_comida COMIDA
+             }
         }
 return
 
@@ -536,9 +587,16 @@ if #FINDCNT > 0
          {
            set %stack_mochila %stack_mochila + #FINDSTACK
          }
-     event sysmessage %item_name EN LA MOCHILA [ %stack_mochila ]
+     set #SYSMSGCOL 73
+     event sysmessage %item_name MOCHILA [ %stack_mochila ]
      wait 20
    }
+   else
+      {
+        set #SYSMSGCOL 38
+        event sysmessage %item_name MOCHILA [ %stack_mochila ]
+        wait 20
+      }
 finditem %item C_ , %bank_ID
 if #FINDCNT > 0
    {
@@ -546,13 +604,21 @@ if #FINDCNT > 0
          {
            set %stack_bank %stack_bank + #FINDSTACK
          }
-     event sysmessage %item_name EN EL BANCO [ %stack_bank ]
+     set #SYSMSGCOL 88
+     event sysmessage %item_name BANK [ %stack_bank ]
      wait 20
    }
+   else
+      {
+        set #SYSMSGCOL 38
+        event sysmessage %item_name BANK [ %stack_bank ]
+        wait 20
+      }
 if ( %stack_mochila < %cantidad ) ; No hay comida, o queda poca en la mochila...
      {
        set %reponer %cantidad - %stack_mochila
-       event sysmessage REPONIENDO %item_name [ %reponer ]
+       set #SYSMSGCOL 18
+       event sysmessage REPONIENDO: %item_name [ %reponer ]
        wait 20
        finditem %item C_ , %bank_ID
        if ( %stack_bank < %reponer ) ; No hay comida, o queda poca en el banco...
