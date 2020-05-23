@@ -65,13 +65,13 @@ set %comida RGG_NRD_QSD_ZBG_WLI_QRD_END_FUD_YLI_WLI_HGI
 set %proxima_vez #SCNT
 
 set #SYSMSGCOL 1187
-event sysmessage ==================
+event sysmessage =================
 wait 20
 set #SYSMSGCOL 1165
 event sysmessage Veterinaria v . %version
 wait 20
 set #SYSMSGCOL 1187
-event sysmessage ==================
+event sysmessage =================
 wait 20
 
 ; Comprobar la suerte [ 2020-05-22 - SirDrunk: + Veterinaria si tienes +25 de suerte sube más rapido. ]
