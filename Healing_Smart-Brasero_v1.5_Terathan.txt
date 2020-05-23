@@ -30,16 +30,16 @@
 ;    `'(_ )_)(_)_)'
 ;
 ; Author: Sthil Lauda
-; Version: 1.4
+; Version: 1.5
 ; Client Tested with: 2.0.3
 ; EUO version tested with: 1.5 Version 130
 ; Shard: Ultima Alianza
 ; Release: 28/04/2019
-; Revision date: 22/05/2020
+; Revision date: 23/05/2020
 ; Purpose: Intenta macrear healing sin morir en el intento... XD
 ;==================================
 ;
-set %version v1.4
+set %version v1.5
 ; ________________________________
 ;
 ; ///////////////////////////////
@@ -123,6 +123,17 @@ event sysmessage Healing Brasero %version
 set #SYSMSGCOL 88
 event sysmessage =====================
 wait 20
+
+; Comprobar la suerte [ CHANGELOG - 2020-05-22 - SirDrunk: + Tener +5 de luck ayuda a subir healing más rapido. ] 
+if ( #LUCK < 5 ) ; 5 es una joya de suerte (collar, anillo, brazalete, etc), o se le puede añadir una armadura de cota de mallas de oro con arma y escudo  ^^
+     {
+       set #SYSMSGCOL 1264
+       event sysmessage ===============================
+       event sysmessage Llevas poca suerte encima :-(
+       event sysmessage ===============================     
+       wait 2s
+       display OK ! Tener +5 de suerte ayuda a subir healing más rapido !       
+     }
 
 gosub setupBank     ; Configuración del banco.
 gosub checkPilon    ; Configuración del pilón de agua o un pozo para limpiar las vendas.
