@@ -35,7 +35,7 @@ set %version v1.3
 ; EUO version tested with: 1.5 Version 142
 ; Shard: Ultima Alianza (¡Hasta la muerte!)
 ; Public Release: 08/12/2019
-; Revised On: 24/08/2019
+; Revised On: 23/05/2019
 ; Purpose: Fabrica Kegs de varios tipos y tamaños :-)
 ; Instrucciones; Configurar y abrir todas las bolsas, activar un tipo de KEG, el tamaño que van a tener, y el número de KEGS que quieres hacer.
 ;*************************************************
@@ -90,22 +90,22 @@ set %comida RGG_NRD_QSD_ZBG_WLI_QRD_END_FUD_YLI_WLI_HGI
  +_KGI_EGI_QLI_KLI_MLI_KRD_HQD_AQD_MQE_VQE_TQE_JQE_IQE
  +_GQE_SPE_ZPE_OQE_BDF_KPE_RQE_YSD_SQD_YWI_AXI_PQD_QQD
 set %regs_ids WZF_QZF_JZF_MZF_JUF_KZF_KUF_RZF_IUF_FUF_LZF_SZF
-set %regs_veneno WZF       ; Belladona
-set %regs_invis QZF        ; Sangre de Dragón
-set %regs_curacion JZF     ; Ginseng
-set %regs_fuerza MZF       ; Raíz de Mandrágora
-set %regs_agilidad JUF     ; Musgo de Sangre
-set %regs_antidoto KZF     ; Ajo
-set %regs_resistencia KUF  ; Perla Nigga
+set %regs_veneno WZF           ; Belladona
+set %regs_invis QZF            ; Sangre de Dragón
+set %regs_curacion JZF         ; Ginseng
+set %regs_fuerza MZF           ; Raíz de Mandrágora
+set %regs_agilidad JUF         ; Musgo de Sangre
+set %regs_antidoto KZF         ; Ajo
+set %regs_resistencia KUF      ; Perla Nigga
 set %regs_inteligencia KZF_RZF ; Ajo + Seda
-set %regs_bendecir KZF_MZF ; Ajo + Mandrágora
-set %regs_encojer IUF      ; Alas de Murciélago
-set %regs_piel_piedra FUF  ; Azufre
-set %regs_explosion SZF    ; Ceniza Sulfurusa
-set %regs_mana LZF         ; Ojos de Tritón
-set %botellas WUF          ; Frascos Vacíos
-set %barril QMJ_YBK_XBK    ; Barriles Vacíos
-set %morteros RQF          ; ¬¬
+set %regs_bendecir KZF_MZF     ; Ajo + Mandrágora
+set %regs_encojer IUF          ; Alas de Murciélago
+set %regs_piel_piedra FUF      ; Azufre
+set %regs_explosion SZF_FUF    ; Ceniza Sulfurusa + Azufre
+set %regs_mana LZF             ; Ojos de Tritón
+set %botellas WUF              ; Frascos Vacíos
+set %barril QMJ_YBK_XBK        ; Barriles Vacíos
+set %morteros RQF
 set %tiempo_actual #SCNT
 set %proxima_vez #SCNT
 set %start1 #TRUE
