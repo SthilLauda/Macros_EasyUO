@@ -341,6 +341,7 @@ if #DISPRES = yes
              set #SYSMSGCOL 73
              event sysmessage MACREANDO EN UNA TIENDA :-)
              wait 20
+             display OK ¡Debes entrenar en una tienda de caldereros como la que hay en Minoc!
            }
            else
               {
