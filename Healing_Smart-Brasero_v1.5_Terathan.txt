@@ -125,7 +125,7 @@ event sysmessage =====================
 wait 20
 
 ; Comprobar la suerte [ CHANGELOG - 2020-05-22 - SirDrunk: + Tener +5 de luck ayuda a subir healing más rapido. ] 
-if ( #LUCK < 5 ) ; 5 es una joya de suerte (collar, anillo, brazalete, etc), o se le puede añadir una armadura de cota de mallas de oro con arma y escudo  ^^
+if ( #LUCK < 6 ) ; Una joya de suerte (collar, anillo, brazalete, etc), o se le puede añadir una armadura de cota de mallas de oro con arma y escudo  ^^
      {
        set #SYSMSGCOL 1264
        event sysmessage ===============================
