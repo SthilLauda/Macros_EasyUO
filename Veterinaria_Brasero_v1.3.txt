@@ -75,7 +75,7 @@ event sysmessage =================
 wait 20
 
 ; Comprobar la suerte [ 2020-05-22 - SirDrunk: + Veterinaria si tienes +25 de suerte sube más rapido. ]
-if ( #LUCK < 25 ) ; 25 son dos o tres joyas de suerte (collar, anillo, brazalete, etc), o se le puede añadir una armadura de cota de mallas de oro con arma y escudo  ^^
+if ( #LUCK < 26 ) ; 25 son dos o tres joyas de suerte (collar, anillo, brazalete, etc), o se le puede añadir una armadura de cota de mallas de oro con arma y escudo  ^^
      {
        set #SYSMSGCOL 1264
        event sysmessage ===============================
