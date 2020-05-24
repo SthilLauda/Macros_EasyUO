@@ -82,7 +82,7 @@ if ( #LUCK < 26 ) ; Dos o tres joyas de suerte (collar, anillo, brazalete, etc),
        event sysmessage Llevas poca suerte encima :-(
        event sysmessage ===============================     
        wait 2s
-       display OK ! Tener +25 de suerte ayuda a subir healing más rapido !       
+       display OK ! Tener +26 de suerte ayuda a subir healing más rapido !       
      }
 
 finditem %pilones C_ , #BACKPACKID
