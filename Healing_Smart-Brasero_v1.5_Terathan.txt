@@ -132,7 +132,7 @@ if ( #LUCK < 6 ) ; Una joya de suerte (collar, anillo, brazalete, etc), o se le 
        event sysmessage Llevas poca suerte encima :-(
        event sysmessage ===============================     
        wait 2s
-       display OK ! Tener +5 de suerte ayuda a subir healing más rapido !       
+       display OK ! Tener +6 de suerte ayuda a subir healing más rapido !       
      }
 
 gosub setupBank     ; Configuración del banco.
