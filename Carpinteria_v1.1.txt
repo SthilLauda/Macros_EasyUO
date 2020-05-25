@@ -49,7 +49,7 @@ set %tiempo_alimentacion 360 ; Cada cuántos segundos va a comprobar si tiene ha
 ;________________________________________________
 ;
 set %madera ZLK
-set %sierra AGG_EGG
+set %sierra AGG_EGG_DGG
 set %lote MMF
 set %start 0
 set %tiempo_actual #SCNT ; Reloj
