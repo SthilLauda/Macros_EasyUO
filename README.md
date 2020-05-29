@@ -1,4 +1,4 @@
-# :unicorn: Macros EasyUO :unicorn:
+# :gear: Macros EasyUO :gear:
 
 Repositorio de macros escritas en `EasyUO` para el servidor de [Ultima Alianza](https://ultima-alianza.com/)
 
