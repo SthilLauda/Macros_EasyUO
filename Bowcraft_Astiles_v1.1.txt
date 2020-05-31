@@ -215,6 +215,7 @@ if #FINDCNT < 2
 return
 
 sub reponerTroncos ;<============================================>
+_reLog:
 set %stack ( ( #MAXWEIGHT - #WEIGHT ) / 2 ) - 10
 finditem %tronco C_ , #BACKPACKID
 if #FINDSTACK <= %stack
@@ -239,8 +240,19 @@ if #FINDSTACK <= %stack
                              halt
                            }
                    }
+                   else
+                      {
+                        ignoreitem #FINDID BAD_LOGS
+                        goto _reLog
+                      }
               }
         }
+        else
+           {
+             set #SYSMSGCOL 38
+             event sysmessage NO QUEDA MADERA! :-(
+             halt
+           }
    }
 return
 
