@@ -138,7 +138,7 @@ set %lugar 0 ; Mina en la que actuará la macro
 ; En caso contrario, debes configurar aquí la posición de las runas que van a las tiendas donde se piden los encargos (BOD's).
 set %runabod_herreria 3          ; Runa a la tienda de herrería donde pedir BODs.
 set %runabod_flecheria 7         ; Runa a la tienda de flechería donde pedir BODs.
-set %runabod_escriba 11          ; Runa a la tienda de escriba donde pedir BODs.
+set %runabod_escriba 11          ; Runa a la tienda de escribas donde pedir BODs.
 set %frequecia_bod 1             ; El tiempo que quieres que tarde en ir a por el primer bod (1 minuto para coger un BoD en el primer recall) ; (Cuando lo pida, el siguiente será a las 2 horas xD)
 ;________________________________________________
 ;
