@@ -1,0 +1,1392 @@
+; ======================================================================================================
+;  '||   ||` '||`   ||                                 /.\      '||`
+;   ||   ||   ||    ||     ''                         // \\      ||   ''
+;   ||   ||   ||  ''||''   ||  '||),,(|,   '''|.     //...\\     ||   ||   '''|.  `||''|,  '''/  '''|.
+;   ||   ||   ||    ||     ||   || || ||  .|''||    //     \\    ||   ||  .|''||   ||  ||   //  .|''||
+;   `|...|'  .||.   `|..' .||. .||    ||. `|..||. .//       \\. .||. .||. `|..||. .||  ||. /... `|..||.
+; ======================================================================================================
+;
+; Macro de Minar para UA-Sphere (Sphere 0.56b-Nightly)
+;                  ___
+;               .-' \\".
+;              /`    ;--:
+;             |     (  (_)==
+;             |_ ._ '.__.;
+;             \_/`--_---_(
+;              (`--(./-\.)
+;              `|     _\ |
+;               | \  __ /
+;              /|  '.__/
+;           .'` \     |_
+;        jgs     '-__ / `-
+;
+; Creado por: Alex [ MOD+ Sthil ]
+; Ultima edición: 01/06/2020 por Sthil Lauda
+; Modificaciones de: DaviD JoneS, darksplit, Sthil Lauda.
+; ------------------------------------------------------
+set %version v1.6
+; IMPORTANTE:
+; - Cuando enciendas la macro, debes estar exactamente en el lugar donde te deja la runa que te lleva a casa.
+; - Las runas de las minas deben estar marcadas DENTRO de ellas.
+; - No se funde el material, macro de separar/fundir disponible en el foro: https://ultima-alianza.com/foro/threads/61838-Repositorio-con-mis-macros
+; - Sólo se podrá utilizar la macro en las minas preestablecidas, mostradas más abajo.
+; - No es necesario tener regs de recall encima al iniciar la Macro, lo comprueba y coge automáticamente.
+; - Regs, mineral y comida deberán estar en el MISMO CONTENEDOR.
+; - Esta macro mina únicamente en una mina de tu elección.
+; - Skill de Magia a 30 para poder recalear.
+;
+; Modificaciones:
+;
+; 01/06/2020
+; Nueva función: - Añadido sistema dinámico de recogida de BOD's en base a las skills del personaje (Herrería, Bowcrafting, Inscription).
+;
+; 24/08/2019:
+; Nueva función: - Añadido "sub refreshBackpack" para refrescar la mochila al llegar a casa (Evita mineral "fantasma" que no existe).
+;                - Añadido nuevo "sub" para meditar con fundamento.
+;                - Nuevo sub para dejar los minerales.
+;                - Mejorado el sub de recall a casa y recall a la mina.
+;
+; 12/08/2019:
+; Nueva función: - Añadida función para comer desde el cofre.
+;                - Añadida función para detectar los save's del server.
+;                - Sustituído "msg .resend $" por "event macro 3 0 .resend" (Más estable).
+;
+; 08/08/2019:
+; Correcciones de código: - Eliminados mensajes que hacían petar el client después de abrir el cofre.
+;
+; 27/07/2019
+; Correcciones de código: - Añadido "#LTARGETKIND 3" para no fallar el target a la hora de usar el pico en el suelo.
+;                         - Sustituido el antiguo "event drag" y "click", por el nuevo "exevent drag" y "exevent dropc".
+;                         - Sustituido "wait 10" por "target" al usar el pico.
+;                         - Sustituido "wait 20" por "wait_for GUMP 452_236" para esperar a que se abra el libro de runas.
+;                         - Sustituido "wait 20" por "wait_for GUMP %idcaja" para esperar a que se abra el cofre de casa.
+;                         - Añadido "contpos 0 0" para no fallar al hacer click en el cartel del libro de runas, si este se ha movido de sitio.
+;                         - Sustituido "wait 10s" "wait_for RECALL" para añadir robustez en el recaleo.
+;
+; 23/05/2010
+; Corrección de código: cambiado el sub del peso, para que recalee en función del #maxweight de cada pj
+; según su fuerza.
+;
+; 08/04/2010
+; Corrección de bugs: variables mal escritas, añadido código de Journal para que no se quede parado.
+; Añadidos: Comprobar y coger Regs automáticamente al llegar a casa para tener siempre 5 de cada,
+; simplificación de algunos nuevos comandos para evitar bugs (exevent Dropc, exevent Drag),
+; se ha implementado un código para desarmar la mano derecha al empezar para poder encontrar el pico.
+; Creada descripción de la Macro y mejora de la explicación de su funcionamiento.
+; Comentarios explicativos y mejora visual de los Sysmessage.
+; Próximamente se añadirá la posibilidad de recalear al Bank en vez de a Casa.
+;
+; Explicación:
+; Esta macro ha sido creada para Minar dejando el mineral en casa con la ayuda de Runas.
+; Al comienzo y cada vez que vuelva a casa, se comprobará el número de regs del personaje,
+; y se cogerán los necesarios para volver a tener 5 de cada para evitar pérdidas en el caso de una
+; matanza de un PK en la mina.
+; Meditará antes y después de recalear para subir el maná para acelerar el proceso,
+; aún así, no es realmente necesaria la skill de Meditar.
+; Minará por toda la mina, de manera aleatoria, pero evitando volver a minar allí dónde ya lo hiciste.
+;
+; Listado de Minas actuales:
+;
+; 0- Ninguna (Mina solo igual, pero si se sale de dentro de la mina no se volverá a meter, deberás moverlo tu)
+; 1- Shame (Norte de la entrada Shame (Trabajos Forzados))
+; 2- Covetous 1 (Primera Mina a la derecha de la Dungeon Covetous)
+; 3- Covetous 2 (Segunda Mina a la derecha de la Dungeon Covetous)
+; 4- Covetous 3 (De las dos minas juntas en Covetous Norte, la de arriba)
+; 5- Covetous 4 (De las dos minas juntas en Covetous Norte, la de abajo, meterse bien adentro antes de iniciar la macro)
+; 6- Minoc Ciudad 1 (La mina que hay al Este de Minoc, pasando el puente)
+; 7- Minoc Ciudad 2 (La mina al lado de la que hay pasando el puente de Minoc)
+; 8- Minoc Mina 1 (De las Minas del Norte de Minoc, la primera de la izquierda abajo)
+; 9- Minoc Mina 2 (De las Minas del Norte de Minoc, la de la izquierda donde hay dos (Haven))
+; 10- Minoc Mina 3 (De las Minas del Norte de Minoc, la de la derecha donde hay dos (Haven))
+; 11- Destard 1 (Un poco a la izquierda de La Dungeon Destard)
+; 12- Destard 2 (Desde la entrada de Destard Dungeon bajando bordeando, la primera mina que encuentras)
+; 13- Destard 3 (Desde la entrada de Destard Dungeon bajando bordeando, la segunda mina que encuentras)
+; 14- Destard 4 (Desde la entrada de Destard Dungeon bajando bordeando, la terera mina que encuentras, en la de la parte derecha de la montaña)
+; 15- Wrong 1 (Junto a la entrada de la Dungeon de Wrong)
+; 16- Wrong 2 (Bordendo la montaña desde la entrada de Wrong hacia la izquierda, la primera que encuentras)
+; 17- Wrong 3 (Bordendo la montaña desde la entrada de Wrong hacia la izquierda, la segunda que encuentras)
+; 18- Hythloth 1 (Bordeando la montaña, hacia arriba desde Hythloth, la primera que encuentras)
+; 19- Hythloth 2 (Bordeando la montaña, hacia abajo derecha de Hythloth, la primera Mina que encuentras)
+; 20- Hythloth 3 (Bordeando la montaña, hacia abajo derecha de Hythloth, la segunda Mina que encuentras)
+; 22- Avatar Norte 1 (De la montaña del Norte de Avatar, la primera que encuentas)
+; 23- Avatar Norte 2 (De la montaña del Norte de Avatar, desde la primera, a la derecha bordeando, la primera que encuentras)
+; 24- Desierto (En el cruce de caminos)
+; 25- Shame Sur
+; ===============================
+;________________________________
+;
+; ///////////////////////////////
+; ******** CONFIGURACIÓN ********
+; ///////////////////////////////
+;________________________________
+;
+; - Hueco donde tengas la runa que te llevará al cofre para guardar los minerales (1-16)
+;--------------------
+set %runacasa 1
+;--------------------
+; - Hueco donde tengas la runa que te llevará DENTRO de la mina (1-16)
+;--------------------
+set %runamina 14
+;--------------------
+; - Elige una mina de la lista a continuación y escribe su número en la variante siguiente:
+; -------------------
+set %lugar 0 ; Mina en la que actuará la macro
+;--------------------
+; ****** BODS ******
+;--------------------
+; Si no tienes habilidad/skill de herrería a más de 80, ni de fabricar arcos, ni de escriba, entonces no hace falta que configures nada más.
+; En caso contrario, debes configurar aquí la posición de las runas que van a las tiendas donde se piden los encargos (BOD's).
+set %runabod_herreria 3          ; Runa a la tienda de herrería donde pedir BODs.
+set %runabod_flecheria 7         ; Runa a la tienda de flechería donde pedir BODs.
+set %runabod_escriba 11          ; Runa a la tienda de escriba donde pedir BODs.
+set %frequecia_bod 1             ; El tiempo que quieres que tarde en ir a por el primer bod (1 minuto para coger un BoD en el primer recall) ; (Cuando lo pida, el siguiente será a las 2 horas xD)
+;________________________________________________
+;
+; //////////////////////////////////////////////
+; ************* FIN CONFIGURACIÓN *************
+; //////////////////////////////////////////////
+;________________________________________________
+;
+chooseskill mini real
+set %skillini #skill
+set %locs LOCATIONS_PISADAS
+set %borrado 0
+set *recaleos 0
+set *numero_de_bods 0
+set %hora_actual #SCNT
+set %hora_ultimo_bod #SCNT
+set %proxima_vez_stats #SCNT
+set %tiempo 50 ; Tiempo para mostrar las estadísticas.
+set %comida RGG_NRD_QSD_ZBG_WLI_QRD_END_FUD_YLI_WLI_HGI
+ +_KGI_EGI_QLI_KLI_MLI_KRD_HQD_AQD_MQE_VQE_TQE_JQE_IQE
+ +_GQE_SPE_ZPE_OQE_BDF_KPE_RQE_YSD_SQD_AXI_PQD_QQD
+set %proxima_vez_comer #SCNT
+set %_worldsavejournalindex #jindex ; Journal para escanear en busca de save's del server.
+set *CEOWorldSaving #FALSE          ; Indica si hay un save del server en marcha.
+
+set #SYSMSGCOL 88
+event sysmessage =====================
+set #SYSMSGCOL 53
+event sysmessage  Minar Foro UA %version
+set #SYSMSGCOL 88
+event sysmessage =====================
+wait 40
+
+chooseSkill Blac real
+set %skill_blac #skill
+chooseSkill Bowc real
+set %skill_bow #skill
+chooseskill Insc real
+set %skill_insc #skill
+gosub lugares
+
+configurar:
+if %confp = 1 || %confp = N/A
+{
+set #sysmsgcol 88
+setuotitle Abre el contenedor donde dejar los minerales y donde estaran los Regs
+event sysmessage =====================
+event sysmessage Abre el contenedor donde
+event sysmessage dejar los Minerales
+event sysmessage y presiona tecla ESC.
+event sysmessage =====================
+set %conf 1
+set %confp 2
+goto TESC
+}
+if %confp = 2
+{
+set #SYSMSGCOL 53
+event sysmessage TOCA TU MOCHILA
+wait 20
+repeat
+     {
+       wait 1
+     }
+     until #CONTID = #BACKPACKID
+set %backpack_X #CONTPOSX
+set %backpack_Y #CONTPOSY
+set #SYSMSGCOL 73
+event sysmessage Posicion: %backpack_X %backpack_Y
+wait 20
+set #SYSMSGCOL 88
+setuotitle Abre el Libro donde tengas las runas a tu Casa y a la Mina y presiona ESC
+event sysmessage =====================
+event sysmessage Abre el Libro con las
+event sysmessage runas de Casa y Mina.
+event sysmessage y presiona tecla ESC.
+event sysmessage =====================
+set %conf 2
+if ( %skill_blac >= 800 || %skill_bow >= 800 || %skill_insc >= 800 )
+     {
+       set %confp 3
+     }
+goto TESC
+}
+if %confp = 3
+{
+set #SYSMSGCOL 88
+setuotitle Abre el Libro donde tengas las runas a las tiendas de BODS y presiona ESC
+event sysmessage =====================
+event sysmessage Abre el Libro con las
+event sysmessage runas a los BODS.
+event sysmessage y presiona tecla ESC.
+event sysmessage =====================
+set %conf 3
+goto TESC
+}
+
+TESC:
+onHotKey ESC
+{
+if %conf = 1
+{
+set %idcaja #LOBJECTID
+set #SYSMSGCOL 73
+event sysmessage OK Cofre: %idcaja
+wait 20
+set %dondecasax #CHARPOSX
+set %dondecasay #CHARPOSY
+set %dondeminax 0
+gosub regs
+set #sysmsgcol 43
+event Sysmessage Desequipando manos...
+event macro 24 2
+wait 20
+goto configurar
+}
+if %conf = 2
+{
+set %runebook #LOBJECTID
+set #SYSMSGCOL 73
+event sysmessage OK Libro Minas: %runebook
+wait 20
+gosub wait_for GUMP 452_236 CLOSE
+if ( %skill_blac >= 800 || %skill_bow >= 800 || %skill_insc >= 800 )
+     {
+       goto configurar
+     }
+     else
+        {
+          goto recallmina
+        }
+}
+if %conf = 3
+{
+set %runebook_bods #LOBJECTID
+set #SYSMSGCOL 73
+event sysmessage OK Libro BOD's: %runebook_bods
+wait 20
+gosub wait_for GUMP 452_236 CLOSE
+setuotitle Abre el la bolsa para dejar los BODS y presiona ESC
+set #SYSMSGCOL 88
+event sysmessage =====================
+event sysmessage Abre la bolsa para
+event sysmessage dejar los BODS, y
+event sysmessage presiona tecla ESC.
+event sysmessage =====================
+wait 20
+_loopESC:
+onhotkey ESC
+       {
+         set %bolsa_bods #LOBJECTID
+         set #SYSMSGCOL 73
+         event sysmessage OK Bolsa BOD's: %bolsa_bods
+         wait 20
+         gosub wait_for GUMP %bolsa_bods CLOSE
+         gosub wait_for GUMP %idcaja CLOSE
+         goto _FinConfig
+       }
+       wait 1
+goto _loopESC
+_FinConfig:
+gosub time #time  ; Tiempo de inicio de la macro.
+set #SYSMSGCOL 88
+event sysmessage ===================
+set #SYSMSGCOL 18
+event sysmessage  INICIO: %temp
+set #SYSMSGCOL 88
+event sysmessage ===================
+wait 40
+if ( %skill_blac >= 800 || %skill_bow >= 800 || %skill_insc >= 800 )
+     {
+       set %proximo_bod %hora_ultimo_bod + %frequecia_bod * 60 ; Dos horas
+       set %segundos_restantes %hora_actual - %proximo_bod
+       set %minutos_restantes %segundos_restantes / 60
+       set %segundos_restantes %segundos_restantes * -1
+       set %minutos_restantes %minutos_restantes * -1
+       if %minutos_restantes >= 2
+          {
+            set #SYSMSGCOL 43
+            event sysmessage Quedan %minutos_restantes minutos para coger un BoD...
+            wait 40
+          }
+       if %minutos_restantes <= 1
+          {
+            set #SYSMSGCOL 43
+            event sysmessage Quedan %segundos_restantes segundos para coger un BoD...
+            wait 40
+          }
+     }
+goto recallmina
+}
+}
+goto TESC
+
+comienzo:
+set %hora_actual #SCNT
+set %proximo_bod %hora_ultimo_bod + %frequecia_bod * 60  ; Dos horas
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+findItem NPF
+if #FINDCNT = 0
+   {
+     findItem QPF
+   }
+set #LOBJECTID #FINDID
+set %cmsg #jIndex
+event macro 17
+target
+set %fmsg #jIndex
+for %i %cmsg %fmsg
+{
+scanJournal %i
+if Donde_quieres_utilizar in #journal
+{
+set %seguridad 0
+goto acabapicar
+}
+}
+goto comienzo
+
+acabapicar:
+set %cmsg #jIndex
+set #LTARGETX #CHARPOSX + 1
+set #LTARGETY #CHARPOSY - 1
+set #lTargetKind 3
+event macro 22
+wait 20
+set %fmsg #jIndex
+for %i %cmsg %fmsg
+{
+scanJournal %i
+if Pones_el in #journal || No_encuentras in #journal ; Consigue minar, y lo vuelve a hacer.
+{
+set %skillinc #SKILL - %skillini
+setuotitle Skill de Mining | Inicial: %skillini | Actual: #SKILL | Incremento: %skillinc | Peso: #WEIGHT
+gosub compruebapeso
+goto comienzo
+}
+if Aqui_no_hay_nada_por in #journal || Prueba_a in #journal || No_puedes_minar_tan in #journal || No_puedes_ver_bien in #RESULT || Eso_esta_demasiado_lejos in #journal ; No se puede minar, cambio de lugar.
+{
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+gosub compruebapeso
+goto moverse
+}
+}
+gosub seguridad
+goto acabapicar
+
+moverse:
+set %hora_actual #SCNT
+set %proximo_bod %hora_ultimo_bod + %frequecia_bod * 60  ; Dos horas
+if ( %skill_blac >= 800 || %skill_bow >= 800 || %skill_insc >= 800 )
+     {
+       set %proximo_bod %hora_ultimo_bod + %frequecia_bod * 60  ; Dos horas
+       set %segundos_restantes %hora_actual - %proximo_bod
+       set %minutos_restantes %segundos_restantes / 60
+       set %segundos_restantes %segundos_restantes * -1
+       set %minutos_restantes %minutos_restantes * -1
+       if %minutos_restantes >= 2
+          {
+            set #sysmsgcol 69
+            event sysmessage Quedan %minutos_restantes minutos para coger un BoD...
+          }
+       if %minutos_restantes <= 1
+          {
+            set #sysmsgcol 69
+            if %segundos_restantes >= 0
+               {
+                 event sysmessage %segundos_restantes segundos para coger un BoD...
+               }
+            if %segundos_restantes <= 0 && %minutos_restantes <= 0
+               {
+                 event sysmessage En el siguiente recall cogo un BoD...
+               }
+          }
+       if %proxima_vez_stats <= %hora_actual
+          {
+            set #sysmsgcol 88
+            event sysmessage *numero_de_bods BoDs recogidos...
+            event sysmessage *recaleos recalls a casa desde %temp horas...
+            set %proxima_vez_stats %hora_actual + %tiempo
+          }
+     }
+if %lugar > 0
+{
+if #CHARPOSX , _ , #CHARPOSY notIn %locs
+{
+set %borrado %borrado + 1
+if %borrado > 100
+{
+set %locs LOCATIONS_PISADAS
+set %borrado 0
+}
+set %locs %locs , _ , #CHARPOSX , _ , #CHARPOSY
+}
+if %lugar = 5
+{
+if %lugaro > #CHARPOSX
+{
+for %i 1 6
+{
+event macro 5 3
+wait 20
+}
+}
+
+}
+if %lugarp = X
+{
+if %lugaro < #CHARPOSX
+{
+for %i 1 6
+{
+event macro 5 7
+wait 20
+}
+}
+}
+if %lugarp = Y
+{
+if %lugaro < #CHARPOSY
+{
+for %i 1 6
+{
+event macro 5 1
+wait 20
+}
+}
+}
+}
+set %mover #random % 7
+event macro 5 %mover
+wait 20
+event macro 5 %mover
+wait 20
+if #CHARPOSX , _ , #CHARPOSY in %locs
+{
+goto moverse
+}
+goto comienzo
+
+recallcasa:
+if #MANA < 11
+   {
+     gosub meditar
+   }
+set %posruna %runacasa
+gosub librecall
+set #LOBJECTID %runebook
+event macro 17
+gosub wait_for GUMP 452_236 40
+contpos 0 0
+click %runex %runey f dmc
+event macro 13 46
+gosub wait_for RECALL 15
+if ( #RESULT ) ; Ok, nos hemos movido de sitio...
+     {
+       set *recaleos *recaleos + 1
+       event macro 3 0 .resend
+       wait 10
+       gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+       gosub abrir_cofre
+       gosub dejarbods
+       gosub comprobar_comida
+       gosub regs
+       goto dejarminerales
+     }
+     else ; Ha fallado el recall.
+        {
+          event macro 13 46
+          goto recallcasa
+        }
+goto recallcasa
+
+recallmina:
+if #MANA < 11
+   {
+     gosub meditar
+   }
+set %posruna %runamina
+gosub librecall
+set #LOBJECTID %runebook
+event macro 17
+gosub wait_for GUMP 452_236 40
+contpos 0 0
+click %runex %runey f dmc
+event macro 13 46
+gosub wait_for RECALL 15
+if ( #RESULT ) ; Ok, nos hemos movido de sitio...
+     {
+       event macro 3 0 .resend
+       wait 10
+       goto comienzo
+     }
+     else ; Ha fallado el recall.
+        {
+          goto recallmina
+        }
+goto recallmina
+
+recallbod:
+if ( %skill_blac >= 800 )
+     {
+       if #MANA < 11
+         {
+           gosub meditar
+         }
+       gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+       set %posruna %runabod_herreria
+       gosub librecall
+       set #LOBJECTID %runebook_bods
+       event macro 17
+       gosub wait_for GUMP 452_236 50
+       contpos 0 0
+       click %runex %runey f
+       event macro 13 46
+       gosub wait_for RECALL 15
+       event macro 13 46
+       event macro 3 0 .resend
+       wait 1s
+       event macro 3 0 bod
+       wait 2s
+       gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+       set %hora_ultimo_bod #SCNT
+       set %frequecia_bod 140 ; 2 horas + save´s
+       if ( %skill_bow >= 800 || %skill_insc >= 800 ) ; Si tenemos Bowcraft o Inscription, nos vamos a por otro bod
+            {
+              goto recallbod_flecheria
+            }
+            else
+               {
+                 goto recallcasa
+               }
+     }
+     else
+        {
+          recallbod_flecheria:
+          if ( %skill_bow >= 800 )
+               {
+                 if #MANA < 11
+                    {
+                      gosub meditar
+                    }
+                 gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+                 set %posruna %runabod_flecheria
+                 gosub librecall
+                 set #LOBJECTID %runebook_bods
+                 event macro 17
+                 gosub wait_for GUMP 452_236 50
+                 contpos 0 0
+                 click %runex %runey f
+                 event macro 13 46
+                 gosub wait_for RECALL 15
+                 event macro 13 46
+                 event macro 3 0 .resend
+                 wait 1s
+                 event macro 3 0 bod
+                 wait 2s
+                 gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+                 set %hora_ultimo_bod #SCNT
+                 set %frequecia_bod 140 ; 2 horas + save´s
+                 if ( %skill_insc >= 800 ) ; Si tenemos Inscription, nos vamos a por otro bod
+                      {
+                        goto recallbod_escriba
+                      }
+                      else
+                         {
+                           goto recallcasa
+                         }
+               }
+               else
+                  {
+                    recallbod_escriba:
+                    if ( %skill_insc >= 800 )
+                         {
+                           if #MANA < 11
+                              {
+                                gosub meditar
+                              }
+                           gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+                           set %posruna %runabod_escriba
+                           gosub librecall
+                           set #LOBJECTID %runebook_bods
+                           event macro 17
+                           gosub wait_for GUMP 452_236 50
+                           contpos 0 0
+                           click %runex %runey f
+                           event macro 13 46
+                           gosub wait_for RECALL 15
+                           event macro 13 46
+                           event macro 3 0 .resend
+                           wait 1s
+                           event macro 3 0 bod
+                           wait 2s
+                           gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+                           set %hora_ultimo_bod #SCNT
+                           set %frequecia_bod 140 ; 2 horas + save´s
+                           goto recallcasa
+                         }
+                  }
+                  else
+                     {
+                        goto recallcasa
+                     }
+        }
+
+
+dejarminerales:
+gosub refreshBackpack
+_dejar:
+finditem TVJ_GWJ_EWJ_DWJ C_ , #BACKPACKID
+if #FINDCNT > 0 ; Hay minerales...
+   {
+     exevent drag #FINDID #FINDSTACK
+     exevent dropc %idcaja
+     wait 30
+     goto _dejar
+   }
+   else ; No queda más mineral en la mochila
+      {
+        goto recallmina
+      }
+return
+
+sub dejarbods
+gosub refreshBackpack
+_dejarbods:
+finditem TVH c_ , #BACKPACKID
+if #FINDCNT > 0
+{
+  exevent drag #FINDID #FINDSTACK
+  exevent dropc %bolsa_bods
+  wait 30
+  set *numero_de_bods *numero_de_bods + 1
+  goto _dejarbods
+}
+return
+
+sub refreshBackpack
+event macro 9 7 ; Close Backpack
+event macro 8 7 ; Open Backpack
+gosub wait_for GUMP #BACKPACKID 40
+contpos %backpack_X %backpack_Y
+return
+
+sub abrir_cofre
+_abre:
+set #LOBJECTID %idcaja
+event macro 17 0
+gosub wait_for GUMP %idcaja 40
+if ( ! #RESULT ) ; Ha fallado al abrirse...
+     {
+       wait 20
+       goto _abre
+     }
+return
+
+sub regs
+gosub mandrake
+gosub black
+gosub blood
+return
+
+sub mandrake
+finditem MZF C_ , #BACKPACKID
+if #FINDSTACK <= 4
+{
+set %regcnt #findstack
+set %reg MZF
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+gosub coger
+}
+finditem MZF C_ , #BACKPACKID
+return
+
+sub black
+finditem KUF C_ , #BACKPACKID
+if #FINDSTACK <= 4
+{
+set %regcnt #findstack
+set %reg KUF
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+gosub coger
+}
+finditem KUF C_ , #BACKPACKID
+return
+
+sub blood
+finditem JUF C_ , #BACKPACKID
+if #FINDSTACK <= 4
+{
+set %regcnt #findstack
+set %reg JUF
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+gosub coger
+}
+finditem JUF C_ , #BACKPACKID
+return
+
+sub coger
+set %debocoger 5 - %regcnt
+finditem %reg C_ , %idcaja
+if #FINDSTACK >= %debocoger
+   {
+     exevent drag #FINDID %debocoger
+     exevent dropc #BACKPACKID
+     wait 30
+   }
+   else
+      {
+        set #SYSMSGCOL 38
+        event sysmessage NO QUEDAN REGS! :-(
+        halt
+      }
+return
+
+sub meditar ; <==============================>
+_reMedit:
+gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+set %jstart #jindex
+event macro 13 46
+gosub wait_for MSG pierdes trance en_paz 50
+if ( #TRUE in #result )
+     {
+       if pierdes in #result
+          {
+            goto _reMedit ; Meditamos hasta que no perdamos la concentración
+          }
+       if trance in #result
+          {
+            set %jstart #jindex
+            gosub wait_for MSG pierdes 50
+            if ( #TRUE in #result )
+                 {
+                   goto _reMedit
+                 }
+                 else ; Meditamos hasta llenar la barra al máximo...
+                    {
+                      repeat
+                           {
+                             gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+                             wait 1
+                           }
+                           until #MANA = #MAXMANA
+                    }
+          }
+       if en_paz in #result ; OK, estamos bien de maná.
+          {
+            return
+          }
+     }
+     else
+        {
+          goto _reMedit
+        }
+return
+
+;=====================================================
+; Rutina para, en caso de hambre, comer hasta saciarse
+;=====================================================
+; v2.2
+sub comprobar_comida
+{
+  hambriento:
+  gosub CEOWorldSaveChecker Dentro_de_1_minuto grabacion_del_mundo bases_de_datos 45 120
+  set %jrnl #jindex ; Marcamos un índice de las líneas del diario.
+  event macro 4 0 .hungry
+  wait 20
+  while #true
+     {
+       if #jindex > %jrnl ; Si aparece una nueva línea.
+          {
+            set %jrnl %jrnl + 1  ; Seleccionamos ese numero de línea.
+            scanjournal %jrnl   ; La leemos...
+            if Dentro_de_1_minuto in #journal
+               {
+                 wait 140s ; Save del server...
+               }
+            if Estas_no_le_afecta_el_hambre in #journal || Estas_tan_lleno_que_no_puedes in #journal || Estas_totalmente_saciado in #journal
+               {
+                 set %proxima_vez_comer %tiempo_actual + %tiempo_alimentacion
+                 return
+               }
+               else
+                  {
+                    if Estas_lleno in #journal || Estas_contento in #journal || Estas_en_inanicion in #journal || Estas_hambriento in #journal || Sientes_mucho in #journal || Estas_con_hambre in #journal || Estas_parcialmente in #journal || Estas_bien_lleno in #journal || Te_sientes_casi_lleno in #journal
+                       {
+                         comer:
+                         finditem %comida C_ , #BACKPACKID
+                         if #findcnt > 0
+                            {
+                              set #LOBJECTID #FINDID
+                              event macro 17
+                              wait 20
+                              goto hambriento
+                            }
+                            else ; No hay comida en la mochila...
+                               {
+                                 finditem %comida C_ , %idcaja
+                                 if #findcnt > 0
+                                    {
+                                      exevent drag #FINDID 1
+                                      exevent dropc #BACKPACKID
+                                      wait 30
+                                      goto comer
+                                    }
+                                    else ; Y tampoco en el cofre...
+                                       {
+                                         event exmsg #CHARID 3 48 COMPRA COMIDA!! :-(
+                                         wait 40
+                                         set %proxima_vez %tiempo_actual + %tiempo_alimentacion
+                                         return
+                                       }
+                               }
+                       }
+                       else ; Mensaje extraño, repetimos...
+                          {
+                            goto hambriento
+                          }
+                  }
+          }
+       return
+     } ; FIN While
+}
+return
+
+sub librecall
+{
+if %posruna < 9
+{
+set %runex 130
+if %posruna = 1
+{
+set %y 0
+}
+else
+{
+set %runea %posruna - 1
+set %y 15 * %runea
+}
+set %runey 70 + %y
+}
+if %posruna > 8
+{
+set %runex 290
+if %posruna = 9
+{
+set %y 0
+}
+else
+{
+set %runea %posruna - 9
+set %y 15 * %runea
+}
+set %runey 70 + %y
+}
+return
+}
+
+sub seguridad
+{
+set %seguridad %seguridad + 1
+if %seguridad > 15
+{
+set %seguridad 0
+goto comienzo
+}
+return
+}
+
+sub lugares
+{
+if %lugar = 1
+{
+set %lugaro 1460
+set %lugarp Y
+}
+if %lugar = 2
+{
+set %lugaro 2454
+set %lugarp X
+}
+
+if %lugar = 3
+{
+set %lugaro 914
+set %lugarp Y
+}
+if %lugar = 4
+{
+set %lugaro 828
+set %lugarp Y
+}
+if %lugar = 5
+{
+set %lugaro 2355
+set %lugarp X
+}
+if %lugar = 6
+{
+set %lugaro 499
+set %lugarp Y
+}
+if %lugar = 7
+{
+set %lugaro 2602
+set %lugarp X
+}
+if %lugar = 8
+{
+set %lugaro 2426
+set %lugarp X
+}
+if %lugar = 9
+{
+set %lugaro 2440
+set %lugarp X
+}
+if %lugar = 10
+{
+set %lugaro 66
+set %lugarp Y
+}
+if %lugar = 11
+{
+set %lugaro 266
+set %lugarp Y
+}
+if %lugar = 12
+{
+set %lugaro 1259
+set %lugarp X
+}
+if %lugar = 13
+{
+set %lugaro 2729
+set %lugarp Y
+}
+if %lugar = 14
+{
+set %lugaro 2895
+set %lugarp Y
+}
+if %lugar = 15
+{
+set %lugaro 1991
+set %lugarp X
+}
+if %lugar = 16
+{
+set %lugaro 1499
+set %lugarp X
+}
+if %lugar = 17
+{
+set %lugaro 1941
+set %lugarpX
+}
+if %lugar = 18
+{
+set %lugaro 1918
+set %lugarp X
+}
+if %lugar = 19
+{
+set %lugaro 3822
+set %lugarp Y
+}
+if %lugar = 20
+{
+set %lugaro 4766
+set %lugarp X
+}
+if %lugar = 21
+{
+set %lugaro 4817
+set %lugarp X
+}
+if %lugar = 22
+{
+set %lugaro 3302
+set %lugarp Y
+}
+if %lugar = 23
+{
+set %lugaro 4554
+set %lugarp X
+}
+if %lugar = 24
+{
+set %lugaro 1812
+set %lugarp X
+}
+if %lugar = 25
+{
+set %lugaro 1695
+set %lugarp Y
+}
+
+return
+}
+
+sub compruebapeso
+set %proximo_bod %hora_ultimo_bod + %frequecia_bod * 60  ; Dos horas
+set %hora_actual #SCNT
+if #WEIGHT >= #MAXWEIGHT - 40
+   {
+     if %skill_blac >= 800 || %skill_bow >= 800 || %skill_insc >= 800
+        {
+          if %hora_actual >= %proximo_bod
+             {
+               goto recallbod
+             }
+             else
+                {
+                  goto recallcasa
+                }
+        }
+        else
+           {
+             goto recallcasa
+           }
+   }
+return
+
+;-@ ============================== @-;
+;-@ ############################## @-;
+;-@ SUBS públicos del Foro EasyUO  @-;
+;-@ ############################## @-;
+;-@ ============================== @-;
+
+;==================================
+; Name: sub time
+; Author: Orngrimm
+; Version: 1.1
+; Client Tested with: UO 4.0.6a
+; EasyUO version tested with: EasyUO 1.42.009D
+; Revision Date: 23.11.04
+; Public Release: 20.12.03
+; Purpose: Formates the time correctly. Also 01:02:03 is formatted correct.
+; normally this time gives 1:2:3 without leading "0". My sub takes care of it!
+; Disclaimer:   Dont change this script and release it under own name.
+;            Let this header intact and dont distribute without it!
+;            DONT distribute without my permission!! (PM Orngrimm @ easyuo.com)
+; Copyright: Orngrimm
+;==================================
+
+; Thanks to Janus who found (and fixed!) a bug with 00:xx:yy shown as xx:xx:yy.
+
+;*******************************************
+;**** Parses the correct time from %1 (gosub time #time)
+;*******************************************
+sub time
+set %string %1
+set %len 2
+str len %string
+if #Strres = 5
+        set %len 1
+if #StrRes =< 4
+        {
+        set %hour 00:
+        goto _time_min
+        }
+; Parsing the hour
+str left %string %len
+set %hour #StrRes
+str len %hour
+if #strRes = 1 2
+        set %hour 0 , %hour , :
+        goto _time_min
+set %hour %hour , :
+; Parsing the minute
+_time_min:
+str right %string 4
+str left #StrRes 2
+set %min #StrRes
+str len %Min
+if #strRes = 1 2
+        set %min 0 , %min , :
+        goto _time_sec
+set %min %min , :
+; Parsing the second
+_time_sec:
+str right %string 2
+set %sec #StrRes
+str len %sec
+if #strRes = 1 2
+        set %temp %hour , %min , 0 , %sec
+        goto _time_end
+set %temp %hour , %min , %sec
+_time_end:
+return %temp
+stop
+
+;-----------------------------------------------------------
+; Script Name: CEOWorldSaveChecker
+; Author: CEO
+; Version: 1.0
+; Client Tested with: 4.0.10b
+; EUO version tested with: 1.42.00A5
+; Shard OSI / FS: OSI
+; Revision Date: 060105
+; Public Release: 060105
+; Global Variables Used:  *CEOWorldSaving
+; Purpose: Used to catch the world save message for freeshards and temporarily pause mainscript during save.
+;-------------------------------------------------------------
+sub CEOWorldSaveChecker
+; sub to pause a script during a RunUO world save.
+set %_text1 %1
+set %_text2 %2
+set %_text3 %3
+if %_worldsaveupcoming
+{
+        if %_worldsavetimer < #scnt
+        {
+                set %_worldsavetimer #scnt + %5
+                gosub popupworldsave 25 15 blue
+                goto _WSC_WAIT1
+        }
+        return
+}
+_WSC1:
+if %_worldsavejournalindex > #jindex
+        return
+scanjournal %_worldsavejournalindex
+if %_text1  in #JOURNAL
+{
+        set %_worldsaveupcoming #true
+        set %_worldsavetimer #scnt + %4
+        set %_worldsavejournalindex  %_worldsavejournalindex + 1
+        return
+}
+set %_worldsavejournalindex  %_worldsavejournalindex + 1
+goto _WSC1
+_WSC_WAIT1:
+if %_worldsavetimer < #scnt
+        goto _WSC_Complete
+wait 5
+set *CEOWorldSaving #true
+if %_worldsavejournalindex > #jindex
+        goto _WSC_WAIT1
+scanjournal %_worldsavejournalindex
+if %_text2 in #journal
+{
+        gosub popupworldsave 25 15 yellow
+        set %_worldsavejournalindex  %_worldsavejournalindex + 1
+        goto _WSC_WAIT2
+}
+set %_worldsavejournalindex  %_worldsavejournalindex + 1
+goto _WSC_WAIT1
+_WSC_WAIT2:
+if %_worldsavetimer < #scnt
+        goto _WSC_Complete
+wait 5
+if %_worldsavejournalindex > #jindex
+        goto _WSC_WAIT2
+scanjournal %_worldsavejournalindex
+if %_text3 notin #journal
+{
+        set %_worldsavejournalindex  %_worldsavejournalindex + 1
+        goto _WSC_WAIT2
+}
+_WSC_Complete:
+set %_worldsavejournalindex  #jindex
+set %_worldsaveupcoming #false
+set *CEOWorldSaving #false
+menu delete worldsave
+return
+
+sub popupworldsave
+set %x %1
+set %y %2
+set %worldcolor %3
+menu Clear
+menu Window Title World Save Monitor
+menu Window Color Black
+menu Window Size 160 160
+menu shape worldsave 20 15 125 125 1 7 2 olive 7 %worldcolor
+menu font bgcolor %worldcolor
+menu font color lime
+menu font type b
+menu font size 15
+set %x %x + 30
+set %y %y + 30
+menu text worldsave %x %y World
+set %x %x + 15
+set %y %y + 20
+menu text worldsave %x %y Save
+set %x %x + 15
+set %y %y + 20
+menu text worldsave %x %y Wait
+menu font size 9
+menu font bgcolor black
+menu font color lime
+menu font type n
+menu Show 920 770
+return
+
+;=================================================================
+sub wait_for
+;=================================================================
+; This "wait_for" sub package was created by Locke. If you use these subs please keep this header intact.
+; Documentation: the sub package grew to large with all the comments. To load them call the sub like this:
+; gosub wait_for docs    | or you can use doc, documention, what, or my personal favorite, kickass.
+
+; "wait_for core dispatcher" version 1.2 by Locke
+if %1 = doc || if %1 = docs || if %1 = documentation || if %1 = what || if %1 = kickass
+{
+Display ok Please click ok and wait for your browser to start.
+execute http://www.easyuo.com/forum/viewtopic.php?t=24716
+halt
+}
+nameSpace Push
+namespace local LLNS
+set #result N/A ; if #result isn't set by one of my wait_for subs it'll throw an error.
+set !LPC #lpc
+set #lpc 200
+for %i 0 %0
+set !_A . %i % . %i
+gosub wait_for_ , !_A1
+set #lpc !lpc
+namespace clear LLNS
+namespace pop
+if #result <> N/A
+return #result
+else
+display ok You specified an unknown wait_for command. Script returned #result and is halting.
+halt
+;=================================================================
+sub wait_for_MSG ; version 1.4 ~Locke
+;=================================================================
+if !_A0 < 3
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for MSG %message time_out_in_seconds$
++Script is halting
+halt
+}
+set !_timeout ( #scnt2 + !_A . !_A0 )
+_lets_wait_for_a_message:
+for %i %jstart #jindex
+{
+ scanjournal %i
+  for %ii 2 !_A0
+  {
+    if !_A . %ii in #journal && %jstart <> %i
+    set #result #true , #spc , !_A . %ii
+  }
+}
+
+if #true notin #result
+{
+set #result #false
+ if !_timeout =< #scnt2
+ return #result
+wait 1
+goto _lets_wait_for_a_message
+}
+else
+return #result
+
+wait 1
+goto _lets_wait_for_a_message
+
+;======================================================================
+sub wait_for_GUMP ; version 1.4 ~Locke
+;=================================================================
+; Añadido #CONTID ^^
+if !_A0 < 3
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for GUMP XXX_YYY time_out_in_seconds$
++Script is halting
+halt
+}
+if !_A3 <> CLOSE
+set !_timeout #scnt2 + !_A3
+else
+set !_timeout 0 ; no gump wait if %3 = CLOSE since we already believe it to be open.
+
+_lets_wait_for_a_gump:
+if #CONTSIZE = !_A2 || #CONTKIND = !_A2 || #CONTNAME = !_A2 || #CONTTYPE = !_A2 || #CONTID = !_A2
+{
+ if !_A5 <> N/A && !_A6 <> N/A
+ {
+ set !clickx !_A5 + #contposx
+ set !clicky !_A6 + #contposy
+ click !clickx !clicky
+ }
+ if !_A3 = CLOSE || if !_A4 = CLOSE || !_A5 = CLOSE || !_A6 = CLOSE
+ {
+ set !string #contsize
+ str pos !string _
+ set !pos #strres
+ str del !string #strres #strres
+ set !clickX #contposx + ( #strres / 2 )
+ str del !string 1 !pos
+ set !clickY #contposy + ( #strres / 2 )
+ click !clickx !clicky R
+ }
+return #true
+}
+
+if ( !_timeout =< #scnt2 ) && ( !_A4 = N/A )
+   {
+     return #false
+   }
+
+if !_A4 <> N/A && !_timeout =< #scnt2
+{
+finditem !_A4
+if #findkind <> -1
+{
+ for #findindex 1 #findcnt
+ {
+  if #finddist > 2
+  ignoreitem #findid LLWAITFOR
+  else
+  break
+ }
+ set #lobjectid #findid
+ event macro 17 0
+ set !_timeout #scnt2 + !_A3
+}
+else
+return #false
+}
+wait 1
+goto _lets_wait_for_a_gump
+;======================================================================
+sub wait_for_RECALL ; Version 0.1 ~Locke
+;=================================================================
+; %A2 = wait_time in seconds
+if !_A0 < 2
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for RECALL % , timeout
++Script is halting
+halt
+}
+set !_timeout !_A2 + #scnt
+set !old_POS_X #charposx
+set !old_POS_Y #charposy
+set !old_pos_Z #charposz
+repeat
+{
+if #CHARPOSX <> !old_POS_X || #CHARPOSY <> !old_POS_Y || #CHARPOSZ <> !old_POS_Z
+return #true
+wait 1
+}
+until #scnt => !_timeout
+return #false
