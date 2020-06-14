@@ -41,7 +41,7 @@ set #SYSMSGCOL 1187
 event sysmessage =======================
 wait 20
 set #SYSMSGCOL 1165
-event sysmessage Fabricar Morteros v1.0
+event sysmessage Fabricar Morteros v1.1
 wait 20
 set #SYSMSGCOL 1187
 event sysmessage =======================
