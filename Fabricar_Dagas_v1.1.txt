@@ -46,6 +46,8 @@ set #SYSMSGCOL 1187
 event sysmessage ====================
 wait 20
 
+ignoreitem reset
+
 ;
 ;========================================================
 ;
@@ -95,8 +97,9 @@ if #CONTSIZE <> 530_480
 return
 
 sub lingotes
+_ingot:
 finditem %iron C_ , #BACKPACKID
-if #FINDSTACK < 5
+if #FINDSTACK <= 5
    {
      finditem %iron C_ , %cofre_lingotes
      if #FINDCNT > 0
@@ -120,6 +123,11 @@ if #FINDSTACK < 5
                              halt
                            }
                    }
+                   else
+                      {
+                        ignoreitem #FINDID BAD_INGOTS
+                        goto _ingot
+                      }
               }
         }
         else
