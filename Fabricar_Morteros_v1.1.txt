@@ -7,11 +7,11 @@
 ; =====================================================================================================
 ; Script Name: Fabricar Morteros
 ; Author: Sthil Lauda
-; Version: 1.0
+; Version: 1.1
 ; Client Tested with: 2.0.3
 ; EUO version tested with: EasyUO 1.5 Version 243
 ; Shard: Ultima Alianza (¡Hasta la muerte!)
-; Revision Date: 15/04/2020
+; Revision Date: 14/06/2020
 ; Public Release: 15/04/2020
 ; Global Variables Used: Ninguna.
 ; Purpose: Fabrica morteros hasta llenar una bolsa entera (255).
@@ -47,6 +47,8 @@ set #SYSMSGCOL 1187
 event sysmessage =======================
 wait 20
 
+ignoreitem reset
+
 ;
 ;========================================================
 ;
@@ -69,8 +71,9 @@ goto loop
 ;
 
 sub lingotes
+_ingot:
 finditem %lingotes C_ , #BACKPACKID
-if #FINDSTACK < 5
+if #FINDSTACK <= 5
    {
      finditem %lingotes C_ , %cofre_lingotes
      if #FINDCNT > 0
@@ -94,6 +97,11 @@ if #FINDSTACK < 5
                              halt
                            }
                    }
+                   else
+                      {
+                        ignoreitem #FINDID BAD_INGOTS
+                        goto _ingot
+                      }
               }
         }
         else
