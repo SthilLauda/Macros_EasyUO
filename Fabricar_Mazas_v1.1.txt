@@ -46,6 +46,7 @@ set #SYSMSGCOL 1187
 event sysmessage =====================
 wait 20
 
+ignoreitem reset
 gosub setupMode
 
 ;
@@ -70,8 +71,9 @@ goto loop
 ;
 
 sub lingotes
+_ingot:
 finditem %lingotes C_ , #BACKPACKID
-if #FINDSTACK < 5
+if #FINDSTACK <= 5
    {
      finditem %lingotes C_ , %cofre_lingotes
      if #FINDCNT > 0
@@ -95,6 +97,11 @@ if #FINDSTACK < 5
                              halt
                            }
                    }
+                   else
+                      {
+                        ignoreitem #FINDID BAD_INGOTS
+                        goto _ingot
+                      }
               }
         }
         else
