@@ -31,14 +31,15 @@
 ; ==================================================================================
 ; INSTRUCCIONES:
 ;
-; 1- Cargarse de peso hasta acercarse al máximo (añadir alimentos, mineral, etc).
-; 3- Pulsar el play :)
+; 1- Configurar el nivel de stamina en %nivel_stamina 
+; 2- Cargarse de peso hasta acercarse al máximo (añadir alimentos, mineral, etc).
+; 3- Pulsar play y seguir las instrucciones para fijar las coordenadas de movimiento :)
 ;
 ; ==============================================================
 ; ESQUEMA:
 ;
-; Punto A ----camina--desde--A--hacia--B--> Punto B
-; Punto A <----camina--desde--B--hacia--A-- Punto B
+; "Punto A" ----camina->-desde--A->-hasta->-B--> "Punto B"
+; "Punto B" ----camina->-desde--B->-hasta->-A--> "Punto A"
 ;
 ; ==============================================================
 ; ________________________________
