@@ -1,11 +1,11 @@
 ; Script Name: TIM's Journal Scanner
 ; Author: TIM (timginter)
-; Version: 1.1
+; Version: 1.2
 ; Client Tested with: 5.0.1j
 ; EUO version tested with: 1.5 v. 102
 ; Shard OSI / FS:  OSI/FS
-; Revision Date: 28/01/09
-; Public Release: 28/01/09
+; Revision Date: 17/06/2020
+; Public Release: 28/01/2009
 ; Purpose: Muestra entradas de diario a través del menú redimensionable. Guarda entradas de diario en un archivo especificado. C:\Diario_UA.txt. Filtra mensajes para mostrar.
 
 gosub menuBody
@@ -221,7 +221,7 @@ sub menuBody
 
  set %yCoordinate %yCoordinate + 20
  menu button save 5 %yCoordinate 100 20 SAVE
- menu edit path 110 %yCoordinate 150 C:\Diario_UA.txt
+ menu edit path 110 %yCoordinate 150 %UserProfile%\Desktop\Diario_UA.txt
 
  menu button left 265 %yCoordinate 20 20 <
  menu button right 287 %yCoordinate 20 20 >
