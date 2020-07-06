@@ -49,7 +49,7 @@ set %tesoros AXE_BXE_CXE_DXE_EXE_FXE_GXE_HXE_IXE_
 ignoreitem reset TESOROS_ENCONTRADOS
 
 loop:
-finditem %tesoros G_10
+finditem %tesoros G_
 if #FINDCNT > 0
    {
      set #SYSMSGCOL 1165
