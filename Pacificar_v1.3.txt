@@ -233,8 +233,9 @@ set !_timeout ( #scnt + !_A . !_A0 )
 _lets_wait_for_a_message:
 for %i %jstart #jindex
 {
- scanjournal %i
-  for %ii 2 !_A0
+  scanjournal %i
+  set %end !_A0 - 1
+  for %ii 2 %end
   {
     if !_A . %ii in #journal && %jstart <> %i
     set #result #true , #spc , !_A . %ii
