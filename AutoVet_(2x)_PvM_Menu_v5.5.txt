@@ -132,7 +132,7 @@ set %vendas_limpias ZLF
 set %vendas_sucias AMF
 set %golems_encogidos ZIM
 set %golems_abiertos YAB
-set %pilones TEE_QEE_WEE_VEE
+set %pilones TEE_QEE_WEE_VEE_UEG
 set %armaduras_golem NYAB
 set %arcos_golem GYAB
 set %espadas_golem UPO
