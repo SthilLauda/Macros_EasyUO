@@ -1,0 +1,395 @@
+; ======================================================================================================
+;  '||   ||` '||`   ||                                 /.\      '||`
+;   ||   ||   ||    ||     ''                         // \\      ||   ''
+;   ||   ||   ||  ''||''   ||  '||),,(|,   '''|.     //...\\     ||   ||   '''|.  `||''|,  '''/  '''|.
+;   ||   ||   ||    ||     ||   || || ||  .|''||    //     \\    ||   ||  .|''||   ||  ||   //  .|''||
+;   `|...|'  .||.   `|..' .||. .||    ||. `|..||. .//       \\. .||. .||. `|..||. .||  ||. /... `|..||.
+; =====================================================================================================
+; Script Name: Buscar / Separar Items
+;              ______
+;           .-'      `-.
+;         .'            `.
+;        /                \
+;       ;                 ;`
+;       |         H       |;
+;       ;                 ;|
+;       '\               / ;
+;        \`.           .' /
+;         `.`-._____.-' .'
+;           / /`_____.-'
+;          / / /
+;         / / /
+;        / / /
+;       / / /
+;      / / /
+;     / / /
+;    / / /
+;   / / /
+;  / / /
+;  \/_/
+;
+; Author: Sthil Lauda
+; Version: 1.0
+; Client Tested with: 2.0.3
+; EUO version tested with: EasyUO 1.5 Version 243
+; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Revision Date: 21/07/2020
+; Public Release: 21/07/2020
+; Global Variables Used: Ninguna.
+; Purpose: Busca y separa los objetos que hay en un contenedor dependiendo de su descripción (propiedades).
+;_________________________________________
+;
+; ////////////////////////////////////////
+; ******** ¡NO HAY CONFIGURACIÓN! ********
+; ////////////////////////////////////////
+;_________________________________________
+;
+
+set #menubutton n/a         ; NO TOCAR
+set %contenedor_origen n/a  ; NO TOCAR
+set %contenedor_destino n/a ; NO TOCAR
+set %texto NADA             ; NO TOCAR
+set %items_found 000        ; NO TOCAR
+set %items_indice 000       ; NO TOCAR
+set %num_items 0            ; NO TOCAR
+
+set #SYSMSGCOL 1187
+event sysmessage ====================
+wait 20
+set #SYSMSGCOL 1165
+event sysmessage Separar Items v1.0
+wait 20
+set #SYSMSGCOL 1187
+event sysmessage ====================
+wait 20
+
+gosub showEUOMenu1
+;
+;========================================================
+;
+; ******************* LOOP PRINCIPAL ********************
+;
+;========================================================
+;
+mainloop:
+gosub bloop
+wait 1
+goto mainloop
+;
+;========================================================
+;
+; ***************** FIN LOOP PRINCIPAL *****************
+;
+;========================================================
+;
+
+sub bloop
+bloop:
+if #menubutton <> n/a
+   {
+     gosub #menubutton
+     set #menubutton n/a
+   }
+return
+
+sub SetupOrigContainer
+set #SYSMSGCOL 73
+setuotitle Haz CLICK en el CONTENEDOR ORIGEN
+event sysmessage ============================
+event sysmessage Contenedor de ORIGEN
+event sysmessage ============================
+wait 20
+set #TARGCURS 1
+while #TARGCURS = 1
+      {
+        wait 1
+      }
+set %contenedor_origen #LTARGETID
+set #SYSMSGCOL 88
+if ( %contenedor_origen = #BACKPACKID )
+     {
+       event sysmessage ORIGEN: **MOCHILA**
+       wait 20
+     }
+     else
+        {
+          event sysmessage ORIGEN: %contenedor_origen
+          wait 20
+          set #LOBJECTID %contenedor_origen
+          event macro 17
+          gosub wait_for GUMP %contenedor_origen 60
+          contpos 366 611
+          wait 10
+        }
+return
+
+sub SetupDestContainer
+set #SYSMSGCOL 73
+setuotitle Haz CLICK en el CONTENEDOR DESTINO
+event sysmessage ============================
+event sysmessage Contenedor de DESTINO
+event sysmessage ============================
+wait 20
+set #TARGCURS 1
+while #TARGCURS = 1
+      {
+        wait 1
+      }
+set %contenedor_destino #LTARGETID
+set #SYSMSGCOL 88
+if ( %contenedor_destino = #BACKPACKID )
+     {
+       event sysmessage DESTINO: **MOCHILA**
+       wait 20
+     }
+     else
+        {
+          event sysmessage DESTINO: %contenedor_destino
+          wait 20
+          set #LOBJECTID %contenedor_destino
+          event macro 17
+          gosub wait_for GUMP %contenedor_destino 60
+          contpos 535 611
+          wait 10
+        }
+return
+
+sub FilterLoop
+set %items_found 0
+set %items_indice 0
+set %num_items 0
+set #sysmsgcol 53
+menu Get TEXTO
+set %texto #menures
+if ( %texto = NADA )
+     {
+       display ERROR: ¡Debes escribir algo en la casilla de buscar! ¬¬
+       set #SYSMSGCOL 38
+       event sysmessage ESCRIBE EL TEXTO A BUSCAR!
+       wait 20
+       return
+     }
+if ( %contenedor_origen = %contenedor_destino ) && ( %contenedor_origen <> n/a && %contenedor_destino <> n/a )
+     {
+       display ERROR: ¡El contenedor de destino debe ser distinto al de origen! ¬¬
+       set #SYSMSGCOL 38
+       event sysmessage ERROR EN CONTENEDORES!
+       wait 20
+       return
+     }
+if ( %contenedor_origen = n/a )
+     {
+       display ERROR: ¡El contenedor de ORIGEN está sin configurar! ¬¬
+       set #SYSMSGCOL 38
+       event sysmessage FALTA EL ORIGEN!
+       wait 20
+       return
+     }
+if ( %contenedor_destino = n/a )
+     {
+       display ERROR: ¡El contenedor de DESTINO está sin configurar! ¬¬
+       set #SYSMSGCOL 38
+       event sysmessage FALTA EL DESTINO!
+       wait 20
+       return
+     }
+event sysmessage Busqueda: [ %texto ]
+wait 20
+_repaso:
+finditem * C_ , %contenedor_origen
+if #FINDCNT > 0
+   {
+     set %items_found #FINDCNT
+     set %items_indice #FINDINDEX
+     menu Delete EUOLabel2
+     menu Delete EUOLabel4
+     menu Delete EUOLabel6
+     menu Font Transparent #false
+     menu Font BGColor None
+     menu Font Color $000080FF
+     menu Text EUOLabel4 45 44 %items_found
+     menu Font Color Red
+     menu Text EUOLabel6 45 64 %num_items
+     menu Font Color Yellow
+     menu Text EUOLabel2 12 44 %items_indice
+     for #FINDINDEX 1 #FINDCNT
+         {
+           set %items_indice #FINDINDEX
+           menu Font Color Yellow
+           menu Text EUOLabel2 12 44 %items_indice
+           gosub waitforprop #FINDID
+           if %texto in #PROPERTY
+              {
+                exevent drag #FINDID #FINDSTACK
+                exevent dropc %contenedor_destino
+                wait 30
+                set %num_items %num_items + 1
+                menu Font Color Red
+                menu Text EUOLabel6 45 64 %num_items
+              }
+              else
+                 {
+                   ignoreitem #FINDID BAD_TEXT
+                 }
+         }
+         goto _repaso
+   }
+set #sysmsgcol 1165
+event sysmessage TERMINADO! [ %num_items ] Items!
+wait 20
+ignoreitem reset BAD_TEXT
+return
+
+;--------- EasyUO Menu Designer Code Begin ---------
+sub showEUOMenu1
+	menu Clear
+	menu Window Title Separar Items v1.0
+	menu Window Color BtnFace
+	menu Window Size 343 95
+	menu Font Transparent #true
+	menu Font Align Right
+	menu Shape EUOShape3 0 -4 337 97 3 7 1 Black 7 Black
+	menu Shape EUOShape2 0 0 338 93 4 1 1 Black 7 Lime
+	menu Shape EUOShape1 4 3 329 85 4 7 1 Black 7 Background
+	menu Font Name MS Sans Serif
+	menu Font Size 14
+	menu Font Style b
+	menu Font Color $0040FF00
+	menu Font Align Left
+	menu Font BGColor BtnShadow
+	menu Text EUOLabel1 12 16 BUSCAR:
+	menu Font Size 8
+	menu Font Color Yellow
+	menu Font Transparent #false
+	menu Font BGColor none
+	menu Text EUOLabel2 12 44 %items_indice
+	menu Font Color Aqua
+	menu Text EUOLabel3 36 44 /
+  menu Font Color $000080FF
+	menu Text EUOLabel4 45 44 %items_found
+	menu Font Color Aqua
+	menu Text EUOLabel5 8 64 Total:
+  menu Font Color Red
+	menu Text EUOLabel6 45 64 %num_items
+	menu Font Size 12
+	menu Font Color Blue
+	menu Font BGColor Silver
+	menu Edit TEXTO 106 16 141 %texto
+	menu Font Size 8
+	menu Font Color Yellow
+	menu Font BGColor Red
+	menu Button FilterLoop 256 12 69 33 START
+	menu Font BGColor Blue
+	menu Button SetupOrigContainer 81 52 120 29 Contenedor Origen
+	menu Font BGColor Highlight
+	menu Button SetupDestContainer 205 52 120 29 Contenedor Destino
+	menu Show 421 270
+return
+;--------- EasyUO Menu Designer Code End ---------
+
+sub waitforprop ; <==============================>
+set %oldprop N/A
+_testforprop:
+event property %1
+if #property = %oldprop || #property = $
+   {
+     wait 1
+     goto _testforprop
+   }
+return
+
+;=================================================================
+sub wait_for
+;=================================================================
+; This "wait_for" sub package was created by Locke. If you use these subs please keep this header intact.
+; Documentation: the sub package grew to large with all the comments. To load them call the sub like this:
+; gosub wait_for docs    | or you can use doc, documention, what, or my personal favorite, kickass.
+
+; "wait_for core dispatcher" version 1.2 by Locke
+if %1 = doc || if %1 = docs || if %1 = documentation || if %1 = what || if %1 = kickass
+{
+Display ok Please click ok and wait for your browser to start.
+execute http://www.easyuo.com/forum/viewtopic.php?t=24716
+halt
+}
+nameSpace Push
+namespace local LLNS
+set #result N/A ; if #result isn't set by one of my wait_for subs it'll throw an error.
+set !LPC #lpc
+set #lpc 200
+for %i 0 %0
+set !_A . %i % . %i
+gosub wait_for_ , !_A1
+set #lpc !lpc
+namespace clear LLNS
+namespace pop
+if #result <> N/A
+return #result
+else
+display ok You specified an unknown wait_for command. Script returned #result and is halting.
+halt
+;======================================================================
+sub wait_for_GUMP ; version 1.4 ~Locke
+;=================================================================
+; Añadido #CONTID ^^
+if !_A0 < 3
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for GUMP XXX_YYY time_out_in_seconds$
++Script is halting
+halt
+}
+if !_A3 <> CLOSE
+set !_timeout #scnt2 + !_A3
+else
+set !_timeout 0 ; no gump wait if %3 = CLOSE since we already believe it to be open.
+
+_lets_wait_for_a_gump:
+if #CONTSIZE = !_A2 || #CONTKIND = !_A2 || #CONTNAME = !_A2 || #CONTTYPE = !_A2 || #CONTID = !_A2
+{
+ if !_A5 <> N/A && !_A6 <> N/A
+ {
+ set !clickx !_A5 + #contposx
+ set !clicky !_A6 + #contposy
+ click !clickx !clicky
+ }
+ if !_A3 = CLOSE || if !_A4 = CLOSE || !_A5 = CLOSE || !_A6 = CLOSE
+ {
+ set !string #contsize
+ str pos !string _
+ set !pos #strres
+ str del !string #strres #strres
+ set !clickX #contposx + ( #strres / 2 )
+ str del !string 1 !pos
+ set !clickY #contposy + ( #strres / 2 )
+ click !clickx !clicky R
+ }
+return #true
+}
+
+if ( !_timeout =< #scnt2 ) && ( !_A4 = N/A )
+   {
+     return #false
+   }
+
+if !_A4 <> N/A && !_timeout =< #scnt2
+{
+finditem !_A4
+if #findkind <> -1
+{
+ for #findindex 1 #findcnt
+ {
+  if #finddist > 2
+  ignoreitem #findid LLWAITFOR
+  else
+  break
+ }
+ set #lobjectid #findid
+ event macro 17 0
+ set !_timeout #scnt2 + !_A3
+}
+else
+return #false
+}
+wait 1
+goto _lets_wait_for_a_gump
