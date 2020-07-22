@@ -1,0 +1,124 @@
+; ======================================================================================================
+;  '||   ||` '||`   ||                                 /.\      '||`
+;   ||   ||   ||    ||     ''                         // \\      ||   ''
+;   ||   ||   ||  ''||''   ||  '||),,(|,   '''|.     //...\\     ||   ||   '''|.  `||''|,  '''/  '''|.
+;   ||   ||   ||    ||     ||   || || ||  .|''||    //     \\    ||   ||  .|''||   ||  ||   //  .|''||
+;   `|...|'  .||.   `|..' .||. .||    ||. `|..||. .//       \\. .||. .||. `|..||. .||  ||. /... `|..||.
+; =====================================================================================================
+;
+; Title: Cronómetro
+;
+;   .'`~~~~~~~~~~~`'.
+;   (  .'11 12 1'.  )
+;   |  :10 \    2:  |
+;   |  :9   @-> 3:  |
+;   |  :8       4;  |
+;   '. '..7 6 5..' .'
+;    ~-------------~
+;
+; Author: Sthil Lauda
+; Version: 1.0
+; Client Tested with: 2.0.3
+; EUO version tested with: EasyUO 1.5 Version 243
+; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Public Release: 22/07/2020
+; Revised On: 22/07/2020
+; Propósito: Cronómetro de tiempo en segundos.
+; Instrucciones: Pulsar la tecla ESC para empezar y terminar.
+
+set %init #TRUE
+
+loop:
+if ( %init )
+     {
+       onhotkey ESC
+              {
+                set %init_timer #SCNT
+                set %init #FALSE
+                set #SYSMSGCOL 88
+                gosub time #time
+                event sysmessage START: [ %temp ]
+                wait 20
+              }
+              wait 1
+     }
+if ( ! %init )
+     {
+       onhotkey ESC
+              {
+                set %fin_timer #SCNT
+                set %result_time abs ( %fin_timer - %init_timer )
+                set %init #TRUE
+                set #SYSMSGCOL 1165
+                gosub time #time
+                event sysmessage STOP: [ %temp ] / [ %result_time ]
+                wait 20
+                Display OK Tiempo transcurrido en segundos: , #spc , %result_time
+                goto loop
+              }
+              wait 1
+     }
+goto loop
+
+;==================================
+; Name: sub time
+; Author: Orngrimm
+; Version: 1.1
+; Client Tested with: UO 4.0.6a
+; EasyUO version tested with: EasyUO 1.42.009D
+; Revision Date: 23.11.04
+; Public Release: 20.12.03
+; Purpose: Formates the time correctly. Also 01:02:03 is formatted correct.
+; normally this time gives 1:2:3 without leading "0". My sub takes care of it!
+; Disclaimer:   Dont change this script and release it under own name.
+;            Let this header intact and dont distribute without it!
+;            DONT distribute without my permission!! (PM Orngrimm @ easyuo.com)
+; Copyright: Orngrimm
+;==================================
+
+; Thanks to Janus who found (and fixed!) a bug with 00:xx:yy shown as xx:xx:yy.
+
+;*******************************************
+;**** Parses the correct time from %1 (gosub time #time)
+;*******************************************
+sub time
+set %string %1
+set %len 2
+str len %string
+if #Strres = 5
+        set %len 1
+if #StrRes =< 4
+        {
+        set %hour 00:
+        goto _time_min
+        }
+; Parsing the hour
+str left %string %len
+set %hour #StrRes
+str len %hour
+if #strRes = 1 2
+        set %hour 0 , %hour , :
+        goto _time_min
+set %hour %hour , :
+; Parsing the minute
+_time_min:
+str right %string 4
+str left #StrRes 2
+set %min #StrRes
+str len %Min
+if #strRes = 1 2
+        set %min 0 , %min , :
+        goto _time_sec
+set %min %min , :
+; Parsing the second
+_time_sec:
+str right %string 2
+set %sec #StrRes
+str len %sec
+if #strRes = 1 2
+        set %temp %hour , %min , 0 , %sec
+        goto _time_end
+set %temp %hour , %min , %sec
+_time_end:
+return %temp
+stop
