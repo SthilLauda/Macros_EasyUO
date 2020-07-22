@@ -32,15 +32,15 @@
 ; Version: 1.0
 ; Client Tested with: 2.0.3
 ; EUO version tested with: EasyUO 1.5 Version 243
-; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Shard: Ultima Alianza (Â¡Hasta la muerte!)
 ; Revision Date: 21/07/2020
 ; Public Release: 21/07/2020
 ; Global Variables Used: Ninguna.
-; Purpose: Busca y separa los objetos que hay en un contenedor dependiendo de su descripción (propiedades).
+; Purpose: Busca y separa (mueve) los objetos que hay en un contenedor dependiendo de su descripciÃ³n (propiedades).
 ;_________________________________________
 ;
 ; ////////////////////////////////////////
-; ******** ¡NO HAY CONFIGURACIÓN! ********
+; ******** Â¡NO HAY CONFIGURACIÃ“N! ********
 ; ////////////////////////////////////////
 ;_________________________________________
 ;
@@ -163,7 +163,7 @@ menu Get TEXTO
 set %texto #menures
 if ( %texto = NADA )
      {
-       display ERROR: ¡Debes escribir algo en la casilla de buscar! ¬¬
+       display ERROR: Â¡Debes escribir algo en la casilla de buscar! Â¬Â¬
        set #SYSMSGCOL 38
        event sysmessage ESCRIBE EL TEXTO A BUSCAR!
        wait 20
@@ -171,7 +171,7 @@ if ( %texto = NADA )
      }
 if ( %contenedor_origen = %contenedor_destino ) && ( %contenedor_origen <> n/a && %contenedor_destino <> n/a )
      {
-       display ERROR: ¡El contenedor de destino debe ser distinto al de origen! ¬¬
+       display ERROR: Â¡El contenedor de destino debe ser distinto al de origen! Â¬Â¬
        set #SYSMSGCOL 38
        event sysmessage ERROR EN CONTENEDORES!
        wait 20
@@ -179,7 +179,7 @@ if ( %contenedor_origen = %contenedor_destino ) && ( %contenedor_origen <> n/a &
      }
 if ( %contenedor_origen = n/a )
      {
-       display ERROR: ¡El contenedor de ORIGEN está sin configurar! ¬¬
+       display ERROR: Â¡El contenedor de ORIGEN estÃ¡ sin configurar! Â¬Â¬
        set #SYSMSGCOL 38
        event sysmessage FALTA EL ORIGEN!
        wait 20
@@ -187,7 +187,7 @@ if ( %contenedor_origen = n/a )
      }
 if ( %contenedor_destino = n/a )
      {
-       display ERROR: ¡El contenedor de DESTINO está sin configurar! ¬¬
+       display ERROR: Â¡El contenedor de DESTINO estÃ¡ sin configurar! Â¬Â¬
        set #SYSMSGCOL 38
        event sysmessage FALTA EL DESTINO!
        wait 20
@@ -331,7 +331,7 @@ halt
 ;======================================================================
 sub wait_for_GUMP ; version 1.4 ~Locke
 ;=================================================================
-; Añadido #CONTID ^^
+; AÃ±adido #CONTID ^^
 if !_A0 < 3
 {
 display ok You haven't specified enough vars.$
