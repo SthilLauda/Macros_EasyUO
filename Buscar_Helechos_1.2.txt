@@ -34,51 +34,93 @@
 ; \_/__________________________________________________________________/
 ;
 ; Author: Sthil Lauda
-; Version: 1.0
+; Version: 1.2
 ; Client Tested with: 2.0.3
 ; EUO version tested with: EasyUO 1.5 Version 243
 ; Shard: Ultima Alianza (¡Hasta la muerte!)
 ; Public Release: 13/04/20
-; Revised On: 13/04/20
+; Revised On: 23/07/20
 ; Propósito: Ayuda a encontrar el sitio donde está el tesoro.
 ; Instrucciones: Andar por el mapa hasta que encuentre algo... xD
+;
+;________________________________
+;
+; ///////////////////////////////
+; ******** CONFIGURACIÓN ********
+; ///////////////////////////////
+;________________________________
+;
+set %tecla F12        ; Tecla para mostrar la información del tesoro encontrado.
+set %tiempo_espera 10 ; Cuantos segundos esperar a que pulses la tecla, antes de descartar el tesoro encontrado y seguir buscando más...
+;________________________________________________
+;
+; //////////////////////////////////////////////
+; ************* FIN CONFIGURACIÓN *************
+; //////////////////////////////////////////////
+;________________________________________________
 ;
 set %tesoros AXE_BXE_CXE_DXE_EXE_FXE_GXE_HXE_IXE_
     +JXE_KXE_LXE_MXD_NXE_PUI_VWE_MWE_RGH_MPG_BUD_
     +HIF_JIF_IIF_KIF_IKF
 ignoreitem reset TESOROS_ENCONTRADOS
+ignoreitem reset TESOROS_DESCARTADOS
 
 loop:
-finditem %tesoros G_
+finditem %tesoros G_10
 if #FINDCNT > 0
    {
+     set %procesado #FALSE
      set #SYSMSGCOL 1165
-     event sysmessage *** TESORO ENCONTRADO! ***
+     event sysmessage *** TESORO ENCONTRADO ***
+     wait 20
+     set #SYSMSGCOL 88
+     event sysmessage PULSA %tecla PARA DETALLES
      wait 40
-     gosub waitforprop #FINDID
-     gosub FindThingsDir #FINDX #FINDY Orientacion
-     gosub traducirOrientacion
-     DISPLAY OK PROPIEDADES: #PROPERTY $$
-     +FINDX: #FINDX $
-     +FINDY: #FINDY $
-     +FINDZ: #FINDZ $
-     +DISTANCIA: #FINDDIST casillas $
-     +ORIENTACION: %direccion
-     display yesno ¿QUIERES INTENTAR ABRIR EL TESORO ENCONTRADO?
-     if #DISPRES = yes
-        {
-          set #LOBJECTID #FINDID
-          event macro 17 0
-          wait 20
-        }
-     ignoreitem #FINDID TESOROS_ENCONTRADOS
+     set %chest_timeout #SCNT + %tiempo_espera
+     _waitToKey:
+     onhotkey %tecla
+            {
+              set %procesado #TRUE
+              gosub waitforprop #FINDID
+              gosub FindThingsDir #FINDX #FINDY Orientacion
+              gosub traducirOrientacion
+              DISPLAY OK PROPIEDADES: #PROPERTY $$
+              +ID: #FINDID $
+              +Coordenada X: #FINDX $
+              +Coordenada Y: #FINDY $
+              +Coordenada Z: #FINDZ $
+              +DISTANCIA: #FINDDIST casillas $
+              +ORIENTACION: %direccion
+              display yesno ¿QUIERES INTENTAR ABRIR EL TESORO ENCONTRADO?
+              if #DISPRES = yes
+                 {
+                   set #LOBJECTID #FINDID
+                   event macro 17 0
+                   wait 20
+                 }
+              ignoreitem #FINDID TESOROS_ENCONTRADOS
+              goto loop
+            }
+     if ( #SCNT > %chest_timeout )
+          {
+            if ( ! %procesado )
+                 {
+                   set #SYSMSGCOL 38
+                   event sysmessage IGNORANDO TESORO: #FINDID
+                   wait 20
+                   ignoreitem #FINDID TESOROS_DESCARTADOS
+                   goto loop
+                 }
+          }
+     wait 1
+     goto _waitToKey
    }
    wait 1
 goto loop
 
 SUB FindThingsDir ; <===================================================>
 ;ver 1.2 10Jul04 by Roadkill
-;purpose: find the direction from you that a thing is.
+;purpose: find the direction from you that a thing is
 ;%1= #findx of object, it's UO world coord
 ;%2=#findy of object, it's UO world coord
 ;%3= the name of the return var, i.e. 'dir', 'thingsdirection' by default
