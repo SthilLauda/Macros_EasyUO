@@ -75,7 +75,7 @@ if #FINDCNT > 0
      wait 20
      set #SYSMSGCOL 88
      event sysmessage PULSA %tecla PARA DETALLES
-     wait 40
+     wait 20
      set %chest_timeout #SCNT + %tiempo_espera
      _waitToKey:
      onhotkey %tecla
