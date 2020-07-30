@@ -1,0 +1,125 @@
+; =====================================================================================================
+;  '||   ||` '||`   ||                                 /.\      '||`
+;   ||   ||   ||    ||     ''                         // \\      ||   ''
+;   ||   ||   ||  ''||''   ||  '||),,(|,   '''|.     //...\\     ||   ||   '''|.  `||''|,  '''/  '''|.
+;   ||   ||   ||    ||     ||   || || ||  .|''||    //     \\    ||   ||  .|''||   ||  ||   //  .|''||
+;   `|...|'  .||.   `|..' .||. .||    ||. `|..||. .//       \\. .||. .||. `|..||. .||  ||. /... `|..||.
+; =====================================================================================================
+;
+; Script Name: Comprobar Hambre
+;
+;  ,--./,-.
+; /,-._.--~\
+;  __}  {
+; \`-._,-`-,
+;  `._,._,'
+;
+set %version v1.0
+;
+; Author: Sthil Lauda
+; Version: 1.0
+; Client Tested with: 2.0.3
+; EUO version tested with: 1.5 Version 142
+; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Public Release: 30/07/2020
+; Revised On: 30/07/2020
+; Purpose: Mantiene el personaje bien alimentado.
+; Instrucciones; Configurar el tiempo de alimentación.
+;*************************************************
+;________________________________
+;
+; ///////////////////////////////
+; ******** CONFIGURACIÓN ********
+; ///////////////////////////////
+;________________________________
+;
+set %tiempo_alimentacion 360 ; Cada cuántos segundos comprobar si tienes hambre.
+;________________________________________________
+;
+; //////////////////////////////////////////////
+; ************* FIN CONFIGURACIÓN *************
+; //////////////////////////////////////////////
+;________________________________________________
+;
+set %comida RGG_NRD_QSD_ZBG_WLI_QRD_END_FUD_YLI_WLI_HGI
+ +_KGI_EGI_QLI_KLI_MLI_KRD_AQD_MQE_VQE_TQE_JQE_IQE
+ +_GQE_SPE_ZPE_OQE_BDF_KPE_RQE_YSD_SQD_YWI_AXI_PQD_QQD
+ +_HND_YRD_
+set %tiempo_actual #SCNT
+set %proxima_vez #SCNT
+
+set #SYSMSGCOL 1187
+event sysmessage =======================
+wait 20
+set #SYSMSGCOL 1165
+event sysmessage Comprobar Hambre v1.0
+wait 20
+set #SYSMSGCOL 1187
+event sysmessage =======================
+wait 20
+
+loop:
+set %tiempo_actual #SCNT
+if %proxima_vez <= %tiempo_actual
+   {
+     gosub comprobar_comida
+   }
+   wait 1
+goto loop
+
+;=====================================================
+; Rutina para, en caso de hambre, comer hasta saciarse
+;=====================================================
+; v2.2
+sub comprobar_comida
+{
+  hambriento:
+  set %jrnl #jindex ; Marcamos un índice de las líneas del diario.
+  event macro 4 0 .hungry
+  wait 20
+  while #true
+     {
+       if #jindex > %jrnl ; Si aparece una nueva línea.
+          {
+            set %jrnl %jrnl + 1 ; Seleccionamos ese numero de línea.
+            scanjournal %jrnl   ; La leemos...
+            if Estas_no_le_afecta_el_hambre in #journal || Estas_tan_lleno_que_no_puedes in #journal
+               {
+                 set %proxima_vez %tiempo_actual + %tiempo_alimentacion
+                 return
+               }
+               else
+                  {
+                    if Estas_lleno in #journal || Estas_contento in #journal || Estas_en_inanicion in #journal || Estas_hambriento in #journal || Sientes_mucho in #journal || Estas_con_hambre in #journal || Estas_parcialmente in #journal || Estas_bien_lleno in #journal || Te_sientes_casi_lleno in #journal || Estas_totalmente_saciado in #journal
+                       {
+                         finditem %comida C_ , #BACKPACKID
+                         if #findcnt > 0
+                            {
+                              set #LOBJECTID #FINDID
+                              event macro 17
+                              wait 20
+                              goto hambriento
+                            }
+                            else
+                               {
+                                 set #SYSMSGCOL 38
+                                 event sysmessage COMPRA COMIDA!!
+                                 wait 20
+                                 event exmsg #CHARID 3 48 COMPRA COMIDA!!
+                                 wait 40
+                                 set %proxima_vez %tiempo_actual + %tiempo_alimentacion
+                               }
+                       }
+                       else ; Mensaje extraño, repetimos...
+                          {
+                            goto hambriento
+                          }
+                  }
+          }
+       return
+     } ; FIN While
+}
+return
+
+
+
