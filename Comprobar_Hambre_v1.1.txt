@@ -1,0 +1,192 @@
+; =====================================================================================================
+;  '||   ||` '||`   ||                                 /.\      '||`
+;   ||   ||   ||    ||     ''                         // \\      ||   ''
+;   ||   ||   ||  ''||''   ||  '||),,(|,   '''|.     //...\\     ||   ||   '''|.  `||''|,  '''/  '''|.
+;   ||   ||   ||    ||     ||   || || ||  .|''||    //     \\    ||   ||  .|''||   ||  ||   //  .|''||
+;   `|...|'  .||.   `|..' .||. .||    ||. `|..||. .//       \\. .||. .||. `|..||. .||  ||. /... `|..||.
+; =====================================================================================================
+;
+; Script Name: Comprobar Hambre
+;
+;     ,--./,-.
+;    /,-._.--~\
+;     __}  {
+;    \`-._,-`-,
+;     `._,._,'
+;
+set %version v1.1
+;
+; Author: Sthil Lauda
+; Version: 1.1
+; Client Tested with: 2.0.3
+; EUO version tested with: 1.5 Version 142
+; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Public Release: 30/07/2020
+; Revised On: 31/07/2020
+; Purpose: Mantiene el personaje bien alimentado.
+; Instrucciones: Configurar el tiempo de alimentación.
+;*************************************************
+;________________________________
+;
+; ///////////////////////////////
+; ******** CONFIGURACIÓN ********
+; ///////////////////////////////
+;________________________________
+;
+set %tiempo_alimentacion 360 ; Cada cuántos segundos comprobar si tienes hambre.
+;________________________________________________
+;
+; //////////////////////////////////////////////
+; ************* FIN CONFIGURACIÓN *************
+; //////////////////////////////////////////////
+;________________________________________________
+;
+set %comida RGG_NRD_QSD_ZBG_WLI_QRD_END_FUD_YLI_WLI_HGI
+ +_KGI_EGI_QLI_KLI_MLI_KRD_AQD_MQE_VQE_TQE_JQE_IQE_SQD
+ +_GQE_SPE_ZPE_OQE_BDF_KPE_RQE_YSD_SQD_YWI_AXI_PQD_QQD
+ +_HND_YRD_
+set %tiempo_actual #SCNT
+set %proxima_vez #SCNT
+
+set #SYSMSGCOL 1187
+event sysmessage =======================
+wait 20
+set #SYSMSGCOL 1165
+event sysmessage Comprobar Hambre %version
+wait 20
+set #SYSMSGCOL 1187
+event sysmessage =======================
+wait 20
+
+loop:
+set %tiempo_actual #SCNT
+if %proxima_vez <= %tiempo_actual
+   {
+     gosub comprobar_comida
+   }
+   wait 1
+goto loop
+
+;=====================================================
+; Rutina para, en caso de hambre, comer hasta saciarse
+;=====================================================
+; v2.5
+sub comprobar_comida
+{
+  _hambriento:
+  set %jstart #jindex
+  event macro 4 0 .hungry
+  gosub wait_for MSG Estas_no_le_afecta_el_hambre Estas_tan_lleno_que_no_puedes Estas_totalmente_saciado Estas_lleno Estas_contento Estas_en_inanicion Estas_hambriento Sientes_mucho Estas_con_hambre Estas_parcialmente Estas_bien_lleno Te_sientes_casi_lleno 50
+  if ( #TRUE in #RESULT )
+       {
+         if ( Estas_no_le_afecta_el_hambre in #RESULT || Estas_tan_lleno_que_no_puedes in #RESULT )
+             {
+               set %proxima_vez %tiempo_actual + %tiempo_alimentacion
+               return
+             }
+             else
+                {
+                  if ( Estas_lleno in #RESULT || Estas_contento in #RESULT || Estas_en_inanicion in #RESULT || Estas_hambriento in #RESULT || Sientes_mucho in #RESULT || Estas_con_hambre in #RESULT || Estas_parcialmente in #RESULT || Estas_bien_lleno in #RESULT || Te_sientes_casi_lleno in #RESULT || Estas_totalmente_saciado in #RESULT )
+                       {
+                         finditem %comida C_ , #BACKPACKID
+                         if #FINDCNT > 0
+                            {
+                              set %jstart #jindex
+                              set #LOBJECTID #FINDID
+                              event macro 17
+                              gosub wait_for MSG Estas_tan_lleno_que_no_puedes 20
+                              if ( #TRUE in #RESULT )
+                                   {
+                                     set %proxima_vez %tiempo_actual + %tiempo_alimentacion
+                                     return
+                                   }
+                                   else
+                                      {
+                                        goto _hambriento
+                                      }
+                            }
+                            else
+                               {
+                                 set #SYSMSGCOL 38
+                                 event sysmessage COMPRA COMIDA!!
+                                 wait 20
+                                 event exmsg #CHARID 3 48 COMPRA COMIDA!!
+                                 wait 40
+                                 set %proxima_vez %tiempo_actual + %tiempo_alimentacion
+                               }
+                       }
+                }
+       }
+       else ; Mensaje extraño, repetimos...
+          {
+            goto _hambriento
+          }
+}
+return
+
+;=================================================================
+sub wait_for
+;=================================================================
+; This "wait_for" sub package was created by Locke. If you use these subs please keep this header intact.
+; Documentation: the sub package grew to large with all the comments. To load them call the sub like this:
+; gosub wait_for docs    | or you can use doc, documention, what, or my personal favorite, kickass.
+
+; "wait_for core dispatcher" version 1.2 by Locke
+if %1 = doc || if %1 = docs || if %1 = documentation || if %1 = what || if %1 = kickass
+{
+Display ok Please click ok and wait for your browser to start.
+execute http://www.easyuo.com/forum/viewtopic.php?t=24716
+halt
+}
+nameSpace Push
+namespace local LLNS
+set #result N/A ; if #result isn't set by one of my wait_for subs it'll throw an error.
+set !LPC #lpc
+set #lpc 200
+for %i 0 %0
+set !_A . %i % . %i
+gosub wait_for_ , !_A1
+set #lpc !lpc
+namespace clear LLNS
+namespace pop
+if #result <> N/A
+return #result
+else
+display ok You specified an unknown wait_for command. Script returned #result and is halting.
+halt
+;=================================================================
+sub wait_for_MSG ; version 1.4 ~Locke
+;=================================================================
+if !_A0 < 3
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for MSG %message time_out_in_seconds$
++Script is halting
+halt
+}
+set !_timeout ( #scnt2 + !_A . !_A0 )
+_lets_wait_for_a_message:
+for %i %jstart #jindex
+{
+  scanjournal %i
+  set %end !_A0 - 1
+  for %ii 2 %end
+  {
+    if !_A . %ii in #journal && %jstart <> %i
+    set #result #true , #spc , !_A . %ii
+  }
+}
+
+if #true notin #result
+{
+set #result #false
+ if !_timeout =< #scnt2
+ return #result
+wait 1
+goto _lets_wait_for_a_message
+}
+else
+return #result
+
+wait 1
+goto _lets_wait_for_a_message
