@@ -94,7 +94,7 @@ sub comprobar_comida
                               set %jstart #jindex
                               set #LOBJECTID #FINDID
                               event macro 17
-                              gosub wait_for MSG Estas_tan_lleno_que_no_puedes Estas_no_le_afecta_el_hambre 20
+                              gosub wait_for MSG Estas_tan_lleno_que_no_puedes Estas_no_le_afecta_el_hambre no_te_puedes_comer_eso 20
                               if ( #TRUE in #RESULT )
                                    {
                                      set %proxima_vez %tiempo_actual + %tiempo_alimentacion
