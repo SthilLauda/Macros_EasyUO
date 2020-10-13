@@ -77,7 +77,7 @@ set %hid_timer #SCNT2             ; Reloj
 set %proxima_vez #SCNT            ; Reloj
 set %vendaLimpia ZLF              ; ID de las vendas limpias.
 set %vendaSucia AMF               ; ID de las vendas sucias.
-set %pilon TEE_QEE_WEE_VEE        ; ID's de los pilones de agua.
+set %pilon TEE_QEE_WEE_VEE_UEG    ; ID's de los pilones de agua.
 set %tipos_braseros RMF_PMF       ; ID de los braseros.
 set %tipos_papeleras BKF          ; ID de las papeleras de Tickets.
 set %seda RZF
