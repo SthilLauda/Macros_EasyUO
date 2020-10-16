@@ -72,6 +72,9 @@ event sysmessage  Spirit Speak %version
 set #SYSMSGCOL 88
 event sysmessage ==================
 wait 40
+
+display ¡ATENCIÓN! ¡NO PUEDES MACREAR ESTA HABILIDAD DENTRO DE CIUDADES CON GUARDIAS!
+
 ;
 ;========================================================
 ;
