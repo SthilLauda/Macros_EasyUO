@@ -35,9 +35,9 @@
 ; Shard: Ultima Alianza ¡Hasta la muerte!
 ; Revision Date: 25/01/2019
 ; Public Release: 08/02/2019
-; Purpose: Entrenar skill de lockpicking desde 40-50 hasta 75, parando la macro cada 5 puntos para seguir subiendo con
+; Propósito: Entrenar skill de lockpicking desde 40-50 hasta 75, parando la macro cada 5 puntos para seguir subiendo con
 ;          nuevas cajas fabricadas con un mayor nivel (+5 puntos) de skill de Artesanía/Tinker.
-; Instrucciones: Colocar dos cofres, uno con todas las cajas y ganzúas, y otro más que esté vacío.
+; Instrucciones: Colocar dos cofres grandes; el primero de ellos con todas las cajas dentro para forzar (40 cajas o más) y un montón de ganzúas, y el segundo cofre grande debe estar vacío.
 ;
 ;________________________________
 ;
