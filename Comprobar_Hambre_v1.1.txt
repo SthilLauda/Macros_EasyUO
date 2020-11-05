@@ -23,7 +23,7 @@ set %version v1.1
 ; Shard: Ultima Alianza (¡Hasta la muerte!)
 ; Public Release: 30/07/2020
 ; Revised On: 31/07/2020
-; Purpose: Mantiene el personaje bien alimentado.
+; Purpose: Mantiene al personaje bien alimentado.
 ; Instrucciones: Configurar el tiempo de alimentación.
 ;*************************************************
 ;________________________________
