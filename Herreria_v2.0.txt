@@ -59,6 +59,7 @@ set %papelera EAELWND         ; El ID de tu papelera (como máximo debe estar a 
 set %tornillos YFG
 set %martillos GBG_FBG_TLH_CGG
 set %hierro RMK
+set %tickets HVF
 set %peso_disponible ( #MAXWEIGHT - #WEIGHT )
 set %tmp_ingots 0
 set %menu_reciclarx 0
