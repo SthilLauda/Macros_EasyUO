@@ -62,7 +62,6 @@ set %martillos GBG_FBG_TLH_CGG
 set %hierro RMK
 set %tickets HVF
 set %peso_disponible ( #MAXWEIGHT - #WEIGHT )
-set %tmp_ingots 0
 set %menu_reciclarx 0
 set %menu_reciclary 0
 set %boton_eliminar_offsetx 89
