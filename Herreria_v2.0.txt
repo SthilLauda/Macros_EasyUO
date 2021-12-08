@@ -33,11 +33,11 @@
 ; Shard: Ultima Alianza (¡Hasta la muerte!)
 ; Revision Date: 07/12/2021
 ; Public Release: 05/08/2019
-; Purpose: Subir la skill de Herrería fabricando tornillos y fundiéndolos para recuperar mineral :-)
-; Instrucciones: En Minoc hay una tienda de caldereros donde podrás comprar las mazas, compra muchas, haz tres o cuatro viajes, porque pesan mucho.
+; Purpose: Subir la skill de Herrería fabricando tornillos y canjeándolos por tickets en el sistema de recompensas :-)
+; Instrucciones: En Minoc hay una tienda de caldereros donde podrás comprar las mazas. Compra muchas, haz tres o cuatro viajes, porque pesan mucho.
 ;                Ponlas todas en una bolsa, y configura el ID de esa bolsa en la macro.
 ;                Para ello ábrela y mira en EasyUO en el apartado #LOBJECTID para encontrar el ID de la bolsa que acabas de abrir.
-;                Haz lo mismo para la bolsa de tickets y la papelera.
+;                Haz lo mismo para la bolsa de tickets y también con el barril del sistema de recompensas. Si no tienes uno di "Quiero poner el Sistema de Recompensas".
 ;
 ;________________________________
 ;
