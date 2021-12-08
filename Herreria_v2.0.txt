@@ -132,7 +132,7 @@ if #FINDSTACK <= 0
    }
    else
       {
-        set %for_lingotes #FINDSTACK ; Cantidad de lingotes a procesar en cada tanda de crafteo (y le restamos los lingotes que pesa una maza).
+        set %for_lingotes #FINDSTACK ; Cantidad de lingotes a procesar en cada tanda de crafteo.
       }
 return
 
