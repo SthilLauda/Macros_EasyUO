@@ -1,0 +1,393 @@
+; ======================/================================================================================
+;  '||   ||` '||`   ||                                 /.\      '||`
+;   ||   ||   ||    ||     ''                         // \\      ||   ''
+;   ||   ||   ||  ''||''   ||  '||),,(|,   '''|.     //...\\     ||   ||   '''|.  `||''|,  '''/  '''|.
+;   ||   ||   ||    ||     ||   || || ||  .|''||    //     \\    ||   ||  .|''||   ||  ||   //  .|''||
+;   `|...|'  .||.   `|..' .||. .||    ||. `|..||. .//       \\. .||. .||. `|..||. .||  ||. /... `|..||.
+; =====================================================================================================
+; Author: Sthil Lauda
+; Version: 1.0
+; Client Tested with: 2.0.3
+; EUO version tested with: EasyUO 1.5 Version 243
+; Shard: Ultima Alianza (¡Hasta la muerte!)
+; Public Release: 02/06/2022
+; Revised On: 20/06/2022
+; Propósito: Empaquetar piezas sueltas de armaduras dentro de almacenadores.
+; Instrucciones: Se necesita una bolsa con piezas, otra bolsa con almacenadores vacíos, y otra bolsa más para dejarlos una vez llenos.
+;
+
+set %partes_armor OSH_MSH_NSH_ISH_LSH_HSH_NJL_JKH_KKH_HKH_VKH_QKH
+set %almacenadores IUD
+set #LPC 300
+
+display yesno ************** [CONFIGURAR] ***************$$
+              + ¿Quieres almacenar armaduras de escamas?$$
+              + ********************************************$
+              if ( #dispres = no )
+                   {
+                     set %grebas LSH
+                     set %coraza HSH
+                     set %brazal MSH
+                     set %guante ISH
+                     set %collar NSH
+                     set %casco OSH
+                     set %tipo_almacenador 1939
+                   }
+                   else
+                      {
+                        set %grebas VKH
+                        set %coraza QKH
+                        set %brazal HKH
+                        set %guante KKH
+                        set %collar JKH
+                        set %casco NJL
+                        set %tipo_almacenador 1911
+                      }
+
+configurar:
+if %confp = 1 || %confp = N/A
+{
+  set #sysmsgcol 53
+  setuotitle Haz CLICK en la bolsa de almacenadores VACIOS
+  event sysmessage ================
+  event sysmessage Haz click en la bolsa de almacenadores VACIOS
+  event sysmessage ================
+  set #TARGCURS 1
+  target
+  while #TARGCURS = 1
+        {
+          wait 1
+        }
+  set %bolsa_almacenadores_vacios #LTARGETID
+  set #LOBJECTID %bolsa_almacenadores_vacios
+  event macro 17
+  gosub wait_for GUMP %bolsa_almacenadores_vacios 40
+  set %conf 1
+  set %confp 2
+  goto TESC
+}
+if %confp = 2
+{
+  set #sysmsgcol 53
+  setuotitle Haz CLICK en la bolsa de almacenadores LLENOS
+  event sysmessage ================
+  event sysmessage Haz click en la bolsa de almacenadores LLENOS
+  event sysmessage ================
+  set #TARGCURS 1
+  target
+  while #TARGCURS = 1
+        {
+          wait 1
+        }
+  set %bolsa_almacenadores_llenos #LTARGETID
+  set #LOBJECTID %bolsa_almacenadores_llenos
+  event macro 17
+  gosub wait_for GUMP %bolsa_almacenadores_llenos 40
+  set %conf 2
+  set %confp 3
+  goto TESC
+}
+if %confp = 3
+{
+  set #sysmsgcol 53
+  setuotitle Haz CLICK en el contenedor de PIEZAS
+  event sysmessage ================
+  event sysmessage Haz click en la bolsa de PIEZAS
+  event sysmessage ================
+  set %conf 3
+  set #TARGCURS 1
+  target
+  while #TARGCURS = 1
+        {
+          wait 1
+        }
+  set %bolsa_amaduras #LTARGETID
+  set #LOBJECTID %bolsa_amaduras
+  event macro 17
+  gosub wait_for GUMP %bolsa_amaduras 40
+  goto TESC
+}
+
+TESC:
+  if %conf = 1
+     {
+       goto configurar
+     }
+  if %conf = 2
+     {
+       goto configurar
+     }
+  if %conf = 3
+     {
+       set #sysmsgcol 1271
+       event sysmessage EMPEZANDO!
+       wait 20
+       set %confp 1
+       ignoreitem reset bad_piezas
+       ignoreitem reset bad_packs
+       goto loop
+     }
+goto TESC
+
+
+loop:
+gosub analyce
+gosub findPack
+gosub movePackIn
+gosub grabArmor
+gosub movePackOut
+goto loop
+
+sub analyce
+set %grebas_flag #FALSE
+set %coraza_flag #FALSE
+set %brazal_flag #FALSE
+set %guante_flag #FALSE
+set %collar_flag #FALSE
+set %casco_flag #FALSE
+finditem %partes_armor C_ , %bolsa_amaduras
+if #FINDCNT > 0
+   {
+     for #FINDINDEX 1 #FINDCNT
+         {
+           if %grebas in #FINDTYPE && ! %grebas_flag
+              {
+                set %grebas_id #FINDID
+                set %grebas_flag #TRUE
+              }
+              else
+                 {
+                   if %coraza in #FINDTYPE && ! %coraza_flag
+                      {
+                        set %coraza_id #FINDID
+                        set %coraza_flag #TRUE
+                      }
+                      else
+                         {
+                           if %brazal in #FINDTYPE && ! %brazal_flag
+                              {
+                                set %brazal_id #FINDID
+                                set %brazal_flag #TRUE
+                              }
+                              else
+                                 {
+                                   if %guante in #FINDTYPE && ! %guante_flag
+                                      {
+                                        set %guante_id #FINDID
+                                        set %guante_flag #TRUE
+                                      }
+                                      else
+                                         {
+                                           if %collar in #FINDTYPE && ! %collar_flag
+                                              {
+                                                set %collar_id #FINDID
+                                                set %collar_flag #TRUE
+                                              }
+                                              else
+                                                 {
+                                                   if %casco in #FINDTYPE && ! %casco_flag
+                                                      {
+                                                        set %casco_id #FINDID
+                                                        set %casco_flag #TRUE
+                                                      }
+                                                      else
+                                                         {
+                                                           ignoreitem #FINDID bad_piezas
+                                                         }
+                                                 }
+                                         }
+                                 }
+                         }
+                 }
+           }
+         if ! %grebas_flag || ! %coraza_flag || ! %brazal_flag || ! %guante_flag || ! %collar_flag
+            {
+              goto _faltan
+            }
+            else ; OK! :-)
+               {
+                 return
+               }
+      }
+   }
+   else
+      {
+        _faltan:
+        set #SYSMSGCOL 38
+        event sysmessage PIEZAS INSUFICIENTES! :-(
+        halt
+      }
+return
+
+sub grabArmor
+gosub pickArmor %grebas_id
+gosub pickArmor %coraza_id
+gosub pickArmor %brazal_id
+gosub pickArmor %guante_id
+gosub pickArmor %collar_id
+if %casco_flag
+   {
+     gosub pickArmor %casco_id
+   }
+return
+
+sub pickArmor
+set %tmp_pieza %1
+_rePick:
+finditem %tmp_pieza C_ , %bolsa_amaduras
+if #FINDCNT > 0
+   {
+     exevent drag %tmp_pieza #FINDSTACK
+     exevent dropc %ID_almacenador
+     wait 20
+     goto _rePick
+   }
+return
+
+sub findPack
+_findPack:
+finditem %almacenadores C_ , %bolsa_almacenadores_vacios
+if #FINDCNT > 0
+   {
+     for #FINDINDEX 1 #FINDCNT
+         {
+           if #FINDCOL = %tipo_almacenador
+              {
+                set %ID_almacenador #FINDID
+                return
+              }
+              else
+                 {
+                   ignoreitem #FINDID bad_packs
+                   goto _findPack
+                 }
+         }
+   }
+   else
+      {
+        set #SYSMSGCOL 38
+        event sysmessage NO QUEDAN ALMACENADORES!
+        halt
+      }
+return
+
+sub movePackIn
+_movePackIn:
+finditem %ID_almacenador C_ , %bolsa_almacenadores_vacios
+if #FINDCNT > 0
+   {
+     exevent drag %ID_almacenador #FINDSTACK
+     exevent dropc #BACKPACKID
+     wait 20
+     goto _movePackIn
+   }
+return
+
+sub movePackOut
+_movePackOut:
+finditem %ID_almacenador C_ , #BACKPACKID
+if #FINDCNT > 0
+   {
+     exevent drag %ID_almacenador #FINDSTACK
+     exevent dropc %bolsa_almacenadores_llenos
+     wait 20
+     goto _movePackOut
+   }
+ignoreitem reset bad_piezas
+return
+
+;=================================================================
+sub wait_for
+;=================================================================
+; This "wait_for" sub package was created by Locke. If you use these subs please keep this header intact.
+; Documentation: the sub package grew to large with all the comments. To load them call the sub like this:
+; gosub wait_for docs    | or you can use doc, documention, what, or my personal favorite, kickass.
+
+; "wait_for core dispatcher" version 1.2 by Locke
+if %1 = doc || if %1 = docs || if %1 = documentation || if %1 = what || if %1 = kickass
+{
+Display ok Please click ok and wait for your browser to start.
+execute http://www.easyuo.com/forum/viewtopic.php?t=24716
+halt
+}
+nameSpace Push
+namespace local LLNS
+set #result N/A ; if #result isn't set by one of my wait_for subs it'll throw an error.
+set !LPC #lpc
+set #lpc 200
+for %i 0 %0
+set !_A . %i % . %i
+gosub wait_for_ , !_A1
+set #lpc !lpc
+namespace clear LLNS
+namespace pop
+if #result <> N/A
+return #result
+else
+display ok You specified an unknown wait_for command. Script returned #result and is halting.
+halt
+;======================================================================
+sub wait_for_GUMP ; version 1.4 ~Locke
+;=================================================================
+; Añadido #CONTID ^^
+if !_A0 < 3
+{
+display ok You haven't specified enough vars.$
++The basic format is: gosub wait_for GUMP XXX_YYY time_out_in_seconds$
++Script is halting
+halt
+}
+if !_A3 <> CLOSE
+set !_timeout #scnt2 + !_A3
+else
+set !_timeout 0 ; no gump wait if %3 = CLOSE since we already believe it to be open.
+
+_lets_wait_for_a_gump:
+if #CONTSIZE = !_A2 || #CONTKIND = !_A2 || #CONTNAME = !_A2 || #CONTTYPE = !_A2 || #CONTID = !_A2
+{
+ if !_A5 <> N/A && !_A6 <> N/A
+ {
+ set !clickx !_A5 + #contposx
+ set !clicky !_A6 + #contposy
+ click !clickx !clicky
+ }
+ if !_A3 = CLOSE || if !_A4 = CLOSE || !_A5 = CLOSE || !_A6 = CLOSE
+ {
+ set !string #contsize
+ str pos !string _
+ set !pos #strres
+ str del !string #strres #strres
+ set !clickX #contposx + ( #strres / 2 )
+ str del !string 1 !pos
+ set !clickY #contposy + ( #strres / 2 )
+ click !clickx !clicky R
+ }
+return #true
+}
+
+if ( !_timeout =< #scnt2 ) && ( !_A4 = N/A )
+   {
+     return #false
+   }
+
+if !_A4 <> N/A && !_timeout =< #scnt2
+{
+finditem !_A4
+if #findkind <> -1
+{
+ for #findindex 1 #findcnt
+ {
+  if #finddist > 2
+  ignoreitem #findid LLWAITFOR
+  else
+  break
+ }
+ set #lobjectid #findid
+ event macro 17 0
+ set !_timeout #scnt2 + !_A3
+}
+else
+return #false
+}
+wait 1
+goto _lets_wait_for_a_gump
