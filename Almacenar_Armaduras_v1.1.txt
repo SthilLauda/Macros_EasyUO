@@ -6,7 +6,7 @@
 ;   `|...|'  .||.   `|..' .||. .||    ||. `|..||. .//       \\. .||. .||. `|..||. .||  ||. /... `|..||.
 ; =====================================================================================================
 ; Author: Sthil Lauda
-; Version: 1.0
+; Version: 1.1
 ; Client Tested with: 2.0.3
 ; EUO version tested with: EasyUO 1.5 Version 243
 ; Shard: Ultima Alianza (¡Hasta la muerte!)
